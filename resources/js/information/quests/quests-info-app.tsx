@@ -8,6 +8,7 @@ import QuestInfoTreePage from './components/quest-info-tree-page';
 import PublicQuestDetailPageProps from './components/types/public-quest-detail-page-props';
 import QuestDetail from '../../game/reusable-components/quest/components/quest-detail';
 
+import Card from 'ui/cards/card';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const navigateTo =
@@ -34,17 +35,19 @@ const PublicQuestDetailPage = ({
   }
 
   return (
-    <QuestDetail
-      quest={quest}
-      navigation={{
-        on_open_quest: navigateTo('/information/quests'),
-        on_open_npc: navigateTo('/information/npcs'),
-        on_open_map: navigateTo('/information/map'),
-        on_open_item: navigateTo('/information/item'),
-        on_open_raid: navigateTo('/information/raids'),
-        on_open_passive: navigateTo('/information/passive-skill'),
-      }}
-    />
+    <Card>
+      <QuestDetail
+        quest={quest}
+        navigation={{
+          on_open_quest: navigateTo('/information/quests'),
+          on_open_npc: navigateTo('/information/npcs'),
+          on_open_map: navigateTo('/information/map'),
+          on_open_item: navigateTo('/information/item'),
+          on_open_raid: navigateTo('/information/raids'),
+          on_open_passive: navigateTo('/information/passive-skill'),
+        }}
+      />
+    </Card>
   );
 };
 

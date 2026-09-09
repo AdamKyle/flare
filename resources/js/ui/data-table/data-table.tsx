@@ -50,7 +50,7 @@ const DataTable = <TRow,>(props: DataTableProps<TRow>): ReactNode => {
   };
 
   return (
-    <div className="border-glacier-200 dark:border-glacier-800 dark:bg-glacier-950 w-full min-w-0 overflow-hidden rounded-md border bg-white">
+    <div className="w-full min-w-0 overflow-hidden rounded-md border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
       <DataTableFilters
         id_prefix={props.id_prefix}
         search_label={props.search_label}

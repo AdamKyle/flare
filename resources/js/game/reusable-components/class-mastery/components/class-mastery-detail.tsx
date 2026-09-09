@@ -43,7 +43,7 @@ const ClassMasteryDetail = ({
     ));
 
   const renderBaseFactsSection = (): ReactNode => (
-    <section className="space-y-3">
+    <section className="space-y-2">
       <Dl>
         <Dt>Class</Dt>
         <Dd>{classMastery.game_class.name}</Dd>
@@ -57,7 +57,7 @@ const ClassMasteryDetail = ({
         )}
       </Dl>
       {classMastery.description && (
-        <p className="text-glacier-800 dark:text-glacier-200">
+        <p className="text-gray-700 dark:text-gray-300">
           {classMastery.description}
         </p>
       )}
@@ -96,8 +96,8 @@ const ClassMasteryDetail = ({
     }
 
     return (
-      <section className="space-y-3">
-        <h2 className="text-glacier-900 dark:text-glacier-100 text-lg font-semibold">
+      <section className="space-y-2">
+        <h2 className="text-marigold-700 dark:text-marigold-500 text-lg font-semibold">
           Attack
         </h2>
         <Dl>
@@ -159,8 +159,8 @@ const ClassMasteryDetail = ({
   ];
 
   const renderModifiersSection = (): ReactNode => (
-    <section className="space-y-3">
-      <h2 className="text-glacier-900 dark:text-glacier-100 text-lg font-semibold">
+    <section className="space-y-2">
+      <h2 className="text-marigold-700 dark:text-marigold-500 text-lg font-semibold">
         Modifiers
       </h2>
       <Dl>{renderPercentRows(modifierRows)}</Dl>
@@ -168,8 +168,8 @@ const ClassMasteryDetail = ({
   );
 
   const renderEvasionSection = (): ReactNode => (
-    <section className="space-y-3">
-      <h2 className="text-glacier-900 dark:text-glacier-100 text-lg font-semibold">
+    <section className="space-y-2">
+      <h2 className="text-marigold-700 dark:text-marigold-500 text-lg font-semibold">
         Evasion and Reductions
       </h2>
       <Dl>{renderPercentRows(evasionRows)}</Dl>
@@ -198,7 +198,7 @@ const ClassMasteryDetail = ({
     <div className="flex flex-col">
       {sections.map((section, index) => (
         <Fragment key={section.key}>
-          {index > 0 && <Separator additional_css="my-4" />}
+          {index > 0 && <Separator additional_css="my-0" />}
           {section.content}
         </Fragment>
       ))}

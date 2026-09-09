@@ -4,13 +4,14 @@ namespace Tests\Unit\Game\Character\CharacterInventory\Services;
 
 use App\Flare\Models\AlchemyBagSlot;
 use App\Game\Automation\Values\AutomationType;
+use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Character\CharacterAttack\Events\UpdateCharacterAttackEvent;
 use App\Game\Character\CharacterInventory\Events\CharacterBoonsUpdateBroadcastEvent;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\UseItemService;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
+use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Values\SkillTypeValue;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -81,10 +82,11 @@ class UseItemServiceTest extends TestCase
         $this->assertEquals(200, $result['status']);
         $this->assertEquals('Used selected item.', $result['message']);
 
-        Event::assertDispatched(UpdateCharacterAttackEvent::class);
-        Event::assertDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateCharacterAttackEvent::class);
+        Event::assertNotDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateBaseCharacterInformation::class);
         Event::assertDispatched(CharacterBoonsUpdateBroadcastEvent::class);
-        Event::assertDispatchedTimes(UpdateBaseCharacterInformation::class, 1);
+        Queue::assertPushed(CharacterAttackTypesCacheBuilder::class, 1);
 
         $this->assertNotEmpty($character->boons);
         $this->assertEquals(0, AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag->id)->where('item_id', $item->id)->count());
@@ -320,6 +322,7 @@ class UseItemServiceTest extends TestCase
     public function test_remove_boon_from_character()
     {
         Queue::fake();
+        Event::fake();
 
         $item = $this->createItem([
             'usable' => true,
@@ -342,61 +345,11 @@ class UseItemServiceTest extends TestCase
 
         $this->assertEmpty($character->boons);
         $this->assertNull($character->inventory->slots->where('item.type', 'alchemy')->first());
-    }
 
-    public function test_update_character_based_on_item_used()
-    {
-        Queue::fake();
-        Event::fake();
-
-        $item = $this->createItem([
-            'usable' => true,
-            'lasts_for' => 30,
-            'type' => 'alchemy',
-            'affects_skill_type' => SkillTypeValue::TRAINING,
-        ]);
-
-        $character = (new CharacterFactory)->createBaseCharacter()
-            ->givePlayerLocation()
-            ->inventoryManagement()
-            ->giveItem($item)
-            ->getCharacter();
-
-        $this->useItemService->useItem($character->inventory->slots->where('item.type', 'alchemy')->first(), $character);
-
-        $this->useItemService->updateCharacter($character->refresh(), $item);
-
-        Event::assertDispatched(UpdateBaseCharacterInformation::class);
-        Event::assertDispatched(UpdateTopBarEvent::class);
-        Event::assertDispatched(ServerMessageEvent::class);
+        Queue::assertPushed(CharacterAttackTypesCacheBuilder::class, 1);
         Event::assertDispatched(CharacterBoonsUpdateBroadcastEvent::class);
-    }
-
-    public function test_update_character_based_on_item_used_when_item_does_not_affect_skills()
-    {
-        Queue::fake();
-        Event::fake();
-
-        $item = $this->createItem([
-            'usable' => true,
-            'lasts_for' => 30,
-            'type' => 'alchemy',
-        ]);
-
-        $character = (new CharacterFactory)->createBaseCharacter()
-            ->givePlayerLocation()
-            ->inventoryManagement()
-            ->giveItem($item)
-            ->getCharacter();
-
-        $this->useItemService->useItem($character->inventory->slots->where('item.type', 'alchemy')->first(), $character);
-
-        $this->useItemService->updateCharacter($character->refresh(), $item);
-
-        Event::assertDispatched(UpdateBaseCharacterInformation::class);
-        Event::assertDispatched(UpdateTopBarEvent::class);
-        Event::assertDispatched(ServerMessageEvent::class);
-        Event::assertDispatched(CharacterBoonsUpdateBroadcastEvent::class);
+        Event::assertNotDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateBaseCharacterInformation::class);
     }
 
     public function test_character_boons_stack_when_the_same_item_is_found_and_used()
@@ -427,9 +380,10 @@ class UseItemServiceTest extends TestCase
         $this->assertEquals(200, $result['status']);
         $this->assertEquals('Used selected items.', $result['message']);
 
-        Event::assertDispatched(UpdateCharacterAttackEvent::class);
-        Event::assertDispatched(UpdateTopBarEvent::class);
-        Event::assertDispatchedTimes(UpdateBaseCharacterInformation::class, 1);
+        Event::assertNotDispatched(UpdateCharacterAttackEvent::class);
+        Event::assertNotDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateBaseCharacterInformation::class);
+        Queue::assertPushed(CharacterAttackTypesCacheBuilder::class, 1);
 
         $character = $character->refresh();
 
@@ -467,8 +421,9 @@ class UseItemServiceTest extends TestCase
         $this->assertEquals(200, $result['status']);
         $this->assertEquals('Used selected items. Some items were not able to be used because of the amount of boons you have. You can check your Alchemy Bag to see which ones are left.', $result['message']);
 
-        Event::assertDispatched(UpdateCharacterAttackEvent::class);
-        Event::assertDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateCharacterAttackEvent::class);
+        Event::assertNotDispatched(UpdateTopBarEvent::class);
+        Queue::assertPushed(CharacterAttackTypesCacheBuilder::class, 1);
 
         $boons = $character->boons;
 
@@ -508,8 +463,9 @@ class UseItemServiceTest extends TestCase
         $this->assertEquals(200, $result['status']);
         $this->assertEquals('Used selected items. Some items were not able to be used because of the amount of boons you have. You can check your Alchemy Bag to see which ones are left.', $result['message']);
 
-        Event::assertDispatched(UpdateCharacterAttackEvent::class);
-        Event::assertDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateCharacterAttackEvent::class);
+        Event::assertNotDispatched(UpdateTopBarEvent::class);
+        Queue::assertPushed(CharacterAttackTypesCacheBuilder::class, 1);
 
         $boons = $character->boons;
 
@@ -560,8 +516,9 @@ class UseItemServiceTest extends TestCase
         $this->assertEquals(200, $result['status']);
         $this->assertEquals('Used selected items. Some items were not able to be used because of the amount of boons you have. You can check your Alchemy Bag to see which ones are left.', $result['message']);
 
-        Event::assertDispatched(UpdateCharacterAttackEvent::class);
-        Event::assertDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateCharacterAttackEvent::class);
+        Event::assertNotDispatched(UpdateTopBarEvent::class);
+        Queue::assertPushed(CharacterAttackTypesCacheBuilder::class, 1);
 
         $boons = $character->boons;
 
@@ -700,8 +657,9 @@ class UseItemServiceTest extends TestCase
         $this->assertEquals(200, $result['status']);
         $this->assertEquals('Used selected items.', $result['message']);
 
-        Event::assertDispatched(UpdateCharacterAttackEvent::class);
-        Event::assertDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateCharacterAttackEvent::class);
+        Event::assertNotDispatched(UpdateTopBarEvent::class);
+        Queue::assertPushed(CharacterAttackTypesCacheBuilder::class, 1);
 
         $boons = $character->boons;
 
@@ -831,6 +789,7 @@ class UseItemServiceTest extends TestCase
         Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
 
         Queue::fake();
+        Event::fake();
 
         $item = $this->createItem([
             'usable' => true,
@@ -868,6 +827,12 @@ class UseItemServiceTest extends TestCase
         $this->assertEquals('2026-01-01 20:00:00', $boon->refresh()->complete->toDateTimeString());
         $this->assertEquals(480, $boon->last_for_minutes);
         $this->assertEquals(10, $boon->amount_used);
+
+        Queue::assertPushed(CharacterAttackTypesCacheBuilder::class, 1);
+        Event::assertDispatched(CharacterBoonsUpdateBroadcastEvent::class);
+        Event::assertDispatched(UpdateCharacterInventoryCountEvent::class);
+        Event::assertNotDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateBaseCharacterInformation::class);
     }
 
     public function test_filling_up_boon_deletes_alchemy_bag_slot_row_when_amount_reaches_zero(): void

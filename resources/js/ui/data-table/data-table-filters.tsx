@@ -41,7 +41,7 @@ const DataTableFilters = ({
       <div key={filter.key} className="w-full md:w-56">
         <label
           htmlFor={filterId}
-          className="text-glacier-700 dark:text-glacier-300 mb-1 block text-xs font-semibold uppercase"
+          className="mb-1 block text-xs font-semibold text-gray-700 uppercase dark:text-gray-300"
         >
           {filter.label}
         </label>
@@ -71,11 +71,11 @@ const DataTableFilters = ({
   };
 
   return (
-    <div className="border-glacier-200 bg-glacier-50 dark:border-glacier-800 dark:bg-glacier-900 flex flex-col gap-4 border-b p-4 md:flex-row md:flex-wrap md:items-end">
+    <div className="flex flex-col gap-4 border-b border-gray-200 bg-gray-50 p-4 md:flex-row md:flex-wrap md:items-end dark:border-gray-700 dark:bg-gray-800">
       <div className={clsx('w-full', hasFilters ? 'md:w-80' : 'md:flex-1')}>
         <label
           htmlFor={searchId}
-          className="text-glacier-700 dark:text-glacier-300 mb-1 block text-xs font-semibold uppercase"
+          className="mb-1 block text-xs font-semibold text-gray-700 uppercase dark:text-gray-300"
         >
           {search_label}
         </label>

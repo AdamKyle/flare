@@ -20,13 +20,13 @@ import Separator from 'ui/separator/separator';
 
 const stateSurfaceStyles: Record<ClassRankVisualState, string> = {
   [ClassRankVisualState.CURRENT]:
-    'border-danube-200 bg-danube-50/70 dark:border-danube-800/70 dark:bg-danube-950/20',
+    'border-danube-300 bg-danube-50 dark:border-danube-500 dark:bg-danube-100',
   [ClassRankVisualState.MASTERED]:
-    'border-de-york-200 bg-de-york-50/70 dark:border-de-york-800/70 dark:bg-de-york-950/30',
+    'border-de-york-300 bg-de-york-50 dark:border-de-york-500 dark:bg-de-york-100',
   [ClassRankVisualState.UNLOCKED]:
-    'border-glacier-200 bg-glacier-50/70 dark:border-glacier-800/70 dark:bg-glacier-950/30',
+    'border-glacier-300 bg-glacier-50 dark:border-glacier-500 dark:bg-glacier-100',
   [ClassRankVisualState.LOCKED]:
-    'border-mango-tango-200 bg-mango-tango-50/70 dark:border-mango-tango-800/70 dark:bg-mango-tango-950/30',
+    'border-mango-tango-300 bg-mango-tango-50 dark:border-mango-tango-500 dark:bg-mango-tango-100',
 };
 
 const ClassRankDetailContent = ({
@@ -38,6 +38,7 @@ const ClassRankDetailContent = ({
   on_switch_class: onSwitchClass,
   on_open_class: onOpenClass,
   on_open_specialty: onOpenSpecialty,
+  switch_class_action_in_footer: switchClassActionInFooter = false,
 }: ClassRankDetailContentProps): ReactNode => {
   const visualState = resolveClassRankVisualState(selectedRank);
   const progressVariant = resolveClassRankProgressVariant(visualState);
@@ -101,7 +102,7 @@ const ClassRankDetailContent = ({
 
     return (
       <div className="flex flex-col gap-2">
-        <h3 className="text-glacier-900 dark:text-glacier-100 text-sm font-semibold tracking-wide uppercase">
+        <h3 className="text-sm font-semibold tracking-wide text-gray-800 uppercase dark:text-gray-200">
           Weapon Masteries
         </h3>
         <InfiniteScroll
@@ -130,7 +131,7 @@ const ClassRankDetailContent = ({
 
     return (
       <div className="flex flex-col gap-2">
-        <h3 className="text-glacier-900 dark:text-glacier-100 text-sm font-semibold tracking-wide uppercase">
+        <h3 className="text-sm font-semibold tracking-wide text-gray-800 uppercase dark:text-gray-200">
           Class Specialties
         </h3>
         <InfiniteScroll
@@ -158,6 +159,12 @@ const ClassRankDetailContent = ({
       return null;
     }
 
+    if (switchClassActionInFooter) {
+      return switchError ? (
+        <Alert variant={AlertVariant.DANGER}>{switchError}</Alert>
+      ) : null;
+    }
+
     return (
       <div className="flex flex-col gap-2">
         {switchError && (
@@ -178,11 +185,13 @@ const ClassRankDetailContent = ({
 
   const hasWeaponMasteries = selectedRank.weapon_masteries.length > 0;
   const hasSpecialties = belongingSpecialties.length > 0;
-  const hasSwitchClass = !selectedRank.is_active;
+  const hasSwitchClass = switchClassActionInFooter
+    ? !selectedRank.is_active && Boolean(switchError)
+    : !selectedRank.is_active;
 
   return (
-    <div className="flex flex-col gap-4">
-      <h2 className="text-glacier-900 dark:text-glacier-100 text-xl font-bold">
+    <div className="flex flex-col">
+      <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
         {selectedRank.class_name}
       </h2>
 
@@ -190,6 +199,8 @@ const ClassRankDetailContent = ({
         game_class={selectedRank.class_detail}
         on_open_class={onOpenClass}
       />
+
+      <Separator additional_css="my-0" />
 
       <div
         className={`flex flex-col gap-2 rounded-lg border p-3 ${stateSurfaceStyles[visualState]}`}

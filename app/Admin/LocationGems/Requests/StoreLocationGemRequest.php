@@ -3,13 +3,15 @@
 namespace App\Admin\LocationGems\Requests;
 
 use App\Admin\LocationGems\Rules\EligibleLocationGemLocation;
+use App\Admin\Requests\Concerns\HasGemRangeValidation;
 use App\Game\Gems\Values\GemTypeValue;
-use Closure;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class StoreLocationGemRequest extends FormRequest
 {
+    use HasGemRangeValidation;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -47,7 +49,7 @@ class StoreLocationGemRequest extends FormRequest
     /**
      * Return every range field managed by the Location Gem form.
      */
-    private function rangeFields(): array
+    protected function rangeFields(): array
     {
         return [
             'character_xp_bonus_range',
@@ -78,27 +80,6 @@ class StoreLocationGemRequest extends FormRequest
             'monster_xp_increase_range',
             'monster_gold_drop_increase_range',
             'monster_atonement_range',
-        ];
-    }
-
-    /**
-     * Build the Location Gem range-field validation rule.
-     */
-    private function rangeRule(): array
-    {
-        return [
-            'nullable',
-            'string',
-            'max:255',
-            function (string $attribute, mixed $value, Closure $fail): void {
-                if (is_null($value) || trim($value) === '') {
-                    return;
-                }
-
-                if (preg_match('/^\d+(?:\.\d+)?-\d+(?:\.\d+)?$/', $value) !== 1) {
-                    $fail('The range must contain exactly two nonnegative numeric values separated by a hyphen.');
-                }
-            },
         ];
     }
 }

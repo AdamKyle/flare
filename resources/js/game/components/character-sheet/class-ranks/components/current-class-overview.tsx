@@ -9,6 +9,7 @@ import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
 import { ProgressBarSize } from 'ui/progress/enums/progress-bar-size';
 import { ProgressBarVariant } from 'ui/progress/enums/progress-bar-variant';
 import ProgressBar from 'ui/progress/progress-bar';
+import Separator from 'ui/separator/separator';
 
 const CurrentClassOverview = ({
   active_rank: activeRank,
@@ -35,7 +36,7 @@ const CurrentClassOverview = ({
     }
 
     return (
-      <span className="bg-de-york-100 text-de-york-800 dark:bg-de-york-900/40 dark:text-de-york-200 inline-flex self-start rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap">
+      <span className="bg-de-york-200 text-de-york-900 dark:bg-de-york-200 dark:text-de-york-900 inline-flex self-start rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap">
         Mastered
       </span>
     );
@@ -74,7 +75,7 @@ const CurrentClassOverview = ({
 
     return (
       <div className="flex flex-col gap-2">
-        <h3 className="text-glacier-900 dark:text-glacier-100 text-sm font-semibold tracking-wide uppercase">
+        <h3 className="text-glacier-900 dark:text-glacier-300 text-sm font-semibold tracking-wide uppercase">
           Weapon Masteries
         </h3>
         <InfiniteScroll
@@ -96,32 +97,38 @@ const CurrentClassOverview = ({
     );
   };
 
+  const hasWeaponMasteries = activeRank.weapon_masteries.length > 0;
+
   return (
-    <div className="border-danube-300 bg-danube-50/70 dark:border-danube-700 dark:bg-danube-950/20 flex flex-col gap-4 rounded-lg border-l-2 p-4">
+    <div className="border-danube-300 dark:border-danube-500 flex flex-col gap-4 rounded-lg border-l-2 p-4">
       <div>
-        <span className="text-glacier-600 dark:text-glacier-400 text-xs font-semibold tracking-wide uppercase">
+        <span className="text-danube-700 dark:text-danube-300 text-xs font-semibold tracking-wide uppercase">
           Current Class
         </span>
         <button
           type="button"
           onClick={onOpenClass}
           aria-label={`View ${activeRank.class_name} Class details`}
-          className="text-danube-800 hover:text-danube-600 focus-visible:ring-danube-500 dark:text-danube-200 dark:hover:text-danube-100 block w-full rounded-sm text-left text-2xl font-bold transition-colors focus:outline-none focus-visible:ring-2"
+          className="text-danube-900 hover:text-danube-700 focus-visible:ring-danube-500 dark:text-danube-300 dark:hover:text-danube-200 block w-full rounded-sm text-left text-2xl font-bold transition-colors focus:outline-none focus-visible:ring-2"
         >
           {activeRank.class_name}
         </button>
       </div>
 
       {activeRank.class_detail.description && (
-        <p className="text-glacier-800 dark:text-glacier-200 text-sm">
+        <p className="text-danube-900 dark:text-danube-300 text-sm">
           {activeRank.class_detail.description}
         </p>
       )}
+
+      <Separator />
 
       <div className="flex flex-col gap-2">
         {renderMasteredBadge()}
         {renderLevelProgress()}
       </div>
+
+      <Separator />
 
       <EquippedSpecialtiesSummary
         specialties_equipped={specialtiesEquipped}
@@ -129,6 +136,8 @@ const CurrentClassOverview = ({
         on_open_specialty={onOpenSpecialty}
         on_manage_specialties={onManageSpecialties}
       />
+
+      {hasWeaponMasteries && <Separator />}
 
       {renderWeaponMasteries()}
     </div>

@@ -1,9 +1,15 @@
+import clsx from 'clsx';
 import React, { ReactNode } from 'react';
 
 import CompactWeaponMasteryProps from './types/compact-weapon-mastery-props';
 
 import { ProgressBarSize } from 'ui/progress/enums/progress-bar-size';
 import ProgressBar from 'ui/progress/progress-bar';
+import {
+  cardMutedTextVariantStyles,
+  cardSurfaceVariantStyles,
+  cardTextVariantStyles,
+} from 'ui/progress/styles/progress-bar/card-variant-styles';
 
 const formatWeaponType = (weaponType: string): string =>
   weaponType
@@ -42,12 +48,27 @@ const CompactWeaponMastery = ({
   };
 
   return (
-    <div className="bg-glacier-50/60 dark:bg-glacier-950/20 rounded-md px-3 py-2">
+    <div
+      className={clsx(
+        'rounded-md border px-3 py-2',
+        cardSurfaceVariantStyles(progressVariant)
+      )}
+    >
       <div className="mb-1 flex flex-wrap items-baseline justify-between gap-1">
-        <span className="text-glacier-900 dark:text-glacier-100 text-sm font-semibold">
+        <span
+          className={clsx(
+            'text-sm font-semibold',
+            cardTextVariantStyles(progressVariant)
+          )}
+        >
           {weaponMastery.mastery_name}
         </span>
-        <span className="text-glacier-600 dark:text-glacier-400 text-xs">
+        <span
+          className={clsx(
+            'text-xs',
+            cardMutedTextVariantStyles(progressVariant)
+          )}
+        >
           {formatWeaponType(weaponMastery.weapon_type)}
         </span>
       </div>

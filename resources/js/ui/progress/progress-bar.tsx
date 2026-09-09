@@ -6,6 +6,7 @@ import {
   baseFillStyles,
   baseTrackStyles,
 } from './styles/progress-bar/base-styles';
+import { cardMutedTextVariantStyles } from './styles/progress-bar/card-variant-styles';
 import { fillVariantStyles } from './styles/progress-bar/fill-variant-styles';
 import { trackVariantStyles } from './styles/progress-bar/track-variant-styles';
 import ProgressBarProps from './types/progress-bar-props';
@@ -25,7 +26,12 @@ const ProgressBar = (props: ProgressBarProps): ReactNode => {
 
   return (
     <div className={clsx('w-full', props.additional_css)}>
-      <div className="mb-1 flex justify-between text-sm font-medium text-gray-700 dark:text-gray-300">
+      <div
+        className={clsx(
+          'mb-1 flex justify-between text-sm font-medium',
+          cardMutedTextVariantStyles(props.variant)
+        )}
+      >
         <span id={labelId}>{props.label}</span>
         {props.value_label !== undefined && <span>{props.value_label}</span>}
       </div>

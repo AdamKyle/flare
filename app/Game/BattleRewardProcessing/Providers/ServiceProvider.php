@@ -21,7 +21,6 @@ use App\Game\BattleRewardProcessing\Services\CharacterXPService;
 use App\Game\BattleRewardProcessing\Services\FactionLoyaltyRewardRequestService;
 use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
-use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\ClassRanks\Services\ClassRankService;
 use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Chance\RandomNumberGenerator;
@@ -41,7 +40,6 @@ use App\Game\GuideQuests\Services\GuideQuestService;
 use App\Game\Skills\Services\SkillService;
 use App\Game\Tops\Services\BroadcastTopsUpdateService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
-use League\Fractal\Manager;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
@@ -60,8 +58,6 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(CharacterXPService::class, fn ($app) => new CharacterXPService(
             $app->make(CharacterService::class),
             $app->make(SkillService::class),
-            $app->make(Manager::class),
-            $app->make(CharacterSheetBaseInfoTransformer::class),
             $app->make(BattleMessageHandler::class),
             $app->make(AreaGemEffectService::class),
         ));

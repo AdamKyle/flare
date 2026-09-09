@@ -5,4 +5,5 @@ export default interface AdminAnchorButtonProps {
   label: string;
   variant: ButtonVariant;
   aria_label?: string;
+  additional_css?: string;
 }

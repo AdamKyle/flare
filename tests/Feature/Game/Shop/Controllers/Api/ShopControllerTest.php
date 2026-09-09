@@ -33,7 +33,7 @@ class ShopControllerTest extends TestCase
 
     public function test_visit_shop_returns_standard_paginated_response_shape(): void
     {
-        $this->createItem(['type' => 'shield', 'cost' => 100]);
+        $item = $this->createItem(['type' => 'shield', 'cost' => 100]);
 
         $response = $this->actingAs($this->character->user)
             ->getJson('/api/character/'.$this->character->id.'/visit-shop?per_page=10&page=1&search_text=&filters[type]=shield');
@@ -44,6 +44,8 @@ class ShopControllerTest extends TestCase
         $this->assertArrayHasKey('data', $data);
         $this->assertArrayHasKey('can_load_more', $data['meta']);
         $this->assertSame(100, $data['data'][0]['cost']);
+        $this->assertSame($item->id, $data['data'][0]['id']);
+        $this->assertSame($item->id, $data['data'][0]['item_id']);
     }
 
     public function test_visit_shop_filters_by_type_filter_param(): void
@@ -76,71 +78,78 @@ class ShopControllerTest extends TestCase
         $this->assertSame(100, $data['data'][1]['cost']);
     }
 
-    public function test_buy_redirects_with_error_when_character_has_no_gold(): void
+    public function test_buy_returns_error_when_character_has_no_gold(): void
     {
         $this->character->update(['gold' => 0]);
         $item = $this->createItem(['cost' => 100]);
 
         $response = $this->actingAs($this->character->user)
-            ->from('/game')
             ->call('POST', '/api/shop/buy/item/'.$this->character->id, ['item_id' => $item->id]);
 
-        $response->assertRedirect('/game');
-        $response->assertSessionHas('error', 'You do not have enough gold.');
+        $response->assertStatus(422);
+        $response->assertJson(['message' => 'You do not have enough gold.']);
     }
 
-    public function test_buy_redirects_with_error_when_item_not_found(): void
+    public function test_buy_returns_error_when_item_not_found(): void
     {
         $this->character->update(['gold' => 1000]);
 
         $response = $this->actingAs($this->character->user)
-            ->from('/game')
             ->call('POST', '/api/shop/buy/item/'.$this->character->id, ['item_id' => 999999]);
 
-        $response->assertRedirect('/game');
-        $response->assertSessionHas('error', 'Item not found.');
+        $response->assertStatus(422);
+        $response->assertJson(['message' => 'Item not found.']);
     }
 
-    public function test_buy_redirects_with_error_when_not_enough_gold_for_item(): void
+    public function test_buy_returns_error_when_not_enough_gold_for_item(): void
     {
         $this->character->update(['gold' => 50]);
         $item = $this->createItem(['cost' => 100]);
 
         $response = $this->actingAs($this->character->user)
-            ->from('/game')
             ->call('POST', '/api/shop/buy/item/'.$this->character->id, ['item_id' => $item->id]);
 
-        $response->assertRedirect('/game');
-        $response->assertSessionHas('error', 'You do not have enough gold.');
+        $response->assertStatus(422);
+        $response->assertJson(['message' => 'You do not have enough gold.']);
     }
 
     public function test_buy_purchases_item_successfully(): void
     {
-        Event::fake();
-
         $this->character->update(['gold' => 1000]);
         $item = $this->createItem(['cost' => 100, 'type' => 'shield']);
 
+        $shopListResponse = $this->actingAs($this->character->user)
+            ->getJson('/api/character/'.$this->character->id.'/visit-shop?per_page=10&page=1&search_text=&filters[type]=shield');
+
+        $shopListData = json_decode($shopListResponse->getContent(), true);
+        $listedItemId = $shopListData['data'][0]['item_id'];
+
         $response = $this->actingAs($this->character->user)
-            ->call('POST', '/api/shop/buy/item/'.$this->character->id, ['item_id' => $item->id]);
+            ->call('POST', '/api/shop/buy/item/'.$this->character->id, ['item_id' => $listedItemId]);
 
         $jsonData = json_decode($response->getContent(), true);
 
         $response->assertOk();
+        $this->assertSame($item->id, $listedItemId);
         $this->assertStringStartsWith('Purchased:', $jsonData['message']);
+        $this->assertSame(900, $jsonData['gold']);
+        $this->assertSame(
+            $this->character->refresh()->inventory_max,
+            $jsonData['inventory_count']['inventory_max']
+        );
+        $this->assertSame(1, $jsonData['inventory_count']['inventory_count']);
     }
 
-    public function test_buy_redirects_with_error_when_inventory_is_full(): void
+    public function test_buy_returns_error_when_inventory_is_full(): void
     {
         $this->character->update(['gold' => 1000, 'inventory_max' => 0]);
         $item = $this->createItem(['cost' => 100]);
 
         $response = $this->actingAs($this->character->user)
-            ->from('/game')
             ->call('POST', '/api/shop/buy/item/'.$this->character->id, ['item_id' => $item->id]);
 
-        $response->assertRedirect('/game');
-        $response->assertSessionHas('error', 'Inventory is full. Please make room.');
+        $response->assertStatus(422);
+        $response->assertJson(['message' => 'Inventory is full. Please make room.']);
     }
 
     public function test_buy_applies_merchant_discount_and_purchases_successfully(): void
@@ -262,12 +271,17 @@ class ShopControllerTest extends TestCase
             'amount' => 2,
         ]);
 
+        $jsonData = json_decode($response->getContent(), true);
+
         $response->assertStatus(200);
         $this->assertSame(800, $this->character->refresh()->gold);
         $this->assertSame(2, $this->character->inventory->slots()->where('item_id', $item->id)->count());
+        $this->assertSame(800, $jsonData['gold']);
+        $this->assertSame(2, $jsonData['inventory_count']['inventory_count']);
+        $this->assertSame($this->character->inventory_max, $jsonData['inventory_count']['inventory_max']);
     }
 
-    public function test_purchase_multiple_redirects_with_error_when_amount_exceeds_inventory_space(): void
+    public function test_purchase_multiple_returns_error_when_amount_exceeds_inventory_space(): void
     {
         $this->character->update(['gold' => 100000, 'inventory_max' => 1]);
         $item = $this->createItem(['cost' => 100]);
@@ -277,11 +291,11 @@ class ShopControllerTest extends TestCase
             'amount' => 5,
         ]);
 
-        $response->assertStatus(302);
-        $response->assertSessionHas('error', 'You cannot purchase more then you have inventory space.');
+        $response->assertStatus(422);
+        $response->assertJson(['message' => 'You cannot purchase more then you have inventory space.']);
     }
 
-    public function test_purchase_multiple_redirects_with_error_when_not_enough_gold(): void
+    public function test_purchase_multiple_returns_error_when_not_enough_gold(): void
     {
         $this->character->update(['gold' => 10, 'inventory_max' => 200]);
         $item = $this->createItem(['cost' => 100]);
@@ -291,8 +305,8 @@ class ShopControllerTest extends TestCase
             'amount' => 2,
         ]);
 
-        $response->assertStatus(302);
-        $response->assertSessionHas('error', 'You do not have enough gold.');
+        $response->assertStatus(422);
+        $response->assertJson(['message' => 'You do not have enough gold.']);
     }
 
     public function test_purchase_multiple_applies_merchant_discount_and_purchases_successfully(): void
@@ -311,12 +325,11 @@ class ShopControllerTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_buy_and_replace_redirects_with_error_when_item_is_craft_only(): void
+    public function test_buy_and_replace_returns_error_when_item_is_craft_only(): void
     {
         $item = $this->createItem(['type' => 'shield', 'craft_only' => true, 'cost' => 100]);
 
         $response = $this->actingAs($this->character->user)
-            ->from('/game')
             ->call('POST', '/api/shop/buy-and-replace/'.$this->character->id, [
                 'item_id_to_buy' => $item->id,
                 'position' => 'left-hand',
@@ -324,8 +337,8 @@ class ShopControllerTest extends TestCase
                 'equip_type' => 'shield',
             ]);
 
-        $response->assertRedirect('/game');
-        $response->assertSessionHas('error', 'You are not capable of affording such luxury, child!');
+        $response->assertStatus(422);
+        $response->assertJson(['message' => 'You are not capable of affording such luxury, child!']);
     }
 
     public function test_buy_and_replace_returns_error_when_not_enough_gold(): void
@@ -403,9 +416,13 @@ class ShopControllerTest extends TestCase
 
         $response->assertOk();
         $this->assertStringStartsWith('Purchased and equipped:', $jsonData['message']);
+        $this->assertSame(99900, $jsonData['gold']);
+        $this->assertArrayHasKey('inventory_max', $jsonData['inventory_count']);
+        $this->assertArrayHasKey('inventory_count', $jsonData['inventory_count']);
 
         $character = $character->refresh();
 
+        $this->assertSame(99900, $character->gold);
         $this->assertNotNull($character->inventory->slots->first(function ($slot) use ($newShield) {
             return $slot->item_id === $newShield->id && $slot->equipped;
         }));

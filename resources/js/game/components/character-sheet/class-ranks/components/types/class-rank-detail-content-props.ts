@@ -11,4 +11,5 @@ export default interface ClassRankDetailContentProps {
   on_switch_class: (gameClassId: number) => void;
   on_open_class: (gameClassId: number) => void;
   on_open_specialty: (gameClassSpecialId: number) => void;
+  switch_class_action_in_footer?: boolean;
 }

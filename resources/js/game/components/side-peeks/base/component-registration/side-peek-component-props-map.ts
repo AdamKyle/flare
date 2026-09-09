@@ -17,15 +17,18 @@ import GameMapRelatedNpcsSidePeekProps from '../../../../../admin/game-maps/comp
 import GameMapRelatedQuestItemsSidePeekProps from '../../../../../admin/game-maps/components/side-peeks/types/game-map-related-quest-items-side-peek-props';
 import GameMapRelatedQuestsSidePeekProps from '../../../../../admin/game-maps/components/side-peeks/types/game-map-related-quests-side-peek-props';
 import AdminItemDetailSidePeekProps from '../../../../../admin/items/components/side-peeks/types/admin-item-detail-side-peek-props';
+import ItemExportSidePeekProps from '../../../../../admin/items/components/side-peeks/types/item-export-side-peek-props';
 import ItemFormSidePeekProps from '../../../../../admin/items/components/side-peeks/types/item-form-side-peek-props';
 import ItemImportSidePeekProps from '../../../../../admin/items/components/side-peeks/types/item-import-side-peek-props';
 import AdminLocationGemDetailSidePeekProps from '../../../../../admin/location-gems/components/side-peeks/types/admin-location-gem-detail-side-peek-props';
+import AdminLocationGemRollDetailSidePeekProps from '../../../../../admin/location-gems/components/side-peeks/types/admin-location-gem-roll-detail-side-peek-props';
 import LocationGemBulkRollResultSidePeekProps from '../../../../../admin/location-gems/components/side-peeks/types/location-gem-bulk-roll-result-side-peek-props';
 import LocationGemImportSidePeekProps from '../../../../../admin/location-gems/components/side-peeks/types/location-gem-import-side-peek-props';
 import AdminLocationDetailSidePeekProps from '../../../../../admin/locations/components/side-peeks/types/admin-location-detail-side-peek-props';
 import LocationFormSidePeekProps from '../../../../../admin/locations/components/side-peeks/types/location-form-side-peek-props';
 import LocationImportSidePeekProps from '../../../../../admin/locations/components/side-peeks/types/location-import-side-peek-props';
 import AdminMapGemDetailSidePeekProps from '../../../../../admin/map-gems/components/side-peeks/types/admin-map-gem-detail-side-peek-props';
+import AdminMapGemRollDetailSidePeekProps from '../../../../../admin/map-gems/components/side-peeks/types/admin-map-gem-roll-detail-side-peek-props';
 import MapGemBulkRollResultSidePeekProps from '../../../../../admin/map-gems/components/side-peeks/types/map-gem-bulk-roll-result-side-peek-props';
 import MapGemImportSidePeekProps from '../../../../../admin/map-gems/components/side-peeks/types/map-gem-import-side-peek-props';
 import BugReportSidePeekProps from '../../../../../admin/monitoring/logs-dashboard/components/side-peeks/types/bug-report-side-peek-props';
@@ -99,6 +102,7 @@ export type SidePeekComponentPropsMap = {
   [SidePeekComponentRegistrationEnum.ADMIN_ITEM_DETAIL]: AdminItemDetailSidePeekProps;
   [SidePeekComponentRegistrationEnum.ADMIN_ITEM_FORM]: ItemFormSidePeekProps;
   [SidePeekComponentRegistrationEnum.ADMIN_ITEM_IMPORT]: ItemImportSidePeekProps;
+  [SidePeekComponentRegistrationEnum.ADMIN_ITEM_EXPORT]: ItemExportSidePeekProps;
   [SidePeekComponentRegistrationEnum.ADMIN_QUEST_DETAIL]: AdminQuestDetailSidePeekProps;
   [SidePeekComponentRegistrationEnum.ADMIN_MONSTER_DETAIL]: AdminMonsterDetailSidePeekProps;
   [SidePeekComponentRegistrationEnum.ADMIN_CLASS_IMPORT]: ClassImportSidePeekProps;
@@ -107,8 +111,10 @@ export type SidePeekComponentPropsMap = {
   [SidePeekComponentRegistrationEnum.ADMIN_MAP_GEM_IMPORT]: MapGemImportSidePeekProps;
   [Registration.ADMIN_MAP_GEM_DETAIL]: AdminMapGemDetailSidePeekProps;
   [Registration.ADMIN_MAP_GEM_BULK_ROLL_RESULT]: MapGemBulkRollResultSidePeekProps;
+  [Registration.ADMIN_MAP_GEM_ROLL_DETAIL]: AdminMapGemRollDetailSidePeekProps;
   [SidePeekComponentRegistrationEnum.ADMIN_LOCATION_GEM_IMPORT]: LocationGemImportSidePeekProps;
   [Registration.ADMIN_LOCATION_GEM_DETAIL]: AdminLocationGemDetailSidePeekProps;
   [Registration.ADMIN_LOCATION_GEM_BULK_ROLL_RESULT]: LocationGemBulkRollResultSidePeekProps;
+  [Registration.ADMIN_LOCATION_GEM_ROLL_DETAIL]: AdminLocationGemRollDetailSidePeekProps;
   // Future components go here
 };

@@ -18,28 +18,10 @@ const MonsterSpellSection = ({ monster }: MonsterDetailProps): ReactNode => {
     { label: 'Max Affix Damage', value: spells.max_affix_damage ?? 0 },
   ].filter((row) => row.value !== 0);
 
-  const percentRows: { label: string; value: number }[] = [
-    { label: 'Casting Accuracy', value: spells.casting_accuracy ?? 0 },
-    { label: 'Spell Evasion', value: spells.spell_evasion ?? 0 },
-    { label: 'Affix Resistance', value: spells.affix_resistance ?? 0 },
-    { label: 'Healing Percentage', value: spells.healing_percentage ?? 0 },
-    { label: 'Entrancing Chance', value: spells.entrancing_chance ?? 0 },
-    {
-      label: 'Devouring Light Chance',
-      value: spells.devouring_light_chance ?? 0,
-    },
-    {
-      label: 'Devouring Darkness Chance',
-      value: spells.devouring_darkness_chance ?? 0,
-    },
-    {
-      label: 'Life Stealing Resistance',
-      value: spells.life_stealing_resistance ?? 0,
-    },
-  ].filter((row) => row.value !== 0);
+  const entrancingChance = spells.entrancing_chance ?? 0;
 
   const hasRows =
-    spells.can_cast || damageRows.length > 0 || percentRows.length > 0;
+    spells.can_cast || damageRows.length > 0 || entrancingChance !== 0;
 
   if (!hasRows) {
     return null;
@@ -47,7 +29,7 @@ const MonsterSpellSection = ({ monster }: MonsterDetailProps): ReactNode => {
 
   return (
     <div>
-      <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
+      <h2 className="text-marigold-700 dark:text-marigold-500 mb-2 text-base font-semibold">
         Spells &amp; Affixes
       </h2>
       <Dl>
@@ -63,12 +45,12 @@ const MonsterSpellSection = ({ monster }: MonsterDetailProps): ReactNode => {
             <Dd>{formatNumberWithCommas(row.value)}</Dd>
           </React.Fragment>
         ))}
-        {percentRows.map((row) => (
-          <React.Fragment key={row.label}>
-            <Dt>{row.label}</Dt>
-            <Dd>{formatPercent(row.value)}</Dd>
-          </React.Fragment>
-        ))}
+        {entrancingChance !== 0 && (
+          <>
+            <Dt>Entrancing Chance</Dt>
+            <Dd>{formatPercent(entrancingChance)}</Dd>
+          </>
+        )}
       </Dl>
     </div>
   );

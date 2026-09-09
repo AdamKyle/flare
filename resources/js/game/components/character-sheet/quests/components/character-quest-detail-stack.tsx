@@ -1,8 +1,8 @@
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState } from 'react';
 
 import CharacterQuestHandInActions from './character-quest-hand-in-actions';
-import CharacterQuestDetailViewProps from './types/character-quest-detail-view-props';
+import CharacterQuestDetailStackProps from './types/character-quest-detail-stack-props';
 import QuestDetail from '../../../../reusable-components/quest/components/quest-detail';
 import { SidePeekComponentRegistrationEnum } from '../../../side-peeks/base/component-registration/side-peek-component-registration-enum';
 import { SidePeek } from '../../../side-peeks/base/event-types/side-peek';
@@ -10,19 +10,20 @@ import { useSidePeekEmitter } from '../../../side-peeks/base/hooks/use-side-peek
 import { useCharacterQuestDetail } from '../api/hooks/use-character-quest-detail';
 import { useHandInCharacterQuest } from '../api/hooks/use-hand-in-character-quest';
 
+import { StackedCardContentMode } from 'ui/cards/enums/stacked-card-content-mode';
+import StackedCard from 'ui/cards/stacked-card';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
-const CharacterQuestDetailView = ({
+const CharacterQuestDetailStack = ({
   character_id: characterId,
   quest_id: questId,
-  has_back: hasBack,
   completed_quest_ids: completedQuestIds,
-  on_back: onBack,
   on_close: onClose,
-  on_open_quest: onOpenQuest,
   on_completed_quests_change: onCompletedQuestsChange,
-}: CharacterQuestDetailViewProps): ReactNode => {
+}: CharacterQuestDetailStackProps): ReactNode => {
   const sidePeekEmitter = useSidePeekEmitter();
+
+  const [nestedQuestId, setNestedQuestId] = useState<number | null>(null);
 
   const {
     quest,
@@ -95,34 +96,6 @@ const CharacterQuestDetailView = ({
     );
   };
 
-  const renderHeader = (): ReactNode => (
-    <div className="flex items-center justify-between gap-2 py-2">
-      <div className="flex items-center gap-2">
-        {hasBack && (
-          <button
-            type="button"
-            onClick={onBack}
-            aria-label="Back to previous Quest"
-            className="focus-visible:ring-danube-500 dark:focus-visible:ring-danube-300 flex h-9 w-9 items-center justify-center rounded-full text-gray-600 hover:bg-gray-100 focus:outline-none focus-visible:ring-2 dark:text-gray-300 dark:hover:bg-gray-700"
-          >
-            <i className="fas fa-arrow-left" aria-hidden="true" />
-          </button>
-        )}
-        <h2 className="text-glacier-900 dark:text-glacier-100 text-base font-semibold">
-          Quest Details
-        </h2>
-      </div>
-      <button
-        type="button"
-        onClick={onClose}
-        aria-label="Close Quest Details"
-        className="focus-visible:ring-danube-500 dark:focus-visible:ring-danube-300 flex h-9 w-9 items-center justify-center rounded-full text-gray-600 hover:bg-gray-100 focus:outline-none focus-visible:ring-2 dark:text-gray-300 dark:hover:bg-gray-700"
-      >
-        <i className="fas fa-times" aria-hidden="true" />
-      </button>
-    </div>
-  );
-
   const renderContent = (): ReactNode => {
     if (loading) {
       return <InfiniteLoader />;
@@ -149,8 +122,9 @@ const CharacterQuestDetailView = ({
         <QuestDetail
           quest={quest}
           completed_quest_ids={detailCompletedQuestIds}
+          presentation="side-peek"
           navigation={{
-            on_open_quest: onOpenQuest,
+            on_open_quest: setNestedQuestId,
             on_open_npc: handleOpenNpc,
             on_open_map: handleOpenMap,
             on_open_item: handleOpenItem,
@@ -162,11 +136,28 @@ const CharacterQuestDetailView = ({
   };
 
   return (
-    <div className="flex flex-col gap-2">
-      {renderHeader()}
-      {renderContent()}
-    </div>
+    <StackedCard
+      on_close={onClose}
+      aria_label="Quest Details"
+      content_mode={StackedCardContentMode.FULL_BLEED}
+    >
+      <div className="relative flex h-full min-h-0 flex-col overflow-hidden">
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-5">
+          {renderContent()}
+        </div>
+
+        {nestedQuestId !== null && (
+          <CharacterQuestDetailStack
+            character_id={characterId}
+            quest_id={nestedQuestId}
+            completed_quest_ids={detailCompletedQuestIds}
+            on_close={() => setNestedQuestId(null)}
+            on_completed_quests_change={onCompletedQuestsChange}
+          />
+        )}
+      </div>
+    </StackedCard>
   );
 };
 
-export default CharacterQuestDetailView;
+export default CharacterQuestDetailStack;

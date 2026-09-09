@@ -49,6 +49,13 @@ export const usePurchaseItem = (
         item_id: requestParams.item_id,
       });
 
+      if (!result?.inventory_count) {
+        setError({ message: 'Received a malformed purchase response.' });
+        setLoading(false);
+
+        return;
+      }
+
       setSuccessMessage(result.message);
 
       onSuccessRef.current({

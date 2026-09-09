@@ -1,9 +1,11 @@
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode } from 'react';
 
 import AdminLocationGemDetailSidePeekProps from './types/admin-location-gem-detail-side-peek-props';
+import { SidePeekComponentRegistrationEnum } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
+import { SidePeek as SidePeekEventType } from '../../../../game/components/side-peeks/base/event-types/side-peek';
+import { useSidePeekEmitter } from '../../../../game/components/side-peeks/base/hooks/use-side-peek-emitter';
 import { LocationGemApiMessages } from '../../api/enums/location-gem-api-messages';
-import { useActivateLocationGemRoll } from '../../api/hooks/use-activate-location-gem-roll';
 import { useLocationGemDetail } from '../../api/hooks/use-location-gem-detail';
 import LocationGemDetailBody from '../location-gem-detail-body';
 
@@ -16,24 +18,33 @@ const AdminLocationGemDetailSidePeek = ({
     location_gem: locationGem,
     loading,
     error,
-    refresh,
   } = useLocationGemDetail(locationGemId);
-  const { error: activateError, activate_roll: activateRoll } =
-    useActivateLocationGemRoll();
-  const [activatingGemId, setActivatingGemId] = useState<number | null>(null);
-  const [announcement, setAnnouncement] = useState('');
+  const sidePeekEmitter = useSidePeekEmitter();
 
-  const handleActivateRoll = async (gemId: number): Promise<void> => {
-    setActivatingGemId(gemId);
-    const activated = await activateRoll(locationGemId, gemId);
-    setActivatingGemId(null);
+  const handleOpenMap = (id: number): void => {
+    sidePeekEmitter.emit(
+      SidePeekEventType.SIDE_PEEK,
+      SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_DETAIL,
+      {
+        is_open: true,
+        title: 'Game Map Details',
+        allow_clicking_outside: true,
+        game_map_id: id,
+      }
+    );
+  };
 
-    if (activated) {
-      setAnnouncement(
-        `Roll #${activated.rolled_gem?.roll_number ?? ''} is now active.`
-      );
-      refresh();
-    }
+  const handleOpenLocation = (id: number): void => {
+    sidePeekEmitter.emit(
+      SidePeekEventType.SIDE_PEEK,
+      SidePeekComponentRegistrationEnum.ADMIN_LOCATION_DETAIL,
+      {
+        is_open: true,
+        title: 'Location Details',
+        allow_clicking_outside: true,
+        location_id: id,
+      }
+    );
   };
 
   const renderContent = (): ReactNode => {
@@ -50,22 +61,19 @@ const AdminLocationGemDetailSidePeek = ({
     }
 
     return (
-      <div className="space-y-4">
-        {activateError && <ApiErrorAlert apiError={activateError.message} />}
-        <LocationGemDetailBody
-          location_gem={locationGem}
-          on_activate_roll={(gemId) => void handleActivateRoll(gemId)}
-          activating_gem_id={activatingGemId}
-        />
-      </div>
+      <LocationGemDetailBody
+        location_gem={locationGem}
+        is_side_peek
+        navigation={{
+          on_open_map: handleOpenMap,
+          on_open_location: handleOpenLocation,
+        }}
+      />
     );
   };
 
   return (
     <div className="relative flex h-full min-h-0 flex-col overflow-hidden">
-      <p className="sr-only" role="status" aria-live="polite">
-        {announcement}
-      </p>
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-5">
         {renderContent()}
       </div>

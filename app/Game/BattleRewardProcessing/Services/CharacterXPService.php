@@ -10,8 +10,6 @@ use App\Flare\Models\Monster;
 use App\Game\Battle\Values\MaxLevel;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
-use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
-use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Core\Services\CharacterService;
@@ -26,8 +24,6 @@ use Exception;
 use Facades\App\Game\BattleRewardProcessing\Calculators\XPCalculator;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Database\Eloquent\Collection;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
 
 class CharacterXPService
 {
@@ -40,8 +36,6 @@ class CharacterXPService
     public function __construct(
         private readonly CharacterService $characterService,
         private readonly SkillService $skillService,
-        private readonly Manager $manager,
-        private readonly CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer,
         private readonly BattleMessageHandler $battleMessageHandler,
         private readonly AreaGemEffectService $areaGemEffectService,
     ) {}
@@ -197,7 +191,6 @@ class CharacterXPService
 
         if ($shouldBuildCache || $leftOverXP < $character->xp_next) {
             CharacterAttackTypesCacheBuilder::dispatch($character);
-            $this->updateCharacterStats($character);
         }
 
         ServerMessageHandler::handleMessage($character->user, CharacterMessageTypes::LEVEL_UP, $character->level);
@@ -383,20 +376,6 @@ class CharacterXPService
         $this->character = $this->character->refresh();
 
         $this->battleMessageHandler->handleXPMessage($this->character->user, $xp, $this->character->xp);
-    }
-
-    /**
-     * Update the character stats.
-     */
-    private function updateCharacterStats(Character $character): void
-    {
-        $characterData = new Item($character, $this->characterSheetBaseInfoTransformer);
-        $characterData = $this->manager->createData($characterData)->toArray();
-
-        $this->safelyDispatchBroadcastEvent(
-            new UpdateBaseCharacterInformation($character->user, $characterData),
-            ['character_id' => $character->id]
-        );
     }
 
     /**

@@ -1,5 +1,6 @@
-import React, { ReactNode } from 'react';
+import React, { Fragment, ReactNode } from 'react';
 
+import QuestChildQuestsSection from './quest-child-quests-section';
 import QuestDependenciesSection from './quest-dependencies-section';
 import QuestGiverSection from './quest-giver-section';
 import QuestRequirementsSection from './quest-requirements-section';
@@ -13,6 +14,7 @@ import FactualLink from '../../quest-item/partials/factual-link';
 import { QUEST_KIND_LABELS } from '../enums/quest-kind';
 import QuestDetailProps from '../types/quest-detail-props';
 
+import DetailGridRow from 'ui/detail-grid/detail-grid-row';
 import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
@@ -23,7 +25,39 @@ const QuestDetail = ({
   navigation,
   completed_quest_ids: completedQuestIds,
   quest_item_ownership: questItemOwnership,
+  presentation = 'page',
 }: QuestDetailProps): ReactNode => {
+  const isSidePeek = presentation === 'side-peek';
+
+  const renderRow = (sections: ReactNode[]): ReactNode => {
+    const visibleSections = sections.filter((section) => section !== null);
+
+    if (visibleSections.length === 0) {
+      return null;
+    }
+
+    if (isSidePeek) {
+      return (
+        <div className="flex flex-col gap-6">
+          {visibleSections.map((section, index) => (
+            <Fragment key={index}>
+              {index > 0 && <Separator additional_css="my-1" />}
+              {section}
+            </Fragment>
+          ))}
+        </div>
+      );
+    }
+
+    return (
+      <DetailGridRow>
+        {visibleSections.map((section, index) => (
+          <Fragment key={index}>{section}</Fragment>
+        ))}
+      </DetailGridRow>
+    );
+  };
+
   const hasStory = Boolean(
     quest.story.before_completion_markdown ||
     quest.story.after_completion_markdown
@@ -31,9 +65,10 @@ const QuestDetail = ({
 
   const hasQuestGiver = Boolean(quest.npc);
 
-  const hasDependencies =
+  const hasChildQuests = quest.structure.child_quests.length > 0;
+
+  const hasOtherDependencies =
     Boolean(quest.structure.parent_quest) ||
-    quest.structure.child_quests.length > 0 ||
     Boolean(quest.structure.required_quest) ||
     quest.structure.required_quest_chain.length > 0;
 
@@ -91,7 +126,7 @@ const QuestDetail = ({
 
   const renderRestrictionsContent = (): ReactNode => (
     <div>
-      <h3 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
+      <h3 className="text-marigold-700 dark:text-marigold-500 mb-2 text-base font-semibold">
         Restrictions
       </h3>
       <Dl>
@@ -111,42 +146,55 @@ const QuestDetail = ({
     </div>
   );
 
-  const sections: { present: boolean; node: ReactNode }[] = [
+  const hasGiverOrChildRow = hasQuestGiver || hasChildQuests;
+  const hasRequirementsOrRewardsRow = hasRequirements || hasRewards;
+
+  const rows: { present: boolean; node: ReactNode }[] = [
     {
       present: hasStory,
       node: <QuestStorySection quest={quest} navigation={navigation} />,
     },
     {
-      present: hasQuestGiver,
-      node: <QuestGiverSection quest={quest} navigation={navigation} />,
+      present: hasGiverOrChildRow,
+      node: renderRow([
+        hasQuestGiver ? (
+          <QuestGiverSection quest={quest} navigation={navigation} />
+        ) : null,
+        hasChildQuests ? (
+          <QuestChildQuestsSection
+            quest={quest}
+            navigation={navigation}
+            completed_quest_ids={completedQuestIds}
+          />
+        ) : null,
+      ]),
     },
     {
-      present: hasDependencies,
+      present: hasRequirementsOrRewardsRow,
+      node: renderRow([
+        hasRequirements ? (
+          <QuestRequirementsSection
+            quest={quest}
+            navigation={navigation}
+            quest_item_ownership={questItemOwnership}
+          />
+        ) : null,
+        hasRewards ? (
+          <QuestRewardsSection
+            quest={quest}
+            navigation={navigation}
+            quest_item_ownership={questItemOwnership}
+          />
+        ) : null,
+      ]),
+    },
+    {
+      present: hasOtherDependencies,
       node: (
         <QuestDependenciesSection
           quest={quest}
           navigation={navigation}
           completed_quest_ids={completedQuestIds}
-        />
-      ),
-    },
-    {
-      present: hasRequirements,
-      node: (
-        <QuestRequirementsSection
-          quest={quest}
-          navigation={navigation}
-          quest_item_ownership={questItemOwnership}
-        />
-      ),
-    },
-    {
-      present: hasRewards,
-      node: (
-        <QuestRewardsSection
-          quest={quest}
-          navigation={navigation}
-          quest_item_ownership={questItemOwnership}
         />
       ),
     },
@@ -156,8 +204,8 @@ const QuestDetail = ({
   const renderSections = (): ReactNode => {
     let hasRenderedSection = false;
 
-    return sections.map((section, index) => {
-      if (!section.present) {
+    return rows.map((row, index) => {
+      if (!row.present) {
         return null;
       }
 
@@ -165,10 +213,10 @@ const QuestDetail = ({
       hasRenderedSection = true;
 
       return (
-        <React.Fragment key={index}>
-          {showSeparator && <Separator />}
-          {section.node}
-        </React.Fragment>
+        <Fragment key={index}>
+          {showSeparator && <Separator additional_css="my-1" />}
+          {row.node}
+        </Fragment>
       );
     });
   };

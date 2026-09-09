@@ -19,7 +19,7 @@ const QuestGiverSection = ({
 
   return (
     <div>
-      <h3 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
+      <h3 className="text-marigold-700 dark:text-marigold-500 mb-2 text-base font-semibold">
         Quest Giver
       </h3>
       <Dl>

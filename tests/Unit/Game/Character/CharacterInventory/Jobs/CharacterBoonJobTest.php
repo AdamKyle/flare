@@ -2,10 +2,15 @@
 
 namespace Tests\Unit\Game\Character\CharacterInventory\Jobs;
 
+use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
+use App\Game\Character\CharacterInventory\Events\CharacterBoonsUpdateBroadcastEvent;
 use App\Game\Character\CharacterInventory\Jobs\CharacterBoonJob;
+use App\Game\Core\Events\UpdateBaseCharacterInformation;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterBoon;
@@ -42,6 +47,8 @@ class CharacterBoonJobTest extends TestCase
 
     public function test_remove_boon()
     {
+        Queue::fake([CharacterAttackTypesCacheBuilder::class]);
+
         $character = $this->character->getCharacter();
 
         $this->createCharacterBoon([
@@ -58,6 +65,10 @@ class CharacterBoonJobTest extends TestCase
         CharacterBoonJob::dispatch($character->boons->first()->id);
 
         Event::assertDispatched(ServerMessageEvent::class);
+        Event::assertDispatched(CharacterBoonsUpdateBroadcastEvent::class);
+        Event::assertNotDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateBaseCharacterInformation::class);
+        Queue::assertPushed(CharacterAttackTypesCacheBuilder::class, 1);
 
         $character = $character->refresh();
 

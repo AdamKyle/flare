@@ -2,7 +2,7 @@
 
 namespace App\Game\Core\Listeners;
 
-use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
+use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Character\CharacterAttack\Events\UpdateCharacterAttackEvent;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Events\CharacterLevelUpEvent;
@@ -15,15 +15,9 @@ class CharacterLevelUpListener
 {
     private CharacterService $characterService;
 
-    private BuildCharacterAttackTypes $buildCharacterAttackTypes;
-
-    /**
-     * Constructor
-     */
-    public function __construct(CharacterService $characterService, BuildCharacterAttackTypes $buildCharacterAttackTypes)
+    public function __construct(CharacterService $characterService)
     {
         $this->characterService = $characterService;
-        $this->buildCharacterAttackTypes = $buildCharacterAttackTypes;
     }
 
     /**
@@ -44,7 +38,7 @@ class CharacterLevelUpListener
             ServerMessageHandler::handleMessage($character->user, CharacterMessageTypes::LEVEL_UP, $character->level);
 
             if ($event->shouldUpdateCache) {
-                $this->buildCharacterAttackTypes->buildCache($character);
+                CharacterAttackTypesCacheBuilder::dispatch($character->refresh());
 
                 event(new UpdateCharacterBaseDetailsEvent($character));
                 event(new UpdateCharacterAttackEvent($character));

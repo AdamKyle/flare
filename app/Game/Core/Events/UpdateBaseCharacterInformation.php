@@ -6,27 +6,18 @@ use App\Flare\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class UpdateBaseCharacterInformation implements ShouldBroadcast
+class UpdateBaseCharacterInformation implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /**
-     * @param  array  $character
-     */
-    public $character;
+    public array $character;
 
-    /**
-     * @var User
-     */
-    private $user;
+    private User $user;
 
-    /**
-     * Create a new event instance.
-     */
     public function __construct(User $user, array $characterData)
     {
         $this->character = $characterData['data'];
@@ -34,17 +25,10 @@ class UpdateBaseCharacterInformation implements ShouldBroadcast
     }
 
     /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return Channel|array
+     * Get the channel the event should broadcast on.
      */
-    public function broadcastOn()
+    public function broadcastOn(): Channel
     {
         return new PrivateChannel('update-character-base-stats-'.$this->user->id);
-    }
-
-    public function broadcastQueue(): string
-    {
-        return 'character_broadcasts';
     }
 }

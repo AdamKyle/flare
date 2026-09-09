@@ -10,6 +10,7 @@ use App\Admin\MapGems\Transformers\MapGemDetailTransformer;
 use App\Admin\MapGems\Transformers\MapGemFormOptionsTransformer;
 use App\Admin\MapGems\Transformers\MapGemFormTransformer;
 use App\Admin\MapGems\Transformers\MapGemListTransformer;
+use App\Admin\Transformers\AdminGemRollTransformer;
 use App\Flare\Models\GameMapGemParamter;
 use App\Flare\Models\Gem;
 use App\Flare\Pagination\Pagination;
@@ -26,6 +27,7 @@ class MapGemsController extends Controller
         private readonly MapGemDetailTransformer $mapGemDetailTransformer,
         private readonly MapGemFormTransformer $mapGemFormTransformer,
         private readonly MapGemFormOptionsTransformer $mapGemFormOptionsTransformer,
+        private readonly AdminGemRollTransformer $adminGemRollTransformer,
     ) {}
 
     /**
@@ -104,6 +106,43 @@ class MapGemsController extends Controller
         $result = $this->mapGemService->rollAll($request->user());
 
         return response()->json($result, 200);
+    }
+
+    /**
+     * Return the paginated Gem roll history for the given Map Gem profile, active roll first.
+     */
+    public function rolls(Request $request, GameMapGemParamter $gameMapGemParamter): JsonResponse
+    {
+        $paginator = $this->mapGemService->paginateRolls(
+            $gameMapGemParamter,
+            (int) $request->input('per_page', 10),
+            (int) $request->input('page', 1),
+        );
+
+        $rolledGemId = $gameMapGemParamter->rolled_gem_id;
+
+        $data = $paginator->getCollection()
+            ->map(fn (Gem $gem): array => $this->adminGemRollTransformer->transform($gem, $gem->id === $rolledGemId))
+            ->values()
+            ->all();
+
+        return response()->json([
+            'data' => $data,
+            'meta' => [
+                'can_load_more' => $paginator->hasMorePages(),
+                'pagination' => [
+                    'count' => $paginator->count(),
+                    'current_page' => $paginator->currentPage(),
+                    'links' => [
+                        'next' => $paginator->nextPageUrl(),
+                        'prev' => $paginator->previousPageUrl(),
+                    ],
+                    'per_page' => $paginator->perPage(),
+                    'total' => $paginator->total(),
+                    'total_pages' => $paginator->lastPage(),
+                ],
+            ],
+        ]);
     }
 
     /**

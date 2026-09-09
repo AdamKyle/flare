@@ -3,7 +3,7 @@ import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import { useCharacterQuestBrowseOptions } from './quests/api/hooks/use-character-quest-browse-options';
 import { useCharacterQuestTree } from './quests/api/hooks/use-character-quest-tree';
 import CharacterQuestBrowsePanel from './quests/components/character-quest-browse-panel';
-import CharacterQuestDetailView from './quests/components/character-quest-detail-view';
+import CharacterQuestDetailStack from './quests/components/character-quest-detail-stack';
 import { useCharacterQuestWebsocket } from './quests/websockets/hooks/use-character-quest-websocket';
 import {
   QUEST_BROWSE_TAB_KIND,
@@ -25,7 +25,7 @@ const CharacterQuests = (): ReactNode => {
   const [activeTab, setActiveTab] = useState<QuestBrowseTab>(
     QuestBrowseTab.BASE
   );
-  const [questDetailHistory, setQuestDetailHistory] = useState<number[]>([]);
+  const [openQuestId, setOpenQuestId] = useState<number | null>(null);
 
   const hasInitializedMapRef = useRef(false);
   const previousCharacterMapIdRef = useRef<number | null>(null);
@@ -147,31 +147,12 @@ const CharacterQuests = (): ReactNode => {
   };
 
   const handleOpenQuestFromBrowse = (questId: number): void => {
-    setQuestDetailHistory([questId]);
-  };
-
-  const handleOpenQuestInHistory = (questId: number): void => {
-    setQuestDetailHistory((history) => {
-      const existingIndex = history.indexOf(questId);
-
-      if (existingIndex !== -1) {
-        return history.slice(0, existingIndex + 1);
-      }
-
-      return [...history, questId];
-    });
-  };
-
-  const handleBackDetail = (): void => {
-    setQuestDetailHistory((history) => history.slice(0, -1));
+    setOpenQuestId(questId);
   };
 
   const handleCloseDetail = (): void => {
-    setQuestDetailHistory([]);
+    setOpenQuestId(null);
   };
-
-  const currentQuestId =
-    questDetailHistory[questDetailHistory.length - 1] ?? null;
 
   return (
     <div className="relative min-h-0">
@@ -190,15 +171,12 @@ const CharacterQuests = (): ReactNode => {
         on_open_quest={handleOpenQuestFromBrowse}
       />
 
-      {currentQuestId !== null && (
-        <CharacterQuestDetailView
+      {openQuestId !== null && (
+        <CharacterQuestDetailStack
           character_id={characterId}
-          quest_id={currentQuestId}
-          has_back={questDetailHistory.length > 1}
+          quest_id={openQuestId}
           completed_quest_ids={completedQuestIds}
-          on_back={handleBackDetail}
           on_close={handleCloseDetail}
-          on_open_quest={handleOpenQuestInHistory}
           on_completed_quests_change={handleCompletedQuestsChange}
         />
       )}

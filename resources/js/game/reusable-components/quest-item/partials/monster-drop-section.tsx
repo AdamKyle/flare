@@ -40,14 +40,14 @@ const MonsterDropsSection = ({
           key={`required-monster-${monster.id}`}
           className={relationshipRowClassName}
         >
-          <p className="text-glacier-900 dark:text-glacier-100 font-medium">
+          <p className="text-glacier-900 dark:text-glacier-900 font-medium">
             <FactualLink
               id={monster.id}
               label={monster.name}
               on_click={navigation.on_open_monster}
             />
           </p>
-          <p className="text-glacier-600 dark:text-glacier-400 text-xs">
+          <p className="text-glacier-600 dark:text-glacier-800 text-xs">
             While on map
             {' · '}
             <FactualLink

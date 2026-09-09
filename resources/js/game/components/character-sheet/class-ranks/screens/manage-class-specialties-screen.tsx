@@ -124,7 +124,7 @@ const ManageClassSpecialtiesScreen = ({
       manageSectionVisibility={onClose}
     >
       <div className="flex flex-col">
-        <p className="text-glacier-800 dark:text-glacier-200 text-sm">
+        <p className="text-sm text-gray-700 dark:text-gray-300">
           Equip up to 3 Class Specialties. At most 1 equipped Specialty may be a
           Damage Specialty.
         </p>

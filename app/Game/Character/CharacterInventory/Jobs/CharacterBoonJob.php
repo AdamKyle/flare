@@ -58,7 +58,7 @@ class CharacterBoonJob implements ShouldQueue
 
         $boon->delete();
 
-        $useItemService->updateCharacter($character->refresh());
+        $useItemService->refreshCharacterAfterBoonChange($character->refresh());
 
         Cache::delete('can-character-survive-'.$character->id);
 

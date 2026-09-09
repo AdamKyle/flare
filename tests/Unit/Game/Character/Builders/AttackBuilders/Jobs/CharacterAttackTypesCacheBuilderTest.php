@@ -6,6 +6,7 @@ use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Character\Exceptions\MissingInventoryException;
+use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use Cache;
 use Event;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -34,6 +35,19 @@ class CharacterAttackTypesCacheBuilderTest extends TestCase
         CharacterAttackTypesCacheBuilder::dispatch($character);
 
         $this->assertNotNull(Cache::get('character-attack-data-'.$character->id));
+    }
+
+    public function test_handle_broadcasts_the_refreshed_authoritative_character_state(): void
+    {
+        Event::fake();
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->equipBasicAttackLoadout()->getCharacter();
+
+        CharacterAttackTypesCacheBuilder::dispatch($character);
+
+        Event::assertDispatched(UpdateBaseCharacterInformation::class, function (UpdateBaseCharacterInformation $event) use ($character): bool {
+            return $event->character['id'] === $character->id;
+        });
     }
 
     public function test_handle_dispatches_automation_log_update_when_alert_stats_updated_is_true(): void

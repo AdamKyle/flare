@@ -88,6 +88,7 @@ export const MonsterStatSection = ({
     >
       <MonsterDetail
         monster={data}
+        presentation="page"
         navigation={{
           on_open_map: handleOpenMap,
           on_open_item: handleOpenItem,

@@ -262,12 +262,30 @@ const CharacterClassSpecialtyDetailSidePeek = ({
 
   const topContext = renderTopContext();
 
+  const statusParts: string[] = [
+    targetSpecialty.class_mastery.type === 'attack' ? 'Attack' : 'Passive',
+  ];
+
+  if (isDamageSpecialty) {
+    statusParts.push('Damage');
+  }
+
+  if (equippedRow) {
+    statusParts.push('Equipped');
+  } else if (targetRow.is_locked_level) {
+    statusParts.push('Locked');
+  } else if (targetRow.is_available) {
+    statusParts.push('Available');
+  }
+
   return (
-    <div className="flex h-full min-h-0 flex-col gap-4 overflow-y-auto px-4 py-4 sm:px-5">
-      {topContext}
-      {topContext && <Separator additional_css="my-0" />}
-      <ClassMasteryDetail class_mastery={targetSpecialty.class_mastery} />
-      <Separator additional_css="my-0" />
+    <div className="flex h-full min-h-0 flex-col overflow-y-auto px-4 py-4 sm:px-5">
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+        {targetSpecialty.name}
+      </h2>
+      <p className="text-sm text-gray-700 dark:text-gray-300">
+        {statusParts.join(' · ')}
+      </p>
       <Dl>
         <Dt>Class</Dt>
         <Dd>{targetSpecialty.class_name}</Dd>
@@ -281,6 +299,9 @@ const CharacterClassSpecialtyDetailSidePeek = ({
         )}
       </Dl>
       {renderLearnedProgress()}
+      {topContext}
+      <Separator additional_css="my-3" />
+      <ClassMasteryDetail class_mastery={targetSpecialty.class_mastery} />
       {classSpecialtiesApi.mutationError && (
         <Alert variant={AlertVariant.DANGER}>
           {classSpecialtiesApi.mutationError}

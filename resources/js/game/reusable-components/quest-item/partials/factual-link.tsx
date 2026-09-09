@@ -15,7 +15,7 @@ const FactualLink = ({
     <button
       type="button"
       onClick={() => onClick(id)}
-      className="text-danube-700 hover:text-danube-600 focus-visible:ring-danube-400 dark:text-danube-200 dark:hover:text-danube-100 decoration-danube-400 dark:decoration-danube-500 rounded-sm font-medium underline underline-offset-2 focus:outline-none focus-visible:ring-2"
+      className="focus-visible:ring-brand-600 dark:focus-visible:ring-brand-400 rounded-sm font-medium text-gray-900 underline decoration-gray-400 underline-offset-2 hover:text-gray-600 focus:outline-none focus-visible:ring-2 dark:text-gray-100 dark:decoration-gray-500 dark:hover:text-gray-300"
     >
       {label}
     </button>

@@ -52,6 +52,13 @@ export const UsePurchaseManyItems = (
         amount: requestParams.amount,
       });
 
+      if (!result?.inventory_count) {
+        setError({ message: 'Received a malformed purchase response.' });
+        setLoading(false);
+
+        return;
+      }
+
       setSuccessMessage(result.message);
 
       onSuccessRef.current({

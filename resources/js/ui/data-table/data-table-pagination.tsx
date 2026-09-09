@@ -21,12 +21,12 @@ const DataTablePagination = ({
   return (
     <nav
       aria-label="Table pagination"
-      className="border-glacier-200 bg-glacier-50 dark:border-glacier-800 dark:bg-glacier-900 flex flex-col items-center justify-between gap-3 border-t p-4 sm:flex-row"
+      className="flex flex-col items-center justify-between gap-3 border-t border-gray-200 bg-gray-50 p-4 sm:flex-row dark:border-gray-700 dark:bg-gray-800"
     >
       <p
         role="status"
         aria-live="polite"
-        className="text-glacier-700 dark:text-glacier-300 text-sm"
+        className="text-sm text-gray-700 dark:text-gray-300"
       >
         {total_records} total record{total_records === 1 ? '' : 's'} &middot;
         Page {total_pages === 0 ? 0 : current_page} of {total_pages}
@@ -37,7 +37,7 @@ const DataTablePagination = ({
           onClick={() => requestPageChange(1)}
           disabled={isFirstPage}
           aria-label="First page"
-          className="focus-visible:ring-glacier-400 border-glacier-300 text-glacier-700 dark:border-glacier-700 dark:text-glacier-200 rounded-md border px-2 py-1 text-sm focus:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
+          className="focus-visible:ring-brand-600 dark:focus-visible:ring-brand-400 rounded-md border border-gray-300 px-2 py-1 text-sm text-gray-700 focus:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:text-gray-200"
         >
           First
         </button>
@@ -46,7 +46,7 @@ const DataTablePagination = ({
           onClick={() => requestPageChange(current_page - 1)}
           disabled={isFirstPage}
           aria-label="Previous page"
-          className="focus-visible:ring-glacier-400 border-glacier-300 text-glacier-700 dark:border-glacier-700 dark:text-glacier-200 rounded-md border px-3 py-1 text-sm focus:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
+          className="focus-visible:ring-brand-600 dark:focus-visible:ring-brand-400 rounded-md border border-gray-300 px-3 py-1 text-sm text-gray-700 focus:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:text-gray-200"
         >
           Previous
         </button>
@@ -55,7 +55,7 @@ const DataTablePagination = ({
           onClick={() => requestPageChange(current_page + 1)}
           disabled={isLastPage}
           aria-label="Next page"
-          className="focus-visible:ring-glacier-400 border-glacier-300 text-glacier-700 dark:border-glacier-700 dark:text-glacier-200 rounded-md border px-3 py-1 text-sm focus:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
+          className="focus-visible:ring-brand-600 dark:focus-visible:ring-brand-400 rounded-md border border-gray-300 px-3 py-1 text-sm text-gray-700 focus:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:text-gray-200"
         >
           Next
         </button>
@@ -64,7 +64,7 @@ const DataTablePagination = ({
           onClick={() => requestPageChange(total_pages)}
           disabled={isLastPage}
           aria-label="Last page"
-          className="focus-visible:ring-glacier-400 border-glacier-300 text-glacier-700 dark:border-glacier-700 dark:text-glacier-200 rounded-md border px-2 py-1 text-sm focus:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
+          className="focus-visible:ring-brand-600 dark:focus-visible:ring-brand-400 rounded-md border border-gray-300 px-2 py-1 text-sm text-gray-700 focus:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:text-gray-200"
         >
           Last
         </button>

@@ -7,7 +7,7 @@ use App\Flare\Models\InventorySet;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\SetSlot;
-use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
+use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Character\CharacterInventory\Validations\SetHandsValidation;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
@@ -23,14 +23,10 @@ class InventorySetService
 
     private SetHandsValidation $setHandsValidation;
 
-    private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler;
-
     public function __construct(
-        SetHandsValidation $setHandsValidation,
-        UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler
+        SetHandsValidation $setHandsValidation
     ) {
         $this->setHandsValidation = $setHandsValidation;
-        $this->updateCharacterAttackTypesHandler = $updateCharacterAttackTypesHandler;
     }
 
     /**
@@ -493,7 +489,7 @@ class InventorySetService
      */
     protected function updateCharacterAttackDataCache(Character $character): void
     {
-        $this->updateCharacterAttackTypesHandler->updateCache($character);
+        CharacterAttackTypesCacheBuilder::dispatch($character->refresh());
     }
 
     /**

@@ -49,6 +49,5 @@ export default interface MapGemDetailDefinition {
   monster_atonement_range: string | null;
   roll_count: number;
   rolled_gem: AdminRolledGemDefinition | null;
-  roll_history: AdminRolledGemDefinition[];
   generated_gem_world: GeneratedGemWorldDefinition | null;
 }

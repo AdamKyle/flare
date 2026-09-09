@@ -4,10 +4,29 @@ import MonsterNormalTabPanel from './monster-normal-tab-panel';
 import MonsterSpecialLocationEffectsTabPanel from './monster-special-location-effects-tab-panel';
 import { MonsterGemEffectContextDefinition } from '../api/definitions/monster-detail-definition';
 import MonsterDetailProps from '../types/monster-detail-props';
+import MonsterNormalTabPanelProps from '../types/monster-normal-tab-panel-props';
+import MonsterSpecialLocationEffectsTabPanelProps from '../types/monster-special-location-effects-tab-panel-props';
 
+import Card from 'ui/cards/card';
 import PillTabs from 'ui/tabs/pill-tabs';
 
 const TAB_CSS = 'min-w-0 flex-1 px-4 sm:min-w-56 sm:flex-none';
+
+const CardWrappedMonsterNormalTabPanel = (
+  props: MonsterNormalTabPanelProps
+): ReactNode => (
+  <Card>
+    <MonsterNormalTabPanel {...props} />
+  </Card>
+);
+
+const CardWrappedMonsterSpecialLocationEffectsTabPanel = (
+  props: MonsterSpecialLocationEffectsTabPanelProps
+): ReactNode => (
+  <Card>
+    <MonsterSpecialLocationEffectsTabPanel {...props} />
+  </Card>
+);
 
 /**
  * Normal values are persisted base values; special-location tabs use cached transformed contexts.
@@ -35,20 +54,26 @@ const MonsterDetail = ({
   monster,
   navigation,
   initial_context_tab: initialContextTab = false,
+  presentation = 'side-peek',
 }: MonsterDetailProps): ReactNode => {
+  const isPage = presentation === 'page';
   const hasGemEffectContexts = monster.gem_effect_contexts.length > 0;
   const hasSingleContext = monster.gem_effect_contexts.length === 1;
 
   const renderBody = (): ReactNode => {
     if (!hasGemEffectContexts) {
-      return (
+      const normalPanel = (
         <MonsterNormalTabPanel monster={monster} navigation={navigation} />
       );
+
+      return isPage ? <Card>{normalPanel}</Card> : normalPanel;
     }
 
     const normalTab = {
       label: 'Original Stats',
-      component: MonsterNormalTabPanel,
+      component: isPage
+        ? CardWrappedMonsterNormalTabPanel
+        : MonsterNormalTabPanel,
       props: { monster, navigation },
     } as const;
 
@@ -56,7 +81,9 @@ const MonsterDetail = ({
       label: hasSingleContext
         ? resolveSingleContextTabLabel(monster.gem_effect_contexts[0])
         : 'Special Location Effects',
-      component: MonsterSpecialLocationEffectsTabPanel,
+      component: isPage
+        ? CardWrappedMonsterSpecialLocationEffectsTabPanel
+        : MonsterSpecialLocationEffectsTabPanel,
       props: { contexts: monster.gem_effect_contexts, navigation },
     } as const;
 
@@ -74,7 +101,7 @@ const MonsterDetail = ({
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-glacier-900 dark:text-glacier-100 text-xl font-semibold">
+      <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
         {monster.identity.name}
       </h1>
 

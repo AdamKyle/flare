@@ -10,6 +10,7 @@ use App\Admin\LocationGems\Transformers\LocationGemDetailTransformer;
 use App\Admin\LocationGems\Transformers\LocationGemFormOptionsTransformer;
 use App\Admin\LocationGems\Transformers\LocationGemFormTransformer;
 use App\Admin\LocationGems\Transformers\LocationGemListTransformer;
+use App\Admin\Transformers\AdminGemRollTransformer;
 use App\Flare\Models\GameLocationGemParamter;
 use App\Flare\Models\Gem;
 use App\Flare\Pagination\Pagination;
@@ -26,6 +27,7 @@ class LocationGemsController extends Controller
         private readonly LocationGemDetailTransformer $locationGemDetailTransformer,
         private readonly LocationGemFormTransformer $locationGemFormTransformer,
         private readonly LocationGemFormOptionsTransformer $locationGemFormOptionsTransformer,
+        private readonly AdminGemRollTransformer $adminGemRollTransformer,
     ) {}
 
     /**
@@ -104,6 +106,43 @@ class LocationGemsController extends Controller
         $result = $this->locationGemService->rollAll($request->user());
 
         return response()->json($result, 200);
+    }
+
+    /**
+     * Return the paginated Gem roll history for the given Location Gem profile, active roll first.
+     */
+    public function rolls(Request $request, GameLocationGemParamter $gameLocationGemParamter): JsonResponse
+    {
+        $paginator = $this->locationGemService->paginateRolls(
+            $gameLocationGemParamter,
+            (int) $request->input('per_page', 10),
+            (int) $request->input('page', 1),
+        );
+
+        $rolledGemId = $gameLocationGemParamter->rolled_gem_id;
+
+        $data = $paginator->getCollection()
+            ->map(fn (Gem $gem): array => $this->adminGemRollTransformer->transform($gem, $gem->id === $rolledGemId))
+            ->values()
+            ->all();
+
+        return response()->json([
+            'data' => $data,
+            'meta' => [
+                'can_load_more' => $paginator->hasMorePages(),
+                'pagination' => [
+                    'count' => $paginator->count(),
+                    'current_page' => $paginator->currentPage(),
+                    'links' => [
+                        'next' => $paginator->nextPageUrl(),
+                        'prev' => $paginator->previousPageUrl(),
+                    ],
+                    'per_page' => $paginator->perPage(),
+                    'total' => $paginator->total(),
+                    'total_pages' => $paginator->lastPage(),
+                ],
+            ],
+        ]);
     }
 
     /**

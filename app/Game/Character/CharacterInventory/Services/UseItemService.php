@@ -6,22 +6,14 @@ use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\CharacterBoon;
-use App\Flare\Models\GameSkill;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Game\Automation\Values\AutomationType;
-use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
-use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
+use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Character\CharacterInventory\Events\CharacterBoonsUpdateBroadcastEvent;
 use App\Game\Character\CharacterInventory\Jobs\CharacterBoonJob;
-use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
-use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
-use App\Game\Messages\Events\ServerMessageEvent;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item as ResourceItem;
 
 class UseItemService
 {
@@ -30,30 +22,6 @@ class UseItemService
     const MAX_TIME = 8 * 60;
 
     const MAX_AMOUNT = 10;
-
-    private CharacterSheetBaseInfoTransformer $characterAttackTransformer;
-
-    private Manager $manager;
-
-    private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes;
-
-    private CharacterInventoryService $characterInventoryService;
-
-    private BuildCharacterAttackTypes $buildCharacterAttackTypes;
-
-    public function __construct(
-        Manager $manager,
-        CharacterSheetBaseInfoTransformer $characterAttackTransformer,
-        UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
-        CharacterInventoryService $characterInventoryService,
-        BuildCharacterAttackTypes $buildCharacterAttackTypes,
-    ) {
-        $this->manager = $manager;
-        $this->characterAttackTransformer = $characterAttackTransformer;
-        $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
-        $this->characterInventoryService = $characterInventoryService;
-        $this->buildCharacterAttackTypes = $buildCharacterAttackTypes;
-    }
 
     /**
      * Use several selected Alchemy Bag items for the character, applying boons up to the active limits.
@@ -108,12 +76,9 @@ class UseItemService
             $character = $character->refresh();
         }
 
-        $this->updateCharacterAttackTypes->updateCache($character);
         $character = $character->refresh();
 
-        $this->broadcastBaseCharacterInformation($character);
-
-        event(new UpdateTopBarEvent($character));
+        CharacterAttackTypesCacheBuilder::dispatch($character);
 
         event(new UpdateCharacterInventoryCountEvent($character));
 
@@ -219,12 +184,9 @@ class UseItemService
             }
         }
 
-        $this->updateCharacterAttackTypes->updateCache($character);
         $character = $character->refresh();
 
-        $this->broadcastBaseCharacterInformation($character);
-
-        event(new UpdateTopBarEvent($character));
+        CharacterAttackTypesCacheBuilder::dispatch($character);
 
         event(new UpdateCharacterInventoryCountEvent($character));
 
@@ -365,6 +327,10 @@ class UseItemService
             'complete' => now()->addMinutes($minutesLeft + $timeAdded),
             'last_for_minutes' => $minutesLeft + $timeAdded,
         ]);
+
+        event(new UpdateCharacterInventoryCountEvent($character));
+
+        $this->refreshCharacterAfterBoonChange($character);
 
         return $this->successResult([
             'message' => $item->name.' filled up using '.$used.' item(s), adding '.$timeAdded.' minutes.',
@@ -514,62 +480,24 @@ class UseItemService
     }
 
     /**
-     * Transform and broadcast the character's current base attack information.
+     * Remove a boon from the character and queue the Character recalculation.
      */
-    private function broadcastBaseCharacterInformation(Character $character): void
-    {
-        $characterAttack = new ResourceItem($character, $this->characterAttackTransformer);
-
-        event(new UpdateBaseCharacterInformation($character->user, $this->manager->createData($characterAttack)->toArray()));
-    }
-
-    /**
-     * Removes a boon from the character and updates their info.
-     *
-     * @return void
-     */
-    public function removeBoon(Character $character, CharacterBoon $boon)
+    public function removeBoon(Character $character, CharacterBoon $boon): void
     {
         $boon->delete();
 
-        $character = $character->refresh();
-
-        $this->updateCharacter($character);
+        $this->refreshCharacterAfterBoonChange($character);
     }
 
     /**
-     * Update a character based on the item they used.
-     *
-     * @return void
+     * Refresh the character, queue the Character recalculation, and broadcast active boons.
      */
-    public function updateCharacter(Character $character, ?Item $item = null)
+    public function refreshCharacterAfterBoonChange(Character $character): void
     {
-        $this->buildCharacterAttackTypes->buildCache($character->refresh());
+        $character = $character->refresh();
 
-        $this->broadcastBaseCharacterInformation($character);
+        CharacterAttackTypesCacheBuilder::dispatch($character);
 
-        event(new UpdateTopBarEvent($character));
-
-        if (! is_null($item)) {
-            event(new ServerMessageEvent($character->user, 'You used: '.$item->name));
-        }
-
-        $boons = $character->boons()->active()->get()->toArray();
-
-        foreach ($boons as $key => $boon) {
-            $item = Item::find($boon['item_id']);
-
-            if (is_null($item->affects_skill_type)) {
-                continue;
-            }
-
-            $skills = GameSkill::where('type', $item->affect_skill_type)->pluck('name')->toArray();
-
-            $boon['affected_skills'] = implode(', ', $skills);
-
-            $boons[$key] = $boon;
-        }
-
-        event(new CharacterBoonsUpdateBroadcastEvent($character->user, $boons));
+        $this->broadcastCharacterBoons($character);
     }
 }

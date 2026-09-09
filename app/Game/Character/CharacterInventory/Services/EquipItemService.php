@@ -8,7 +8,7 @@ use App\Flare\Models\InventorySet;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\SetSlot;
-use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
+use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Character\CharacterAttack\Transformers\CharacterAttackTransformer;
 use App\Game\Character\CharacterInventory\Exceptions\EquipItemException;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
@@ -28,21 +28,15 @@ class EquipItemService
 
     private InventorySetService $inventorySetService;
 
-    private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler;
-
     private Character $character;
 
     private array $request;
 
-    /**
-     * EquipItemService constructor.
-     */
-    public function __construct(Manager $manager, CharacterAttackTransformer $characterTransformer, InventorySetService $inventorySetService, UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler)
+    public function __construct(Manager $manager, CharacterAttackTransformer $characterTransformer, InventorySetService $inventorySetService)
     {
         $this->manager = $manager;
         $this->characterTransformer = $characterTransformer;
         $this->inventorySetService = $inventorySetService;
-        $this->updateCharacterAttackTypesHandler = $updateCharacterAttackTypesHandler;
     }
 
     /**
@@ -74,7 +68,7 @@ class EquipItemService
 
             $character = $character->refresh();
 
-            $this->updateCharacterAttackTypesHandler->updateCache($character);
+            CharacterAttackTypesCacheBuilder::dispatch($character);
 
             $response = $this->successResult([
                 'message' => 'Item has been equipped.',

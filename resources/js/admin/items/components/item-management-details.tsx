@@ -7,6 +7,7 @@ import { ITEM_CRAFTING_TYPE_LABELS } from '../enums/item-crafting-type';
 import { ITEM_DEFAULT_POSITION_LABELS } from '../enums/item-default-position';
 import { ITEM_SPECIALTY_TYPE_LABELS } from '../enums/item-specialty-type';
 
+import DetailGridRow from 'ui/detail-grid/detail-grid-row';
 import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
@@ -42,7 +43,7 @@ const ItemManagementDetails = ({
 
     return (
       <section>
-        <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
+        <h2 className="text-marigold-700 dark:text-marigold-500 mb-2 text-base font-semibold">
           Special Acquisition
         </h2>
         <Dl>
@@ -82,11 +83,11 @@ const ItemManagementDetails = ({
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <DetailGridRow>
       {renderSpecialAcquisition()}
 
       <section>
-        <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
+        <h2 className="text-marigold-700 dark:text-marigold-500 mb-2 text-base font-semibold">
           Catalog Management
         </h2>
         <Dl>
@@ -144,7 +145,7 @@ const ItemManagementDetails = ({
           )}
         </Dl>
       </section>
-    </div>
+    </DetailGridRow>
   );
 };
 

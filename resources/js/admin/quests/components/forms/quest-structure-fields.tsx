@@ -113,7 +113,7 @@ const QuestStructureFields = ({
                 {state.required_quest_chain.map((id, index) => (
                   <li
                     key={id}
-                    className="bg-danube-100 text-danube-800 dark:bg-danube-900/40 dark:text-danube-200 flex items-center gap-2 rounded-full px-3 py-1 text-sm"
+                    className="bg-danube-100 text-danube-800 dark:bg-danube-200 dark:text-danube-900 flex items-center gap-2 rounded-full px-3 py-1 text-sm"
                   >
                     <span>
                       {index + 1}. {chainQuestNames[index]}

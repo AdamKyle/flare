@@ -16,7 +16,6 @@ import { MonsterShowScreenProps } from '../screen-manager/monster-screen-props';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
-import Card from 'ui/cards/card';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const MonsterShowScreen = ({
@@ -108,17 +107,16 @@ const MonsterShowScreen = ({
           />
         </div>
 
-        <Card>
-          <MonsterDetail
-            monster={monster}
-            navigation={{
-              on_open_item: handleOpenItem,
-              on_open_map: handleOpenMap,
-              on_open_map_gem: handleOpenMapGem,
-              on_open_location_gem: handleOpenLocationGem,
-            }}
-          />
-        </Card>
+        <MonsterDetail
+          monster={monster}
+          presentation="page"
+          navigation={{
+            on_open_item: handleOpenItem,
+            on_open_map: handleOpenMap,
+            on_open_map_gem: handleOpenMapGem,
+            on_open_location_gem: handleOpenLocationGem,
+          }}
+        />
       </div>
     );
   };

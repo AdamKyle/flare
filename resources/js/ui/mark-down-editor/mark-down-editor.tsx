@@ -144,7 +144,7 @@ function MarkDownEditor({
           <div className="flex items-center justify-end px-2 py-2">
             <button
               type="button"
-              className="bg-danube-100 hover:bg-danube-200 active:bg-danube-300 dark:bg-danube-900/50 dark:hover:bg-danube-800 dark:active:bg-danube-700 rounded-md border border-gray-300 px-2 py-1 text-sm text-gray-800 dark:border-gray-700 dark:text-gray-100"
+              className="bg-danube-100 hover:bg-danube-200 active:bg-danube-300 dark:bg-danube-200 dark:hover:bg-danube-800 dark:active:bg-danube-700 rounded-md border border-gray-300 px-2 py-1 text-sm text-gray-800 dark:border-gray-700 dark:text-gray-900"
               onClick={() => set_is_preview((value) => !value)}
             >
               {is_preview ? 'Edit' : 'Preview'}

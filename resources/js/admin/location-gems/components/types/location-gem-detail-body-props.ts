@@ -1,7 +1,12 @@
 import LocationGemDetailDefinition from '../../api/definitions/location-gem-detail-definition';
 
+export interface LocationGemDetailBodyNavigationDefinition {
+  on_open_map?: (id: number) => void;
+  on_open_location?: (id: number) => void;
+}
+
 export default interface LocationGemDetailBodyProps {
   location_gem: LocationGemDetailDefinition;
-  on_activate_roll?: (gem_id: number) => void;
-  activating_gem_id?: number | null;
+  is_side_peek?: boolean;
+  navigation?: LocationGemDetailBodyNavigationDefinition;
 }

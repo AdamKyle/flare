@@ -80,6 +80,18 @@ const ItemListScreen = (): ReactNode => {
     );
   };
 
+  const handleExport = (): void => {
+    sidePeekEmitter.emit(
+      SidePeekEventType.SIDE_PEEK,
+      SidePeekComponentRegistrationEnum.ADMIN_ITEM_EXPORT,
+      {
+        is_open: true,
+        title: 'Export Items',
+        allow_clicking_outside: true,
+      }
+    );
+  };
+
   const totalPages = response?.meta.pagination.total_pages ?? 0;
   const totalRecords = response?.meta.pagination.total ?? 0;
   const columns = buildItemListColumns(profile);
@@ -158,10 +170,10 @@ const ItemListScreen = (): ReactNode => {
           variant={ButtonVariant.PRIMARY}
           on_click={handleImport}
         />
-        <AdminAnchorButton
-          href={`/admin/items/export?profile=${profile}`}
+        <Button
           label="Export"
           variant={ButtonVariant.PRIMARY}
+          on_click={handleExport}
         />
       </div>
       <DataTable<ItemDefinition>

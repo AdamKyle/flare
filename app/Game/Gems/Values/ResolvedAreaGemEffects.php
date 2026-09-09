@@ -14,7 +14,7 @@ class ResolvedAreaGemEffects
      * @param  ResolvedAreaGemRewardEffects  $rewardEffects  Combined player/reward effects.
      * @param  float  $characterPowerReduction  Combined Character power reduction contributed by Map Gems only.
      * @param  array<int, float>  $craftingSkillBonuses  Combined crafting bonus keyed by GameSkill id.
-     * @param  ResolvedAreaGemRarityEffects  $rarityEffects  Resolved source-specific Unique/Mythic/Cosmic rarity modifiers.
+     * @param  ResolvedAreaGemRarityEffects  $rarityEffects  Resolved Unique/Mythic/Cosmic rarity modifiers.
      * @param  array<int, ResolvedAreaGemSource>  $sources  Source metadata for each contributing Gem.
      * @param  AreaGemContext|null  $contextType  The resolved Area Gem gameplay context.
      * @param  string|null  $contextLabel  Human readable label for the resolved context.
@@ -57,7 +57,7 @@ class ResolvedAreaGemEffects
     }
 
     /**
-     * The resolved source-specific Unique/Mythic/Cosmic rarity modifiers for this context.
+     * The resolved Unique/Mythic/Cosmic rarity modifiers for this context.
      */
     public function rarityEffects(): ResolvedAreaGemRarityEffects
     {

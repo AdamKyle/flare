@@ -3,9 +3,7 @@
 namespace App\Game\Gems\Values;
 
 /**
- * Immutable resolved Unique/Mythic/Cosmic Gem rarity modifiers for a single Game
- * Map/Location gameplay context. Rarity modifiers are source-specific: they never
- * add a Map and a Location contribution together.
+ * Immutable resolved Unique/Mythic/Cosmic Gem rarity modifiers for a Game Map/Location gameplay context.
  */
 class ResolvedAreaGemRarityEffects
 {

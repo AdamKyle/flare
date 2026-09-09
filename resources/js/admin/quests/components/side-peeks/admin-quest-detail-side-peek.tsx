@@ -188,6 +188,7 @@ const AdminQuestDetailSidePeek = ({
 
         <QuestDetail
           quest={quest}
+          presentation="side-peek"
           navigation={{
             on_open_quest: (id) => setNestedSelection({ type: 'quest', id }),
             on_open_item: (id) => setNestedSelection({ type: 'item', id }),

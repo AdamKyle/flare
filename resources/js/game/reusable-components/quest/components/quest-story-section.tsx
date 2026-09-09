@@ -32,7 +32,7 @@ const QuestStorySection = ({ quest }: QuestDetailProps): ReactNode => {
 
   return (
     <div>
-      <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
+      <h2 className="text-marigold-700 dark:text-marigold-500 mb-2 text-base font-semibold">
         Story
       </h2>
       <PillTabs tabs={tabs} ariaLabel="Quest story" />

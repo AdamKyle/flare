@@ -6,9 +6,11 @@ import { GAME_MAP_EVENT_TYPE_LABELS } from '../enums/game-map-event-type';
 import GameMapDetailProps from '../types/game-map-detail-props';
 import GameMapFactualDefinition from '../types/game-map-factual-definition';
 
+import DetailGrid from 'ui/detail-grid/detail-grid';
 import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
+import Separator from 'ui/separator/separator';
 
 interface GameMapBonusEntry {
   label: string;
@@ -171,6 +173,11 @@ const GameMapDetail = ({
     );
   };
 
+  const hasFactsBelowDescription =
+    hasAccessRows ||
+    Boolean(gameMap.required_quest_item) ||
+    bonusEntries.length > 0;
+
   return (
     <div
       className={clsx(
@@ -185,12 +192,17 @@ const GameMapDetail = ({
           className="h-full w-full object-contain"
         />
       </div>
-      <div className="flex flex-col gap-6">
-        {renderDescription()}
+      <DetailGrid>
+        {gameMap.description && (
+          <div className="col-span-full">{renderDescription()}</div>
+        )}
+        {gameMap.description && hasFactsBelowDescription && (
+          <Separator additional_css="col-span-full my-1" />
+        )}
         {renderAccessConfiguration()}
         {renderRequiredQuestItem()}
         {renderBonuses()}
-      </div>
+      </DetailGrid>
     </div>
   );
 };

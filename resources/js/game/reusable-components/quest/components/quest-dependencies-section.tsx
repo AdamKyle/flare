@@ -28,7 +28,6 @@ const QuestDependenciesSection = ({
 
   const hasRows =
     Boolean(structure.parent_quest) ||
-    structure.child_quests.length > 0 ||
     Boolean(structure.required_quest) ||
     structure.required_quest_chain.length > 0;
 
@@ -39,12 +38,6 @@ const QuestDependenciesSection = ({
   const parentQuestState = structure.parent_quest
     ? resolveQuestTreeState(structure.parent_quest, completedQuestIds)
     : undefined;
-
-  const childQuestCards = structure.child_quests.map((child) => ({
-    id: child.id,
-    name: child.name,
-    state: resolveQuestTreeState(child, completedQuestIds),
-  }));
 
   const requiredQuestState = structure.required_quest
     ? resolveQuestTreeState(structure.required_quest, completedQuestIds)
@@ -73,29 +66,6 @@ const QuestDependenciesSection = ({
             state={parentQuestState}
             on_open_quest={navigation?.on_open_quest}
           />
-        </div>
-      </div>
-    );
-  };
-
-  const renderChildQuests = (): ReactNode => {
-    if (childQuestCards.length === 0) {
-      return null;
-    }
-
-    return (
-      <div>
-        <p className={fieldLabelClassName}>Child Quests</p>
-        <div className="mt-1 flex flex-col gap-2">
-          {childQuestCards.map((card) => (
-            <QuestCard
-              key={card.id}
-              quest_id={card.id}
-              name={card.name}
-              state={card.state}
-              on_open_quest={navigation?.on_open_quest}
-            />
-          ))}
         </div>
       </div>
     );
@@ -154,7 +124,6 @@ const QuestDependenciesSection = ({
   return (
     <div className="flex flex-col gap-4">
       {renderParentQuest()}
-      {renderChildQuests()}
       {renderRequiredQuest()}
       {renderRequiredQuestChain()}
     </div>

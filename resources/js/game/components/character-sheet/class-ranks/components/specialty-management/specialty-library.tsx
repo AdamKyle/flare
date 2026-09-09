@@ -10,7 +10,6 @@ import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 import Separator from 'ui/separator/separator';
 
 const statusOptions: DropdownItem[] = [
-  { label: 'Equipped', value: SpecialtyProgressFilter.EQUIPPED },
   { label: 'Mastered', value: SpecialtyProgressFilter.MASTERED },
   { label: 'In Progress', value: SpecialtyProgressFilter.IN_PROGRESS },
   { label: 'Available', value: SpecialtyProgressFilter.AVAILABLE },
@@ -43,8 +42,6 @@ const matchesStatusFilter = (
   filter: SpecialtyProgressFilter
 ): boolean => {
   switch (filter) {
-    case SpecialtyProgressFilter.EQUIPPED:
-      return row.is_equipped;
     case SpecialtyProgressFilter.MASTERED:
       return row.is_mastered;
     case SpecialtyProgressFilter.IN_PROGRESS:
@@ -99,6 +96,7 @@ const SpecialtyLibrary = ({
   );
 
   const visibleRows = rows
+    .filter((row) => !row.is_equipped)
     .filter((row) => row.definition.game_class_id === selectedClassId)
     .filter((row) => matchesStatusFilter(row, statusFilter))
     .sort((a, b) => {
@@ -119,7 +117,7 @@ const SpecialtyLibrary = ({
     >
       <h3
         id="specialty-library-heading"
-        className="text-glacier-900 dark:text-glacier-100 text-sm font-semibold tracking-wide uppercase"
+        className="text-sm font-semibold tracking-wide text-gray-900 uppercase dark:text-gray-100"
       >
         Available Specialties
       </h3>
@@ -128,7 +126,7 @@ const SpecialtyLibrary = ({
         <div className="flex-1">
           <label
             id="specialty-library-class-label"
-            className="text-glacier-800 dark:text-glacier-200 mb-1 block text-xs font-semibold"
+            className="mb-1 block text-xs font-semibold text-gray-700 dark:text-gray-300"
           >
             Class
           </label>
@@ -143,7 +141,7 @@ const SpecialtyLibrary = ({
         <div className="flex-1">
           <label
             id="specialty-library-status-label"
-            className="text-glacier-800 dark:text-glacier-200 mb-1 block text-xs font-semibold"
+            className="mb-1 block text-xs font-semibold text-gray-700 dark:text-gray-300"
           >
             Status
           </label>
@@ -163,7 +161,7 @@ const SpecialtyLibrary = ({
       <Separator additional_css="my-3" />
 
       {visibleRows.length === 0 ? (
-        <p className="text-glacier-700 dark:text-glacier-300 text-sm">
+        <p className="text-sm text-gray-700 dark:text-gray-300">
           No Class Specialties match this filter.
         </p>
       ) : (

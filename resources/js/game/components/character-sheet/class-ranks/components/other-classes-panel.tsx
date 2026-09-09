@@ -64,10 +64,10 @@ const OtherClassesPanel = ({
   return (
     <div className="flex min-h-0 flex-col gap-2 lg:h-full">
       <div>
-        <h3 className="text-glacier-900 dark:text-glacier-100 text-sm font-semibold tracking-wide uppercase">
+        <h3 className="text-sm font-semibold tracking-wide text-gray-900 uppercase dark:text-gray-100">
           Other Classes
         </h3>
-        <p className="text-glacier-600 dark:text-glacier-400 text-xs">
+        <p className="text-xs text-gray-600 dark:text-gray-400">
           Select a Class to view its progression, specialties, and requirements.
         </p>
       </div>
@@ -75,7 +75,7 @@ const OtherClassesPanel = ({
       <div>
         <label
           id="other-classes-progress-filter-label"
-          className="text-glacier-800 dark:text-glacier-200 mb-1 block text-xs font-semibold"
+          className="mb-1 block text-xs font-semibold text-gray-700 dark:text-gray-300"
         >
           Filter Class progress
         </label>

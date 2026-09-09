@@ -31,15 +31,19 @@ import GameMapRelatedNpcsSidePeekProps from '../../../../../admin/game-maps/comp
 import GameMapRelatedQuestItemsSidePeekProps from '../../../../../admin/game-maps/components/side-peeks/types/game-map-related-quest-items-side-peek-props';
 import GameMapRelatedQuestsSidePeekProps from '../../../../../admin/game-maps/components/side-peeks/types/game-map-related-quests-side-peek-props';
 import AdminItemDetailSidePeek from '../../../../../admin/items/components/side-peeks/admin-item-detail-side-peek';
+import ItemExportSidePeek from '../../../../../admin/items/components/side-peeks/item-export-side-peek';
 import ItemFormSidePeek from '../../../../../admin/items/components/side-peeks/item-form-side-peek';
 import ItemImportSidePeek from '../../../../../admin/items/components/side-peeks/item-import-side-peek';
 import AdminItemDetailSidePeekProps from '../../../../../admin/items/components/side-peeks/types/admin-item-detail-side-peek-props';
+import ItemExportSidePeekProps from '../../../../../admin/items/components/side-peeks/types/item-export-side-peek-props';
 import ItemFormSidePeekProps from '../../../../../admin/items/components/side-peeks/types/item-form-side-peek-props';
 import ItemImportSidePeekProps from '../../../../../admin/items/components/side-peeks/types/item-import-side-peek-props';
 import AdminLocationGemDetailSidePeek from '../../../../../admin/location-gems/components/side-peeks/admin-location-gem-detail-side-peek';
+import AdminLocationGemRollDetailSidePeek from '../../../../../admin/location-gems/components/side-peeks/admin-location-gem-roll-detail-side-peek';
 import LocationGemBulkRollResultSidePeek from '../../../../../admin/location-gems/components/side-peeks/location-gem-bulk-roll-result-side-peek';
 import LocationGemImportSidePeek from '../../../../../admin/location-gems/components/side-peeks/location-gem-import-side-peek';
 import AdminLocationGemDetailSidePeekProps from '../../../../../admin/location-gems/components/side-peeks/types/admin-location-gem-detail-side-peek-props';
+import AdminLocationGemRollDetailSidePeekProps from '../../../../../admin/location-gems/components/side-peeks/types/admin-location-gem-roll-detail-side-peek-props';
 import LocationGemBulkRollResultSidePeekProps from '../../../../../admin/location-gems/components/side-peeks/types/location-gem-bulk-roll-result-side-peek-props';
 import LocationGemImportSidePeekProps from '../../../../../admin/location-gems/components/side-peeks/types/location-gem-import-side-peek-props';
 import AdminLocationDetailSidePeek from '../../../../../admin/locations/components/side-peeks/admin-location-detail-side-peek';
@@ -49,9 +53,11 @@ import AdminLocationDetailSidePeekProps from '../../../../../admin/locations/com
 import LocationFormSidePeekProps from '../../../../../admin/locations/components/side-peeks/types/location-form-side-peek-props';
 import LocationImportSidePeekProps from '../../../../../admin/locations/components/side-peeks/types/location-import-side-peek-props';
 import AdminMapGemDetailSidePeek from '../../../../../admin/map-gems/components/side-peeks/admin-map-gem-detail-side-peek';
+import AdminMapGemRollDetailSidePeek from '../../../../../admin/map-gems/components/side-peeks/admin-map-gem-roll-detail-side-peek';
 import MapGemBulkRollResultSidePeek from '../../../../../admin/map-gems/components/side-peeks/map-gem-bulk-roll-result-side-peek';
 import MapGemImportSidePeek from '../../../../../admin/map-gems/components/side-peeks/map-gem-import-side-peek';
 import AdminMapGemDetailSidePeekProps from '../../../../../admin/map-gems/components/side-peeks/types/admin-map-gem-detail-side-peek-props';
+import AdminMapGemRollDetailSidePeekProps from '../../../../../admin/map-gems/components/side-peeks/types/admin-map-gem-roll-detail-side-peek-props';
 import MapGemBulkRollResultSidePeekProps from '../../../../../admin/map-gems/components/side-peeks/types/map-gem-bulk-roll-result-side-peek-props';
 import MapGemImportSidePeekProps from '../../../../../admin/map-gems/components/side-peeks/types/map-gem-import-side-peek-props';
 import BugReportSidePeek from '../../../../../admin/monitoring/logs-dashboard/components/side-peeks/bug-report-side-peek';
@@ -300,6 +306,10 @@ export const SidePeekComponentRegistry: {
     component: ItemImportSidePeek,
     props: {} as ItemImportSidePeekProps,
   },
+  [SidePeekComponentRegistrationEnum.ADMIN_ITEM_EXPORT]: {
+    component: ItemExportSidePeek,
+    props: {} as ItemExportSidePeekProps,
+  },
   [SidePeekComponentRegistrationEnum.ADMIN_QUEST_DETAIL]: {
     component: AdminQuestDetailSidePeek,
     props: {} as AdminQuestDetailSidePeekProps,
@@ -336,6 +346,11 @@ export const SidePeekComponentRegistry: {
     props: {} as MapGemBulkRollResultSidePeekProps,
     content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
   },
+  [SidePeekComponentRegistrationEnum.ADMIN_MAP_GEM_ROLL_DETAIL]: {
+    component: AdminMapGemRollDetailSidePeek,
+    props: {} as AdminMapGemRollDetailSidePeekProps,
+    content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
+  },
   [SidePeekComponentRegistrationEnum.ADMIN_LOCATION_GEM_IMPORT]: {
     component: LocationGemImportSidePeek,
     props: {} as LocationGemImportSidePeekProps,
@@ -348,6 +363,11 @@ export const SidePeekComponentRegistry: {
   [SidePeekComponentRegistrationEnum.ADMIN_LOCATION_GEM_BULK_ROLL_RESULT]: {
     component: LocationGemBulkRollResultSidePeek,
     props: {} as LocationGemBulkRollResultSidePeekProps,
+    content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
+  },
+  [SidePeekComponentRegistrationEnum.ADMIN_LOCATION_GEM_ROLL_DETAIL]: {
+    component: AdminLocationGemRollDetailSidePeek,
+    props: {} as AdminLocationGemRollDetailSidePeekProps,
     content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
   },
   // Add more components here

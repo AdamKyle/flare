@@ -25,6 +25,7 @@ import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import Card from 'ui/cards/card';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
+import Separator from 'ui/separator/separator';
 
 const ItemShowScreen = ({
   item_id: itemId,
@@ -261,22 +262,29 @@ const ItemShowScreen = ({
         {renderBlockers()}
 
         <Card>
-          <AdminItemPresentation item={item} navigation={questItemNavigation} />
-        </Card>
+          <div className="flex flex-col gap-6">
+            <AdminItemPresentation
+              item={item}
+              navigation={questItemNavigation}
+            />
 
-        <Card>
-          <ItemManagementDetails
-            type={item.type}
-            management={item.management}
-          />
-        </Card>
+            <Separator additional_css="my-1" />
 
-        <ItemUsageCard
-          usage={usage.usage}
-          loading={usage.loading}
-          error={usage.error}
-          on_open_related_entity={handleOpenRelatedEntity}
-        />
+            <ItemManagementDetails
+              type={item.type}
+              management={item.management}
+            />
+
+            <Separator additional_css="my-1" />
+
+            <ItemUsageCard
+              usage={usage.usage}
+              loading={usage.loading}
+              error={usage.error}
+              on_open_related_entity={handleOpenRelatedEntity}
+            />
+          </div>
+        </Card>
 
         <div className="flex flex-wrap items-center gap-3">
           {renderDeleteAction()}

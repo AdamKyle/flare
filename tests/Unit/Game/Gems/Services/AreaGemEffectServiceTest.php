@@ -91,6 +91,24 @@ class AreaGemEffectServiceTest extends TestCase
         $this->assertSame(0.2, round($result->monsterEffect(AreaGemMonsterEffect::ENEMY_STRENGTH_INCREASE), 2));
     }
 
+    public function test_resolve_for_game_map_with_rolled_location_gem_adds_map_and_location_reward_effects(): void
+    {
+        $gameMap = $this->createGameMap(['name' => 'Combined Reward Map', 'default' => false]);
+        $mapProfile = $this->createGameMapGemParamter(['game_map_id' => $gameMap->id]);
+        $mapGem = $this->createMapGeneratedGem($mapProfile, ['gold_gain' => 0.1, 'kingdom_passive_training_reduction' => 0.05]);
+        $mapProfile->update(['rolled_gem_id' => $mapGem->id]);
+
+        $location = $this->createLocation(['game_map_id' => $gameMap->id, 'type' => null]);
+        $locationProfile = $this->createGameLocationGemParamter(['location_id' => $location->id]);
+        $locationGem = $this->createLocationGeneratedGem($locationProfile, ['gold_gain' => 0.2, 'kingdom_passive_training_reduction' => 0.08]);
+        $locationProfile->update(['rolled_gem_id' => $locationGem->id]);
+
+        $result = $this->areaGemEffectService->resolveForGameMap($gameMap->refresh(), $location->refresh());
+
+        $this->assertSame(0.3, round($result->rewardEffect(AreaGemRewardEffect::GOLD_GAIN), 2));
+        $this->assertSame(0.13, round($result->rewardEffect(AreaGemRewardEffect::KINGDOM_PASSIVE_TRAINING_REDUCTION), 2));
+    }
+
     public function test_resolve_for_game_map_without_rolled_location_gem_falls_back_to_map_gem_monster_effect(): void
     {
         $gameMap = $this->createGameMap(['name' => 'Fallback Monster Map', 'default' => false]);
@@ -313,7 +331,7 @@ class AreaGemEffectServiceTest extends TestCase
         $this->assertSame(0.3, round($result->rarityEffects()->cosmic(), 2));
     }
 
-    public function test_normal_location_with_rolled_gem_uses_location_gem_rarity_only(): void
+    public function test_normal_location_with_rolled_gem_adds_map_and_location_rarity(): void
     {
         $gameMap = $this->createGameMap(['name' => 'Normal Location Rarity', 'default' => false]);
         $mapProfile = $this->createGameMapGemParamter(['game_map_id' => $gameMap->id]);
@@ -327,7 +345,7 @@ class AreaGemEffectServiceTest extends TestCase
 
         $result = $this->areaGemEffectService->resolveForGameMap($gameMap->refresh(), $location->refresh());
 
-        $this->assertSame(0.15, round($result->rarityEffects()->unique(), 2));
+        $this->assertSame(1.05, round($result->rarityEffects()->unique(), 2));
     }
 
     public function test_normal_location_without_rolled_gem_falls_back_to_map_gem_rarity(): void

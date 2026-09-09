@@ -89,7 +89,7 @@ class CreateMonsterCacheTest extends TestCase
         $this->assertSame(15, $cached['str']);
     }
 
-    public function test_location_cache_applies_map_and_location_gem_at_normal_multiplier(): void
+    public function test_location_gem_overrides_map_gem_monster_effects_in_a_normal_location(): void
     {
         $gameMap = $this->createGameMap(['name' => 'Command Location Gem Map', 'default' => false]);
         $mapProfile = $this->createGameMapGemParamter(['game_map_id' => $gameMap->id]);
@@ -108,7 +108,7 @@ class CreateMonsterCacheTest extends TestCase
         $cached = collect(Cache::get(MonsterCacheKey::LOCATION_MONSTERS->value)['location-'.$location->id]['data'])
             ->firstWhere('id', $monster->id);
 
-        $this->assertSame(13, $cached['str']);
+        $this->assertSame(12, $cached['str']);
         $this->assertSame($monster->id, $cached['id']);
     }
 
@@ -137,7 +137,7 @@ class CreateMonsterCacheTest extends TestCase
         $this->assertSame(12, $cached['str']);
     }
 
-    public function test_location_gem_world_combines_parent_map_and_location_gem_monster_effects(): void
+    public function test_location_gem_world_doubles_location_gem_monster_effects_without_adding_parent_map_gem_monster_effects(): void
     {
         $parentMap = $this->createGameMap(['name' => 'Command Parent Location Gem World Map', 'default' => false]);
         $mapProfile = $this->createGameMapGemParamter(['game_map_id' => $parentMap->id]);
@@ -165,7 +165,7 @@ class CreateMonsterCacheTest extends TestCase
         $cached = collect(Cache::get(MonsterCacheKey::MONSTERS->value)[$generatedMap->name]['data'])
             ->firstWhere('id', $monster->id);
 
-        $this->assertSame(15, $cached['str']);
+        $this->assertSame(14, $cached['str']);
     }
 
     public function test_raid_monster_remains_unaffected_by_a_rolled_gem(): void

@@ -11,7 +11,7 @@ const FloatingCard = (props: FloatingCardProps) => {
     return (
       <button
         type="button"
-        className="flex h-9 w-9 items-center justify-center rounded-full border-none bg-transparent p-0 text-gray-700 transition-colors duration-200 ease-in-out hover:bg-gray-500/20 focus-visible:ring-2 focus-visible:ring-gray-600 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-400 focus-visible:outline-none dark:text-gray-300 dark:hover:bg-gray-700 dark:focus-visible:ring-gray-300 dark:focus-visible:ring-offset-gray-800"
+        className="flex h-9 w-9 items-center justify-center rounded-full border-none bg-transparent p-0 text-gray-700 transition-colors duration-200 ease-in-out hover:bg-gray-200 focus-visible:ring-2 focus-visible:ring-gray-600 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-400 focus-visible:outline-none dark:text-gray-300 dark:hover:bg-gray-700 dark:focus-visible:ring-gray-300 dark:focus-visible:ring-offset-gray-800"
         onClick={props.back_action}
         aria-label="Go back"
         title="Go back"

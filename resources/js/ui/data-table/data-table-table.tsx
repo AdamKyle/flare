@@ -23,7 +23,7 @@ const DataTableTable = <TRow,>({
     const columnSortKey = column.sort_key ?? column.key;
 
     if (columnSortKey !== sort_key) {
-      return <i className="fas fa-sort text-glacier-400" aria-hidden="true" />;
+      return <i className="fas fa-sort text-gray-400" aria-hidden="true" />;
     }
 
     if (sort_direction === 'desc') {
@@ -75,7 +75,7 @@ const DataTableTable = <TRow,>({
         type="button"
         onClick={() => on_sort_change(column.sort_key ?? column.key)}
         aria-label={sortActionLabel}
-        className="focus-visible:ring-glacier-500 dark:focus-visible:ring-glacier-300 inline-flex items-center gap-1 rounded-sm font-semibold focus:outline-none focus-visible:ring-2"
+        className="focus-visible:ring-brand-600 dark:focus-visible:ring-brand-400 inline-flex items-center gap-1 rounded-sm font-semibold focus:outline-none focus-visible:ring-2"
       >
         <span>{column.header}</span>
         {renderSortIcon(column)}
@@ -92,7 +92,7 @@ const DataTableTable = <TRow,>({
           column.sortable ? resolveColumnSortDirection(column) : undefined
         }
         className={clsx(
-          'text-glacier-700 dark:text-glacier-200 px-3 py-2 text-left text-xs font-semibold tracking-wide uppercase',
+          'px-3 py-2.5 text-left text-xs font-semibold tracking-wide text-gray-700 uppercase dark:text-gray-300',
           column.header_class_name
         )}
         style={
@@ -117,7 +117,7 @@ const DataTableTable = <TRow,>({
         type="button"
         onClick={() => action.on_click(row)}
         aria-label={action.aria_label ? action.aria_label(row) : action.label}
-        className="focus-visible:ring-glacier-500 dark:focus-visible:ring-glacier-300 text-danube-600 dark:text-danube-300 ml-2 rounded-sm text-sm font-medium hover:underline focus:outline-none focus-visible:ring-2"
+        className="focus-visible:ring-brand-600 dark:focus-visible:ring-brand-400 ml-2 rounded-sm text-sm font-medium text-gray-700 hover:text-gray-900 hover:underline focus:outline-none focus-visible:ring-2 dark:text-gray-300 dark:hover:text-gray-100"
       >
         {action.label}
       </button>
@@ -137,7 +137,7 @@ const DataTableTable = <TRow,>({
         <button
           type="button"
           onClick={() => on_row_activate(row)}
-          className="focus-visible:ring-glacier-500 dark:focus-visible:ring-glacier-300 text-danube-600 dark:text-danube-300 w-full rounded-sm text-left font-medium hover:underline focus:outline-none focus-visible:ring-2"
+          className="focus-visible:ring-brand-600 dark:focus-visible:ring-brand-400 w-full rounded-sm text-left font-semibold text-gray-900 hover:underline focus:outline-none focus-visible:ring-2 dark:text-gray-100"
         >
           <span>{column.value(row)}</span>
         </button>
@@ -154,7 +154,7 @@ const DataTableTable = <TRow,>({
     <td
       key={column.key}
       className={clsx(
-        'text-glacier-900 dark:text-glacier-100 px-3 py-2 align-top text-sm break-words',
+        'px-3 py-2.5 align-top text-sm break-words text-gray-900 dark:text-gray-100',
         column.class_name
       )}
     >
@@ -165,7 +165,7 @@ const DataTableTable = <TRow,>({
   const renderRow = (row: TRow) => (
     <tr
       key={row_id(row)}
-      className="border-glacier-200 hover:bg-glacier-50 dark:border-glacier-800 dark:hover:bg-glacier-900 border-b last:border-0"
+      className="border-b border-gray-200 last:border-0 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700"
     >
       {columns.map((column, index) => renderCell(row, column, index))}
     </tr>
@@ -175,7 +175,7 @@ const DataTableTable = <TRow,>({
     <tr>
       <td
         colSpan={columns.length}
-        className="text-glacier-600 dark:text-glacier-300 px-3 py-6 text-center text-sm"
+        className="px-3 py-6 text-center text-sm text-gray-600 dark:text-gray-300"
       >
         {empty_message}
       </td>
@@ -195,7 +195,7 @@ const DataTableTable = <TRow,>({
       <table className="w-full border-collapse">
         <caption className="sr-only">{caption}</caption>
         <thead>
-          <tr className="border-glacier-200 bg-glacier-100 dark:border-glacier-700 dark:bg-glacier-900 border-b">
+          <tr className="border-b border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
             {renderHeaders()}
           </tr>
         </thead>

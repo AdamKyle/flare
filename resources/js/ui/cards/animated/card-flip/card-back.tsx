@@ -32,7 +32,7 @@ const CardBack = ({
 
   return (
     <div
-      className="absolute inset-0 flex h-full flex-col items-center justify-between rounded-t-xl border-x border-t border-gray-900/60 bg-gray-900 px-4 py-4 text-center text-gray-50 shadow-sm transition-shadow group-hover:shadow-md dark:border-gray-700/80 dark:bg-gray-700"
+      className="absolute inset-0 flex h-full flex-col items-center justify-between rounded-t-xl border-x border-t border-gray-900 bg-gray-900 px-4 py-4 text-center text-gray-50 shadow-sm transition-shadow group-hover:shadow-md dark:border-gray-700 dark:bg-gray-700"
       style={{
         backfaceVisibility: 'hidden',
         WebkitBackfaceVisibility: 'hidden',

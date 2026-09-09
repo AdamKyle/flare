@@ -467,7 +467,22 @@ class LocationGemsApiControllerTest extends TestCase
         $this->assertNotSame($existingGem->id, $profile->rolled_gem_id);
     }
 
-    public function test_detail_roll_history_includes_every_roll_newest_first_with_active_marked(): void
+    public function test_detail_no_longer_includes_roll_history(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $profile = $this->createGameLocationGemParamter(['name' => 'History Profile']);
+        $secondGem = $this->createLocationGeneratedGem($profile, ['name' => 'History Gem 2', 'roll_number' => 2]);
+        $profile->update(['rolled_gem_id' => $secondGem->id, 'roll_count' => 2]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/location-gems/'.$profile->id);
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertArrayNotHasKey('roll_history', $data);
+        $this->assertTrue($data['rolled_gem']['is_active']);
+        $this->assertSame($secondGem->id, $data['rolled_gem']['id']);
+    }
+
+    public function test_paginated_rolls_endpoint_returns_every_roll_active_first(): void
     {
         $admin = $this->createAdmin($this->createAdminRole());
         $profile = $this->createGameLocationGemParamter(['name' => 'History Profile']);
@@ -475,16 +490,17 @@ class LocationGemsApiControllerTest extends TestCase
         $secondGem = $this->createLocationGeneratedGem($profile, ['name' => 'History Gem 2', 'roll_number' => 2]);
         $profile->update(['rolled_gem_id' => $secondGem->id, 'roll_count' => 2]);
 
-        $response = $this->actingAs($admin)->call('GET', '/api/admin/location-gems/'.$profile->id);
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/location-gems/'.$profile->id.'/rolls');
         $data = json_decode($response->getContent(), true);
 
-        $this->assertCount(2, $data['roll_history']);
-        $this->assertSame($secondGem->id, $data['roll_history'][0]['id']);
-        $this->assertTrue($data['roll_history'][0]['is_active']);
-        $this->assertSame($firstGem->id, $data['roll_history'][1]['id']);
-        $this->assertFalse($data['roll_history'][1]['is_active']);
-        $this->assertTrue($data['rolled_gem']['is_active']);
-        $this->assertSame($secondGem->id, $data['rolled_gem']['id']);
+        $response->assertStatus(200);
+        $this->assertCount(2, $data['data']);
+        $this->assertSame($secondGem->id, $data['data'][0]['id']);
+        $this->assertTrue($data['data'][0]['is_active']);
+        $this->assertSame($firstGem->id, $data['data'][1]['id']);
+        $this->assertFalse($data['data'][1]['is_active']);
+        $this->assertSame(10, $data['meta']['pagination']['per_page']);
+        $this->assertSame(2, $data['meta']['pagination']['total']);
     }
 
     public function test_activate_roll_switches_active_gem_without_changing_roll_count(): void
@@ -605,6 +621,102 @@ class LocationGemsApiControllerTest extends TestCase
         );
 
         $this->assertSame(422, $response->getStatusCode());
+    }
+
+    public function test_store_rejects_range_with_minimum_above_maximum(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $map = $this->createGameMap(['name' => 'Inverted Range Map']);
+        $location = $this->createLocation(['name' => 'Inverted Range Location', 'game_map_id' => $map->id, 'type' => 1]);
+
+        $response = $this->actingAs($admin)->call(
+            'POST',
+            '/api/admin/location-gems',
+            [
+                'location_id' => $location->id,
+                'name' => 'Inverted Range Profile',
+                'gold_gain_range' => '0.5-0.2',
+            ],
+            [], [], ['HTTP_ACCEPT' => 'application/json'],
+        );
+
+        $this->assertSame(422, $response->getStatusCode());
+    }
+
+    public function test_store_normalizes_blank_range_to_null(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $map = $this->createGameMap(['name' => 'Blank Range Map']);
+        $location = $this->createLocation(['name' => 'Blank Range Location', 'game_map_id' => $map->id, 'type' => 1]);
+
+        $response = $this->actingAs($admin)->call('POST', '/api/admin/location-gems', [
+            'location_id' => $location->id,
+            'name' => 'Blank Range Profile',
+            'gold_gain_range' => '',
+        ]);
+
+        $this->assertSame(201, $response->getStatusCode());
+        $this->assertDatabaseHas('game_location_gem_paramters', [
+            'name' => 'Blank Range Profile',
+            'gold_gain_range' => null,
+        ]);
+    }
+
+    public function test_store_normalizes_zero_range_to_null(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $map = $this->createGameMap(['name' => 'Zero Range Map']);
+        $location = $this->createLocation(['name' => 'Zero Range Location', 'game_map_id' => $map->id, 'type' => 1]);
+
+        $response = $this->actingAs($admin)->call('POST', '/api/admin/location-gems', [
+            'location_id' => $location->id,
+            'name' => 'Zero Range Profile',
+            'gold_gain_range' => '0',
+        ]);
+
+        $this->assertSame(201, $response->getStatusCode());
+        $this->assertDatabaseHas('game_location_gem_paramters', [
+            'name' => 'Zero Range Profile',
+            'gold_gain_range' => null,
+        ]);
+    }
+
+    public function test_store_normalizes_zero_to_zero_range_to_null(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $map = $this->createGameMap(['name' => 'Zero To Zero Range Map']);
+        $location = $this->createLocation(['name' => 'Zero To Zero Range Location', 'game_map_id' => $map->id, 'type' => 1]);
+
+        $response = $this->actingAs($admin)->call('POST', '/api/admin/location-gems', [
+            'location_id' => $location->id,
+            'name' => 'Zero To Zero Range Profile',
+            'gold_gain_range' => '0-0',
+        ]);
+
+        $this->assertSame(201, $response->getStatusCode());
+        $this->assertDatabaseHas('game_location_gem_paramters', [
+            'name' => 'Zero To Zero Range Profile',
+            'gold_gain_range' => null,
+        ]);
+    }
+
+    public function test_store_preserves_valid_configured_range(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $map = $this->createGameMap(['name' => 'Configured Range Map']);
+        $location = $this->createLocation(['name' => 'Configured Range Location', 'game_map_id' => $map->id, 'type' => 1]);
+
+        $response = $this->actingAs($admin)->call('POST', '/api/admin/location-gems', [
+            'location_id' => $location->id,
+            'name' => 'Configured Range Profile',
+            'gold_gain_range' => '0.01-0.05',
+        ]);
+
+        $this->assertSame(201, $response->getStatusCode());
+        $this->assertDatabaseHas('game_location_gem_paramters', [
+            'name' => 'Configured Range Profile',
+            'gold_gain_range' => '0.01-0.05',
+        ]);
     }
 
     public function test_edit_returns_current_form_values(): void

@@ -35,8 +35,8 @@ const MonsterRaidSection = ({ monster }: MonsterDetailProps): ReactNode => {
 
   return (
     <div>
-      <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
-        Raid &amp; Special Rules
+      <h2 className="text-marigold-700 dark:text-marigold-500 mb-2 text-base font-semibold">
+        Raid / Special
       </h2>
       <Dl>
         {raid.is_raid_monster && (

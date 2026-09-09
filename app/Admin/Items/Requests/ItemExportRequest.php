@@ -2,7 +2,7 @@
 
 namespace App\Admin\Items\Requests;
 
-use App\Admin\Items\Values\ItemProfile;
+use App\Admin\Items\Values\ItemExportProfile;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -22,25 +22,15 @@ class ItemExportRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'profile' => ['required', 'string', Rule::enum(ItemProfile::class)],
+            'profile' => ['required', 'string', Rule::enum(ItemExportProfile::class)],
         ];
-    }
-
-    /**
-     * Apply the Items export default profile before validation runs.
-     */
-    protected function prepareForValidation(): void
-    {
-        $this->merge([
-            'profile' => $this->input('profile', ItemProfile::ALL->value),
-        ]);
     }
 
     /**
      * Resolve the validated Item export profile.
      */
-    public function profile(): ItemProfile
+    public function profile(): ItemExportProfile
     {
-        return ItemProfile::from($this->validated('profile'));
+        return ItemExportProfile::from($this->validated('profile'));
     }
 }

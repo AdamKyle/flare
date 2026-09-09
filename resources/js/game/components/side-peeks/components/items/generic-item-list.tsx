@@ -119,7 +119,7 @@ const GenericItemList = ({
     }
 
     return (
-      <div className="sticky top-0 z-10 rounded border-b border-gray-200 bg-white/90 px-2 py-2 backdrop-blur-sm dark:border-gray-700 dark:bg-gray-800/90">
+      <div className="sticky top-0 z-10 rounded border-b border-gray-200 bg-white px-2 py-2 backdrop-blur-sm dark:border-gray-700 dark:bg-gray-800">
         <div className="flex items-center justify-between">
           <label
             htmlFor="select-all-visible"

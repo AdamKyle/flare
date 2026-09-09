@@ -7,4 +7,5 @@ export default interface QuestDetailProps {
   navigation?: QuestTreeNavigationDefinition;
   completed_quest_ids?: number[];
   quest_item_ownership?: Record<number, QuestItemOwnershipState>;
+  presentation?: 'page' | 'side-peek';
 }

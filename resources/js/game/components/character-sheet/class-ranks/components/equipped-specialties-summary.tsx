@@ -20,7 +20,7 @@ const EquippedSpecialtiesSummary = ({
 
     if (specialtiesEquipped.length === 0) {
       return (
-        <p className="text-glacier-700 dark:text-glacier-300 text-sm">
+        <p className="text-sm text-gray-700 dark:text-gray-300">
           No Class Specialties are equipped.
         </p>
       );
@@ -49,7 +49,7 @@ const EquippedSpecialtiesSummary = ({
 
   return (
     <div className="flex flex-col gap-2">
-      <h3 className="text-glacier-900 dark:text-glacier-100 text-sm font-semibold tracking-wide uppercase">
+      <h3 className="text-sm font-semibold tracking-wide text-gray-900 uppercase dark:text-gray-100">
         Equipped Specialties
       </h3>
       {renderBody()}

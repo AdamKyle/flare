@@ -34,7 +34,7 @@ const CurrentlyEquippedPanel = ({
   };
 
   return (
-    <div className="mb-4 rounded-md border border-gray-200/60 bg-gray-100/30 px-3 py-2 dark:border-gray-700/60 dark:bg-gray-800/30">
+    <div className="mb-4 rounded-md border border-gray-200 bg-gray-100 px-3 py-2 dark:border-gray-700 dark:bg-gray-800">
       <div className="text-mango-tango-500 dark:text-mango-tango-300 mb-1 text-[11px] font-semibold tracking-wide uppercase">
         Currently Equipped
       </div>

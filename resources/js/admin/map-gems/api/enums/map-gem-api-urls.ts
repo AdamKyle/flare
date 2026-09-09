@@ -7,4 +7,5 @@ export enum MapGemApiUrls {
   ROLL = '/admin/map-gems/{gameMapGemParamter}/roll',
   ROLL_ALL = '/admin/map-gems/roll-all',
   ACTIVATE_ROLL = '/admin/map-gems/{gameMapGemParamter}/rolls/{gem}/activate',
+  ROLLS = '/admin/map-gems/{gameMapGemParamter}/rolls',
 }

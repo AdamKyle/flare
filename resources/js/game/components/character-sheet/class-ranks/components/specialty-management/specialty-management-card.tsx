@@ -8,13 +8,13 @@ import { ProgressBarVariant } from 'ui/progress/enums/progress-bar-variant';
 import ProgressBar from 'ui/progress/progress-bar';
 
 const masteredStyles =
-  'border-de-york-400 dark:border-de-york-700 bg-de-york-50 dark:bg-de-york-950/40 hover:bg-de-york-100 dark:hover:bg-de-york-900/50';
+  'border-de-york-400 dark:border-de-york-500 bg-de-york-100 dark:bg-de-york-100 hover:bg-de-york-200 dark:hover:bg-de-york-200 text-de-york-900 dark:text-de-york-900';
 
 const lockedStyles =
-  'border-mango-tango-400 dark:border-mango-tango-700 bg-mango-tango-100 dark:bg-mango-tango-950/40 hover:bg-mango-tango-200 dark:hover:bg-mango-tango-900/50';
+  'border-mango-tango-400 dark:border-mango-tango-500 bg-mango-tango-100 dark:bg-mango-tango-100 hover:bg-mango-tango-200 dark:hover:bg-mango-tango-200 text-mango-tango-900 dark:text-mango-tango-900';
 
 const normalStyles =
-  'border-glacier-300 dark:border-glacier-700 hover:bg-glacier-100 dark:hover:bg-glacier-900/40';
+  'border-glacier-400 dark:border-glacier-500 bg-glacier-100 dark:bg-glacier-100 hover:bg-glacier-200 dark:hover:bg-glacier-200 text-glacier-900 dark:text-glacier-900';
 
 const resolveCardStyles = (
   row: SpecialtyManagementCardProps['row']
@@ -77,12 +77,8 @@ const SpecialtyManagementCard = ({
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex flex-col">
-          <span className="text-glacier-900 dark:text-glacier-100 font-semibold">
-            {row.definition.name}
-          </span>
-          <span className="text-glacier-600 dark:text-glacier-400 text-xs">
-            {row.definition.class_name}
-          </span>
+          <span className="font-semibold">{row.definition.name}</span>
+          <span className="text-xs">{row.definition.class_name}</span>
         </div>
         <SpecialtyStateBadges
           is_damage={row.is_damage}
@@ -95,7 +91,7 @@ const SpecialtyManagementCard = ({
         />
       </div>
 
-      <span className="text-glacier-700 dark:text-glacier-300 text-xs">
+      <span className="text-xs">
         Requires Class Level {row.definition.requires_class_rank_level}
         {' · '}Current Class Level {currentClassLevel}
       </span>

@@ -81,7 +81,7 @@ const LineChartTooltip = <TData extends object>({
   return (
     <div
       role="tooltip"
-      className="space-y-1 rounded-sm bg-gray-100/90 p-2 text-xs shadow-sm dark:bg-gray-800/90"
+      className="space-y-1 rounded-sm bg-gray-100 p-2 text-xs shadow-sm dark:bg-gray-800"
     >
       <div className="font-medium text-gray-900 dark:text-gray-100">
         {x_formatter(resolvedXValue)}

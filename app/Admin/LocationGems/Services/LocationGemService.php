@@ -176,6 +176,18 @@ class LocationGemService
     }
 
     /**
+     * Paginate the Gem roll history for the given Location Gem profile, active roll first.
+     */
+    public function paginateRolls(GameLocationGemParamter $gameLocationGemParamter, int $perPage, int $page): LengthAwarePaginator
+    {
+        return $gameLocationGemParamter->gemRolls()
+            ->orderByRaw('CASE WHEN id = ? THEN 0 ELSE 1 END', [$gameLocationGemParamter->rolled_gem_id])
+            ->orderByDesc('roll_number')
+            ->orderByDesc('id')
+            ->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    /**
      * Activate an existing Location Gem roll without regenerating its Gem World.
      */
     public function activateRoll(GameLocationGemParamter $gameLocationGemParamter, Gem $gem): bool

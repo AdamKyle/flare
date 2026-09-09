@@ -60,7 +60,7 @@ const QuestRequirementsSection = ({
 
   return (
     <div className="flex flex-col gap-4">
-      <h3 className="text-glacier-900 dark:text-glacier-100 text-sm font-semibold">
+      <h3 className="text-marigold-700 dark:text-marigold-500 text-base font-semibold">
         Requirements
       </h3>
       {requirements.primary_item && (

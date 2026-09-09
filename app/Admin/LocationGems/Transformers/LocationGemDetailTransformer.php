@@ -6,7 +6,6 @@ use App\Admin\Transformers\AdminGemRollTransformer;
 use App\Flare\Models\GameLocationGemParamter;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameSkill;
-use App\Flare\Models\Gem;
 
 class LocationGemDetailTransformer
 {
@@ -37,7 +36,6 @@ class LocationGemDetailTransformer
             'monster_atonement_range' => $gameLocationGemParamter->monster_atonement_range,
             'roll_count' => $gameLocationGemParamter->roll_count,
             'rolled_gem' => $this->transformRolledGem($gameLocationGemParamter),
-            'roll_history' => $this->transformRollHistory($gameLocationGemParamter),
             'generated_gem_world' => $this->transformGeneratedGemWorld($gameLocationGemParamter->generatedMap),
         ];
     }
@@ -92,23 +90,6 @@ class LocationGemDetailTransformer
         }
 
         return $this->adminGemRollTransformer->transform($gameLocationGemParamter->rolledGem, true);
-    }
-
-    /**
-     * Transform every Gem roll ever created for this profile, newest first.
-     */
-    private function transformRollHistory(GameLocationGemParamter $gameLocationGemParamter): array
-    {
-        return $gameLocationGemParamter->gemRolls()
-            ->orderByDesc('roll_number')
-            ->orderByDesc('id')
-            ->get()
-            ->map(fn (Gem $gem): array => $this->adminGemRollTransformer->transform(
-                $gem,
-                $gem->id === $gameLocationGemParamter->rolled_gem_id,
-            ))
-            ->values()
-            ->all();
     }
 
     /**

@@ -6,25 +6,25 @@ const badgeBaseStyles =
   'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap';
 
 const damageStyles =
-  'bg-wisp-pink-100 text-wisp-pink-800 dark:bg-wisp-pink-900/60 dark:text-wisp-pink-200';
+  'bg-wisp-pink-200 text-wisp-pink-900 dark:bg-wisp-pink-200 dark:text-wisp-pink-900';
 
 const passiveStyles =
-  'bg-glacier-100 text-glacier-800 dark:bg-glacier-900/60 dark:text-glacier-200';
+  'bg-glacier-200 text-glacier-900 dark:bg-glacier-200 dark:text-glacier-900';
 
 const equippedStyles =
-  'bg-danube-100 text-danube-800 dark:bg-danube-900/60 dark:text-danube-200';
+  'bg-danube-200 text-danube-900 dark:bg-danube-200 dark:text-danube-900';
 
 const masteredStyles =
-  'bg-de-york-100 text-de-york-800 dark:bg-de-york-900/60 dark:text-de-york-200';
+  'bg-de-york-200 text-de-york-900 dark:bg-de-york-200 dark:text-de-york-900';
 
 const inProgressStyles =
-  'bg-glacier-100 text-glacier-800 dark:bg-glacier-900/60 dark:text-glacier-200';
+  'bg-glacier-200 text-glacier-900 dark:bg-glacier-200 dark:text-glacier-900';
 
 const availableStyles =
   'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
 
 const lockedStyles =
-  'bg-mango-tango-100 text-mango-tango-800 dark:bg-mango-tango-900/60 dark:text-mango-tango-200';
+  'bg-mango-tango-200 text-mango-tango-900 dark:bg-mango-tango-200 dark:text-mango-tango-900';
 
 const SpecialtyStateBadges = (props: SpecialtyStateBadgesProps): ReactNode => (
   <div className="flex flex-wrap items-center gap-1">

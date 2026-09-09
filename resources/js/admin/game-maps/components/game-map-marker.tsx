@@ -43,7 +43,7 @@ const GameMapMarker = ({
       aria-label={accessibleName}
       title={accessibleName}
       className={clsx(
-        'focus-visible:ring-mango-tango-400 absolute m-0 flex size-6 items-center justify-center rounded-full border-0 bg-white/90 p-0 leading-none shadow focus:outline-none focus-visible:ring-2 dark:bg-gray-900/90',
+        'focus-visible:ring-mango-tango-400 absolute m-0 flex size-6 items-center justify-center rounded-full border-0 bg-white p-0 leading-none shadow focus:outline-none focus-visible:ring-2 dark:bg-gray-900',
         GAME_MAP_MARKER_COLOR[variant]
       )}
       style={{

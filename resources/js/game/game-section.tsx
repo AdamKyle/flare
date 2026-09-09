@@ -45,7 +45,7 @@ const GameSection = () => {
 
         <div
           className={clsx(
-            'mx-auto w-full rounded-sm lg:w-3/4 dark:border dark:border-gray-700 dark:p-3',
+            'mx-auto w-full lg:w-3/4 dark:rounded-sm dark:border dark:border-gray-700 dark:p-3',
             {
               'mt-4': stackDepth > 0,
             }

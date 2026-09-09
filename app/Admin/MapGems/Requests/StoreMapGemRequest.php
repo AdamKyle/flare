@@ -2,13 +2,15 @@
 
 namespace App\Admin\MapGems\Requests;
 
+use App\Admin\Requests\Concerns\HasGemRangeValidation;
 use App\Game\Gems\Values\GemTypeValue;
-use Closure;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class StoreMapGemRequest extends FormRequest
 {
+    use HasGemRangeValidation;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -46,7 +48,7 @@ class StoreMapGemRequest extends FormRequest
     /**
      * Return every range field managed by the Map Gem form.
      */
-    private function rangeFields(): array
+    protected function rangeFields(): array
     {
         return [
             'character_xp_bonus_range',
@@ -78,27 +80,6 @@ class StoreMapGemRequest extends FormRequest
             'monster_xp_increase_range',
             'monster_gold_drop_increase_range',
             'monster_atonement_range',
-        ];
-    }
-
-    /**
-     * Build the Map Gem range-field validation rule.
-     */
-    private function rangeRule(): array
-    {
-        return [
-            'nullable',
-            'string',
-            'max:255',
-            function (string $attribute, mixed $value, Closure $fail): void {
-                if (is_null($value) || trim($value) === '') {
-                    return;
-                }
-
-                if (preg_match('/^\d+(?:\.\d+)?-\d+(?:\.\d+)?$/', $value) !== 1) {
-                    $fail('The range must contain exactly two nonnegative numeric values separated by a hyphen.');
-                }
-            },
         ];
     }
 }

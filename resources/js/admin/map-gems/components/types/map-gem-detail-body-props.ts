@@ -1,7 +1,11 @@
 import MapGemDetailDefinition from '../../api/definitions/map-gem-detail-definition';
 
+export interface MapGemDetailBodyNavigationDefinition {
+  on_open_map?: (id: number) => void;
+}
+
 export default interface MapGemDetailBodyProps {
   map_gem: MapGemDetailDefinition;
-  on_activate_roll?: (gem_id: number) => void;
-  activating_gem_id?: number | null;
+  is_side_peek?: boolean;
+  navigation?: MapGemDetailBodyNavigationDefinition;
 }

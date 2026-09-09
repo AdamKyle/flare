@@ -3,7 +3,9 @@ import { useCallback, useMemo, useState } from 'react';
 import UseChatActionsDefinition from './definitions/use-chat-actions-definition';
 import UseChatActionsParamsDefinition from './definitions/use-chat-actions-params-definition';
 import AnnouncementMessageDefinition from '../../../api-definitions/chat/annoucement-message-definition';
-import ChatType from '../../../api-definitions/chat/chat-message-definition';
+import ChatType, {
+  ChatMessageType,
+} from '../../../api-definitions/chat/chat-message-definition';
 
 const useChatActions = (
   params: UseChatActionsParamsDefinition
@@ -19,13 +21,31 @@ const useChatActions = (
     setLocalChats(history);
   }, []);
 
+  const buildLocalSystemChat = (
+    message: string,
+    type: ChatMessageType
+  ): ChatType => ({
+    color: '',
+    map_name: '',
+    character_name: '',
+    message,
+    x: 0,
+    y: 0,
+    type,
+    hide_location: true,
+    user_id: 0,
+    custom_class: '',
+    is_chat_bold: false,
+    is_chat_italic: false,
+    name_tag: '',
+  });
+
   const pushSilencedMessage = useCallback((): void => {
     setLocalChats((previous) => {
-      const next: ChatType = {
-        message:
-          "You child, have been chatting up a storm. Slow down. I'll let you know whe you can talk again ...",
-        type: 'error-message',
-      } as ChatType;
+      const next = buildLocalSystemChat(
+        "You child, have been chatting up a storm. Slow down. I'll let you know whe you can talk again ...",
+        'error-message'
+      );
 
       const updated = [next, ...previous];
 
@@ -39,10 +59,10 @@ const useChatActions = (
 
   const pushPrivateMessageSent = useCallback((messageData: string[]): void => {
     setLocalChats((previous) => {
-      const next: ChatType = {
-        message: `Sent to ${messageData[1]}: ${messageData[2]}`,
-        type: 'private-message-sent',
-      } as ChatType;
+      const next = buildLocalSystemChat(
+        `Sent to ${messageData[1]}: ${messageData[2]}`,
+        'private-message-sent'
+      );
 
       const updated = [next, ...previous];
 
@@ -56,10 +76,7 @@ const useChatActions = (
 
   const pushErrorMessage = useCallback((message: string): void => {
     setLocalChats((previous) => {
-      const next: ChatType = {
-        message,
-        type: 'error-message',
-      } as ChatType;
+      const next = buildLocalSystemChat(message, 'error-message');
 
       const updated = [next, ...previous];
 

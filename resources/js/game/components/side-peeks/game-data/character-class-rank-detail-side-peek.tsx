@@ -11,7 +11,10 @@ import { useGameData } from 'game-data/hooks/use-game-data';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
+import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
+import { useSidePeekOptions } from 'ui/side-peek/options/hooks/use-side-peek-options';
+import SidePeekOptionDefinition from 'ui/side-peek/options/types/side-peek-option-definition';
 
 const CharacterClassRankDetailSidePeek = ({
   character_id: characterId,
@@ -32,6 +35,33 @@ const CharacterClassRankDetailSidePeek = ({
     null
   );
 
+  const selectedRank = classRanksApi.data.find(
+    (classRank) => classRank.game_class_id === gameClassId
+  );
+
+  const isSwitching = classRanksApi.switchingClassId === gameClassId;
+
+  const resolveFooterOptions = (): SidePeekOptionDefinition[] => {
+    if (!selectedRank || selectedRank.is_active || nestedGameClassId !== null) {
+      return [];
+    }
+
+    return [
+      {
+        id: 'switch-class',
+        label: 'Switch Class',
+        loading_label: 'Switching...',
+        variant: ButtonVariant.PRIMARY,
+        disabled: selectedRank.is_locked || automationRestricted,
+        loading: isSwitching,
+        on_click: () =>
+          void classRanksApi.switchClass(selectedRank.game_class_id),
+      },
+    ];
+  };
+
+  useSidePeekOptions(resolveFooterOptions());
+
   if (classRanksApi.loading || classSpecialtiesApi.loading) {
     return (
       <div className="p-4">
@@ -51,10 +81,6 @@ const CharacterClassRankDetailSidePeek = ({
       </div>
     );
   }
-
-  const selectedRank = classRanksApi.data.find(
-    (classRank) => classRank.game_class_id === gameClassId
-  );
 
   if (!selectedRank) {
     return (
@@ -95,6 +121,7 @@ const CharacterClassRankDetailSidePeek = ({
           on_switch_class={(id) => void classRanksApi.switchClass(id)}
           on_open_class={setNestedGameClassId}
           on_open_specialty={handleOpenSpecialty}
+          switch_class_action_in_footer
         />
       </div>
 

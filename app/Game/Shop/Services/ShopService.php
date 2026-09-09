@@ -37,7 +37,29 @@ class ShopService
     {
         $items = $this->fetchItemsForShopBasedOnCharacterClass($character, $type, $searchText, $sortCost);
 
-        return $this->pagination->buildPaginatedDate($items, $this->itemTransformer, $perPage, $page);
+        $result = $this->pagination->buildPaginatedDate($items, $this->itemTransformer, $perPage, $page);
+
+        return $this->withShopItemId($result);
+    }
+
+    /**
+     * Add the canonical item_id identity the Shop frontend contract requires, alongside the existing id.
+     */
+    private function withShopItemId(array $result): array
+    {
+        if (! isset($result['data']) || ! is_array($result['data'])) {
+            return $result;
+        }
+
+        $result['data'] = array_map(function (array $item) {
+            if (isset($item['id'])) {
+                $item['item_id'] = $item['id'];
+            }
+
+            return $item;
+        }, $result['data']);
+
+        return $result;
     }
 
     public function sellSpecificItem(Character $character, int $slotId): array

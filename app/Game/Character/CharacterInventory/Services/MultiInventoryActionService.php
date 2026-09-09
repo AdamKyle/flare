@@ -7,7 +7,7 @@ use App\Flare\Models\InventorySet;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\MarketBoard;
 use App\Flare\Models\SetSlot;
-use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
+use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Character\CharacterInventory\Builders\EquipManyBuilder;
 use App\Game\Character\CharacterInventory\Exceptions\EquipItemException;
 use App\Game\Character\CharacterInventory\Jobs\DisenchantMany;
@@ -32,7 +32,6 @@ class MultiInventoryActionService
         private readonly EquipManyBuilder $equipManyBuilder,
         private readonly ShopService $shopService,
         private readonly CharacterInventoryService $characterInventoryService,
-        private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler,
         private readonly DisenchantManyService $disenchantManyService,
         private readonly Manager $manager,
         private readonly CharacterInventoryCountTransformer $characterInventoryCountTransformer,
@@ -92,7 +91,7 @@ class MultiInventoryActionService
 
         $character = $character->refresh();
 
-        $this->updateCharacterAttackTypesHandler->updateCache($character);
+        CharacterAttackTypesCacheBuilder::dispatch($character);
 
         event(new UpdateCharacterInventoryCountEvent($character));
 

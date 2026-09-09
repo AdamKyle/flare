@@ -9,7 +9,7 @@ const SpecialtyReplacementPicker = ({
 }: SpecialtyReplacementPickerProps): ReactNode => {
   return (
     <fieldset className="flex flex-col gap-2">
-      <legend className="text-glacier-900 dark:text-glacier-100 mb-1 text-sm font-semibold">
+      <legend className="mb-1 text-sm font-semibold text-gray-900 dark:text-gray-100">
         Choose a Specialty to replace
       </legend>
       {equippedSpecialties.map((specialEquipped) => {
@@ -19,7 +19,7 @@ const SpecialtyReplacementPicker = ({
           <label
             key={specialEquipped.id}
             htmlFor={id}
-            className="border-glacier-300 dark:border-glacier-700 hover:bg-glacier-100 dark:hover:bg-glacier-900/40 flex cursor-pointer items-center gap-2 rounded-md border p-2"
+            className="border-glacier-300 dark:border-glacier-700 hover:bg-glacier-100 dark:hover:bg-glacier-800 flex cursor-pointer items-center gap-2 rounded-md border p-2"
           >
             <input
               id={id}
@@ -29,7 +29,7 @@ const SpecialtyReplacementPicker = ({
               onChange={() => onSelect(specialEquipped.id)}
               className="text-danube-600 focus:ring-danube-500 h-4 w-4"
             />
-            <span className="text-glacier-900 dark:text-glacier-100 text-sm">
+            <span className="text-sm text-gray-900 dark:text-gray-100">
               {specialEquipped.class_mastery.name}
             </span>
           </label>

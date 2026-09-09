@@ -24,6 +24,7 @@ const TimerBar = ({
   detailed_time: detailedTime = false,
   size = TimerBarSize.DEFAULT,
   additional_css,
+  text_class: textClass,
 }: TimerBarProps) => {
   const [internalRemaining, setInternalRemaining] = useState(length);
   const [completeAtRemaining, setCompleteAtRemaining] = useState(() =>
@@ -102,10 +103,20 @@ const TimerBar = ({
   return (
     <div className={clsx('w-full', additional_css)}>
       <div className="mb-1 flex items-center justify-between">
-        <span className="text-sm font-medium text-gray-900 dark:text-gray-300">
+        <span
+          className={clsx(
+            'text-sm font-medium',
+            textClass ?? 'text-gray-900 dark:text-gray-300'
+          )}
+        >
           {title}
         </span>
-        <span className="font-mono text-sm text-gray-800 dark:text-gray-300">
+        <span
+          className={clsx(
+            'font-mono text-sm',
+            textClass ?? 'text-gray-800 dark:text-gray-300'
+          )}
+        >
           {formattedRemaining}
         </span>
       </div>

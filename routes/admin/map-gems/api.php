@@ -10,5 +10,6 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::put('/admin/map-gems/{gameMapGemParamter}', ['uses' => 'Api\MapGemsController@update']);
     Route::post('/admin/map-gems/{gameMapGemParamter}/roll', ['uses' => 'Api\MapGemsController@roll']);
     Route::put('/admin/map-gems/{gameMapGemParamter}/rolls/{gem}/activate', ['uses' => 'Api\MapGemsController@activateRoll']);
+    Route::get('/admin/map-gems/{gameMapGemParamter}/rolls', ['uses' => 'Api\MapGemsController@rolls']);
     Route::get('/admin/map-gems/{gameMapGemParamter}', ['uses' => 'Api\MapGemsController@show']);
 });

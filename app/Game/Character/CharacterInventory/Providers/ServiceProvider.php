@@ -4,8 +4,6 @@ namespace App\Game\Character\CharacterInventory\Providers;
 
 use App\Flare\Pagination\Pagination;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
-use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
-use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use App\Game\Character\CharacterAttack\Transformers\CharacterAttackTransformer;
 use App\Game\Character\CharacterInventory\Builders\EquipManyBuilder;
 use App\Game\Character\CharacterInventory\Services\BatchCraftingSetService;
@@ -15,14 +13,12 @@ use App\Game\Character\CharacterInventory\Services\ComparisonService;
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
 use App\Game\Character\CharacterInventory\Services\InventorySetService;
 use App\Game\Character\CharacterInventory\Services\MultiInventoryActionService;
-use App\Game\Character\CharacterInventory\Services\UseItemService;
 use App\Game\Character\CharacterInventory\Transformers\CharacterGemSlotsTransformer;
 use App\Game\Character\CharacterInventory\Transformers\CharacterGemsTransformer;
 use App\Game\Character\CharacterInventory\Transformers\CharacterInventoryCountTransformer;
 use App\Game\Character\CharacterInventory\Transformers\InventorySetOptionTransformer;
 use App\Game\Character\CharacterInventory\Transformers\InventoryTransformer;
 use App\Game\Character\CharacterInventory\Validations\SetHandsValidation;
-use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Core\Items\Enricher\ItemEnricherFactory;
 use App\Game\Core\Items\Transformers\Api\UsableItemTransformer;
 use App\Game\Core\Items\Transformers\EquippableItemTransformer;
@@ -54,7 +50,6 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(InventorySetService::class, function ($app) {
             return new InventorySetService(
                 $app->make(SetHandsValidation::class),
-                $app->make(UpdateCharacterAttackTypesHandler::class),
             );
         });
 
@@ -66,8 +61,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new EquipItemService(
                 $app->make(Manager::class),
                 $app->make(CharacterAttackTransformer::class),
-                $app->make(InventorySetService::class),
-                $app->make(UpdateCharacterAttackTypesHandler::class)
+                $app->make(InventorySetService::class)
             );
         });
 
@@ -81,21 +75,10 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(InventorySetService::class),
                 $app->make(MassDisenchantService::class),
                 $app->make(UpdateCharacterSkillsService::class),
-                $app->make(UpdateCharacterAttackTypesHandler::class),
                 $app->make(DisenchantService::class),
                 $app->make(Pagination::class),
                 $app->make(Manager::class),
                 $app->make(InventorySetOptionTransformer::class)
-            );
-        });
-
-        $this->app->bind(UseItemService::class, function ($app) {
-            return new UseItemService(
-                $app->make(Manager::class),
-                $app->make(CharacterSheetBaseInfoTransformer::class),
-                $app->make(UpdateCharacterAttackTypesHandler::class),
-                $app->make(CharacterInventoryService::class),
-                $app->make(BuildCharacterAttackTypes::class),
             );
         });
 
@@ -119,7 +102,6 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(EquipManyBuilder::class),
                 $app->make(ShopService::class),
                 $app->make(CharacterInventoryService::class),
-                $app->make(UpdateCharacterAttackTypesHandler::class),
                 $app->make(DisenchantManyService::class),
                 $app->make(Manager::class),
                 $app->make(CharacterInventoryCountTransformer::class),

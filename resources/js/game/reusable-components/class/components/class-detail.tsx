@@ -7,9 +7,11 @@ import ClassDetailProps from '../types/class-detail-props';
 import { formatPercent } from 'game-utils/format-number';
 
 import Card from 'ui/cards/card';
+import DetailGrid from 'ui/detail-grid/detail-grid';
 import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
+import Separator from 'ui/separator/separator';
 
 interface LabeledValueRow {
   label: string;
@@ -53,14 +55,21 @@ const ClassDetail = ({
     { label: 'Looting', value: gameClass.combat_modifiers.looting_mod },
   ].filter((row) => row.value > 0);
 
+  const hasAttributes = attributeRows.length > 0;
+  const hasCombatModifiers = combatModifierRows.length > 0;
+  const hasUnlockRequirements = Boolean(gameClass.unlock_requirements);
+  const hasSecondRow = hasCombatModifiers || hasUnlockRequirements;
+
   return (
-    <div className="flex flex-col gap-6">
+    <DetailGrid>
       {gameClass.description && (
-        <Card>
-          <p className="text-glacier-800 dark:text-glacier-200">
-            {gameClass.description}
-          </p>
-        </Card>
+        <div className="col-span-full">
+          <Card>
+            <p className="text-glacier-800 dark:text-glacier-200">
+              {gameClass.description}
+            </p>
+          </Card>
+        </div>
       )}
 
       <Card>
@@ -75,7 +84,7 @@ const ClassDetail = ({
         </Dl>
       </Card>
 
-      {attributeRows.length > 0 && (
+      {hasAttributes && (
         <Card>
           <h2 className="text-glacier-900 dark:text-glacier-100 mb-4 text-lg font-semibold">
             Attributes
@@ -84,7 +93,9 @@ const ClassDetail = ({
         </Card>
       )}
 
-      {combatModifierRows.length > 0 && (
+      {hasSecondRow && <Separator additional_css="col-span-full my-1" />}
+
+      {hasCombatModifiers && (
         <Card>
           <h2 className="text-glacier-900 dark:text-glacier-100 mb-4 text-lg font-semibold">
             Combat Modifiers
@@ -118,7 +129,7 @@ const ClassDetail = ({
           </div>
         </Card>
       )}
-    </div>
+    </DetailGrid>
   );
 };
 

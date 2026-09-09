@@ -102,9 +102,7 @@ class AreaGemEffectService
             rewardEffects: $this->combineRewardEffects($mapGem, 1.0, $locationGem, 1.0),
             characterPowerReduction: $this->resolveCharacterReduction($mapGem, 1.0),
             craftingSkillBonuses: $this->combineCraftingSkillBonuses($mapGem, 1.0, $locationGem, 1.0),
-            rarityEffects: is_null($locationGem)
-                ? $this->resolveRarity($mapGem, 1.0)
-                : $this->resolveRarity($locationGem, 1.0),
+            rarityEffects: $this->combineRarityEffects($mapGem, 1.0, $locationGem, 1.0),
             sources: $sources,
             contextType: is_null($location) ? AreaGemContext::MAP : AreaGemContext::LOCATION,
             contextLabel: is_null($location) ? $gameMap->name : $location->name,
@@ -296,6 +294,22 @@ class AreaGemEffectService
         }
 
         return $bonuses;
+    }
+
+    /**
+     * Combine the Map/Location Gem Unique/Mythic/Cosmic rarity modifiers as additive Character bonuses.
+     */
+    private function combineRarityEffects(
+        ?Gem $mapGem,
+        float $mapMultiplier,
+        ?Gem $locationGem,
+        float $locationMultiplier,
+    ): ResolvedAreaGemRarityEffects {
+        return new ResolvedAreaGemRarityEffects(
+            unique: ($mapGem?->unique_item_drop_chance_increase ?? 0.0) * $mapMultiplier + ($locationGem?->unique_item_drop_chance_increase ?? 0.0) * $locationMultiplier,
+            mythic: ($mapGem?->mythic_item_drop_chance_increase ?? 0.0) * $mapMultiplier + ($locationGem?->mythic_item_drop_chance_increase ?? 0.0) * $locationMultiplier,
+            cosmic: ($mapGem?->cosmic_item_drop_chance_increase ?? 0.0) * $mapMultiplier + ($locationGem?->cosmic_item_drop_chance_increase ?? 0.0) * $locationMultiplier,
+        );
     }
 
     /**

@@ -10,7 +10,6 @@ import { ItemApiMessages } from '../api/enums/item-api-messages';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
-import Card from 'ui/cards/card';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const NAVIGABLE_RELATED_ENTITY_RESOURCES = new Set([
@@ -115,12 +114,12 @@ const ItemUsageCard = ({
   };
 
   return (
-    <Card>
-      <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
+    <div>
+      <h2 className="text-marigold-700 dark:text-marigold-500 mb-2 text-base font-semibold">
         Usage / Deletion Impact
       </h2>
       {renderBody()}
-    </Card>
+    </div>
   );
 };
 

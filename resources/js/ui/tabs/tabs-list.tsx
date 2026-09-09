@@ -95,7 +95,7 @@ const TabsList = <PTuple extends readonly object[]>({
       <span className="inline-grid min-w-0 items-center justify-center max-sm:grid-cols-[1rem_1fr_1rem] max-sm:gap-1 sm:grid-cols-[1.25rem_1fr_1.25rem] sm:gap-1.5">
         {renderIconLeft(tabIndex)}
         <span
-          className="min-w-0 text-center leading-tight max-sm:text-xs max-sm:break-normal max-sm:whitespace-normal sm:text-sm sm:whitespace-nowrap"
+          className="min-w-0 text-center leading-tight break-normal whitespace-normal max-sm:text-xs sm:text-sm"
           style={{ overflowWrap: 'normal', wordBreak: 'normal' }}
         >
           {tabItem.label}

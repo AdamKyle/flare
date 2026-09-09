@@ -7,4 +7,5 @@ export enum LocationGemApiUrls {
   ROLL = '/admin/location-gems/{gameLocationGemParamter}/roll',
   ROLL_ALL = '/admin/location-gems/roll-all',
   ACTIVATE_ROLL = '/admin/location-gems/{gameLocationGemParamter}/rolls/{gem}/activate',
+  ROLLS = '/admin/location-gems/{gameLocationGemParamter}/rolls',
 }

@@ -6,12 +6,83 @@ import {
   formatRangeWithCommas,
 } from '../../../util/format-number';
 import FactualLink from '../../quest-item/partials/factual-link';
+import { MonsterGemEffectChangedValueDefinition } from '../api/definitions/monster-detail-definition';
 import MonsterGemEffectContextCardProps from '../types/monster-gem-effect-context-card-props';
 
 import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
 import Separator from 'ui/separator/separator';
+
+const CORE_COMBAT_FIELDS = new Set([
+  'str',
+  'dur',
+  'dex',
+  'chr',
+  'int',
+  'agi',
+  'focus',
+  'ac',
+]);
+
+const DAMAGE_HEALING_FIELDS = new Set([
+  'health_range',
+  'attack_range',
+  'max_healing',
+]);
+
+const ACCURACY_EVASION_FIELDS = new Set([
+  'accuracy',
+  'dodge',
+  'criticality',
+  'casting_accuracy',
+  'spell_evasion',
+]);
+
+const AMBUSH_COUNTER_FIELDS = new Set([
+  'ambush_chance',
+  'ambush_resistance_chance',
+  'counter_chance',
+  'counter_resistance_chance',
+]);
+
+const RESISTANCE_FIELDS = new Set(['affix_resistance']);
+
+interface ChangedValueGroup {
+  heading: string;
+  changes: MonsterGemEffectChangedValueDefinition[];
+}
+
+const groupChangedValues = (
+  changedValues: MonsterGemEffectChangedValueDefinition[]
+): ChangedValueGroup[] => {
+  const groups: ChangedValueGroup[] = [
+    { heading: 'Core Combat Changes', changes: [] },
+    { heading: 'Damage & Healing Changes', changes: [] },
+    { heading: 'Accuracy & Evasion Changes', changes: [] },
+    { heading: 'Ambush & Counter Changes', changes: [] },
+    { heading: 'Resistance Changes', changes: [] },
+    { heading: 'Spells / Affixes / Other Gem Changes', changes: [] },
+  ];
+
+  changedValues.forEach((change) => {
+    if (CORE_COMBAT_FIELDS.has(change.field)) {
+      groups[0].changes.push(change);
+    } else if (DAMAGE_HEALING_FIELDS.has(change.field)) {
+      groups[1].changes.push(change);
+    } else if (ACCURACY_EVASION_FIELDS.has(change.field)) {
+      groups[2].changes.push(change);
+    } else if (AMBUSH_COUNTER_FIELDS.has(change.field)) {
+      groups[3].changes.push(change);
+    } else if (RESISTANCE_FIELDS.has(change.field)) {
+      groups[4].changes.push(change);
+    } else {
+      groups[5].changes.push(change);
+    }
+  });
+
+  return groups;
+};
 
 const formatValue = (
   value: string | number | null,
@@ -61,6 +132,36 @@ const resolveEffectiveClassName = (
   return 'text-danube-700 dark:text-danube-300 font-semibold';
 };
 
+const renderChange = (
+  change: MonsterGemEffectChangedValueDefinition
+): ReactNode => {
+  const effectiveClassName = resolveEffectiveClassName(
+    change.base_value,
+    change.effective_value,
+    change.display_type
+  );
+
+  return (
+    <Fragment key={change.field}>
+      <Dt>{change.label}</Dt>
+      <Dd>
+        <span aria-hidden="true">
+          <span className="text-glacier-500 dark:text-glacier-400">
+            {formatValue(change.base_value, change.display_type)}
+          </span>
+          <span className="text-glacier-500 mx-1">→</span>
+          <span className={effectiveClassName}>
+            {formatValue(change.effective_value, change.display_type)}
+          </span>
+        </span>
+        <span className="sr-only">
+          {`Base ${formatValue(change.base_value, change.display_type)}, effective ${formatValue(change.effective_value, change.display_type)}`}
+        </span>
+      </Dd>
+    </Fragment>
+  );
+};
+
 const MonsterGemEffectContextCard = ({
   context,
   navigation,
@@ -108,11 +209,37 @@ const MonsterGemEffectContextCard = ({
     context.sources.length > 0 ||
     context.character_power_reduction > 0;
 
-  const hasChangedValues = context.changed_values.length > 0;
+  const changedValueGroups = groupChangedValues(context.changed_values).filter(
+    (group) => group.changes.length > 0
+  );
+
+  const renderGroups = (): ReactNode => {
+    if (changedValueGroups.length === 0) {
+      return null;
+    }
+
+    return (
+      <div className="grid grid-cols-1 gap-x-8 gap-y-5 md:grid-cols-2">
+        {changedValueGroups.map((group, index) => (
+          <Fragment key={group.heading}>
+            <div>
+              <h4 className="mb-1 text-xs font-semibold tracking-wide text-gray-800 uppercase dark:text-gray-200">
+                {group.heading}
+              </h4>
+              <Dl>{group.changes.map(renderChange)}</Dl>
+            </div>
+            {index % 2 === 1 && index !== changedValueGroups.length - 1 && (
+              <Separator additional_css="col-span-full my-1" />
+            )}
+          </Fragment>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <div>
-      <h3 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
+      <h3 className="text-marigold-700 dark:text-marigold-500 mb-2 text-base font-semibold">
         {context.label}
       </h3>
 
@@ -140,39 +267,11 @@ const MonsterGemEffectContextCard = ({
         </Dl>
       )}
 
-      {hasContextIdentity && hasChangedValues && <Separator />}
-
-      {hasChangedValues && (
-        <Dl>
-          {context.changed_values.map((change) => {
-            const effectiveClassName = resolveEffectiveClassName(
-              change.base_value,
-              change.effective_value,
-              change.display_type
-            );
-
-            return (
-              <Fragment key={change.field}>
-                <Dt>{change.label}</Dt>
-                <Dd>
-                  <span aria-hidden="true">
-                    <span className="text-glacier-500 dark:text-glacier-400">
-                      {formatValue(change.base_value, change.display_type)}
-                    </span>
-                    <span className="text-glacier-500 mx-1">→</span>
-                    <span className={effectiveClassName}>
-                      {formatValue(change.effective_value, change.display_type)}
-                    </span>
-                  </span>
-                  <span className="sr-only">
-                    {`Base ${formatValue(change.base_value, change.display_type)}, effective ${formatValue(change.effective_value, change.display_type)}`}
-                  </span>
-                </Dd>
-              </Fragment>
-            );
-          })}
-        </Dl>
+      {hasContextIdentity && changedValueGroups.length > 0 && (
+        <Separator additional_css="my-0" />
       )}
+
+      {renderGroups()}
     </div>
   );
 };

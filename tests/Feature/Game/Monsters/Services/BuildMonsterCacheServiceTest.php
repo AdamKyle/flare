@@ -111,7 +111,7 @@ class BuildMonsterCacheServiceTest extends TestCase
         $this->assertSame(15, $cached['str']);
     }
 
-    public function test_build_location_cache_combines_map_and_location_gem_monster_effects(): void
+    public function test_build_location_cache_uses_location_gem_monster_effects_only_overriding_map_gem(): void
     {
         $gameMap = $this->createGameMap(['name' => 'Combined Location Cache Map', 'default' => false]);
         $mapProfile = $this->createGameMapGemParamter(['game_map_id' => $gameMap->id]);
@@ -130,7 +130,7 @@ class BuildMonsterCacheServiceTest extends TestCase
         $cached = collect(Cache::get(MonsterCacheKey::LOCATION_MONSTERS->value)['location-'.$location->id]['data'])
             ->firstWhere('id', $monster->id);
 
-        $this->assertSame(13, $cached['str']);
+        $this->assertSame(12, $cached['str']);
     }
 
     public function test_build_cache_doubles_monster_effect_inside_a_map_gem_world(): void

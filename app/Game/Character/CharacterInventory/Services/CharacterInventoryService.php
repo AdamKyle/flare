@@ -10,7 +10,7 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\SetSlot;
 use App\Flare\Pagination\Pagination;
-use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
+use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Character\CharacterInventory\Transformers\InventorySetOptionTransformer;
 use App\Game\Character\CharacterInventory\Transformers\InventoryTransformer;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
@@ -62,7 +62,6 @@ class CharacterInventoryService
         private readonly InventorySetService $inventorySetService,
         private readonly MassDisenchantService $massDisenchantService,
         private readonly UpdateCharacterSkillsService $updateCharacterSkillsService,
-        private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler,
         private readonly DisenchantService $disenchantService,
         private readonly Pagination $pagination,
         private readonly Manager $manager,
@@ -1214,7 +1213,7 @@ class CharacterInventoryService
      */
     private function updateCharacterAttackDataCache(Character $character): void
     {
-        $this->updateCharacterAttackTypesHandler->updateCache($character);
+        CharacterAttackTypesCacheBuilder::dispatch($character->refresh());
     }
 
     /**

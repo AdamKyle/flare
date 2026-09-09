@@ -11,10 +11,16 @@ const AdminAnchorButton = ({
   label,
   variant,
   aria_label: ariaLabel,
+  additional_css: additionalCss,
 }: AdminAnchorButtonProps): ReactNode => (
   <a
     href={href}
-    className={clsx(baseStyles(), variantStyles(variant), 'inline-block')}
+    className={clsx(
+      baseStyles(),
+      variantStyles(variant),
+      'inline-block',
+      additionalCss
+    )}
     aria-label={ariaLabel || label}
   >
     {label}

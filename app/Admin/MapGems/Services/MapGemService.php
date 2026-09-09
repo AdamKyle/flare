@@ -127,6 +127,18 @@ class MapGemService
     }
 
     /**
+     * Paginate the Gem roll history for the given Map Gem profile, active roll first.
+     */
+    public function paginateRolls(GameMapGemParamter $gameMapGemParamter, int $perPage, int $page): LengthAwarePaginator
+    {
+        return $gameMapGemParamter->gemRolls()
+            ->orderByRaw('CASE WHEN id = ? THEN 0 ELSE 1 END', [$gameMapGemParamter->rolled_gem_id])
+            ->orderByDesc('roll_number')
+            ->orderByDesc('id')
+            ->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    /**
      * Activate an existing Map Gem roll without regenerating its Gem World.
      */
     public function activateRoll(GameMapGemParamter $gameMapGemParamter, Gem $gem): bool

@@ -1,10 +1,6 @@
 import React, { ReactNode } from 'react';
 
-import {
-  formatNumberWithCommas,
-  formatPercent,
-  formatRangeWithCommas,
-} from '../../../util/format-number';
+import { formatNumberWithCommas } from '../../../util/format-number';
 import FactualLink from '../../quest-item/partials/factual-link';
 import { isLocationType, LOCATION_TYPE_LABELS } from '../enums/location-type';
 import MonsterDetailProps from '../types/monster-detail-props';
@@ -24,7 +20,7 @@ const MonsterIdentitySection = ({
 
   return (
     <div>
-      <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
+      <h2 className="text-marigold-700 dark:text-marigold-500 mb-2 text-base font-semibold">
         Identity &amp; Placement
       </h2>
       <Dl>
@@ -46,28 +42,6 @@ const MonsterIdentitySection = ({
           <>
             <Dt>Max Level</Dt>
             <Dd>{formatNumberWithCommas(identity.max_level)}</Dd>
-          </>
-        )}
-        {identity.xp > 0 && (
-          <>
-            <Dt>XP</Dt>
-            <Dd>{formatNumberWithCommas(identity.xp)}</Dd>
-          </>
-        )}
-        {identity.gold > 0 && (
-          <>
-            <Dt>Gold</Dt>
-            <Dd>{formatNumberWithCommas(identity.gold)}</Dd>
-          </>
-        )}
-        <Dt>Health Range</Dt>
-        <Dd>{formatRangeWithCommas(identity.health_range)}</Dd>
-        <Dt>Attack Range</Dt>
-        <Dd>{formatRangeWithCommas(identity.attack_range)}</Dd>
-        {identity.drop_check > 0 && (
-          <>
-            <Dt>Drop Check</Dt>
-            <Dd>{formatPercent(identity.drop_check)}</Dd>
           </>
         )}
         {identity.only_for_location_type !== null && (

@@ -1,10 +1,16 @@
+import clsx from 'clsx';
 import React from 'react';
 
 import DtProps from 'ui/dl/types/dt-props';
 
-const Dt = ({ children }: DtProps) => {
+const Dt = ({ children, text_class: textClass }: DtProps) => {
   return (
-    <dt className="text-glacier-800 dark:text-glacier-300 flex min-w-0 items-center gap-2 font-medium break-words">
+    <dt
+      className={clsx(
+        'flex min-w-0 items-center gap-2 font-medium break-words',
+        textClass ?? 'text-gray-700 dark:text-gray-300'
+      )}
+    >
       {children}
     </dt>
   );

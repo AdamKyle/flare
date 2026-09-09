@@ -8,7 +8,7 @@ use App\Flare\Models\CharacterClassSpecialtiesEquipped;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameClassSpecial;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
-use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
+use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Character\Concerns\FetchEquipped;
@@ -31,7 +31,6 @@ class ClassRankService
     use FetchEquipped, ResponseBuilder;
 
     public function __construct(
-        private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
         private readonly BattleMessageHandler $battleMessageHandler,
         private readonly AreaGemEffectService $areaGemEffectService,
         private readonly ClassDetailTransformer $classDetailTransformer,
@@ -277,7 +276,7 @@ class ClassRankService
 
         $character = $character->refresh();
 
-        $this->updateCharacterAttackTypes->updateCache($character);
+        CharacterAttackTypesCacheBuilder::dispatch($character);
 
         event(new UpdateCharacterBaseDetailsEvent($character));
 
@@ -305,7 +304,7 @@ class ClassRankService
 
         $character = $character->refresh();
 
-        $this->updateCharacterAttackTypes->updateCache($character);
+        CharacterAttackTypesCacheBuilder::dispatch($character);
 
         event(new UpdateCharacterBaseDetailsEvent($character));
 
@@ -375,7 +374,7 @@ class ClassRankService
 
         $character = $character->refresh();
 
-        $this->updateCharacterAttackTypes->updateCache($character);
+        CharacterAttackTypesCacheBuilder::dispatch($character);
 
         event(new UpdateCharacterBaseDetailsEvent($character));
 
@@ -499,6 +498,8 @@ class ClassRankService
         if ($killCount === 1) {
             $equippedSpecials = $character->classSpecialsEquipped()->where('equipped', true)->get();
 
+            $didLevel = false;
+
             foreach ($equippedSpecials as $special) {
                 if ($special->level >= ClassSpecialValue::MAX_LEVEL) {
                     $special->update([
@@ -527,8 +528,12 @@ class ClassRankService
 
                     event(new ServerMessageEvent($character->user, 'Your class special:  '.$special->gameClassSpecial->name.' has gained a new level is now level: '.$special->level));
 
-                    $this->updateCharacterAttackTypes->updateCache($character->refresh());
+                    $didLevel = true;
                 }
+            }
+
+            if ($didLevel) {
+                CharacterAttackTypesCacheBuilder::dispatch($character->refresh());
             }
 
             return;
@@ -595,7 +600,7 @@ class ClassRankService
         }
 
         if ($didLevel) {
-            $this->updateCharacterAttackTypes->updateCache($character->refresh());
+            CharacterAttackTypesCacheBuilder::dispatch($character->refresh());
         }
     }
 
@@ -618,6 +623,8 @@ class ClassRankService
             if (is_null($inventory)) {
                 return;
             }
+
+            $didLevel = false;
 
             foreach (ItemType::weaponMasteryTypes() as $type) {
 
@@ -657,7 +664,7 @@ class ClassRankService
 
                         $weaponMastery = $weaponMastery->refresh();
 
-                        $this->updateCharacterAttackTypes->updateCache($character->refresh());
+                        $didLevel = true;
 
                         event(new ServerMessageEvent(
                             $character->user,
@@ -668,6 +675,10 @@ class ClassRankService
                         ));
                     }
                 }
+            }
+
+            if ($didLevel) {
+                CharacterAttackTypesCacheBuilder::dispatch($character->refresh());
             }
 
             return;
@@ -755,7 +766,7 @@ class ClassRankService
         }
 
         if ($didLevel) {
-            $this->updateCharacterAttackTypes->updateCache($character->refresh());
+            CharacterAttackTypesCacheBuilder::dispatch($character->refresh());
         }
     }
 

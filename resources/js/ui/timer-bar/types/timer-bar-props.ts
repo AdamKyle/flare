@@ -8,4 +8,5 @@ export default interface TimerBarProps {
   detailed_time?: boolean;
   size?: TimerBarSize;
   additional_css?: string;
+  text_class?: string;
 }

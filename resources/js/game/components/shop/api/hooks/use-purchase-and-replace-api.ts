@@ -58,6 +58,13 @@ export const usePurchaseAndReplaceApi = (
         equip_type: requestParams.equip_type,
       });
 
+      if (!result?.inventory_count) {
+        setError({ message: 'Received a malformed purchase response.' });
+        setLoading(false);
+
+        return;
+      }
+
       onSuccessRef.current(result.message, {
         gold: result.gold,
         inventory_count: result.inventory_count,

@@ -25,7 +25,7 @@ export const useChatMessages = (): UseChatMessagesDefinition => {
   useWebsocket<EventPayload>({
     url: ChatWebSocketChannels.CHAT,
     params: {},
-    type: ChannelType.PUBLIC,
+    type: ChannelType.PRESENCE,
     channelName: ChatWebsocketEventNames.PUBLIC_MESSAGE,
     onEvent: handleChatSent,
   });

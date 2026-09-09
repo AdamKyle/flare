@@ -5,7 +5,7 @@ namespace App\Game\ClassRanks\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameSkill;
-use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
+use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Skills\Builders\BaseSkillBuilder;
@@ -16,7 +16,6 @@ class ManageClassService
     use ResponseBuilder;
 
     public function __construct(
-        private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
         private readonly UpdateCharacterSkillsService $updateCharacterSkillsService,
         private readonly ClassRankService $classRankService,
         private readonly BaseSkillBuilder $baseSkillBuilder,
@@ -65,7 +64,7 @@ class ManageClassService
 
         $character = $character->refresh();
 
-        $this->updateCharacterAttackTypes->updateCache($character);
+        CharacterAttackTypesCacheBuilder::dispatch($character);
 
         $this->updateCharacterSkillsService->updateCharacterSkills($character);
 
