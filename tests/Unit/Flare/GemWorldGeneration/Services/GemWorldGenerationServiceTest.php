@@ -64,10 +64,13 @@ class GemWorldGenerationServiceTest extends TestCase
 
         $this->createLocation(['game_map_id' => $generatedMap->id]);
 
+        $mapTileGenerationService = Mockery::mock(MapTileGenerationService::class);
+        $mapTileGenerationService->shouldReceive('tile')->once();
+
         $service = new GemWorldGenerationService(
             Mockery::mock(GemWorldImageGenerator::class),
             Mockery::mock(GemWorldLocationPlacementService::class),
-            Mockery::mock(MapTileGenerationService::class),
+            $mapTileGenerationService,
         );
 
         $result = $service->generateMapGem($gemParamter->fresh());
@@ -98,7 +101,7 @@ class GemWorldGenerationServiceTest extends TestCase
         ]);
 
         $mapTileGenerationService = Mockery::mock(MapTileGenerationService::class);
-        $mapTileGenerationService->shouldNotReceive('tile');
+        $mapTileGenerationService->shouldReceive('tile')->once();
 
         $service = new GemWorldGenerationService(
             Mockery::mock(GemWorldImageGenerator::class),
@@ -179,7 +182,7 @@ class GemWorldGenerationServiceTest extends TestCase
         ]);
 
         $mapTileGenerationService = Mockery::mock(MapTileGenerationService::class);
-        $mapTileGenerationService->shouldNotReceive('tile');
+        $mapTileGenerationService->shouldReceive('tile')->once();
 
         $service = new GemWorldGenerationService(
             Mockery::mock(GemWorldImageGenerator::class),
@@ -212,10 +215,13 @@ class GemWorldGenerationServiceTest extends TestCase
             CouldNotPlaceGeneratedGemWorldLocation::withContext('regular', 5, 1, 'path', 'Surface', 'Fiery', 10, 10, true)
         );
 
+        $mapTileGenerationService = Mockery::mock(MapTileGenerationService::class);
+        $mapTileGenerationService->shouldReceive('tile')->once();
+
         $service = new GemWorldGenerationService(
             Mockery::mock(GemWorldImageGenerator::class),
             $placementService,
-            Mockery::mock(MapTileGenerationService::class),
+            $mapTileGenerationService,
         );
 
         $result = $service->generateMapGem($gemParamter->fresh());
@@ -233,10 +239,13 @@ class GemWorldGenerationServiceTest extends TestCase
 
         $this->createLocation(['game_map_id' => $generatedMap->id]);
 
+        $mapTileGenerationService = Mockery::mock(MapTileGenerationService::class);
+        $mapTileGenerationService->shouldReceive('tile')->once();
+
         $service = new GemWorldGenerationService(
             Mockery::mock(GemWorldImageGenerator::class),
             Mockery::mock(GemWorldLocationPlacementService::class),
-            Mockery::mock(MapTileGenerationService::class),
+            $mapTileGenerationService,
         );
 
         $result = $service->generateLocationGem($gemParamter->fresh());

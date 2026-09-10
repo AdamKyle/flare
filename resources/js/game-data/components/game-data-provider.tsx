@@ -6,6 +6,7 @@ import AnnouncementMessageDefinition from '../../game/api-definitions/chat/annou
 import CharacterSheetDefinition from '../api-data-definitions/character/character-sheet-definition';
 import GameDataDefinition from '../deffinitions/game-data-definition';
 
+import UseCharacterBoonsUpdateStreamResponse from 'game-data/hooks/definitions/use-character-boons-update-stream-response';
 import UseCharterUpdateStreamResponse from 'game-data/hooks/definitions/use-character-update-stream-response';
 import UseLocationBasedCraftingOptionsStreamResponse from 'game-data/hooks/definitions/use-location-based-crafting-options-stream-response';
 import UseMonsterUpdateStreamResponse from 'game-data/hooks/definitions/use-monster-update-stream-response';
@@ -101,6 +102,22 @@ const GameDataProvider = (props: GameDataProviderProps) => {
     });
   };
 
+  const handleOnBoonsUpdate = (data: UseCharacterBoonsUpdateStreamResponse) => {
+    setGameData((prev): GameDataDefinition | null => {
+      if (!prev || !prev.character) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        character: {
+          ...prev.character,
+          active_boons: data.boons,
+        },
+      };
+    });
+  };
+
   const handleUpdateAnnouncements = (data: AnnouncementMessageDefinition) => {
     setGameData((prev): GameDataDefinition | null => {
       if (!prev) {
@@ -157,6 +174,7 @@ const GameDataProvider = (props: GameDataProviderProps) => {
     userId: userIdForWire,
     onEvent: handleOnCharacterUpdate,
     onCraftingOptionsEvent: handleOnCraftingOptionsUpdate,
+    onBoonsEvent: handleOnBoonsUpdate,
   });
 
   const {

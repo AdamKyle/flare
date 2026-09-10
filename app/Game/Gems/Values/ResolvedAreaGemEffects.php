@@ -57,6 +57,16 @@ class ResolvedAreaGemEffects
     }
 
     /**
+     * The already-resolved crafting bonus keyed by GameSkill id.
+     *
+     * @return array<int, float>
+     */
+    public function craftingSkillBonuses(): array
+    {
+        return $this->craftingSkillBonuses;
+    }
+
+    /**
      * The resolved Unique/Mythic/Cosmic rarity modifiers for this context.
      */
     public function rarityEffects(): ResolvedAreaGemRarityEffects

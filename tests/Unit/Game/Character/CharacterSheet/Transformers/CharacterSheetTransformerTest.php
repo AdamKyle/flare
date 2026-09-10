@@ -7,11 +7,12 @@ use App\Game\Character\CharacterSheet\Transformers\CharacterSheetTransformer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterBoon;
 use Tests\Traits\CreateItem;
 
 class CharacterSheetTransformerTest extends TestCase
 {
-    use CreateItem, RefreshDatabase;
+    use CreateCharacterBoon, CreateItem, RefreshDatabase;
 
     private ?CharacterSheetTransformer $transformer;
 
@@ -50,10 +51,33 @@ class CharacterSheetTransformerTest extends TestCase
             'attack', 'ac', 'health', 'resurrection_chance', 'weapon_attack', 'voided_weapon_attack',
             'ring_damage', 'spell_damage', 'voided_spell_damage', 'healing_amount', 'voided_healing_amount',
             'gold', 'gold_dust', 'shards', 'copper_coins', 'gold_bars',
-            'inventory_count', 'resistance_info', 'elemental_atonements', 'reincarnation_info',
+            'inventory_count', 'resistance_info', 'elemental_atonements', 'reincarnation_info', 'active_boons',
         ];
 
         $this->assertSame([], array_diff($expectedKeys, array_keys($data)));
+    }
+
+    public function test_transform_includes_active_boons_using_the_real_active_boon_data(): void
+    {
+        $character = $this->character;
+
+        $item = $this->createItem(['type' => 'alchemy', 'usable' => true, 'name' => 'Transformer Boon Item']);
+
+        $boon = $this->createCharacterBoon([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'last_for_minutes' => 30,
+            'amount_used' => 1,
+            'started' => now(),
+            'complete' => now()->addMinutes(30),
+        ]);
+
+        $data = $this->transformer->transform($character->refresh());
+
+        $this->assertCount(1, $data['active_boons']);
+        $this->assertSame($boon->id, $data['active_boons'][0]['id']);
+        $this->assertSame($item->id, $data['active_boons'][0]['boon_applied']['item_id']);
+        $this->assertSame('Transformer Boon Item', $data['active_boons'][0]['boon_applied']['name']);
     }
 
     public function test_transform_returns_numeric_gameplay_values_not_formatted_strings(): void

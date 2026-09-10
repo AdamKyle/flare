@@ -5,7 +5,5 @@ import CharacterSheetDefinition from 'game-data/api-data-definitions/character/c
 export default interface CharacterCardDetailsProps {
   characterData: CharacterSheetDefinition;
   active_boons: ActiveBoonDefinition[];
-  active_boons_loading: boolean;
   on_open_active_boons: () => void;
-  on_active_boons_complete: () => void;
 }

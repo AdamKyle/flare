@@ -3,6 +3,7 @@
 namespace App\Game\Monsters\Services;
 
 use App\Flare\Models\Monster;
+use App\Flare\Pagination\Pagination;
 use App\Game\Monsters\Values\MonsterCacheKey;
 use Illuminate\Support\Facades\Cache;
 
@@ -14,6 +15,10 @@ use Illuminate\Support\Facades\Cache;
  */
 class MonsterGemEffectContextService
 {
+    public function __construct(
+        private readonly Pagination $pagination,
+    ) {}
+
     /**
      * The cached effective field, its factual label, its base Monster attribute, and its display type.
      *
@@ -81,6 +86,31 @@ class MonsterGemEffectContextService
         $this->collectFromCache(Cache::get(MonsterCacheKey::LOCATION_MONSTERS->value) ?? [], $monster, $contexts);
 
         return $this->sortContexts(array_values($contexts));
+    }
+
+    /**
+     * Build the factual count/preview summary of cached Gem effect contexts for a Monster.
+     */
+    public function summary(Monster $monster): array
+    {
+        $contexts = $this->forMonster($monster);
+
+        return [
+            'count' => count($contexts),
+            'preview' => $contexts[0] ?? null,
+        ];
+    }
+
+    /**
+     * Build the append-paginated set of cached Gem effect contexts for a Monster.
+     */
+    public function paginate(Monster $monster, int $perPage, int $page): array
+    {
+        return $this->pagination->paginateCollectionResponse(
+            collect($this->forMonster($monster)),
+            $perPage,
+            $page,
+        );
     }
 
     /**

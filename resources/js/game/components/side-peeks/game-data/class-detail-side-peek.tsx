@@ -8,7 +8,7 @@ const ClassDetailSidePeek = ({
 }: ClassDetailSidePeekProps): ReactNode => {
   return (
     <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-5">
-      <ClassDetail game_class={classDetail} />
+      <ClassDetail game_class={classDetail} single_column />
     </div>
   );
 };

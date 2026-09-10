@@ -13,8 +13,6 @@ import {
   resolveAlchemyLegalUseCount,
 } from './utils/resolve-alchemy-legal-use-count';
 import BaseUsableItemDefinition from '../../../../api-definitions/items/usable-item-definitions/base-usable-item-definition';
-import { useActiveBoonsApi } from '../../../actions/partials/floating-cards/crafting-section/sections/alchemy/active-boons/api/hooks/use-active-boons-api';
-import { useActiveBoonsWebsocket } from '../../../actions/partials/floating-cards/crafting-section/sections/alchemy/active-boons/websockets/hooks/use-active-boons-websocket';
 import { useInfiniteScroll } from '../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
 import UsableItemsList from '../../components/items/usable-items-list';
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
@@ -40,7 +38,7 @@ const UsableItems = ({
   initial_search_text,
 }: UsableItemsProps) => {
   const { gameData } = useGameData();
-  const userId = gameData?.character?.user_id ?? 0;
+  const activeBoons = gameData?.character?.active_boons ?? [];
 
   const [itemToView, setItemToView] = useState<BaseUsableItemDefinition | null>(
     initial_item ?? null
@@ -65,16 +63,8 @@ const UsableItems = ({
     initialSearchText: initial_search_text,
   });
 
-  const activeBoonsApi = useActiveBoonsApi({ characterId: character_id });
-
-  useActiveBoonsWebsocket({
-    userId,
-    onBoonsUpdated: activeBoonsApi.refresh,
-  });
-
   const handleUseSuccess = (): void => {
     setRefresh((previousValue) => !previousValue);
-    activeBoonsApi.refresh();
 
     if (mutationSource === 'detail') {
       setItemToView(null);
@@ -184,7 +174,7 @@ const UsableItems = ({
   const usingSlotId = using || usingMany ? actingSlotId : null;
 
   const detailLegalUseCount = itemToView
-    ? resolveAlchemyLegalUseCount(itemToView, activeBoonsApi.boons, new Date())
+    ? resolveAlchemyLegalUseCount(itemToView, activeBoons, new Date())
     : 0;
 
   const detailOptions: SidePeekOptionDefinition[] = useMemo(() => {
@@ -404,7 +394,7 @@ const UsableItems = ({
             items={data}
             on_scroll_to_end={handleInventoryScroll}
             on_item_clicked={onViewItem}
-            active_boons={activeBoonsApi.boons}
+            active_boons={activeBoons}
             using_slot_id={usingSlotId}
             on_use_one={(slotId) => handleUseOne(slotId, 'list')}
             on_use_quantity={(slotId, quantity) =>

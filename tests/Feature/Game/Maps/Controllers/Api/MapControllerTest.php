@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Game\Maps\Controllers\Api;
 
+use App\Flare\GemWorldGeneration\Values\GeneratedGemMapType;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Maps\Values\MapTileValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -310,7 +311,7 @@ class MapControllerTest extends TestCase
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $character = $characterFactory->getCharacter();
 
-        $hellMap = $this->createGameMap(['name' => 'Hell', 'path' => 'path']);
+        $hellMap = $this->createGameMap(['name' => 'Hell', 'path' => 'path', 'can_traverse' => true]);
 
         $hellPassItem = $this->createItem(['effect' => ItemEffectType::HELL->value]);
 
@@ -518,5 +519,38 @@ class MapControllerTest extends TestCase
         $this->assertArrayHasKey('data', $data);
         $this->assertArrayHasKey('can_load_more', $data['meta']);
         $this->assertSame('Rusty Key', $data['data'][0]['name']);
+    }
+
+    public function test_ordinary_traverse_rejects_a_forged_request_directly_to_a_generated_gem_world(): void
+    {
+        $parentMap = $this->createGameMap(['name' => 'Surface']);
+        $generatedMap = $this->createGameMap([
+            'name' => 'Fiery Map Gem World',
+            'generated_map_type' => GeneratedGemMapType::MAP_GEM->value,
+            'generated_parent_game_map_id' => $parentMap->id,
+            'can_traverse' => false,
+        ]);
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation(16, 16, $parentMap)->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->postJson('/api/map/traverse/'.$character->id, ['map_id' => $generatedMap->id]);
+
+        $response->assertStatus(422);
+        $this->assertSame($parentMap->id, $character->refresh()->map->game_map_id);
+    }
+
+    public function test_ordinary_traverse_rejects_a_map_with_can_traverse_disabled(): void
+    {
+        $parentMap = $this->createGameMap(['name' => 'Surface']);
+        $blockedMap = $this->createGameMap(['name' => 'Blocked Map', 'can_traverse' => false]);
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation(16, 16, $parentMap)->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->postJson('/api/map/traverse/'.$character->id, ['map_id' => $blockedMap->id]);
+
+        $response->assertStatus(422);
+        $this->assertSame($parentMap->id, $character->refresh()->map->game_map_id);
     }
 }

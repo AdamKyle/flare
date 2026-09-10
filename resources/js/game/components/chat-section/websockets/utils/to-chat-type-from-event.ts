@@ -1,138 +1,82 @@
-import ChatType, {
-  ChatMessageType,
-} from '../../../../api-definitions/chat/chat-message-definition';
+import ChatType from '../../../../api-definitions/chat/chat-message-definition';
 import { EventMessageTypes } from '../enums/event-message-types';
 import EventPayload from '../hooks/definitions/event-payload-definition';
-import { RegularMessagePayloadDefinition } from '../hooks/definitions/regular-message-payload-definition';
+import { GlobalMessagePayloadDefinition } from '../hooks/definitions/global-message-payload-definition';
+import { NpcMessagePayloadDefinition } from '../hooks/definitions/npc-message-payload-definition';
+import { PrivateMessagePayloadDefinition } from '../hooks/definitions/private-message-payload-definition';
 
-const isRegularPayload = (
-  message: EventPayload['message']
-): message is RegularMessagePayloadDefinition => {
-  if (typeof message !== 'object' || message === null) {
-    return false;
-  }
+const CREATOR_NAME = 'The Creator';
 
-  if (!('message' in message)) {
-    return false;
-  }
+export const toChatTypeFromPublicMessage = (event: EventPayload): ChatType => {
+  const isCreatorMessage = event.name === CREATOR_NAME;
 
-  const candidate = message as { message?: unknown };
-
-  return typeof candidate.message === 'string';
-};
-
-const extractMessageText = (message: EventPayload['message']): string => {
-  if (typeof message === 'object' && message !== null && 'message' in message) {
-    const candidate = (message as { message?: unknown }).message;
-
-    if (typeof candidate === 'string') {
-      return candidate;
-    }
-
-    if (candidate != null) {
-      return String(candidate);
-    }
-  }
-
-  return '';
-};
-
-const toChatTypeFromRegularPayload = (
-  payload: RegularMessagePayloadDefinition,
-  chatType: ChatMessageType
-): ChatType => {
   return {
-    color: payload.color,
-    map_name: payload.map_name,
-    character_name: payload.name,
-    message: payload.message,
-    x: Number(payload.x_position),
-    y: Number(payload.y_position),
-    type: chatType,
-    hide_location: payload.hide_location,
-    user_id: payload.user_id,
-    custom_class: payload.custom_class,
-    is_chat_bold: payload.is_chat_bold,
-    is_chat_italic: payload.is_chat_italic,
-    name_tag: payload.nameTag,
+    color: event.message.color,
+    map_name: event.message.map_name,
+    character_name: event.name,
+    message: event.message.message,
+    x: Number(event.message.x_position),
+    y: Number(event.message.y_position),
+    type: isCreatorMessage ? EventMessageTypes.CREATOR_MESSAGE : 'chat',
+    hide_location: event.message.hide_location,
+    user_id: event.message.user_id,
+    custom_class: event.message.custom_class,
+    is_chat_bold: event.message.is_chat_bold,
+    is_chat_italic: event.message.is_chat_italic,
+    name_tag: event.nameTag,
   };
 };
 
-const toCreatorChat = (message: string | { message: string }): ChatType => {
-  const text = typeof message === 'string' ? message : message.message;
+export const toChatTypeFromNpcMessage = (
+  event: NpcMessagePayloadDefinition
+): ChatType => ({
+  color: '',
+  map_name: '',
+  character_name: event.npcName,
+  message: event.message,
+  x: 0,
+  y: 0,
+  type: EventMessageTypes.NPC_MESSAGE,
+  hide_location: true,
+  user_id: 0,
+  custom_class: '',
+  is_chat_bold: false,
+  is_chat_italic: false,
+  name_tag: null,
+});
 
-  return {
-    color: '',
-    map_name: '',
-    character_name: 'The Creator',
-    message: text,
-    x: 0,
-    y: 0,
-    type: EventMessageTypes.CREATOR_MESSAGE as ChatMessageType,
-    hide_location: true,
-    is_chat_bold: false,
-    is_chat_italic: false,
-    user_id: 0,
-    custom_class: '',
-    name_tag: '',
-  };
-};
+export const toChatTypeFromPrivateMessage = (
+  event: PrivateMessagePayloadDefinition
+): ChatType => ({
+  color: '',
+  map_name: '',
+  character_name: event.from,
+  message: event.message,
+  x: 0,
+  y: 0,
+  type: EventMessageTypes.PRIVATE_MESSAGE_RECEIVED,
+  hide_location: true,
+  user_id: 0,
+  custom_class: '',
+  is_chat_bold: false,
+  is_chat_italic: false,
+  name_tag: null,
+});
 
-const toSystemChat = (message: string, type: ChatMessageType): ChatType => {
-  return {
-    color: '',
-    map_name: '',
-    character_name: '',
-    message,
-    x: 0,
-    y: 0,
-    type,
-    hide_location: true,
-    is_chat_bold: false,
-    is_chat_italic: false,
-    user_id: 0,
-    custom_class: '',
-    name_tag: '',
-  };
-};
-
-export const toChatTypeFromEvent = (event: EventPayload): ChatType => {
-  if (event.type === EventMessageTypes.CREATOR_MESSAGE) {
-    return toCreatorChat(event.message);
-  }
-
-  if (
-    [
-      EventMessageTypes.GLOBAL_MESSAGE,
-      EventMessageTypes.ERROR_MESSAGE,
-      EventMessageTypes.PRIVATE_MESSAGE_SENT,
-    ].includes(event.type)
-  ) {
-    const systemMessage = extractMessageText(event.message);
-
-    return toSystemChat(systemMessage, event.type as ChatMessageType);
-  }
-
-  if (event.type === EventMessageTypes.NPC_MESSAGE) {
-    const npcMessage = extractMessageText(event.message);
-
-    return toSystemChat(
-      npcMessage,
-      EventMessageTypes.GLOBAL_MESSAGE as ChatMessageType
-    );
-  }
-
-  if (isRegularPayload(event.message)) {
-    return toChatTypeFromRegularPayload(
-      event.message,
-      event.type as ChatMessageType
-    );
-  }
-
-  const fallbackMessage = extractMessageText(event.message);
-
-  return toSystemChat(
-    fallbackMessage,
-    EventMessageTypes.ERROR_MESSAGE as ChatMessageType
-  );
-};
+export const toChatTypeFromGlobalMessage = (
+  event: GlobalMessagePayloadDefinition
+): ChatType => ({
+  color: '',
+  map_name: '',
+  character_name: '',
+  message: event.message,
+  x: 0,
+  y: 0,
+  type: EventMessageTypes.GLOBAL_MESSAGE,
+  hide_location: true,
+  user_id: 0,
+  custom_class: event.specialColor ?? '',
+  is_chat_bold: false,
+  is_chat_italic: false,
+  name_tag: null,
+});

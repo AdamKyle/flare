@@ -6,8 +6,10 @@ import AdminMonsterDetailSidePeekProps from './types/admin-monster-detail-side-p
 import { resolveSidePeekComponent } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-mapper';
 import { SidePeekComponentRegistrationEnum } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
 import MonsterDetail from '../../../../game/reusable-components/monster/components/monster-detail';
+import MonsterGemEffectContextCard from '../../../../game/reusable-components/monster/components/monster-gem-effect-context-card';
 import { MonsterApiMessages } from '../../api/enums/monster-api-messages';
 import { useMonsterDetail } from '../../api/hooks/use-monster-detail';
+import { useMonsterGemEffectContexts } from '../../api/hooks/use-monster-gem-effect-contexts';
 import MonsterFormContent from '../forms/monster-form-content';
 import { MonsterNestedSelection } from '../types/monster-nested-selection';
 
@@ -26,6 +28,20 @@ const AdminMonsterDetailSidePeek = ({
   const [nestedSelection, setNestedSelection] =
     useState<MonsterNestedSelection | null>(null);
   const [announcement, setAnnouncement] = useState('');
+
+  const gemEffectContexts = useMonsterGemEffectContexts({
+    monster_id: monsterId,
+    enabled: (monster?.gem_effect_context_count ?? 0) > 1,
+  });
+
+  const navigation = {
+    on_open_item: (id: number) => setNestedSelection({ type: 'item', id }),
+    on_open_map: (id: number) => setNestedSelection({ type: 'map', id }),
+    on_open_map_gem: (id: number) =>
+      setNestedSelection({ type: 'map_gem', id }),
+    on_open_location_gem: (id: number) =>
+      setNestedSelection({ type: 'location_gem', id }),
+  };
 
   const handleEdit = (): void => {
     setShowEdit(true);
@@ -112,6 +128,24 @@ const AdminMonsterDetailSidePeek = ({
         );
       }
 
+      case 'gem_effect_context': {
+        return (
+          <StackedCard
+            on_close={handleCloseNested}
+            aria_label={nestedSelection.context.label}
+            content_mode={StackedCardContentMode.FULL_BLEED}
+          >
+            <div className="h-full min-h-0 overflow-y-auto p-4">
+              <MonsterGemEffectContextCard
+                context={nestedSelection.context}
+                navigation={navigation}
+                single_column
+              />
+            </div>
+          </StackedCard>
+        );
+      }
+
       default: {
         const NestedGameMapDetail = resolveSidePeekComponent(
           SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_DETAIL
@@ -158,13 +192,16 @@ const AdminMonsterDetailSidePeek = ({
 
         <MonsterDetail
           monster={monster}
-          navigation={{
-            on_open_item: (id) => setNestedSelection({ type: 'item', id }),
-            on_open_map: (id) => setNestedSelection({ type: 'map', id }),
-            on_open_map_gem: (id) =>
-              setNestedSelection({ type: 'map_gem', id }),
-            on_open_location_gem: (id) =>
-              setNestedSelection({ type: 'location_gem', id }),
+          navigation={navigation}
+          gem_effect_context_browser={{
+            context_rows: gemEffectContexts.context_rows,
+            loading: gemEffectContexts.loading,
+            loading_more: gemEffectContexts.loading_more,
+            error: gemEffectContexts.error,
+            has_more: gemEffectContexts.has_more,
+            on_load_next: gemEffectContexts.load_next,
+            on_open_context: (context) =>
+              setNestedSelection({ type: 'gem_effect_context', context }),
           }}
         />
       </div>

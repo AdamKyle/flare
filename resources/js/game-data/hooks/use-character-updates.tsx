@@ -8,6 +8,7 @@ const UseCharacterUpdates = ({
   userId,
   onEvent,
   onCraftingOptionsEvent,
+  onBoonsEvent,
 }: UseCharacterUpdateParamsDefinition): UseCharacterUpdateDefinition => {
   const [listening, setListening] = useState<boolean>(false);
 
@@ -28,6 +29,7 @@ const UseCharacterUpdates = ({
         userId={userId}
         onEvent={onEvent}
         onCraftingOptionsEvent={onCraftingOptionsEvent}
+        onBoonsEvent={onBoonsEvent}
       />
     );
   };

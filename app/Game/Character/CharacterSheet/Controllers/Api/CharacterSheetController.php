@@ -9,12 +9,12 @@ use App\Flare\Models\Event;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\User;
 use App\Game\Character\Builders\StatDetailsBuilder\StatModifierDetails;
+use App\Game\Character\CharacterInventory\Services\CharacterActiveBoonService;
 use App\Game\Character\CharacterInventory\Services\UseItemService;
 use App\Game\Character\CharacterSheet\Requests\SpecificDetailsRequest;
 use App\Game\Character\CharacterSheet\Transformers\CharacterSheetTransformer;
 use App\Game\Character\CharacterSheet\Transformers\CharacterStatDetailsTransformer;
 use App\Game\Core\Events\GlobalTimeOut;
-use App\Game\Core\Items\Transformers\Api\UsableItemTransformer;
 use App\Game\Core\Jobs\EndGlobalTimeOut;
 use App\Game\Core\Requests\StatDetailsRequest;
 use App\Game\Core\Services\CharacterPassiveSkills;
@@ -23,7 +23,6 @@ use App\Game\Skills\Transformers\SkillsTransformer;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection as SupportCollection;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
@@ -34,10 +33,13 @@ class CharacterSheetController extends Controller
 
     private StatModifierDetails $statModifierDetails;
 
-    public function __construct(Manager $manager, StatModifierDetails $statModifierDetails)
+    private CharacterActiveBoonService $characterActiveBoonService;
+
+    public function __construct(Manager $manager, StatModifierDetails $statModifierDetails, CharacterActiveBoonService $characterActiveBoonService)
     {
         $this->manager = $manager;
         $this->statModifierDetails = $statModifierDetails;
+        $this->characterActiveBoonService = $characterActiveBoonService;
     }
 
     public function sheet(Character $character, CharacterSheetTransformer $characterSheetTransformer)
@@ -123,10 +125,10 @@ class CharacterSheetController extends Controller
     /**
      * Return the character's currently active boon rows.
      */
-    public function activeBoons(Character $character, UsableItemTransformer $usableItemTransformer): JsonResponse
+    public function activeBoons(Character $character): JsonResponse
     {
         return response()->json([
-            'active_boons' => $this->activeBoonRows($character, $usableItemTransformer),
+            'active_boons' => $this->characterActiveBoonService->activeBoons($character),
         ]);
     }
 
@@ -203,7 +205,7 @@ class CharacterSheetController extends Controller
     /**
      * Cancel one active boon for the character.
      */
-    public function cancelBoon(Character $character, CharacterBoon $boon, UseItemService $useItemService, UsableItemTransformer $usableItemTransformer): JsonResponse
+    public function cancelBoon(Character $character, CharacterBoon $boon, UseItemService $useItemService): JsonResponse
     {
         if ($character->id !== $boon->character_id) {
             return response()->json(['message' => 'You cannot do that.'], 422);
@@ -213,10 +215,10 @@ class CharacterSheetController extends Controller
 
         $character = $character->refresh();
 
-        return response()->json(['message' => 'Boon has been deleted', 'boons' => $this->activeBoonRows($character, $usableItemTransformer)], 200);
+        return response()->json(['message' => 'Boon has been deleted', 'boons' => $this->characterActiveBoonService->activeBoons($character)], 200);
     }
 
-    public function fillUpBoon(Character $character, CharacterBoon $boon, UseItemService $useItemService, UsableItemTransformer $usableItemTransformer): JsonResponse
+    public function fillUpBoon(Character $character, CharacterBoon $boon, UseItemService $useItemService): JsonResponse
     {
         if ($character->id !== $boon->character_id) {
             return response()->json(['message' => 'You cannot do that.'], 422);
@@ -233,35 +235,7 @@ class CharacterSheetController extends Controller
 
         return response()->json([
             'message' => $result['message'],
-            'boons' => $this->activeBoonRows($character->refresh(), $usableItemTransformer),
+            'boons' => $this->characterActiveBoonService->activeBoons($character->refresh()),
         ], $status);
-    }
-
-    /**
-     * Build the active boon rows for the character, including source item and remaining Alchemy Bag amount.
-     *
-     * @return SupportCollection
-     */
-    private function activeBoonRows(Character $character, UsableItemTransformer $usableItemTransformer)
-    {
-        $characterBoons = $character->boons()->active()->with('itemUsed')->get();
-
-        return $characterBoons->transform(function ($boon) use ($character, $usableItemTransformer) {
-            $item = new Item($boon->itemUsed, $usableItemTransformer);
-            $item = $this->manager->createData($item)->toArray();
-
-            $item = $item['data'];
-            $item['name'] = $boon->itemUsed->name;
-
-            $boon->boon_applied = $item;
-            $boon->amount_left = is_null($character->alchemyBag)
-                ? 0
-                : $character->alchemyBag->slots()
-                    ->where('character_id', $character->id)
-                    ->where('item_id', $boon->item_id)
-                    ->sum('amount');
-
-            return $boon;
-        });
     }
 }

@@ -10,6 +10,7 @@ import AdminPage from '../../shared/components/admin-page';
 import { AdminPageWidth } from '../../shared/enums/admin-page-width';
 import { MonsterApiMessages } from '../api/enums/monster-api-messages';
 import { useMonsterDetail } from '../api/hooks/use-monster-detail';
+import { useMonsterGemEffectContexts } from '../api/hooks/use-monster-gem-effect-contexts';
 import { MonsterScreens } from '../screen-manager/monster-screen-constants';
 import { useMonsterScreenNavigation } from '../screen-manager/monster-screen-kit';
 import { MonsterShowScreenProps } from '../screen-manager/monster-screen-props';
@@ -25,8 +26,19 @@ const MonsterShowScreen = ({
   const sidePeekEmitter = useSidePeekEmitter();
   const { monster, loading, error } = useMonsterDetail(monsterId);
 
+  const gemEffectContexts = useMonsterGemEffectContexts({
+    monster_id: monsterId,
+    enabled: (monster?.gem_effect_context_count ?? 0) > 1,
+  });
+
   const handleBack = (): void => {
     navigation.pop();
+  };
+
+  const handleOpenGemEffectContext = (
+    context: (typeof gemEffectContexts.context_rows)[number]
+  ): void => {
+    navigation.navigateTo(MonsterScreens.GEM_EFFECT_CONTEXT, { context });
   };
 
   const handleEdit = (): void => {
@@ -115,6 +127,15 @@ const MonsterShowScreen = ({
             on_open_map: handleOpenMap,
             on_open_map_gem: handleOpenMapGem,
             on_open_location_gem: handleOpenLocationGem,
+          }}
+          gem_effect_context_browser={{
+            context_rows: gemEffectContexts.context_rows,
+            loading: gemEffectContexts.loading,
+            loading_more: gemEffectContexts.loading_more,
+            error: gemEffectContexts.error,
+            has_more: gemEffectContexts.has_more,
+            on_load_next: gemEffectContexts.load_next,
+            on_open_context: handleOpenGemEffectContext,
           }}
         />
       </div>

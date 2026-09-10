@@ -1,6 +1,5 @@
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode } from 'react';
 
-import MonsterGemEffectContextCard from './monster-gem-effect-context-card';
 import {
   locationCardBaseStyles,
   locationCardFocusRingStyles,
@@ -11,66 +10,50 @@ import {
 } from '../../location/styles/location-card-styles';
 import MonsterSpecialLocationEffectsTabPanelProps from '../types/monster-special-location-effects-tab-panel-props';
 
-import { StackedCardContentMode } from 'ui/cards/enums/stacked-card-content-mode';
-import StackedCard from 'ui/cards/stacked-card';
+import { Alert } from 'ui/alerts/alert';
+import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
-
-const PAGE_SIZE = 10;
-const SCROLL_LOAD_THRESHOLD_PX = 96;
+import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const MonsterSpecialLocationEffectsTabPanel = ({
   contexts,
-  navigation,
+  loading,
+  loading_more: loadingMore,
+  error,
+  has_more: hasMore,
+  on_load_next: onLoadNext,
+  on_open_context: onOpenContext,
 }: MonsterSpecialLocationEffectsTabPanelProps): ReactNode => {
-  const [selectedKey, setSelectedKey] = useState<string | null>(null);
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-
-  if (contexts.length <= 1) {
-    return (
-      <div>
-        {contexts.map((context) => (
-          <MonsterGemEffectContextCard
-            key={context.key}
-            context={context}
-            navigation={navigation}
-          />
-        ))}
-      </div>
-    );
-  }
-
-  const selectedContext = contexts.find(
-    (context) => context.key === selectedKey
-  );
-
   const handleScroll = (event: React.UIEvent<HTMLDivElement>): void => {
-    const target = event.currentTarget;
-    const distanceFromBottom =
-      target.scrollHeight - target.scrollTop - target.clientHeight;
+    const { scrollTop, scrollHeight, clientHeight } = event.currentTarget;
 
-    if (distanceFromBottom > SCROLL_LOAD_THRESHOLD_PX) {
+    if (!hasMore || loadingMore) {
       return;
     }
 
-    setVisibleCount((previous) =>
-      Math.min(contexts.length, previous + PAGE_SIZE)
-    );
+    if (scrollTop + clientHeight < scrollHeight - 10) {
+      return;
+    }
+
+    onLoadNext();
   };
 
-  const visibleContexts = contexts.slice(0, visibleCount);
+  if (loading && contexts.length === 0) {
+    return <InfiniteLoader />;
+  }
+
+  if (error) {
+    return <Alert variant={AlertVariant.DANGER}>{error}</Alert>;
+  }
 
   return (
-    <div className="relative">
-      <InfiniteScroll
-        handle_scroll={handleScroll}
-        height_class="max-h-[32rem]"
-        additional_css="flex flex-col gap-3"
-      >
-        {visibleContexts.map((context) => (
+    <InfiniteScroll height_class="max-h-[32rem]" handle_scroll={handleScroll}>
+      <div className="flex flex-col gap-2">
+        {contexts.map((context) => (
           <button
             key={context.key}
             type="button"
-            onClick={() => setSelectedKey(context.key)}
+            onClick={() => onOpenContext?.(context)}
             aria-label={`Open transformed stats for ${context.label}`}
             className={`${locationCardBaseStyles()} ${locationCardThemeStyles()} ${locationCardFocusRingStyles()}`}
           >
@@ -94,23 +77,9 @@ const MonsterSpecialLocationEffectsTabPanel = ({
             </div>
           </button>
         ))}
-      </InfiniteScroll>
-
-      {selectedContext && (
-        <StackedCard
-          on_close={() => setSelectedKey(null)}
-          aria_label={selectedContext.label}
-          content_mode={StackedCardContentMode.FULL_BLEED}
-        >
-          <div className="h-full min-h-0 overflow-y-auto p-4">
-            <MonsterGemEffectContextCard
-              context={selectedContext}
-              navigation={navigation}
-            />
-          </div>
-        </StackedCard>
-      )}
-    </div>
+        {loadingMore && <InfiniteLoader />}
+      </div>
+    </InfiniteScroll>
   );
 };
 

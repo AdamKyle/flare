@@ -1,3 +1,4 @@
+import AreaGemSourceDefinition from '../../../gems/api/definitions/area-gem-source-definition';
 import QuestItemFactualDefinition, {
   GameMapIdentityDefinition,
 } from '../../../quest-item/types/quest-item-factual-definition';
@@ -72,21 +73,6 @@ export interface MonsterRaidSectionDefinition {
 export type MonsterGemEffectContextType =
   'map' | 'location' | 'map_gem_world' | 'location_gem_world';
 
-export interface MonsterGemEffectSourceDefinition {
-  type: 'map_gem' | 'location_gem';
-  profile_id: number;
-  profile_name: string;
-  rolled_gem_id: number;
-  rolled_gem_name: string;
-  monster_multiplier: number;
-  reward_multiplier: number;
-  reduction_multiplier: number | null;
-  game_map_id: number | null;
-  game_map_name: string | null;
-  location_id: number | null;
-  location_name: string | null;
-}
-
 export interface MonsterGemEffectChangedValueDefinition {
   field: string;
   label: string;
@@ -101,7 +87,7 @@ export interface MonsterGemEffectContextDefinition {
   label: string;
   game_map: { id: number; name: string } | null;
   location: { id: number; name: string } | null;
-  sources: MonsterGemEffectSourceDefinition[];
+  sources: AreaGemSourceDefinition[];
   character_power_reduction: number;
   changed_values: MonsterGemEffectChangedValueDefinition[];
 }
@@ -114,5 +100,6 @@ export default interface MonsterDetailDefinition {
   spells_and_affixes: MonsterSpellSectionDefinition;
   quest_and_celestial: MonsterQuestCelestialSectionDefinition;
   raid_and_special: MonsterRaidSectionDefinition;
-  gem_effect_contexts: MonsterGemEffectContextDefinition[];
+  gem_effect_context_count: number;
+  gem_effect_context_preview: MonsterGemEffectContextDefinition | null;
 }

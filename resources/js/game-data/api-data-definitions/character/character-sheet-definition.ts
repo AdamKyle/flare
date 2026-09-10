@@ -1,3 +1,5 @@
+import ActiveBoonDefinition from '../../../game/components/actions/partials/floating-cards/crafting-section/sections/alchemy/active-boons/api/definitions/active-boon-definition';
+
 import ElementalAtonementDefinition from 'game-data/api-data-definitions/character/elemental-atonement-definition';
 import InventoryCountDefinition from 'game-data/api-data-definitions/character/inventory-counts-definition';
 import { ReincarnationInfoDefinition } from 'game-data/api-data-definitions/character/reincarnation-info-definition';
@@ -54,6 +56,7 @@ export default interface CharacterSheetDefinition {
   resistance_info: ResistanceInfoDefinition;
   elemental_atonements: ElementalAtonementDefinition;
   reincarnation_info: ReincarnationInfoDefinition;
+  active_boons: ActiveBoonDefinition[];
 
   is_admin?: boolean;
   is_silenced?: boolean | null;

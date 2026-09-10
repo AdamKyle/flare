@@ -52,6 +52,7 @@ import PlayerGameMapDetailSidePeekProps from '../../game-data/types/player-game-
 import PlayerNpcDetailSidePeekProps from '../../game-data/types/player-npc-detail-side-peek-props';
 import ItemDetailsProps from '../../item-details/types/item-details-props';
 import ConjureProps from '../../map-actions/conjure/types/conjure-props';
+import GemWorldProps from '../../map-actions/gem-world/types/gem-world-props';
 import CharacterKingdomDetailsProps from '../../map-actions/kingdom-details/types/character-kingdom-details-props';
 import LocationDetailsProps from '../../map-actions/location-details/types/location-details-props';
 import SetSailProps from '../../map-actions/set-sail/types/set-sail-props';
@@ -72,6 +73,7 @@ export type SidePeekComponentPropsMap = {
   [SidePeekComponentRegistrationEnum.MAP_ACTIONS_TRAVERSE]: TraversePropsDefinition;
   [SidePeekComponentRegistrationEnum.MAP_ACTIONS_SET_SAIL]: SetSailProps;
   [SidePeekComponentRegistrationEnum.MAP_ACTIONS_CONJURE]: ConjureProps;
+  [SidePeekComponentRegistrationEnum.MAP_ACTIONS_GEM_WORLD]: GemWorldProps;
   [SidePeekComponentRegistrationEnum.SERVER_CHAT_ITEM]: ServerChatItemProps;
   [SidePeekComponentRegistrationEnum.CRAFTED_ITEM]: CraftedItemProps;
   [SidePeekComponentRegistrationEnum.ITEM_DETAILS]: ItemDetailsProps;

@@ -33,6 +33,8 @@ class GemWorldGenerationService
         if (! is_null($gemParamter->generatedMap)) {
             $generatedMap = $gemParamter->generatedMap;
 
+            $this->mapTileGenerationService->tile($generatedMap);
+
             if (Location::where('game_map_id', $generatedMap->id)->count() === 0) {
                 return $this->retryPlacements(
                     $generatedMap,
@@ -72,6 +74,8 @@ class GemWorldGenerationService
 
         if (! is_null($gemParamter->generatedMap)) {
             $generatedMap = $gemParamter->generatedMap;
+
+            $this->mapTileGenerationService->tile($generatedMap);
 
             if (Location::where('game_map_id', $generatedMap->id)->count() === 0) {
                 return $this->retryPlacements(

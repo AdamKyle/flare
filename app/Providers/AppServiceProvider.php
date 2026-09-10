@@ -15,6 +15,7 @@ use App\Console\AfterDeployment\RemoveRacialStatBonuses;
 use App\Console\AfterDeployment\RepairQuestFeatureRewards;
 use App\Console\AfterDeployment\RepairStuckExplorationLogs;
 use App\Console\AfterDeployment\ResumeInterruptedRewardProcessing;
+use App\Console\AfterDevelopment\CreateGemWorlds;
 use App\Console\DevelopmentCommands\AssignTopEndGearToPlayer;
 use App\Console\DevelopmentCommands\CompleteGuideQuestForCharacter;
 use App\Console\DevelopmentCommands\CreateCharacter;
@@ -58,6 +59,9 @@ class AppServiceProvider extends ServiceProvider
             ResumeInterruptedRewardProcessing::class,
             FlagUsersWithMissingCharacterInventories::class,
             RemoveRacialStatBonuses::class,
+
+            // After Development Commands
+            CreateGemWorlds::class,
 
             // Development Commands:
             CreateCharacter::class,

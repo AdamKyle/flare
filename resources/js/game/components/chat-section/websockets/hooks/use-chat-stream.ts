@@ -13,7 +13,7 @@ export const useChatStream = ({
 
   const { serverMessages } = useServerMessages({ user_id: userId });
   const { explorationMessages } = useExplorationMessages({ user_id: userId });
-  const { chatMessages } = useChatMessages();
+  const { chatMessages } = useChatMessages({ user_id: userId });
 
   const [ready, setReady] = useState(false);
 

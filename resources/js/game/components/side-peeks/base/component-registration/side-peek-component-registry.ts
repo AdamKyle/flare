@@ -102,6 +102,8 @@ import ItemDetails from '../../item-details/item-details';
 import ItemDetailsProps from '../../item-details/types/item-details-props';
 import Conjure from '../../map-actions/conjure/conjure';
 import ConjureProps from '../../map-actions/conjure/types/conjure-props';
+import GemWorld from '../../map-actions/gem-world/gem-world';
+import GemWorldProps from '../../map-actions/gem-world/types/gem-world-props';
 import CharacterKingdomDetails from '../../map-actions/kingdom-details/character-kingdom-details';
 import CharacterKingdomDetailsProps from '../../map-actions/kingdom-details/types/character-kingdom-details-props';
 import LocationDetails from '../../map-actions/location-details/location-details';
@@ -170,6 +172,11 @@ export const SidePeekComponentRegistry: {
   [SidePeekComponentRegistrationEnum.MAP_ACTIONS_CONJURE]: {
     component: Conjure,
     props: {} as ConjureProps,
+  },
+  [SidePeekComponentRegistrationEnum.MAP_ACTIONS_GEM_WORLD]: {
+    component: GemWorld,
+    props: {} as GemWorldProps,
+    content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
   },
   [SidePeekComponentRegistrationEnum.SERVER_CHAT_ITEM]: {
     component: ServerChatItem,

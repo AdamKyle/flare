@@ -2,7 +2,5 @@ import ActiveBoonDefinition from '../../../crafting-section/sections/alchemy/act
 
 export default interface CharacterAlchemyBoonsProps {
   boons: ActiveBoonDefinition[];
-  loading: boolean;
   on_open: () => void;
-  on_complete: () => void;
 }

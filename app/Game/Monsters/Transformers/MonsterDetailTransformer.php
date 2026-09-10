@@ -18,6 +18,8 @@ class MonsterDetailTransformer
      */
     public function transform(Monster $monster, ?array $gemEffectContexts = null): array
     {
+        $gemEffectSummary = $this->resolveGemEffectSummary($monster, $gemEffectContexts);
+
         return [
             'id' => $monster->id,
             'identity' => $this->identity($monster),
@@ -26,8 +28,24 @@ class MonsterDetailTransformer
             'spells_and_affixes' => $this->spellsAndAffixes($monster),
             'quest_and_celestial' => $this->questAndCelestial($monster),
             'raid_and_special' => $this->raidAndSpecial($monster),
-            'gem_effect_contexts' => $gemEffectContexts ?? $this->monsterGemEffectContextService->forMonster($monster),
+            'gem_effect_context_count' => $gemEffectSummary['count'],
+            'gem_effect_context_preview' => $gemEffectSummary['preview'],
         ];
+    }
+
+    /**
+     * Resolve the Gem effect context count/preview summary from an explicit current context or the factual cache-derived service.
+     */
+    private function resolveGemEffectSummary(Monster $monster, ?array $gemEffectContexts): array
+    {
+        if (! is_null($gemEffectContexts)) {
+            return [
+                'count' => count($gemEffectContexts),
+                'preview' => $gemEffectContexts[0] ?? null,
+            ];
+        }
+
+        return $this->monsterGemEffectContextService->summary($monster);
     }
 
     /**

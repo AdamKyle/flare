@@ -1,9 +1,10 @@
+import { Screens } from 'configuration/screen-manager/screen-manager-constants';
+import { useScreenNavigation } from 'configuration/screen-manager/screen-manager-kit';
 import React, { ReactNode, useEffect, useRef, useState } from 'react';
 
 import { useCharacterQuestBrowseOptions } from './quests/api/hooks/use-character-quest-browse-options';
 import { useCharacterQuestTree } from './quests/api/hooks/use-character-quest-tree';
 import CharacterQuestBrowsePanel from './quests/components/character-quest-browse-panel';
-import CharacterQuestDetailStack from './quests/components/character-quest-detail-stack';
 import { useCharacterQuestWebsocket } from './quests/websockets/hooks/use-character-quest-websocket';
 import {
   QUEST_BROWSE_TAB_KIND,
@@ -17,6 +18,7 @@ import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 
 const CharacterQuests = (): ReactNode => {
   const { gameData } = useGameData();
+  const { navigateTo } = useScreenNavigation();
 
   const characterId = gameData?.character?.id ?? 0;
   const currentGameMapId = gameData?.character?.game_map_id ?? null;
@@ -25,7 +27,6 @@ const CharacterQuests = (): ReactNode => {
   const [activeTab, setActiveTab] = useState<QuestBrowseTab>(
     QuestBrowseTab.BASE
   );
-  const [openQuestId, setOpenQuestId] = useState<number | null>(null);
 
   const hasInitializedMapRef = useRef(false);
   const previousCharacterMapIdRef = useRef<number | null>(null);
@@ -147,11 +148,12 @@ const CharacterQuests = (): ReactNode => {
   };
 
   const handleOpenQuestFromBrowse = (questId: number): void => {
-    setOpenQuestId(questId);
-  };
-
-  const handleCloseDetail = (): void => {
-    setOpenQuestId(null);
+    navigateTo(Screens.QUEST_DETAIL, {
+      character_id: characterId,
+      quest_id: questId,
+      completed_quest_ids: completedQuestIds,
+      on_completed_quests_change: handleCompletedQuestsChange,
+    });
   };
 
   return (
@@ -170,16 +172,6 @@ const CharacterQuests = (): ReactNode => {
         on_active_tab_change={setActiveTab}
         on_open_quest={handleOpenQuestFromBrowse}
       />
-
-      {openQuestId !== null && (
-        <CharacterQuestDetailStack
-          character_id={characterId}
-          quest_id={openQuestId}
-          completed_quest_ids={completedQuestIds}
-          on_close={handleCloseDetail}
-          on_completed_quests_change={handleCompletedQuestsChange}
-        />
-      )}
     </div>
   );
 };

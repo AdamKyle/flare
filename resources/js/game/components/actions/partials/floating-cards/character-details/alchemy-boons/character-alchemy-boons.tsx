@@ -29,7 +29,7 @@ const resolveAggregateWindow = (
 const CharacterAlchemyBoons = (
   props: CharacterAlchemyBoonsProps
 ): ReactNode => {
-  if (props.loading || props.boons.length === 0) {
+  if (props.boons.length === 0) {
     return null;
   }
 
@@ -47,7 +47,6 @@ const CharacterAlchemyBoons = (
       variant={ButtonVariant.ALCHEMY}
       additional_css="w-full mt-2"
       on_click={props.on_open}
-      on_complete={props.on_complete}
       detailed_time
     />
   );

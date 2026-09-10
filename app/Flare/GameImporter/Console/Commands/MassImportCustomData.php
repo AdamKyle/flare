@@ -36,12 +36,9 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
-        //        Artisan::call('import:game-data "World Gems"');
-        //        Artisan::call('import:game-data "Location Templates"');
-        //        Artisan::call('import:game-data Quests');
-        //        Artisan::call('batch-crafting:add-set-to-players --apply');
-        //        Artisan::call('backfill:completed-panel-dismissals --apply');
-        //        Artisan::call('cleanup:duplicate-quest-inventory-slots --apply');
+        Artisan::call('import:game-data "World Gems"');
+        Artisan::call('import:game-data "Location Templates"');
+        Artisan::call('import:game-data Quests');
 
         Artisan::call('remove:racial-stat-bonuses');
 
@@ -49,6 +46,11 @@ class MassImportCustomData extends Command
 
         if (config('app.env') !== 'production') {
             $this->importGameMaps();
+
+            Artisan::call('create:gem-worlds');
+            Artisan::call('create:character-attack-data');
+            Artisan::call('generate:monster-cache');
+            Artisan::call('create:quest-cache');
         }
     }
 

@@ -4,4 +4,5 @@ import { MonsterGemEffectContextDefinition } from '../api/definitions/monster-de
 export default interface MonsterGemEffectContextCardProps {
   context: MonsterGemEffectContextDefinition;
   navigation?: MonsterNavigationDefinition;
+  single_column?: boolean;
 }

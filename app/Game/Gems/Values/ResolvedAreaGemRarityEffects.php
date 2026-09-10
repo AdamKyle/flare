@@ -49,4 +49,18 @@ class ResolvedAreaGemRarityEffects
     {
         return $this->cosmic;
     }
+
+    /**
+     * Serialize this result into its factual field shape.
+     *
+     * @return array<string, float>
+     */
+    public function toArray(): array
+    {
+        return [
+            'unique' => $this->unique,
+            'mythic' => $this->mythic,
+            'cosmic' => $this->cosmic,
+        ];
+    }
 }

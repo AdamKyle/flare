@@ -23,6 +23,10 @@ class UseItemService
 
     const MAX_AMOUNT = 10;
 
+    public function __construct(
+        private readonly CharacterActiveBoonService $characterActiveBoonService,
+    ) {}
+
     /**
      * Use several selected Alchemy Bag items for the character, applying boons up to the active limits.
      */
@@ -476,7 +480,7 @@ class UseItemService
      */
     private function broadcastCharacterBoons(Character $character): void
     {
-        event(new CharacterBoonsUpdateBroadcastEvent($character->user, $character->boons()->active()->get()->toArray()));
+        event(new CharacterBoonsUpdateBroadcastEvent($character->user, $this->characterActiveBoonService->activeBoons($character)));
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Game\Character\CharacterSheet\Transformers;
 
 use App\Flare\Models\Character;
 use App\Flare\Transformers\BaseTransformer;
+use App\Game\Character\CharacterInventory\Services\CharacterActiveBoonService;
 use App\Game\Character\CharacterInventory\Transformers\CharacterInventoryCountTransformer;
 
 class CharacterSheetTransformer extends BaseTransformer
@@ -16,6 +17,7 @@ class CharacterSheetTransformer extends BaseTransformer
         private readonly CharacterElementalAtonementTransformer $characterElementalAtonementTransformer,
         private readonly CharacterReincarnationInfoTransformer $characterReincarnationInfoTransformer,
         private readonly CharacterInventoryCountTransformer $characterInventoryCountTransformer,
+        private readonly CharacterActiveBoonService $characterActiveBoonService,
     ) {}
 
     /**
@@ -32,6 +34,7 @@ class CharacterSheetTransformer extends BaseTransformer
             'resistance_info' => ['data' => $this->characterResistanceInfoTransformer->transform($character)],
             'elemental_atonements' => $this->characterElementalAtonementTransformer->transform($character),
             'reincarnation_info' => ['data' => $this->characterReincarnationInfoTransformer->transform($character)],
+            'active_boons' => $this->characterActiveBoonService->activeBoons($character),
         ]);
     }
 }

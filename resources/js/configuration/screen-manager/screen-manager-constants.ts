@@ -11,5 +11,6 @@ export const Screens = {
   DONATIONS: 'donations',
   GUIDE_QUESTS: 'guide-quests',
   QUEST_LOG: 'quest-log',
+  QUEST_DETAIL: 'quest-detail',
   CLASS_SPECIALTIES: 'class-specialties',
 } as const;

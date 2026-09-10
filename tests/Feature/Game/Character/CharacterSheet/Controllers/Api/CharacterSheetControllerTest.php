@@ -287,6 +287,32 @@ class CharacterSheetControllerTest extends TestCase
         $this->assertSame(0, $response->json('active_boons.0.amount_left'));
     }
 
+    public function test_character_sheet_includes_active_boons_using_the_shared_presentation_contract(): void
+    {
+        $item = $this->createItem(['type' => 'alchemy', 'usable' => true, 'name' => 'Sample Boon Item']);
+        $character = $this->character->getCharacter();
+        $boon = $this->createCharacterBoon([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'last_for_minutes' => 30,
+            'amount_used' => 1,
+            'started' => now(),
+            'complete' => now()->addMinutes(30),
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->getJson('/api/character-sheet/'.$character->id);
+
+        $response->assertOk();
+        $activeBoons = $response->json('data.active_boons');
+
+        $this->assertCount(1, $activeBoons);
+        $this->assertSame($boon->id, $activeBoons[0]['id']);
+        $this->assertSame($item->id, $activeBoons[0]['boon_applied']['item_id']);
+        $this->assertSame($item->name, $activeBoons[0]['boon_applied']['name']);
+        $this->assertArrayHasKey('amount_left', $activeBoons[0]);
+    }
+
     public function test_automations_returns_current_automations(): void
     {
         $character = $this->character->getCharacter();

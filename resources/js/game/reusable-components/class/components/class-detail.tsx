@@ -21,6 +21,7 @@ interface LabeledValueRow {
 const ClassDetail = ({
   game_class: gameClass,
   on_open_class: onOpenClass,
+  single_column: singleColumn,
 }: ClassDetailProps): ReactNode => {
   const renderRows = (rows: LabeledValueRow[]): ReactNode =>
     rows.map((row) => (
@@ -61,7 +62,7 @@ const ClassDetail = ({
   const hasSecondRow = hasCombatModifiers || hasUnlockRequirements;
 
   return (
-    <DetailGrid>
+    <DetailGrid single_column={singleColumn}>
       {gameClass.description && (
         <div className="col-span-full">
           <Card>

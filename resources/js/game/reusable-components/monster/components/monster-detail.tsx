@@ -1,9 +1,11 @@
 import React, { ReactNode } from 'react';
 
+import MonsterGemEffectContextCard from './monster-gem-effect-context-card';
 import MonsterNormalTabPanel from './monster-normal-tab-panel';
 import MonsterSpecialLocationEffectsTabPanel from './monster-special-location-effects-tab-panel';
 import { MonsterGemEffectContextDefinition } from '../api/definitions/monster-detail-definition';
 import MonsterDetailProps from '../types/monster-detail-props';
+import MonsterGemEffectContextCardProps from '../types/monster-gem-effect-context-card-props';
 import MonsterNormalTabPanelProps from '../types/monster-normal-tab-panel-props';
 import MonsterSpecialLocationEffectsTabPanelProps from '../types/monster-special-location-effects-tab-panel-props';
 
@@ -25,6 +27,14 @@ const CardWrappedMonsterSpecialLocationEffectsTabPanel = (
 ): ReactNode => (
   <Card>
     <MonsterSpecialLocationEffectsTabPanel {...props} />
+  </Card>
+);
+
+const CardWrappedMonsterGemEffectContextCard = (
+  props: MonsterGemEffectContextCardProps
+): ReactNode => (
+  <Card>
+    <MonsterGemEffectContextCard {...props} />
   </Card>
 );
 
@@ -55,10 +65,12 @@ const MonsterDetail = ({
   navigation,
   initial_context_tab: initialContextTab = false,
   presentation = 'side-peek',
+  gem_effect_context_browser: gemEffectContextBrowser,
 }: MonsterDetailProps): ReactNode => {
   const isPage = presentation === 'page';
-  const hasGemEffectContexts = monster.gem_effect_contexts.length > 0;
-  const hasSingleContext = monster.gem_effect_contexts.length === 1;
+  const hasGemEffectContexts = monster.gem_effect_context_count > 0;
+  const hasSingleContext = monster.gem_effect_context_count === 1;
+  const preview = monster.gem_effect_context_preview;
 
   const renderBody = (): ReactNode => {
     if (!hasGemEffectContexts) {
@@ -77,14 +89,41 @@ const MonsterDetail = ({
       props: { monster, navigation },
     } as const;
 
+    if (hasSingleContext && preview) {
+      const singleContextTab = {
+        label: resolveSingleContextTabLabel(preview),
+        component: isPage
+          ? CardWrappedMonsterGemEffectContextCard
+          : MonsterGemEffectContextCard,
+        props: { context: preview, navigation, single_column: !isPage },
+      } as const;
+
+      const tabs = [normalTab, singleContextTab] as const;
+
+      return (
+        <PillTabs
+          tabs={tabs}
+          ariaLabel="Monster detail"
+          additional_tab_css={TAB_CSS}
+          initialIndex={initialContextTab ? 1 : 0}
+        />
+      );
+    }
+
     const specialLocationEffectsTab = {
-      label: hasSingleContext
-        ? resolveSingleContextTabLabel(monster.gem_effect_contexts[0])
-        : 'Special Location Effects',
+      label: 'Special Location Effects',
       component: isPage
         ? CardWrappedMonsterSpecialLocationEffectsTabPanel
         : MonsterSpecialLocationEffectsTabPanel,
-      props: { contexts: monster.gem_effect_contexts, navigation },
+      props: {
+        contexts: gemEffectContextBrowser?.context_rows ?? [],
+        loading: gemEffectContextBrowser?.loading ?? false,
+        loading_more: gemEffectContextBrowser?.loading_more ?? false,
+        error: gemEffectContextBrowser?.error ?? null,
+        has_more: gemEffectContextBrowser?.has_more ?? false,
+        on_load_next: gemEffectContextBrowser?.on_load_next ?? (() => {}),
+        on_open_context: gemEffectContextBrowser?.on_open_context,
+      },
     } as const;
 
     const tabs = [normalTab, specialLocationEffectsTab] as const;

@@ -54,6 +54,40 @@ class AdminGemRollServiceTest extends TestCase
         $this->assertSame(0, GemBagSlot::count());
     }
 
+    public function test_roll_map_gem_with_no_admin_persists_a_system_roll(): void
+    {
+        $profile = $this->createGameMapGemParamter([
+            'character_xp_bonus_range' => '0.4321-0.4321',
+        ]);
+
+        $randomNumberGenerator = Mockery::mock(RandomNumberGenerator::class);
+        $randomNumberGenerator->shouldReceive('numberBetween')->zeroOrMoreTimes()->andReturn(500000);
+        $gem = (new AdminGemRollService($randomNumberGenerator))->rollMapGem($profile, null);
+        $profile->refresh();
+
+        $this->assertSame(Gem::DOMAIN_MAP, $gem->domain);
+        $this->assertNull($gem->rolled_by_user_id);
+        $this->assertSame($gem->id, $profile->rolled_gem_id);
+        $this->assertSame(1, $profile->roll_count);
+    }
+
+    public function test_roll_location_gem_with_no_admin_persists_a_system_roll(): void
+    {
+        $profile = $this->createGameLocationGemParamter([
+            'character_xp_bonus_range' => '0.4321-0.4321',
+        ]);
+
+        $randomNumberGenerator = Mockery::mock(RandomNumberGenerator::class);
+        $randomNumberGenerator->shouldReceive('numberBetween')->zeroOrMoreTimes()->andReturn(500000);
+        $gem = (new AdminGemRollService($randomNumberGenerator))->rollLocationGem($profile, null);
+        $profile->refresh();
+
+        $this->assertSame(Gem::DOMAIN_LOCATION, $gem->domain);
+        $this->assertNull($gem->rolled_by_user_id);
+        $this->assertSame($gem->id, $profile->rolled_gem_id);
+        $this->assertSame(1, $profile->roll_count);
+    }
+
     public function test_roll_location_gem_never_sets_character_power_reduction(): void
     {
         $admin = $this->createAdmin($this->createAdminRole());

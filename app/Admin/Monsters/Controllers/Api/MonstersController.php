@@ -2,6 +2,7 @@
 
 namespace App\Admin\Monsters\Controllers\Api;
 
+use App\Admin\Monsters\Requests\MonsterGemEffectContextIndexRequest;
 use App\Admin\Monsters\Requests\MonsterIndexRequest;
 use App\Admin\Monsters\Requests\StoreMonsterRequest;
 use App\Admin\Monsters\Requests\UpdateMonsterRequest;
@@ -55,6 +56,21 @@ class MonstersController extends Controller
     public function show(Monster $monster): JsonResponse
     {
         return response()->json($this->monsterReadService->detail($monster), 200);
+    }
+
+    /**
+     * Return the append-paginated Gem effect context list for the given Monster.
+     */
+    public function gemEffectContexts(MonsterGemEffectContextIndexRequest $request, Monster $monster): JsonResponse
+    {
+        return response()->json(
+            $this->monsterReadService->gemEffectContexts(
+                $monster,
+                $request->integer('per_page'),
+                $request->integer('page'),
+            ),
+            200
+        );
     }
 
     /**

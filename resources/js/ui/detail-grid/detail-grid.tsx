@@ -6,10 +6,12 @@ import DetailGridProps from './types/detail-grid-props';
 const DetailGrid = ({
   children,
   additional_css: additionalCss,
+  single_column = false,
 }: DetailGridProps): ReactNode => (
   <div
     className={clsx(
-      'grid grid-cols-1 gap-x-8 gap-y-5 md:grid-cols-2',
+      'grid grid-cols-1 gap-x-8 gap-y-5',
+      !single_column && 'md:grid-cols-2',
       additionalCss
     )}
   >

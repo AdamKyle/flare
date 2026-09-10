@@ -198,6 +198,7 @@ const ClassRankDetailContent = ({
       <ClassDetail
         game_class={selectedRank.class_detail}
         on_open_class={onOpenClass}
+        single_column
       />
 
       <Separator additional_css="my-0" />

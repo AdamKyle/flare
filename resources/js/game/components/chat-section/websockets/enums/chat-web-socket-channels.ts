@@ -5,4 +5,5 @@ export enum ChatWebSocketChannels {
   NPC_MESSAGE = 'npc-message-{userId}',
   CHAT = 'chat',
   PRIVATE_MESSAGE = 'private-message-{userId}',
+  GLOBAL_MESSAGE = 'global-message',
 }

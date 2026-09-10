@@ -4,7 +4,9 @@ namespace Tests\Feature\Admin\Monsters;
 
 use App\Game\Maps\Values\LocationType;
 use App\Game\Monsters\Services\BuildMonsterCacheService;
+use App\Game\Monsters\Values\MonsterCacheKey;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGameMapGemParamter;
@@ -103,9 +105,10 @@ class MonstersApiControllerTest extends TestCase
         $response = $this->actingAs($admin)->call('GET', "/api/admin/monsters/{$monster->id}", [], [], [], ['HTTP_ACCEPT' => 'application/json']);
         $data = json_decode($response->getContent(), true);
 
-        $this->assertNotEmpty($data['gem_effect_contexts']);
-        $this->assertSame('map', $data['gem_effect_contexts'][0]['type']);
-        $this->assertSame($profile->id, $data['gem_effect_contexts'][0]['sources'][0]['profile_id']);
+        $this->assertSame(1, $data['gem_effect_context_count']);
+        $this->assertSame('map', $data['gem_effect_context_preview']['type']);
+        $this->assertSame($profile->id, $data['gem_effect_context_preview']['sources'][0]['profile_id']);
+        $this->assertArrayNotHasKey('gem_effect_contexts', $data);
     }
 
     public function test_show_returns_empty_gem_effect_contexts_for_a_raid_monster(): void
@@ -123,7 +126,8 @@ class MonstersApiControllerTest extends TestCase
         $response = $this->actingAs($admin)->call('GET', "/api/admin/monsters/{$monster->id}", [], [], [], ['HTTP_ACCEPT' => 'application/json']);
         $data = json_decode($response->getContent(), true);
 
-        $this->assertSame([], $data['gem_effect_contexts']);
+        $this->assertSame(0, $data['gem_effect_context_count']);
+        $this->assertNull($data['gem_effect_context_preview']);
     }
 
     public function test_show_returns_empty_gem_effect_contexts_for_a_weekly_fight_monster(): void
@@ -144,7 +148,8 @@ class MonstersApiControllerTest extends TestCase
         $response = $this->actingAs($admin)->call('GET', "/api/admin/monsters/{$monster->id}", [], [], [], ['HTTP_ACCEPT' => 'application/json']);
         $data = json_decode($response->getContent(), true);
 
-        $this->assertSame([], $data['gem_effect_contexts']);
+        $this->assertSame(0, $data['gem_effect_context_count']);
+        $this->assertNull($data['gem_effect_context_preview']);
     }
 
     public function test_show_returns_empty_gem_effect_contexts_for_a_cave_of_memories_monster(): void
@@ -165,7 +170,8 @@ class MonstersApiControllerTest extends TestCase
         $response = $this->actingAs($admin)->call('GET', "/api/admin/monsters/{$monster->id}", [], [], [], ['HTTP_ACCEPT' => 'application/json']);
         $data = json_decode($response->getContent(), true);
 
-        $this->assertSame([], $data['gem_effect_contexts']);
+        $this->assertSame(0, $data['gem_effect_context_count']);
+        $this->assertNull($data['gem_effect_context_preview']);
     }
 
     public function test_show_returns_empty_gem_effect_contexts_for_a_celestial_monster(): void
@@ -183,7 +189,8 @@ class MonstersApiControllerTest extends TestCase
         $response = $this->actingAs($admin)->call('GET', "/api/admin/monsters/{$monster->id}", [], [], [], ['HTTP_ACCEPT' => 'application/json']);
         $data = json_decode($response->getContent(), true);
 
-        $this->assertSame([], $data['gem_effect_contexts']);
+        $this->assertSame(0, $data['gem_effect_context_count']);
+        $this->assertNull($data['gem_effect_context_preview']);
     }
 
     public function test_store_creates_a_monster_from_every_field_group(): void
@@ -584,5 +591,80 @@ class MonstersApiControllerTest extends TestCase
         $response->assertStatus(200);
         $this->assertCount(1, $data);
         $this->assertSame($matching->id, $data[0]['id']);
+    }
+
+    public function test_gem_effect_contexts_endpoint_returns_the_paginated_shape_with_page_size_ten(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $monster = $this->createMonster();
+
+        $rows = [];
+
+        for ($locationId = 1; $locationId <= 11; $locationId++) {
+            $rows[] = [
+                'id' => $monster->id,
+                'gem_effect_context' => [
+                    'has_effects' => true,
+                    'context_type' => 'location',
+                    'context_label' => sprintf('Location %02d', $locationId),
+                    'game_map' => null,
+                    'location' => ['id' => $locationId, 'name' => sprintf('Location %02d', $locationId)],
+                    'sources' => [],
+                    'character_power_reduction' => 0.0,
+                ],
+            ];
+        }
+
+        Cache::put(MonsterCacheKey::LOCATION_MONSTERS->value, [
+            'Paginated Locations' => ['data' => $rows],
+        ]);
+
+        $response = $this->actingAs($admin)->call('GET', "/api/admin/monsters/{$monster->id}/gem-effect-contexts", [], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true);
+
+        $response->assertStatus(200);
+        $this->assertCount(10, $data['data']);
+        $this->assertSame(10, $data['meta']['pagination']['per_page']);
+        $this->assertSame(11, $data['meta']['pagination']['total']);
+        $this->assertTrue($data['meta']['can_load_more']);
+    }
+
+    public function test_gem_effect_contexts_endpoint_returns_empty_data_for_a_raid_monster(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $gameMap = $this->createGameMap(['name' => 'Raid Contexts Map']);
+        $profile = $this->createGameMapGemParamter(['game_map_id' => $gameMap->id]);
+        $gem = $this->createMapGeneratedGem($profile, ['enemy_strength_increase' => 0.2]);
+        $profile->update(['rolled_gem_id' => $gem->id]);
+
+        $monster = $this->createMonster(['game_map_id' => $gameMap->id, 'is_raid_monster' => true]);
+
+        resolve(BuildMonsterCacheService::class)->buildAll();
+
+        $response = $this->actingAs($admin)->call('GET', "/api/admin/monsters/{$monster->id}/gem-effect-contexts", [], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true);
+
+        $response->assertStatus(200);
+        $this->assertSame([], $data['data']);
+        $this->assertSame(0, $data['meta']['pagination']['total']);
+    }
+
+    public function test_non_admin_cannot_access_monster_gem_effect_contexts(): void
+    {
+        $user = $this->createUser();
+        $monster = $this->createMonster();
+
+        $response = $this->actingAs($user)->call('GET', "/api/admin/monsters/{$monster->id}/gem-effect-contexts", [], [], [], ['HTTP_ACCEPT' => 'application/json']);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_guest_cannot_access_monster_gem_effect_contexts(): void
+    {
+        $monster = $this->createMonster();
+
+        $response = $this->call('GET', "/api/admin/monsters/{$monster->id}/gem-effect-contexts", [], [], [], ['HTTP_ACCEPT' => 'application/json']);
+
+        $response->assertStatus(401);
     }
 }

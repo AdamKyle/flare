@@ -22,6 +22,8 @@ Route::middleware(['auth', 'is.player.banned', 'is.character.who.they.say.they.a
 
     Route::get('/map/details/{gameMap}', ['uses' => 'Api\MapController@gameMapDetails']);
 
+    Route::get('/map/gem-world/{character}', ['uses' => 'Api\GemWorldController@context']);
+
     Route::group(['middleware' => 'throttle:moving'], function () {
 
         // Map Movement:
@@ -36,6 +38,11 @@ Route::middleware(['auth', 'is.player.banned', 'is.character.who.they.say.they.a
 
             // Traverse the player:
             Route::post('/map/traverse/{character}', ['uses' => 'Api\MapController@traverse']);
+
+            // Gem World entry/exit:
+            Route::post('/map/gem-world/enter/{character}', ['uses' => 'Api\GemWorldController@enter']);
+
+            Route::post('/map/gem-world/exit/{character}', ['uses' => 'Api\GemWorldController@exit']);
         });
 
     });

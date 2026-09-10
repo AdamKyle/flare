@@ -12,6 +12,4 @@ export interface RegularMessagePayloadDefinition {
   custom_class: string;
   is_chat_bold: boolean;
   is_chat_italic: boolean;
-  name: string;
-  nameTag: string | null;
 }

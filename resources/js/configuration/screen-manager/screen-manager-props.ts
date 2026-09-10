@@ -10,6 +10,7 @@ import DonationsProps from '../../game/components/donations/types/donations-prop
 import GoblinShopProps from '../../game/components/goblin-shop/types/goblin-shop-props';
 import GuideQuestProps from '../../game/components/guide-quests/types/guide-quest-props';
 import CharacterInventoryProps from '../../game/components/partials/types/character-inventory-props';
+import QuestDetailScreenProps from '../../game/components/quests/types/quest-detail-screen-props';
 import QuestLogScreenProps from '../../game/components/quests/types/quest-log-screen-props';
 import ShopScreenProps from '../../game/components/shop/types/shop-screen-props';
 
@@ -26,6 +27,7 @@ export interface AppScreenPropsMap {
   [Screens.CHARACTER_STAT_DETAILS]: CharacterStatTypeBreakdownProps;
   [Screens.CHARACTER_ATTACK_DETAILS]: CharacterAttackTypeBreakdownProps;
   [Screens.QUEST_LOG]: QuestLogScreenProps;
+  [Screens.QUEST_DETAIL]: QuestDetailScreenProps;
   [Screens.CLASS_SPECIALTIES]: ManageClassSpecialtiesScreenProps;
 }
 

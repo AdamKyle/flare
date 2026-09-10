@@ -9,6 +9,7 @@ import FactualLink from '../../quest-item/partials/factual-link';
 import { MonsterGemEffectChangedValueDefinition } from '../api/definitions/monster-detail-definition';
 import MonsterGemEffectContextCardProps from '../types/monster-gem-effect-context-card-props';
 
+import DetailGrid from 'ui/detail-grid/detail-grid';
 import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
@@ -165,6 +166,7 @@ const renderChange = (
 const MonsterGemEffectContextCard = ({
   context,
   navigation,
+  single_column: singleColumn,
 }: MonsterGemEffectContextCardProps): ReactNode => {
   const renderSource = (
     source: (typeof context.sources)[number]
@@ -219,7 +221,7 @@ const MonsterGemEffectContextCard = ({
     }
 
     return (
-      <div className="grid grid-cols-1 gap-x-8 gap-y-5 md:grid-cols-2">
+      <DetailGrid single_column={singleColumn}>
         {changedValueGroups.map((group, index) => (
           <Fragment key={group.heading}>
             <div>
@@ -228,12 +230,14 @@ const MonsterGemEffectContextCard = ({
               </h4>
               <Dl>{group.changes.map(renderChange)}</Dl>
             </div>
-            {index % 2 === 1 && index !== changedValueGroups.length - 1 && (
-              <Separator additional_css="col-span-full my-1" />
-            )}
+            {!singleColumn &&
+              index % 2 === 1 &&
+              index !== changedValueGroups.length - 1 && (
+                <Separator additional_css="col-span-full my-1" />
+              )}
           </Fragment>
         ))}
-      </div>
+      </DetailGrid>
     );
   };
 

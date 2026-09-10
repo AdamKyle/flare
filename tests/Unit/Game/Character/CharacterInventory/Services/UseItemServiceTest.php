@@ -92,6 +92,45 @@ class UseItemServiceTest extends TestCase
         $this->assertEquals(0, AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag->id)->where('item_id', $item->id)->count());
     }
 
+    public function test_using_an_item_broadcasts_the_presentation_ready_active_boon_contract(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 30,
+            'type' => 'alchemy',
+            'affects_skill_type' => SkillTypeValue::TRAINING->value,
+        ]);
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 2,
+        ]);
+
+        $this->useItemService->useSingleItemFromInventory($character->refresh(), $item);
+
+        $character = $character->refresh();
+        $boon = $character->boons()->active()->first();
+
+        Event::assertDispatched(CharacterBoonsUpdateBroadcastEvent::class, function (CharacterBoonsUpdateBroadcastEvent $event) use ($boon, $item) {
+            $boonRow = $event->boons[0];
+
+            return $boonRow['id'] === $boon->id
+                && $boonRow['item_id'] === $item->id
+                && $boonRow['boon_applied']['item_id'] === $item->id
+                && $boonRow['boon_applied']['name'] === $item->name
+                && $boonRow['amount_left'] === 1;
+        });
+    }
+
     public function test_do_not_go_over_max_amount()
     {
         Event::fake();

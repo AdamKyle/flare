@@ -3,7 +3,9 @@ export type ChatMessageType =
   | 'creator-message'
   | 'global-message'
   | 'error-message'
-  | 'private-message-sent';
+  | 'private-message-sent'
+  | 'private-message-received'
+  | 'npc-message';
 
 export default interface ChatType {
   color: string;

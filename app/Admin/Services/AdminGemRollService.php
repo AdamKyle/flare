@@ -16,7 +16,7 @@ class AdminGemRollService
     /**
      * Roll a new Gem for the Map Gem profile.
      */
-    public function rollMapGem(GameMapGemParamter $gameMapGemParamter, User $admin): Gem
+    public function rollMapGem(GameMapGemParamter $gameMapGemParamter, ?User $admin = null): Gem
     {
         return $this->roll(
             $gameMapGemParamter,
@@ -29,7 +29,7 @@ class AdminGemRollService
     /**
      * Roll a new Gem for the Location Gem profile.
      */
-    public function rollLocationGem(GameLocationGemParamter $gameLocationGemParamter, User $admin): Gem
+    public function rollLocationGem(GameLocationGemParamter $gameLocationGemParamter, ?User $admin = null): Gem
     {
         return $this->roll(
             $gameLocationGemParamter,
@@ -40,11 +40,11 @@ class AdminGemRollService
     }
 
     /**
-     * Roll and persist a Gem for the supplied Gem profile.
+     * Roll and persist a Gem for the supplied Gem profile. A null admin persists a system-created roll.
      */
     private function roll(
         GameMapGemParamter|GameLocationGemParamter $profile,
-        User $admin,
+        ?User $admin,
         string $domain,
         string $sourceForeignKey,
     ): Gem {
@@ -53,7 +53,7 @@ class AdminGemRollService
         $gemData = [
             'name' => $currentProfile->name,
             'domain' => $domain,
-            'rolled_by_user_id' => $admin->id,
+            'rolled_by_user_id' => $admin?->id,
             'roll_number' => $rollNumber,
             $sourceForeignKey => $currentProfile->id,
             'crafting_skill_ids' => $currentProfile->crafting_skill_ids,

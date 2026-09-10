@@ -93,7 +93,7 @@ export const MonsterStatSection = ({
           on_open_map: handleOpenMap,
           on_open_item: handleOpenItem,
         }}
-        initial_context_tab={data.gem_effect_contexts.length > 0}
+        initial_context_tab={data.gem_effect_context_count > 0}
       />
     </ContainerWithTitle>
   );

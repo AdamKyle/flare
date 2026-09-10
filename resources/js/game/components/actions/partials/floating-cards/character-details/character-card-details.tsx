@@ -23,9 +23,7 @@ import Separator from 'ui/separator/separator';
 const CharacterCardDetails = ({
   characterData,
   active_boons: activeBoons,
-  active_boons_loading: activeBoonsLoading,
   on_open_active_boons: onOpenActiveBoons,
-  on_active_boons_complete: onActiveBoonsComplete,
 }: CharacterCardDetailsProps): ReactNode => {
   const { openCharacterSheet } = useManageCharacterSheetVisibility();
   const { openCharacterInventory } = useManageCharacterInventoryVisibility();
@@ -217,12 +215,7 @@ const CharacterCardDetails = ({
         variant={ButtonVariant.PRIMARY}
         additional_css="w-full"
       />
-      <CharacterAlchemyBoons
-        boons={activeBoons}
-        loading={activeBoonsLoading}
-        on_open={onOpenActiveBoons}
-        on_complete={onActiveBoonsComplete}
-      />
+      <CharacterAlchemyBoons boons={activeBoons} on_open={onOpenActiveBoons} />
     </>
   );
 };

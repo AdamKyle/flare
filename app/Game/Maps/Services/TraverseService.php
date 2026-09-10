@@ -82,6 +82,10 @@ class TraverseService
             return false;
         }
 
+        if ($gameMap->isGeneratedGemMap() || ! $gameMap->can_traverse) {
+            return false;
+        }
+
         $mapType = $gameMap->mapType();
 
         if ($mapType->isLabyrinth()) {
@@ -170,6 +174,20 @@ class TraverseService
 
         $gameMap = $character->map->gameMap;
 
+        if (! $gameMap->isGeneratedGemMap()) {
+            $this->sendPlaneNarrativeMessages($character, $gameMap);
+        }
+
+        event(new UpdateCharacterStatus($character));
+    }
+
+    /**
+     * Send the special parent-plane narrative/global messages for the closed set of narrative
+     * Game Map types (Shadow Plane, Hell, Purgatory, The Ice Plane, Twisted Memories, and
+     * Delusional Memories). Never called for a generated Gem Map destination.
+     */
+    private function sendPlaneNarrativeMessages(Character $character, GameMap $gameMap): void
+    {
         if ($gameMap->mapType()->isShadowPlane()) {
             $message = 'As you enter into the Shadow Plane, all you see for miles around are
             shadowy figures moving across the land. The color of the land is grey and lifeless. But you
@@ -220,8 +238,6 @@ class TraverseService
 
             event(new GlobalMessageEvent('"Fliniguss has gone mad."  the Red Hawk Soldier states. "Help us put him down!" '.$character->name.' enters into a place where the war of the ages past never ended.'));
         }
-
-        event(new UpdateCharacterStatus($character));
     }
 
     /**

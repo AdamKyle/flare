@@ -3,4 +3,5 @@ export enum CoreWebSocketChannels {
   UPDATE_CHARACTER = 'update-character-base-stats-{userId}',
   UPDATE_CORE_CHARACTER_DETAILS = 'update-character-base-details-{userId}',
   UPDATE_LOCATION_BASED_CRAFTING_OPTIONS = 'update-location-base-crafting-options-{userId}',
+  UPDATE_BOONS = 'update-boons-{userId}',
 }

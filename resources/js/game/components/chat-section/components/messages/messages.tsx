@@ -2,10 +2,45 @@ import clsx from 'clsx';
 import React, { useCallback, useRef, useState } from 'react';
 
 import MessagesProps from './definitions/message-props';
+import ChatType from '../../../../api-definitions/chat/chat-message-definition';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import Card from 'ui/cards/card';
+
+interface ChatRowViewModel {
+  sender_name: string;
+  has_sender: boolean;
+  name_label: string;
+  location_tag: string;
+  color: string | undefined;
+  custom_class: string;
+  has_custom_class: boolean;
+}
+
+const normalizeChatName = (value: string | null | undefined): string =>
+  (value ?? '').trim();
+
+const buildChatRowViewModel = (row: ChatType): ChatRowViewModel => {
+  const characterName = normalizeChatName(row.character_name);
+  const nameTagLabel = normalizeChatName(row.name_tag);
+  const senderName = characterName || nameTagLabel;
+  const nameLabel = [characterName, nameTagLabel]
+    .filter((part) => part.length > 0)
+    .join(' ');
+  const coords = row.hide_location ? '***/***' : `${row.x}/${row.y}`;
+  const customClass = row.custom_class || '';
+
+  return {
+    sender_name: senderName,
+    has_sender: senderName.length > 0,
+    name_label: nameLabel,
+    location_tag: row.map_name ? `[${row.map_name} (${coords})]` : '',
+    color: customClass.length > 0 ? undefined : row.color || undefined,
+    custom_class: customClass,
+    has_custom_class: customClass.length > 0,
+  };
+};
 
 const Messages = ({
   is_silenced,
@@ -132,39 +167,41 @@ const Messages = ({
         >
           <ul className="space-y-2">
             {chat.map((row, idx) => {
-              const displayName: string =
-                row.character_name.trim() || (row.name_tag ?? '').trim();
-              const name = ` ${row.character_name || ''} ${row.name_tag}`;
-              const coords = row.hide_location
-                ? '***/***'
-                : `${row.x}/${row.y}`;
-              const tag = row.map_name ? `[${row.map_name} (${coords})]` : '';
-
-              const customClass = row.custom_class || '';
-              const hasCustomClass = customClass.length > 0;
+              const rowView = buildChatRowViewModel(row);
 
               return (
                 <li key={idx}>
-                  <span
-                    className={clsx(
-                      'cursor-pointer font-bold underline',
-                      customClass
-                    )}
-                    onClick={() => handleStartPrivateMessage(displayName)}
-                    onKeyDown={handleOnKeyDown(displayName)}
-                    role="button"
-                    tabIndex={0}
-                  >
-                    {tag} {name} {': '}
-                  </span>
+                  {rowView.has_sender ? (
+                    <span
+                      className={clsx(
+                        'cursor-pointer font-bold underline',
+                        rowView.custom_class
+                      )}
+                      onClick={() =>
+                        handleStartPrivateMessage(rowView.sender_name)
+                      }
+                      onKeyDown={handleOnKeyDown(rowView.sender_name)}
+                      role="button"
+                      tabIndex={0}
+                    >
+                      {rowView.location_tag} {rowView.name_label}
+                      {': '}
+                    </span>
+                  ) : (
+                    rowView.name_label.length > 0 && (
+                      <span className={clsx('font-bold', rowView.custom_class)}>
+                        {rowView.location_tag} {rowView.name_label}
+                        {': '}
+                      </span>
+                    )
+                  )}
 
                   <span
-                    style={{
-                      color: hasCustomClass
-                        ? undefined
-                        : row.color || undefined,
-                    }}
-                    className={clsx(hasCustomClass && customClass, 'pl-2')}
+                    style={{ color: rowView.color }}
+                    className={clsx(
+                      rowView.has_custom_class && rowView.custom_class,
+                      'pl-2'
+                    )}
                   >
                     {row.message}
                   </span>
