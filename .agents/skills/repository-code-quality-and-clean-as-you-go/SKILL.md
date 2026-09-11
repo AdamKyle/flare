@@ -167,3 +167,35 @@ Do not move a giant legacy service, processor, controller, hook, or test class i
 Do not keep compatibility adapters, fallback branches, duplicated implementations, legacy result serializers, or transitional code after the task's target architecture no longer needs them.
 
 Do not add convenience methods to an unrelated existing domain service merely to make a new feature easier to implement. Reuse the service's current public contract. Extend the owning domain only when a concrete missing domain capability is proven, belongs there, and is required by the task. Keep that addition minimal and test it in the owning domain.
+
+## Contract-completion audit
+
+Before completion, compare the final code to the user's explicit implementation contract item-by-item.
+
+A green test suite does not permit omission or substitution of requested behavior.
+
+Do not describe any requirement as optional, future work, another session, a later browser-QA item, or out of scope unless the user explicitly excluded it.
+
+For every requested UI surface, verify the exact requested topology exists: tab vs SidePeek vs ScreenManager vs local StackedCard vs inline card. Equivalent information in a different surface is not compliance.
+
+## Mandatory touched-code readability audit
+
+Before completion, inspect every created/modified production PHP method for avoidable nested control flow.
+
+Search touched PHP for:
+
+- nested `if`/`elseif` blocks;
+- `if`/`elseif` inside loops;
+- loops inside branch-heavy blocks;
+- multiple unrelated loops/branches in one method;
+- long imperative methods that mix calculation, persistence, dispatch, and response construction.
+
+Refactor avoidable matches into guard-first, first-class methods with semantic names. Do not mechanically extract one line merely to satisfy a scanner; the result must be more readable.
+
+Also search touched PHPDoc for generic/shape syntax including `<`, `array{`, `@template`, `@phpstan`, and `@psalm` and remove every repository-rule violation.
+
+## Regression gate
+
+When a task changes an existing public behavior or guard condition, existing positive-path tests are part of the contract. A newly correct rejection path does not excuse breaking the established valid path.
+
+If the required/full suite exposes a regression caused by the task, fix the production/fixture/test-contract cause before completion. Do not defer it to browser QA.

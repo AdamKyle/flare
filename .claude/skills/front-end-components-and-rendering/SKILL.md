@@ -323,3 +323,18 @@ React render must be pure.
 Never call a state setter during render. Never mutate refs during render to synchronize props, filters, query parameters, request state, navigation state, or lifecycle state. Use derived values for pure computation and effects for synchronization/side effects.
 
 Do not start requests, abort requests, subscribe/unsubscribe listeners, move focus, navigate, or mutate external state during render.
+
+## Keep feature presentation dumb
+
+When a feature has an adapter/container and factual/presentational children, keep the children dumb.
+
+Presentational children receive already-resolved values, labels, loading flags, errors, and callbacks. They do not decide:
+
+- which endpoint to call;
+- which websocket channel to subscribe to;
+- whether a full screen, tab, SidePeek, or StackedCard owns the interaction;
+- how backend domain percentages are calculated;
+- how Character eligibility is derived;
+- which global provider should be mutated.
+
+If a component begins accumulating API hooks, domain calculations, several mutation handlers, and a large rendering tree, split the adapter behavior from the presentation instead of adding more local state.

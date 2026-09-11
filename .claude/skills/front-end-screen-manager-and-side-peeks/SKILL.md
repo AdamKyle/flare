@@ -216,3 +216,16 @@ A screen or side-peek change is acceptable when:
 - overlay/dialog accessibility is preserved;
 - mobile full-width side-peek behavior is preserved;
 - hidden animated content is not keyboard reachable.
+
+## Requested interaction topology is a contract
+
+Do not substitute one existing navigation primitive for another when the requirement explicitly names the intended surface.
+
+Examples:
+
+- if the requirement says tabs inside an existing floating card, implement tabs inside that floating card; do not replace them with a SidePeek;
+- if the requirement says a full screen stacks through ScreenManager, do not implement a local `StackedCard` screen replacement;
+- if the requirement says nested factual drill-down inside a SidePeek, use local `StackedCard`; do not emit another top-level SidePeek;
+- if the requirement says an action opens a SidePeek, do not replace it with a modal/full screen because that component already exists elsewhere.
+
+Reuse existing primitives at the exact architectural level requested. Component reuse never authorizes changing the requested interaction model.

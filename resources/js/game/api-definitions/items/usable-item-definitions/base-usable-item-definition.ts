@@ -30,4 +30,9 @@ export default interface BaseUsableItemDefinition extends BaseItemDetails {
   shards_cost: number | null;
   gold_dust_cost: number | null;
   copper_coin_cost: number | null;
+  gem_scroll_type: string | null;
+  gem_scroll_bonus: number | null;
+  gem_scroll_currency_type: string | null;
+  gem_scroll_socket_chance: number | null;
+  gem_scroll_pre_gem_chance: number | null;
 }

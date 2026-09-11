@@ -1,4 +1,4 @@
-import { isGemType } from '../../shared/enums/gem-type';
+import { isGemType } from '../../../game/reusable-components/gems/enums/gem-type';
 import {
   normalizeGemRangeValue,
   validateGemRangeValue,

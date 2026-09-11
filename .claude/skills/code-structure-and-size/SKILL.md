@@ -101,3 +101,48 @@ Preserve behavior while improving the touched area. Do not use a local task as j
 When replacing a legacy feature, the new implementation should have a materially smaller and clearer responsibility footprint. Do not move thousands of legacy lines into a new namespace, rename a giant service, or split one giant switch into many equally broad classes without removing duplicated responsibility.
 
 Delete superseded production code and its implementation-detail tests when the task's architecture says the legacy implementation is replaced. Keep only database/model compatibility that is still required and explicitly outside the task's migration scope.
+
+## Laravel-style readability standard for touched code
+
+Touched code should read as a sequence of named domain operations, not as a transcript of implementation mechanics.
+
+For production methods:
+
+- one method owns one operation at one abstraction level;
+- orchestration methods read like an outline of the workflow;
+- decision-heavy code is moved behind meaningful resolvers/guards;
+- loops do not also own unrelated branching, persistence, event dispatch, and response construction;
+- a method with multiple independent branch groups or workflow phases must be split;
+- a private method that remains long and branch-heavy is not a successful extraction.
+
+As a review heuristic, any newly written/touched method that grows beyond roughly 25 logical lines should be challenged for responsibility boundaries. This is not a mechanical line-count failure for declarative mappings, but imperative workflow code should normally become smaller through meaningful extraction.
+
+For production classes:
+
+- coordinators coordinate;
+- calculators calculate;
+- resolvers resolve;
+- transformers transform;
+- repositories/query services read/write data;
+- events carry facts;
+- controllers delegate;
+- React adapters compose behavior;
+- presentational React components render props.
+
+Do not let a feature service become the place where every rule for that feature accumulates.
+
+## Dumb-component rule
+
+A presentational React component should be intentionally boring.
+
+When props already contain the data needed to render, the component must not additionally own:
+
+- API fetching;
+- websocket subscriptions;
+- domain calculations;
+- permission decisions;
+- navigation architecture decisions;
+- mutation orchestration;
+- large transformation pipelines.
+
+Container/adapter components may compose hooks and callbacks, but should pass prepared data into small presentational children.

@@ -14,7 +14,7 @@ use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Core\Services\CharacterService;
 use App\Game\Core\Traits\SafelyBroadcastsEvents;
-use App\Game\Gems\Services\AreaGemEffectService;
+use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
 use App\Game\Gems\Values\AreaGemRewardEffect;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CharacterMessageTypes;
@@ -37,7 +37,7 @@ class CharacterXPService
         private readonly CharacterService $characterService,
         private readonly SkillService $skillService,
         private readonly BattleMessageHandler $battleMessageHandler,
-        private readonly AreaGemEffectService $areaGemEffectService,
+        private readonly CharacterAreaGemEffectService $characterAreaGemEffectService,
     ) {}
 
     /**
@@ -214,7 +214,7 @@ class CharacterXPService
 
         $xp = XPCalculator::fetchXPFromMonster($monster, $this->character->level);
 
-        $monsterXpIncrease = $this->areaGemEffectService->resolveForCharacter($this->character)->rewardEffect(AreaGemRewardEffect::MONSTER_XP_INCREASE);
+        $monsterXpIncrease = $this->characterAreaGemEffectService->resolveForCharacter($this->character)->rewardEffect(AreaGemRewardEffect::MONSTER_XP_INCREASE);
         $xp = (int) round($xp * (1 + $monsterXpIncrease));
 
         if ($this->character->level >= $monster->max_level && $this->character->user->show_monster_to_low_level_message) {
@@ -261,7 +261,7 @@ class CharacterXPService
         });
         $map = $character->map->gameMap;
         $mapBonus = ! is_null($map->xp_bonus) ? $map->xp_bonus : 0;
-        $gemCharacterXpBonus = $this->areaGemEffectService->resolveForCharacter($character)->rewardEffect(AreaGemRewardEffect::CHARACTER_XP_BONUS);
+        $gemCharacterXpBonus = $this->characterAreaGemEffectService->resolveForCharacter($character)->rewardEffect(AreaGemRewardEffect::CHARACTER_XP_BONUS);
 
         $xpBonusIgnoreCaps = $this->getTotalXpBonus($xpBonusQuestSlots, true) + $boonBonus + $mapBonus + $gemCharacterXpBonus;
         $xpBonusWithCaps = $this->getTotalXpBonus($xpBonusQuestSlots, false);

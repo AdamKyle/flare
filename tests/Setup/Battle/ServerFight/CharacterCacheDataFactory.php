@@ -13,11 +13,14 @@ use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HolyBuilde
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ReductionsBuilder;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\CharacterAttack\Transformers\CharacterAttackDataTransformer;
-use App\Game\Gems\Services\AreaGemEffectService;
+use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
 use League\Fractal\Manager;
 
 class CharacterCacheDataFactory
 {
+    /**
+     * Build a real CharacterCacheData instance with real collaborators for tests.
+     */
     public function build(): CharacterCacheData
     {
         return new CharacterCacheData(
@@ -31,7 +34,7 @@ class CharacterCacheDataFactory
                 new HolyBuilder(),
                 new ReductionsBuilder(),
                 resolve(ElementalAtonement::class),
-                resolve(AreaGemEffectService::class),
+                resolve(CharacterAreaGemEffectService::class),
             ),
         );
     }

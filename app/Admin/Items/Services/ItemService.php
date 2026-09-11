@@ -351,6 +351,7 @@ class ItemService
         return Item::query()
             ->whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
-            ->whereNull('parent_id');
+            ->whereNull('parent_id')
+            ->where('randomly_generated', false);
     }
 }

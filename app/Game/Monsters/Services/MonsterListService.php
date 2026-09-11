@@ -3,6 +3,7 @@
 namespace App\Game\Monsters\Services;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\Location;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -14,7 +15,10 @@ class MonsterListService
 {
     use ResponseBuilder;
 
-    public function __construct(private readonly BuildMonsterCacheService $buildMonsterCacheService) {}
+    public function __construct(
+        private readonly BuildMonsterCacheService $buildMonsterCacheService,
+        private readonly CharacterGemMonsterCacheService $characterGemMonsterCacheService,
+    ) {}
 
     /**
      * Build the Monster list payload for the Character's current context.
@@ -70,6 +74,17 @@ class MonsterListService
             return $weeklyMonsters;
         }
 
+        $sharedDataset = $this->resolveSharedDataset($character, $gameMap, $currentLocation);
+
+        return $this->characterGemMonsterCacheService->resolveForCharacter($character, $sharedDataset);
+    }
+
+    /**
+     * Resolve the Character-neutral shared Monster dataset for the current
+     * Location/Map context, before any Character-specific Gem progression overlay.
+     */
+    private function resolveSharedDataset(Character $character, GameMap $gameMap, ?Location $currentLocation): array
+    {
         $locationMonsters = $this->resolveLocationGemMonsters($currentLocation);
 
         if (! is_null($locationMonsters)) {

@@ -143,3 +143,52 @@ $this->craft(...);
 over repeated low-level checks in the caller.
 
 Do not build a generic validation mini-framework. Keep each method specific to the domain operation.
+
+## Nested control flow is a design smell to remove in touched code
+
+The default for touched production PHP is one readable control-flow level.
+
+Avoid:
+
+- `if` inside `if`;
+- `if` inside `elseif`;
+- `elseif` ladders;
+- `if` inside `foreach`/`for`/`while` when the condition can become a named guard/resolver;
+- `foreach`/`for` inside `if` when the loop is a distinct operation;
+- nested loops when a focused resolver/collection operation can own the inner traversal;
+- several independent branches in one method.
+
+Prefer:
+
+1. a guard or resolver;
+2. an early return/continue when appropriate;
+3. a small first-class method named for the domain decision or operation;
+4. a flat orchestration method that reads like the workflow.
+
+A loop body should normally delegate meaningful work to a named method. Keep the loop itself boring.
+
+Bad shape:
+
+```php
+foreach ($rewards as $reward) {
+    if ($reward->isEligible()) {
+        if ($reward->hasCapacity()) {
+            $this->apply($reward);
+        }
+    }
+}
+```
+
+Preferred shape:
+
+```php
+foreach ($rewards as $reward) {
+    $this->applyEligibleReward($reward);
+}
+```
+
+with guard-first logic inside `applyEligibleReward()`.
+
+A single trivial guard with `continue` inside a loop is acceptable only when extracting it would make the code less clear. If the loop body contains another branch after that guard, extract the operation.
+
+When reviewing a touched method, do not ask only whether the code works. Ask whether the happy path can be read top-to-bottom without mentally tracking nested state.

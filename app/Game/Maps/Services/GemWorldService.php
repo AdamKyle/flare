@@ -256,4 +256,18 @@ class GemWorldService
             'game_map' => ['id' => $parentMap->id, 'name' => $parentMap->name],
         ];
     }
+
+    /**
+     * Persist the Character's Gem World first-time introduction acknowledgement, once, server-side.
+     */
+    public function acknowledgeIntroduction(Character $character): array
+    {
+        if (is_null($character->gem_world_introduction_acknowledged_at)) {
+            $character->update(['gem_world_introduction_acknowledged_at' => now()]);
+        }
+
+        return $this->successResult([
+            'gem_world_introduction_acknowledged_at' => $character->refresh()->gem_world_introduction_acknowledged_at,
+        ]);
+    }
 }

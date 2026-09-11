@@ -58,4 +58,18 @@ class GemWorldController extends Controller
 
         return response()->json($response, $status);
     }
+
+    /**
+     * Acknowledge the Character's Gem World first-time introduction, once, server-side.
+     */
+    public function acknowledgeIntroduction(Character $character): JsonResponse
+    {
+        $response = $this->gemWorldService->acknowledgeIntroduction($character);
+
+        $status = $response['status'];
+
+        unset($response['status']);
+
+        return response()->json($response, $status);
+    }
 }

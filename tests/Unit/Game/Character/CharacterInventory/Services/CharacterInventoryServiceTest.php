@@ -1039,6 +1039,110 @@ class CharacterInventoryServiceTest extends TestCase
         $this->assertSame($matchingItem->id, $result[0]['item_id']);
     }
 
+    public function test_get_usable_items_filters_by_scrolls(): void
+    {
+        $matchingItem = $this->createGemXpScrollItem(0.10);
+        $otherItem = $this->createItem(['type' => 'alchemy', 'usable' => true]);
+
+        $character = $this->character->getCharacter();
+
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $matchingItem->id,
+            'amount' => 1,
+        ]);
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $otherItem->id,
+            'amount' => 1,
+        ]);
+
+        $result = $this->characterInventoryService->setCharacter($character)->getUsableItems('', ['scrolls' => true]);
+
+        $this->assertCount(1, $result);
+        $this->assertSame($matchingItem->id, $result[0]['item_id']);
+    }
+
+    public function test_get_usable_items_filters_by_xp_scrolls_subtype_without_the_parent_scrolls_flag(): void
+    {
+        $matchingItem = $this->createGemXpScrollItem(0.10);
+        $otherItem = $this->createGemItemScrollItem(0.02);
+
+        $character = $this->character->getCharacter();
+
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $matchingItem->id,
+            'amount' => 1,
+        ]);
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $otherItem->id,
+            'amount' => 1,
+        ]);
+
+        $result = $this->characterInventoryService->setCharacter($character)->getUsableItems('', ['xp-scrolls' => true]);
+
+        $this->assertCount(1, $result);
+        $this->assertSame($matchingItem->id, $result[0]['item_id']);
+    }
+
+    public function test_get_usable_items_filters_by_currency_scrolls_subtype_without_the_parent_scrolls_flag(): void
+    {
+        $matchingItem = $this->createGemCurrencyScrollItem(0.10);
+        $otherItem = $this->createGemXpScrollItem(0.10);
+
+        $character = $this->character->getCharacter();
+
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $matchingItem->id,
+            'amount' => 1,
+        ]);
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $otherItem->id,
+            'amount' => 1,
+        ]);
+
+        $result = $this->characterInventoryService->setCharacter($character)->getUsableItems('', ['currency-scrolls' => true]);
+
+        $this->assertCount(1, $result);
+        $this->assertSame($matchingItem->id, $result[0]['item_id']);
+    }
+
+    public function test_get_usable_items_filters_by_item_scrolls_subtype_without_the_parent_scrolls_flag(): void
+    {
+        $matchingItem = $this->createGemItemScrollItem(0.02);
+        $otherItem = $this->createGemCurrencyScrollItem(0.10);
+
+        $character = $this->character->getCharacter();
+
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $matchingItem->id,
+            'amount' => 1,
+        ]);
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $otherItem->id,
+            'amount' => 1,
+        ]);
+
+        $result = $this->characterInventoryService->setCharacter($character)->getUsableItems('', ['item-scrolls' => true]);
+
+        $this->assertCount(1, $result);
+        $this->assertSame($matchingItem->id, $result[0]['item_id']);
+    }
+
     public function test_get_quest_items_filters_by_search_text(): void
     {
         $matchingItem = $this->createItem(['type' => 'quest', 'name' => 'ancient key']);

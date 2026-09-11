@@ -1,4 +1,4 @@
-import { GemType } from '../../../shared/enums/gem-type';
+import { GemType } from '../../../../game/reusable-components/gems/enums/gem-type';
 
 export interface MapGemRelatedIdentityDefinition {
   id: number;

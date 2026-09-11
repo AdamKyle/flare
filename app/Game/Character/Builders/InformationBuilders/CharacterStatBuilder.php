@@ -16,7 +16,7 @@ use App\Game\Character\Concerns\Boons;
 use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Core\Items\Values\ItemType;
-use App\Game\Gems\Services\AreaGemEffectService;
+use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
 use Exception;
 use Facades\App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ItemSkillAttribute;
 use Illuminate\Support\Collection;
@@ -60,7 +60,7 @@ class CharacterStatBuilder
         HolyBuilder $holyBuilder,
         ReductionsBuilder $reductionsBuilder,
         ElementalAtonement $elementalAtonement,
-        private readonly AreaGemEffectService $areaGemEffectService,
+        private readonly CharacterAreaGemEffectService $characterAreaGemEffectService,
     ) {
         $this->defenceBuilder = $defenceBuilder;
         $this->damageBuilder = $damageBuilder;
@@ -91,7 +91,7 @@ class CharacterStatBuilder
 
         $this->areaGemCharacterPowerReduction = ($ignoreReductions || is_null($this->map))
             ? 0.0
-            : $this->areaGemEffectService->resolveForCharacter($character)->characterPowerReduction();
+            : $this->characterAreaGemEffectService->resolveForCharacter($character)->characterPowerReduction();
 
         $this->skills = $this->character->skills;
 

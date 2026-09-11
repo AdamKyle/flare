@@ -59,6 +59,12 @@ class UsableItemTransformer extends TransformerAbstract
             'gold_dust_cost' => $item->gold_dust_cost,
             'shards_cost' => $item->shards_cost,
             'gold_bars_cost' => $item->gold_bars_cost,
+            'randomly_generated' => $item->randomly_generated,
+            'gem_scroll_type' => $item->gem_scroll_type?->value,
+            'gem_scroll_bonus' => $item->gem_scroll_bonus,
+            'gem_scroll_currency_type' => $item->gem_scroll_currency_type?->value,
+            'gem_scroll_socket_chance' => $item->gem_scroll_socket_chance,
+            'gem_scroll_pre_gem_chance' => $item->gem_scroll_pre_gem_chance,
         ];
     }
 }

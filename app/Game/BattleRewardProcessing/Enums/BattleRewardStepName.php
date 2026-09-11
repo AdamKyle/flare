@@ -15,6 +15,7 @@ enum BattleRewardStepName: string
     case SECONDARY_REWARDS = 'secondary_rewards';
     case GLOBAL_EVENT_PARTICIPATION = 'global_event_participation';
     case XP = 'xp';
+    case GEM_WORLD_REWARDS = 'gem_world_rewards';
     case EXPLORATION_CONTEXT = 'exploration_context';
     case WINTER_EVENT = 'winter_event';
     case FACTION_LOYALTY_FAME = 'faction_loyalty_fame';
@@ -38,6 +39,7 @@ enum BattleRewardStepName: string
             self::SECONDARY_REWARDS,
             self::GLOBAL_EVENT_PARTICIPATION,
             self::XP,
+            self::GEM_WORLD_REWARDS,
             self::EXPLORATION_CONTEXT,
             self::WINTER_EVENT,
             self::FINAL_PLAYER_UPDATES,

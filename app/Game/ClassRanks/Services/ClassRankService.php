@@ -19,7 +19,7 @@ use App\Game\ClassRanks\Values\ClassSpecialValue;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
 use App\Game\Core\Items\Values\ItemType;
 use App\Game\Core\Traits\ResponseBuilder;
-use App\Game\Gems\Services\AreaGemEffectService;
+use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
 use App\Game\Gems\Values\AreaGemRewardEffect;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\ClassRanksMessageTypes;
@@ -32,7 +32,7 @@ class ClassRankService
 
     public function __construct(
         private readonly BattleMessageHandler $battleMessageHandler,
-        private readonly AreaGemEffectService $areaGemEffectService,
+        private readonly CharacterAreaGemEffectService $characterAreaGemEffectService,
         private readonly ClassDetailTransformer $classDetailTransformer,
         private readonly ClassMasteryDetailTransformer $classMasteryDetailTransformer,
     ) {}
@@ -42,7 +42,7 @@ class ClassRankService
      */
     private function resolveClassRankXpPerKill(Character $character): int
     {
-        $bonus = $this->areaGemEffectService->resolveForCharacter($character)->rewardEffect(AreaGemRewardEffect::CHARACTER_CLASS_RANK_XP_BONUS);
+        $bonus = $this->characterAreaGemEffectService->resolveForCharacter($character)->rewardEffect(AreaGemRewardEffect::CHARACTER_CLASS_RANK_XP_BONUS);
 
         return round(ClassRankValue::XP_PER_KILL * (1 + $bonus));
     }
@@ -52,7 +52,7 @@ class ClassRankService
      */
     private function resolveClassSpecialtyXpPerKill(Character $character): int
     {
-        $bonus = $this->areaGemEffectService->resolveForCharacter($character)->rewardEffect(AreaGemRewardEffect::CHARACTER_CLASS_SPECIALTY_XP_GAIN);
+        $bonus = $this->characterAreaGemEffectService->resolveForCharacter($character)->rewardEffect(AreaGemRewardEffect::CHARACTER_CLASS_SPECIALTY_XP_GAIN);
 
         return round(ClassSpecialValue::XP_PER_KILL * (1 + $bonus));
     }

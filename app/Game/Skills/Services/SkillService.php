@@ -10,7 +10,7 @@ use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Traits\ResponseBuilder;
-use App\Game\Gems\Services\AreaGemEffectService;
+use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
 use App\Game\Skills\Events\SkillLeveledUpServerMessageEvent;
 use App\Game\Skills\Transformers\BasicSkillsTransformer;
 use App\Game\Skills\Transformers\SkillsTransformer;
@@ -32,7 +32,7 @@ class SkillService
         private readonly BattleMessageHandler $battleMessageHandler,
         private readonly PlainDataSerializer $plainDataSerializer,
         private readonly RandomNumberGenerator $randomNumberGenerator,
-        private readonly AreaGemEffectService $areaGemEffectService,
+        private readonly CharacterAreaGemEffectService $characterAreaGemEffectService,
     ) {}
 
     /**
@@ -286,7 +286,7 @@ class SkillService
             return 0;
         }
 
-        $craftingSkillBonus = $this->areaGemEffectService->resolveForCharacter($skill->character)
+        $craftingSkillBonus = $this->characterAreaGemEffectService->resolveForCharacter($skill->character)
             ->craftingSkillBonusFor($skill->game_skill_id);
 
         $xp = 25;

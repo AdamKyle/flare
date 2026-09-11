@@ -10,6 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterGameMapGemProgression;
 use Tests\Traits\CreateGameLocationGemParamter;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGameMapGemParamter;
@@ -19,7 +20,7 @@ use Tests\Traits\CreateMonster;
 
 class MonsterListServiceTest extends TestCase
 {
-    use CreateGameLocationGemParamter, CreateGameMap, CreateGameMapGemParamter, CreateGem, CreateLocation, CreateMonster, RefreshDatabase;
+    use CreateCharacterGameMapGemProgression, CreateGameLocationGemParamter, CreateGameMap, CreateGameMapGemParamter, CreateGem, CreateLocation, CreateMonster, RefreshDatabase;
 
     public function test_normal_map_resolves_the_regular_monsters_cache(): void
     {
@@ -174,5 +175,67 @@ class MonsterListServiceTest extends TestCase
         $list = resolve(MonsterListService::class)->getMonstersForCharacterAsList($character->refresh());
 
         $this->assertTrue(collect($list)->contains('id', $monster->id));
+    }
+
+    public function test_personal_negative_progression_makes_the_effective_monster_stronger(): void
+    {
+        Cache::flush();
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $gameMap = $character->map->gameMap;
+
+        $profile = $this->createGameMapGemParamter(['game_map_id' => $gameMap->id]);
+        $gem = $this->createMapGeneratedGem($profile, ['enemy_strength_increase' => 0.10]);
+        $profile->update(['rolled_gem_id' => $gem->id]);
+
+        $this->createCharacterGameMapGemProgression([
+            'character_id' => $character->id,
+            'game_map_gem_paramter_id' => $profile->id,
+            'level' => 200,
+            'xp' => 0,
+        ]);
+
+        $monster = $this->createMonster(['game_map_id' => $gameMap->id, 'str' => 100, 'damage_stat' => 'str']);
+
+        $effectiveMonster = resolve(MonsterListService::class)->getMonsterForFight($character->refresh(), $monster->id);
+
+        $this->assertSame(113, $effectiveMonster['str']);
+    }
+
+    public function test_weekly_fight_monsters_remain_gem_neutral_even_with_personal_progression(): void
+    {
+        Cache::flush();
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $gameMap = $character->map->gameMap;
+
+        $profile = $this->createGameMapGemParamter(['game_map_id' => $gameMap->id]);
+        $gem = $this->createMapGeneratedGem($profile, ['enemy_strength_increase' => 0.10]);
+        $profile->update(['rolled_gem_id' => $gem->id]);
+
+        $this->createCharacterGameMapGemProgression([
+            'character_id' => $character->id,
+            'game_map_gem_paramter_id' => $profile->id,
+            'level' => 200,
+            'xp' => 0,
+        ]);
+
+        $this->createLocation([
+            'game_map_id' => $gameMap->id,
+            'x' => $character->map->character_position_x,
+            'y' => $character->map->character_position_y,
+            'type' => LocationType::ALCHEMY_CHURCH->value,
+        ]);
+
+        $weeklyMonster = $this->createMonster([
+            'game_map_id' => $gameMap->id,
+            'only_for_location_type' => LocationType::ALCHEMY_CHURCH->value,
+            'str' => 100,
+            'damage_stat' => 'str',
+        ]);
+
+        $effectiveMonster = resolve(MonsterListService::class)->getMonsterForFight($character->refresh(), $weeklyMonster->id);
+
+        $this->assertSame(100, $effectiveMonster['str']);
     }
 }

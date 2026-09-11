@@ -19,7 +19,8 @@ class ItemsSheet implements FromView, ShouldAutoSize, WithTitle
     {
         $query = Item::whereNull('item_suffix_id')
             ->whereNull('item_prefix_id')
-            ->whereNull('parent_id');
+            ->whereNull('parent_id')
+            ->where('randomly_generated', false);
 
         if (empty($this->itemTypes)) {
             $items = $query->orderBy('type', 'desc')->orderBy('cost', 'asc')->get();

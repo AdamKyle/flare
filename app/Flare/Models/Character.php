@@ -9,6 +9,7 @@ use Database\Factories\CharacterFactory;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Character extends Model
 {
@@ -65,6 +66,7 @@ class Character extends Model
         'times_reincarnated',
         'base_stat_mod',
         'base_damage_stat_mod',
+        'gem_world_introduction_acknowledged_at',
     ];
 
     /**
@@ -110,6 +112,7 @@ class Character extends Model
         'times_reincarnated' => 'integer',
         'base_stat_mod' => 'float',
         'base_damage_stat_mod' => 'float',
+        'gem_world_introduction_acknowledged_at' => 'datetime',
     ];
 
     protected $appends = [
@@ -154,6 +157,38 @@ class Character extends Model
     public function alchemyBag()
     {
         return $this->hasOne(AlchemyBag::class, 'character_id', 'id');
+    }
+
+    /**
+     * Get this Character's personal Gem progression for every Map Gem profile.
+     */
+    public function gameMapGemProgressions(): HasMany
+    {
+        return $this->hasMany(CharacterGameMapGemProgression::class);
+    }
+
+    /**
+     * Get this Character's personal Gem progression for every Location Gem profile.
+     */
+    public function gameLocationGemProgressions(): HasMany
+    {
+        return $this->hasMany(CharacterGameLocationGemProgression::class);
+    }
+
+    /**
+     * Get this Character's active Gem Scrolls applied to Map Gem Worlds.
+     */
+    public function gameMapGemScrolls(): HasMany
+    {
+        return $this->hasMany(CharacterGameMapGemScroll::class);
+    }
+
+    /**
+     * Get this Character's active Gem Scrolls applied to Location Gem Worlds.
+     */
+    public function gameLocationGemScrolls(): HasMany
+    {
+        return $this->hasMany(CharacterGameLocationGemScroll::class);
     }
 
     public function factions()

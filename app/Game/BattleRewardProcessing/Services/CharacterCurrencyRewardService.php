@@ -16,7 +16,7 @@ use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Events\Values\EventType;
-use App\Game\Gems\Services\AreaGemEffectService;
+use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
 use App\Game\Gems\Values\AreaGemRewardEffect;
 use App\Game\Maps\Values\LocationType;
 use App\Game\Messages\Types\CurrenciesMessageTypes;
@@ -35,7 +35,7 @@ class CharacterCurrencyRewardService
     public function __construct(
         private readonly BattleMessageHandler $battleMessageHandler,
         private readonly RandomNumberGenerator $randomNumberGenerator,
-        private readonly AreaGemEffectService $areaGemEffectService,
+        private readonly CharacterAreaGemEffectService $characterAreaGemEffectService,
     ) {}
 
     /**
@@ -167,7 +167,7 @@ class CharacterCurrencyRewardService
 
             $goldDust = $this->randomNumberGenerator->numberBetween(1, 375) * $killCount;
 
-            $resolvedAreaGemEffects = $this->areaGemEffectService->resolveForCharacter($this->character);
+            $resolvedAreaGemEffects = $this->characterAreaGemEffectService->resolveForCharacter($this->character);
 
             $shards = (int) round($shards * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::SHARDS_GAIN)));
             $goldDust = (int) round($goldDust * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::GOLD_DUST_GAIN)));
@@ -246,7 +246,7 @@ class CharacterCurrencyRewardService
             return;
         }
 
-        $resolvedAreaGemEffects = $this->areaGemEffectService->resolveForCharacter($this->character);
+        $resolvedAreaGemEffects = $this->characterAreaGemEffectService->resolveForCharacter($this->character);
 
         $goldToReward = (int) round($goldToReward * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::MONSTER_GOLD_DROP_INCREASE)));
         $goldToReward = (int) round($goldToReward * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::GOLD_GAIN)));
@@ -303,7 +303,7 @@ class CharacterCurrencyRewardService
 
                 $coins = $coins + $coins * $mercenarySlotBonus;
 
-                $copperCoinGain = $this->areaGemEffectService->resolveForCharacter($this->character)->rewardEffect(AreaGemRewardEffect::COPPER_COIN_GAIN);
+                $copperCoinGain = $this->characterAreaGemEffectService->resolveForCharacter($this->character)->rewardEffect(AreaGemRewardEffect::COPPER_COIN_GAIN);
                 $coins = $coins + $coins * $copperCoinGain;
 
                 $this->earnedCurrencies['copper_coins'] += $coins;
@@ -330,7 +330,7 @@ class CharacterCurrencyRewardService
             return;
         }
 
-        $copperCoinGain = $this->areaGemEffectService->resolveForCharacter($this->character)->rewardEffect(AreaGemRewardEffect::COPPER_COIN_GAIN);
+        $copperCoinGain = $this->characterAreaGemEffectService->resolveForCharacter($this->character)->rewardEffect(AreaGemRewardEffect::COPPER_COIN_GAIN);
         $coins = (int) round($coins * (1 + $copperCoinGain));
 
         $this->earnedCurrencies['copper_coins'] += $coins;
@@ -355,7 +355,7 @@ class CharacterCurrencyRewardService
         $goldDust = (int) ($eventPlan['gold_dust'] ?? 0);
         $copperCoins = (int) ($eventPlan['copper_coins'] ?? 0);
 
-        $resolvedAreaGemEffects = $this->areaGemEffectService->resolveForCharacter($this->character);
+        $resolvedAreaGemEffects = $this->characterAreaGemEffectService->resolveForCharacter($this->character);
 
         $shards = (int) round($shards * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::SHARDS_GAIN)));
         $goldDust = (int) round($goldDust * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::GOLD_DUST_GAIN)));

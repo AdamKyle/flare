@@ -8,6 +8,7 @@ import GameDataDefinition from '../deffinitions/game-data-definition';
 
 import UseCharacterBoonsUpdateStreamResponse from 'game-data/hooks/definitions/use-character-boons-update-stream-response';
 import UseCharterUpdateStreamResponse from 'game-data/hooks/definitions/use-character-update-stream-response';
+import UseGemProgressionUpdateStreamResponse from 'game-data/hooks/definitions/use-gem-progression-update-stream-response';
 import UseLocationBasedCraftingOptionsStreamResponse from 'game-data/hooks/definitions/use-location-based-crafting-options-stream-response';
 import UseMonsterUpdateStreamResponse from 'game-data/hooks/definitions/use-monster-update-stream-response';
 import { useAnnouncementUpdates } from 'game-data/hooks/use-announcement-updates';
@@ -118,6 +119,24 @@ const GameDataProvider = (props: GameDataProviderProps) => {
     });
   };
 
+  const handleOnGemProgressionUpdate = (
+    data: UseGemProgressionUpdateStreamResponse
+  ) => {
+    setGameData((prev): GameDataDefinition | null => {
+      if (!prev || !prev.character) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        character: {
+          ...prev.character,
+          gem_progression: data.gemProgress,
+        },
+      };
+    });
+  };
+
   const handleUpdateAnnouncements = (data: AnnouncementMessageDefinition) => {
     setGameData((prev): GameDataDefinition | null => {
       if (!prev) {
@@ -175,6 +194,7 @@ const GameDataProvider = (props: GameDataProviderProps) => {
     onEvent: handleOnCharacterUpdate,
     onCraftingOptionsEvent: handleOnCraftingOptionsUpdate,
     onBoonsEvent: handleOnBoonsUpdate,
+    onGemProgressionEvent: handleOnGemProgressionUpdate,
   });
 
   const {

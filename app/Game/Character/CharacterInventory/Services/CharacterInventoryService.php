@@ -24,6 +24,7 @@ use App\Game\Core\Items\Transformers\QuestItemTransformer;
 use App\Game\Core\Items\Values\ArmourType;
 use App\Game\Core\Items\Values\ItemType;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Gems\Progression\Values\GemScrollType;
 use App\Game\Shop\Events\SellItemEvent;
 use App\Game\Skills\Services\DisenchantService;
 use App\Game\Skills\Services\MassDisenchantService;
@@ -606,6 +607,22 @@ class CharacterInventoryService
         }
 
         if (isset($filters['holy-oils']) && ! is_null($item->holy_level)) {
+            return true;
+        }
+
+        if (isset($filters['scrolls']) && ! is_null($item->gem_scroll_type)) {
+            return true;
+        }
+
+        if (isset($filters['xp-scrolls']) && $item->gem_scroll_type === GemScrollType::XP) {
+            return true;
+        }
+
+        if (isset($filters['currency-scrolls']) && $item->gem_scroll_type === GemScrollType::CURRENCY) {
+            return true;
+        }
+
+        if (isset($filters['item-scrolls']) && $item->gem_scroll_type === GemScrollType::ITEM) {
             return true;
         }
 

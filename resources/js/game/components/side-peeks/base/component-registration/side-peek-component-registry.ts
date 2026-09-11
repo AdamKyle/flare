@@ -76,6 +76,8 @@ import AdminQuestDetailSidePeek from '../../../../../admin/quests/components/sid
 import AdminQuestDetailSidePeekProps from '../../../../../admin/quests/components/side-peeks/types/admin-quest-detail-side-peek-props';
 import RaceImportSidePeek from '../../../../../admin/races/components/side-peeks/race-import-side-peek';
 import RaceImportSidePeekProps from '../../../../../admin/races/components/side-peeks/types/race-import-side-peek-props';
+import GemProgressionPanel from '../../../../reusable-components/gems/progression/components/gem-progression-panel';
+import GemProgressionPanelProps from '../../../../reusable-components/gems/progression/components/types/gem-progression-panel-props';
 import BackPack from '../../character-inventory/backpack/backpack';
 import BackpackProps from '../../character-inventory/backpack/types/backpack-props';
 import GemBag from '../../character-inventory/gem-bag/gem-bag';
@@ -176,6 +178,11 @@ export const SidePeekComponentRegistry: {
   [SidePeekComponentRegistrationEnum.MAP_ACTIONS_GEM_WORLD]: {
     component: GemWorld,
     props: {} as GemWorldProps,
+    content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
+  },
+  [SidePeekComponentRegistrationEnum.MAP_ACTIONS_GEM_PROGRESSION]: {
+    component: GemProgressionPanel,
+    props: {} as GemProgressionPanelProps,
     content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
   },
   [SidePeekComponentRegistrationEnum.SERVER_CHAT_ITEM]: {

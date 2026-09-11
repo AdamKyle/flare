@@ -9,7 +9,7 @@ use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\Core\Combat\Values\AttackType;
 use App\Game\Core\Items\Values\ItemType;
-use App\Game\Gems\Services\AreaGemEffectService;
+use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
 use Exception;
 
 class CharacterAttackBuilder
@@ -26,7 +26,7 @@ class CharacterAttackBuilder
 
     public function __construct(
         CharacterStatBuilder $characterStatBuilder,
-        private readonly AreaGemEffectService $areaGemEffectService,
+        private readonly CharacterAreaGemEffectService $characterAreaGemEffectService,
     ) {
         $this->characterStatBuilder = $characterStatBuilder;
     }
@@ -43,7 +43,7 @@ class CharacterAttackBuilder
 
         $this->areaGemCharacterPowerReduction = $ignoreReductions
             ? 0.0
-            : $this->areaGemEffectService->resolveForCharacter($character)->characterPowerReduction();
+            : $this->characterAreaGemEffectService->resolveForCharacter($character)->characterPowerReduction();
 
         $this->characterStatBuilder = $this->characterStatBuilder->setCharacter($character, $ignoreReductions);
 

@@ -51,6 +51,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
         return [
             'id' => $character->id,
             'user_id' => $character->user_id,
+            'gem_world_introduction_acknowledged_at' => $character->gem_world_introduction_acknowledged_at,
             'name' => $character->name,
             'class' => $gameClass->name,
             'class_id' => $gameClass->id,

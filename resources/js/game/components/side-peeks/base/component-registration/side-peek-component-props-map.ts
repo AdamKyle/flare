@@ -39,6 +39,7 @@ import NpcFormSidePeekProps from '../../../../../admin/npcs/components/side-peek
 import NpcImportSidePeekProps from '../../../../../admin/npcs/components/side-peeks/types/npc-import-side-peek-props';
 import AdminQuestDetailSidePeekProps from '../../../../../admin/quests/components/side-peeks/types/admin-quest-detail-side-peek-props';
 import RaceImportSidePeekProps from '../../../../../admin/races/components/side-peeks/types/race-import-side-peek-props';
+import GemProgressionPanelProps from '../../../../reusable-components/gems/progression/components/types/gem-progression-panel-props';
 import BackpackProps from '../../character-inventory/backpack/types/backpack-props';
 import GemBagProps from '../../character-inventory/gem-bag/types/gem-bag-props';
 import SetsProps from '../../character-inventory/sets/types/sets-props';
@@ -74,6 +75,7 @@ export type SidePeekComponentPropsMap = {
   [SidePeekComponentRegistrationEnum.MAP_ACTIONS_SET_SAIL]: SetSailProps;
   [SidePeekComponentRegistrationEnum.MAP_ACTIONS_CONJURE]: ConjureProps;
   [SidePeekComponentRegistrationEnum.MAP_ACTIONS_GEM_WORLD]: GemWorldProps;
+  [SidePeekComponentRegistrationEnum.MAP_ACTIONS_GEM_PROGRESSION]: GemProgressionPanelProps;
   [SidePeekComponentRegistrationEnum.SERVER_CHAT_ITEM]: ServerChatItemProps;
   [SidePeekComponentRegistrationEnum.CRAFTED_ITEM]: CraftedItemProps;
   [SidePeekComponentRegistrationEnum.ITEM_DETAILS]: ItemDetailsProps;

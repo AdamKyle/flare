@@ -30,7 +30,9 @@ use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyUpdate;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
+use App\Game\Gems\Progression\Services\GemWorldRewardService;
 use App\Game\Messages\Types\CurrenciesMessageTypes;
+use App\Game\Monsters\Services\MonsterListService;
 use App\Game\Skills\Services\SkillService;
 use App\Game\Tops\Services\BroadcastTopsUpdateService;
 use Closure;
@@ -69,6 +71,8 @@ class BattleRewardService
         private readonly RandomAffixGenerator $randomAffixGenerator,
         private readonly BroadcastTopsUpdateService $broadcastTopsUpdateService,
         private readonly GlobalEventGoalEligibilityService $globalEventGoalEligibilityService,
+        private readonly GemWorldRewardService $gemWorldRewardService,
+        private readonly MonsterListService $monsterListService,
     ) {}
 
     /**
@@ -266,6 +270,7 @@ class BattleRewardService
             BattleRewardStepName::SECONDARY_REWARDS => $this->handleSecondaryRewards(),
             BattleRewardStepName::GLOBAL_EVENT_PARTICIPATION => $this->handleGlobalEventParticipation(),
             BattleRewardStepName::XP => $this->handleLedgerAwardingXp($step),
+            BattleRewardStepName::GEM_WORLD_REWARDS => $this->handleLedgerGemWorldRewards($step),
             BattleRewardStepName::EXPLORATION_CONTEXT => $this->handleLedgerExplorationContext($request),
             BattleRewardStepName::WINTER_EVENT => $this->handleLedgerWinterEvent($includeWinterEvent),
             BattleRewardStepName::FACTION_LOYALTY_FAME => $this->handleFactionLoyaltyFameStep($request, $step),
@@ -382,6 +387,37 @@ class BattleRewardService
             'remaining_xp' => 0,
             'last_checkpoint_at' => now()->toIso8601String(),
         ]);
+    }
+
+    /**
+     * Handle the Gem World reward step. Exits immediately for any battle
+     * that is not currently taking place inside a generated Gem World,
+     * before loading any Gem progression/Scroll state.
+     */
+    private function handleLedgerGemWorldRewards(CharacterBattleRewardRequestStep $step): void
+    {
+        $gameMap = $this->character->map?->gameMap;
+
+        if (is_null($gameMap) || ! $gameMap->isGeneratedGemMap()) {
+            $this->battleRewardLedgerService->completeStep($step, ['applied' => false, 'reason' => 'not_a_gem_world']);
+
+            return;
+        }
+
+        $totalKills = $this->context['total_creatures'] ?? 1;
+        $effectiveMonster = $this->monsterListService->getMonsterForFight($this->character, $this->monster->id);
+
+        if (is_null($effectiveMonster)) {
+            $this->battleRewardLedgerService->completeStep($step, ['applied' => false, 'reason' => 'monster_not_found']);
+
+            return;
+        }
+
+        $result = $this->gemWorldRewardService->applyToLedgerStep($step, $this->character, $effectiveMonster, $totalKills, $this->earnedCurrencies);
+
+        $this->character = $this->character->refresh();
+
+        $this->battleRewardLedgerService->completeStep($step->refresh(), $result);
     }
 
     private function handleLedgerCurrencyRewards(CharacterBattleRewardRequestStep $step): void

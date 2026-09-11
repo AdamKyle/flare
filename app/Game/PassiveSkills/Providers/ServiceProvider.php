@@ -4,7 +4,7 @@ namespace App\Game\PassiveSkills\Providers;
 
 use App\Game\Core\Services\CharacterPassiveSkills;
 use App\Game\Core\Services\GameTimerService;
-use App\Game\Gems\Services\AreaGemEffectService;
+use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
 use App\Game\PassiveSkills\Services\PassiveSkillTrainingService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
@@ -24,7 +24,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new PassiveSkillTrainingService(
                 $app->make(CharacterPassiveSkills::class),
                 $app->make(GameTimerService::class),
-                $app->make(AreaGemEffectService::class),
+                $app->make(CharacterAreaGemEffectService::class),
             );
         });
         // @codeCoverageIgnoreEnd

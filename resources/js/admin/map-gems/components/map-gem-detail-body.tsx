@@ -1,6 +1,6 @@
 import React, { Fragment, ReactNode } from 'react';
 
-import { gemTypeLabel } from '../../shared/enums/gem-type';
+import { gemTypeLabel } from '../../../game/reusable-components/gems/enums/gem-type';
 import { MAP_GEM_RANGE_DISPLAY_GROUPS } from '../definitions/map-gem-range-display';
 import MapGemDetailBodyProps from './types/map-gem-detail-body-props';
 import FactualLink from '../../../game/reusable-components/quest-item/partials/factual-link';

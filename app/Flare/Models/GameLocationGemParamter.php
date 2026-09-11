@@ -92,6 +92,30 @@ class GameLocationGemParamter extends Model
     }
 
     /**
+     * Get the shared global Gem progression for this profile.
+     */
+    public function progression(): HasOne
+    {
+        return $this->hasOne(GameLocationGemProgression::class);
+    }
+
+    /**
+     * Get every Character's personal Gem progression for this profile.
+     */
+    public function characterProgressions(): HasMany
+    {
+        return $this->hasMany(CharacterGameLocationGemProgression::class);
+    }
+
+    /**
+     * Get every active Character Gem Scroll currently applied to this profile.
+     */
+    public function activeCharacterScrolls(): HasMany
+    {
+        return $this->hasMany(CharacterGameLocationGemScroll::class);
+    }
+
+    /**
      * Return the fillable range field names this profile can roll a Gem value from.
      */
     public function rollableRangeFields(): array

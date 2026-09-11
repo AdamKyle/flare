@@ -8,7 +8,7 @@ use App\Game\ClassRanks\Services\ClassRankService;
 use App\Game\ClassRanks\Services\ManageClassService;
 use App\Game\ClassRanks\Transformers\ClassDetailTransformer;
 use App\Game\ClassRanks\Transformers\ClassMasteryDetailTransformer;
-use App\Game\Gems\Services\AreaGemEffectService;
+use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
 use App\Game\Skills\Builders\BaseSkillBuilder;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -28,7 +28,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(ClassRankService::class, function ($app) {
             return new ClassRankService(
                 $app->make(BattleMessageHandler::class),
-                $app->make(AreaGemEffectService::class),
+                $app->make(CharacterAreaGemEffectService::class),
                 $app->make(ClassDetailTransformer::class),
                 $app->make(ClassMasteryDetailTransformer::class),
             );

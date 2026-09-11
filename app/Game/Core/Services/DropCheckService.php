@@ -9,7 +9,7 @@ use App\Flare\Models\Map;
 use App\Flare\Models\Monster;
 use App\Game\Battle\Services\BattleDrop;
 use App\Game\Core\Items\Builders\BuildMythicItem;
-use App\Game\Gems\Services\AreaGemEffectService;
+use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
 use App\Game\Gems\Values\AreaGemRewardEffect;
 use App\Game\Maps\Values\LocationType;
 use Exception;
@@ -46,7 +46,7 @@ class DropCheckService
     public function __construct(
         BattleDrop $battleDrop,
         BuildMythicItem $buildMythicItem,
-        private readonly AreaGemEffectService $areaGemEffectService,
+        private readonly CharacterAreaGemEffectService $characterAreaGemEffectService,
     ) {
         $this->battleDrop = $battleDrop;
         $this->buildMythicItem = $buildMythicItem;
@@ -72,7 +72,7 @@ class DropCheckService
             $this->gameMapBonus = $gameMap->drop_chance_bonus;
         }
 
-        $resolvedAreaGemEffects = $this->areaGemEffectService->resolveForCharacter($character);
+        $resolvedAreaGemEffects = $this->characterAreaGemEffectService->resolveForCharacter($character);
         $this->gameMapBonus += $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::ITEM_DROP_CHANCE_INCREASE);
         $this->mythicItemDropBonus = $resolvedAreaGemEffects->rarityEffects()->mythic();
         $this->questItemDropBonus = $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::ENEMY_QUEST_ITEM_DROP_CHANCE_INCREASE);
@@ -127,7 +127,7 @@ class DropCheckService
             $this->gameMapBonus = $gameMap->drop_chance_bonus;
         }
 
-        $resolvedAreaGemEffects = $this->areaGemEffectService->resolveForCharacter($character);
+        $resolvedAreaGemEffects = $this->characterAreaGemEffectService->resolveForCharacter($character);
         $this->gameMapBonus += $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::ITEM_DROP_CHANCE_INCREASE);
         $this->mythicItemDropBonus = $resolvedAreaGemEffects->rarityEffects()->mythic();
         $this->questItemDropBonus = $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::ENEMY_QUEST_ITEM_DROP_CHANCE_INCREASE);

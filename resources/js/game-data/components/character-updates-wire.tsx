@@ -6,6 +6,7 @@ import { CoreWebSocketEventNames } from 'game-data/components/event-enums/core-w
 import CharacterUpdateWireProps from 'game-data/components/types/character-update-wire-props';
 import UseCharacterBoonsUpdateStreamResponse from 'game-data/hooks/definitions/use-character-boons-update-stream-response';
 import UseCharterUpdateStreamResponse from 'game-data/hooks/definitions/use-character-update-stream-response';
+import UseGemProgressionUpdateStreamResponse from 'game-data/hooks/definitions/use-gem-progression-update-stream-response';
 import UseLocationBasedCraftingOptionsStreamResponse from 'game-data/hooks/definitions/use-location-based-crafting-options-stream-response';
 
 export const CharacterUpdatesWire = ({
@@ -13,6 +14,7 @@ export const CharacterUpdatesWire = ({
   onEvent,
   onCraftingOptionsEvent,
   onBoonsEvent,
+  onGemProgressionEvent,
 }: CharacterUpdateWireProps) => {
   useWebsocket<UseCharterUpdateStreamResponse>({
     url: CoreWebSocketChannels.UPDATE_CHARACTER,
@@ -44,6 +46,14 @@ export const CharacterUpdatesWire = ({
     type: ChannelType.PRIVATE,
     channelName: CoreWebSocketEventNames.UPDATE_BOONS,
     onEvent: onBoonsEvent,
+  });
+
+  useWebsocket<UseGemProgressionUpdateStreamResponse>({
+    url: CoreWebSocketChannels.UPDATE_GEM_PROGRESSION,
+    params: { userId },
+    type: ChannelType.PRIVATE,
+    channelName: CoreWebSocketEventNames.UPDATE_GEM_PROGRESSION,
+    onEvent: onGemProgressionEvent,
   });
 
   return null;

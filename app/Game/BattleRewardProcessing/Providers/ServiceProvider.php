@@ -35,8 +35,11 @@ use App\Game\Events\Services\EventGoalsService;
 use App\Game\Events\Services\GlobalEventGoalEligibilityService;
 use App\Game\Events\Services\GlobalEventGoalProgressionService;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
+use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
+use App\Game\Gems\Progression\Services\GemWorldRewardService;
 use App\Game\Gems\Services\AreaGemEffectService;
 use App\Game\GuideQuests\Services\GuideQuestService;
+use App\Game\Monsters\Services\MonsterListService;
 use App\Game\Skills\Services\SkillService;
 use App\Game\Tops\Services\BroadcastTopsUpdateService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -53,13 +56,13 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->singleton(CharacterCurrencyRewardService::class, fn ($app) => new CharacterCurrencyRewardService(
             $app->make(BattleMessageHandler::class),
             $app->make(RandomNumberGenerator::class),
-            $app->make(AreaGemEffectService::class),
+            $app->make(CharacterAreaGemEffectService::class),
         ));
         $this->app->bind(CharacterXPService::class, fn ($app) => new CharacterXPService(
             $app->make(CharacterService::class),
             $app->make(SkillService::class),
             $app->make(BattleMessageHandler::class),
-            $app->make(AreaGemEffectService::class),
+            $app->make(CharacterAreaGemEffectService::class),
         ));
         $this->app->bind(CharacterRewardService::class, fn ($app) => new CharacterRewardService(
             $app->make(CharacterXPService::class),
@@ -169,6 +172,8 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(RandomAffixGenerator::class),
                 $app->make(BroadcastTopsUpdateService::class),
                 $app->make(GlobalEventGoalEligibilityService::class),
+                $app->make(GemWorldRewardService::class),
+                $app->make(MonsterListService::class),
             );
         });
 

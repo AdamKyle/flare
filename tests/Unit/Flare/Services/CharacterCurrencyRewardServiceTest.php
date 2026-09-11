@@ -8,7 +8,7 @@ use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Events\Values\EventType;
-use App\Game\Gems\Services\AreaGemEffectService;
+use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
 use App\Game\Maps\Values\LocationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
@@ -235,7 +235,7 @@ class CharacterCurrencyRewardServiceTest extends TestCase
         $characterCurrencyRewardService = new CharacterCurrencyRewardService(
             resolve(BattleMessageHandler::class),
             $randomNumberGenerator,
-            resolve(AreaGemEffectService::class),
+            resolve(CharacterAreaGemEffectService::class),
         );
 
         $characterCurrencyRewardService
@@ -775,7 +775,7 @@ class CharacterCurrencyRewardServiceTest extends TestCase
         $service = new CharacterCurrencyRewardService(
             resolve(BattleMessageHandler::class),
             $randomNumberGenerator,
-            resolve(AreaGemEffectService::class),
+            resolve(CharacterAreaGemEffectService::class),
         );
 
         $service->setCharacter($character->refresh())->currencyEventReward($monster);

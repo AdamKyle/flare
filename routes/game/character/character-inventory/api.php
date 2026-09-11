@@ -15,6 +15,12 @@ Route::group(['middleware' => ['auth', 'is.character.who.they.say.they.are']], f
     Route::get('/character/{character}/gem-bag', ['uses' => 'Api\CharacterGemBagController@getGemSlots']);
     Route::get('/character/{character}/gem-details/{gemBagSlot}', ['uses' => 'Api\CharacterGemBagController@getGem']);
 
+    Route::post('/character/{character}/gem-scrolls/use/{alchemyBagSlot}', ['uses' => 'Api\CharacterGemScrollController@use']);
+    Route::post('/character/{character}/gem-scrolls/map/{characterGameMapGemScroll}/fill/{alchemyBagSlot}', ['uses' => 'Api\CharacterGemScrollController@fillMapScroll']);
+    Route::post('/character/{character}/gem-scrolls/location/{characterGameLocationGemScroll}/fill/{alchemyBagSlot}', ['uses' => 'Api\CharacterGemScrollController@fillLocationScroll']);
+    Route::post('/character/{character}/gem-scrolls/map/{characterGameMapGemScroll}/remove', ['uses' => 'Api\CharacterGemScrollController@removeMapScroll']);
+    Route::post('/character/{character}/gem-scrolls/location/{characterGameLocationGemScroll}/remove', ['uses' => 'Api\CharacterGemScrollController@removeLocationScroll']);
+
     Route::group(['middleware' => ['is.character.dead']], function () {
         Route::get('/character/{character}/inventory/item', ['uses' => 'Api\CharacterInventoryController@itemDetails']);
 

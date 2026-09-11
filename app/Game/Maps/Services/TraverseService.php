@@ -15,7 +15,7 @@ use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransfo
 use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Items\Values\ItemEffectType;
-use App\Game\Gems\Services\AreaGemEffectService;
+use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\UpdateMap;
 use App\Game\Maps\Events\UpdateMonsterList;
@@ -60,7 +60,7 @@ class TraverseService
         LocationService $locationService,
         MapTileValue $mapTileValue,
         private readonly RandomNumberGenerator $randomNumberGenerator,
-        private readonly AreaGemEffectService $areaGemEffectService,
+        private readonly CharacterAreaGemEffectService $characterAreaGemEffectService,
     ) {
         $this->manager = $manager;
         $this->characterSheetBaseInfoTransformer = $characterSheetBaseInfoTransformer;
@@ -374,7 +374,7 @@ class TraverseService
      */
     protected function updateActionsForMap(GameMap $gameMap, GameMap $oldGameMap, Character $character): void
     {
-        $gemReduction = $this->areaGemEffectService->resolveForGameMap($gameMap)->characterPowerReduction();
+        $gemReduction = $this->characterAreaGemEffectService->resolveForCharacter($character)->characterPowerReduction();
 
         if ($this->isCharacterReductionMapType($gameMap)) {
             $this->updateActionTypeCache($character, ($gameMap->character_attack_reduction ?? 0.0) + $gemReduction);

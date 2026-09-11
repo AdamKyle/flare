@@ -1,7 +1,7 @@
 import React, { Fragment, ReactNode } from 'react';
 
 import AdminRolledGemCardProps from './types/admin-rolled-gem-card-props';
-import { gemTypeLabel } from '../../enums/gem-type';
+import { gemTypeLabel } from '../../../../game/reusable-components/gems/enums/gem-type';
 
 import { formatPercent } from 'game-utils/format-number';
 

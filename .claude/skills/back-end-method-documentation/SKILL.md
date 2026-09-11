@@ -120,3 +120,67 @@ Bad summaries merely repeat syntax:
 Keep docblocks accurate when method behavior changes. A stale docblock is a code defect.
 
 Do not put implementation history, ticket references, temporary notes, debugging details, future plans, or architectural essays in method docblocks.
+
+## Universal simple PHPDoc type rule
+
+The repository never documents generic/type-internal detail in method PHPDoc.
+
+Use only:
+
+`@param Type $variableName`
+
+`@return Type`
+
+This applies to every kind of type, including:
+
+- arrays;
+- Collections/Eloquent Collections;
+- Builders/Paginators;
+- models/classes;
+- value objects;
+- enums;
+- callbacks/callables;
+- iterables;
+- nullable/union conceptual types where PHPDoc is genuinely needed;
+- every other documented method parameter or return value.
+
+Never use:
+
+- `array<string, int>`;
+- `array<int, Foo>`;
+- `array{...}`;
+- `Collection<int, Item>`;
+- `EloquentCollection<int, Gem>`;
+- `Builder<Item>`;
+- `Paginator<Monster>`;
+- `class-string<Foo>`;
+- callable signatures such as `callable(string): int`;
+- `@template`;
+- `@phpstan-type`;
+- `@psalm-type`;
+- parameter descriptions after `$variableName`;
+- return descriptions after the simple type.
+
+Use imported/simple class names rather than fully qualifying a generic-looking documentation type.
+
+Do not align tags with repeated spaces. Constructor and method tags use one normal ASCII space between tag, type, and variable.
+
+Correct:
+
+```php
+@param array $earnedCurrencies
+@param Collection $items
+@param Character $character
+@return array
+@return Collection
+```
+
+Incorrect:
+
+```php
+@param  array<string, int>  $earnedCurrencies
+@param Collection<int, Item> $items
+@return array<string, mixed> Description
+```
+
+If a docblock becomes useless after removing type-detail noise and the governing method-documentation rule does not require additional prose for that method category, remove unnecessary noise rather than replacing it with another type-description mechanism.

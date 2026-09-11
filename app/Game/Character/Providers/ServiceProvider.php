@@ -17,7 +17,7 @@ use App\Game\Character\Console\Commands\AssignNewFactionsToCharacters;
 use App\Game\Character\Console\Commands\CreateCharacterAttackDataCache;
 use App\Game\Character\Services\CharacterDeletion;
 use App\Game\Core\Items\Enricher\ItemEnricherFactory;
-use App\Game\Gems\Services\AreaGemEffectService;
+use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
 use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
@@ -43,7 +43,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(CharacterAttackBuilder::class, function ($app) {
             return new CharacterAttackBuilder(
                 $app->make(CharacterStatBuilder::class),
-                $app->make(AreaGemEffectService::class),
+                $app->make(CharacterAreaGemEffectService::class),
             );
         });
 

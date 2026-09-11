@@ -216,3 +216,25 @@ A completed mock audit must report:
 - Confirmation that no physical Laravel log files are read by tests.
 
 Do not claim mocks were validated by execution when tests were not run.
+
+## Event and queue fake decision rule
+
+`Event::fake()` and `Queue::fake()` are not automatically violations, but they are never convenience defaults.
+
+Use an event or queue fake only when all of the following are true:
+
+1. the subject under test executes its real deterministic business behavior;
+2. dispatching the event/job is an output boundary of that subject;
+3. the downstream listener/job behavior is covered at its own authoritative layer;
+4. allowing the downstream chain to execute would test unrelated behavior, create recursive/expensive work, or make the test materially slower without increasing confidence in the subject's rule;
+5. the fake does not hide the very behavior the test claims to prove.
+
+Examples:
+
+- Testing a battle-reward service may fake a downstream notification/broadcast job after the real reward calculation/persistence has executed.
+- Testing the listener/job itself must not fake that listener/job's subject path.
+- Testing that a service changes progression must assert the real persisted progression, not only that an event was dispatched.
+
+Prefer selective fakes over broad global fakes when only one downstream boundary needs isolation.
+
+For every newly introduced fake, the test should make it obvious from its assertions what real behavior executed before the boundary was intercepted.

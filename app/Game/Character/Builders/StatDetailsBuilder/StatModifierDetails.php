@@ -10,7 +10,7 @@ use App\Game\Character\Builders\StatDetailsBuilder\Concerns\BasicItemDetails;
 use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Core\Items\Values\ItemType;
-use App\Game\Gems\Services\AreaGemEffectService;
+use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
 use Facades\App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ItemSkillAttribute;
 use Illuminate\Support\Collection;
 
@@ -24,7 +24,7 @@ class StatModifierDetails
 
     public function __construct(
         private readonly CharacterStatBuilder $characterStatBuilder,
-        private readonly AreaGemEffectService $areaGemEffectService,
+        private readonly CharacterAreaGemEffectService $characterAreaGemEffectService,
     ) {}
 
     /**
@@ -247,15 +247,13 @@ class StatModifierDetails
 
     /**
      * Get the combined legacy Map reduction and resolved Gem power reduction that effect the character, when any exists.
-     *
-     * @return array<string, mixed>|null
      */
     private function getMapCharacterReductionsDetails(): ?array
     {
         $map = $this->character->map->gameMap;
 
         $legacyReduction = $this->resolveLegacyMapReduction($map);
-        $gemReduction = $this->areaGemEffectService->resolveForCharacter($this->character)->characterPowerReduction();
+        $gemReduction = $this->characterAreaGemEffectService->resolveForCharacter($this->character)->characterPowerReduction();
 
         $totalReduction = $legacyReduction + $gemReduction;
 

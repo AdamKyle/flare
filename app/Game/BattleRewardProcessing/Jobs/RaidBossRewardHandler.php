@@ -13,6 +13,7 @@ use App\Game\Battle\Concerns\HandleGivingAncestorItem;
 use App\Game\Battle\Events\UpdateRaidAttacksLeft;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Core\Items\Values\ItemSocketEligibility;
 use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -44,7 +45,7 @@ class RaidBossRewardHandler implements ShouldQueue
      *
      * @throws \Exception
      */
-    public function handle(BattleEventHandler $battleEventHandler, RandomNumberGenerator $randomNumberGenerator)
+    public function handle(BattleEventHandler $battleEventHandler, RandomNumberGenerator $randomNumberGenerator, ItemSocketEligibility $itemSocketEligibility)
     {
         $character = Character::find($this->characterId);
 
@@ -58,7 +59,7 @@ class RaidBossRewardHandler implements ShouldQueue
                 ->where('raid_boss_id', $this->monsterId)
                 ->firstOrFail();
 
-            $this->handleWhenRaidBossIsKilled($character, $killedRaidBoss->raidBoss, $randomNumberGenerator);
+            $this->handleWhenRaidBossIsKilled($character, $killedRaidBoss->raidBoss, $randomNumberGenerator, $itemSocketEligibility);
 
             $location = Location::where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->first();
 
@@ -73,7 +74,7 @@ class RaidBossRewardHandler implements ShouldQueue
      * - Give ancestral item to winner.
      * - Give top 10 damage dealers a piece of gear.
      */
-    private function handleWhenRaidBossIsKilled(Character $charater, Monster $raidBoss, RandomNumberGenerator $randomNumberGenerator): void
+    private function handleWhenRaidBossIsKilled(Character $charater, Monster $raidBoss, RandomNumberGenerator $randomNumberGenerator, ItemSocketEligibility $itemSocketEligibility): void
     {
         event(new GlobalMessageEvent($charater->name.' Has slaughted: '.$raidBoss->name.' and has recieved a special Ancient gift from The Poet him self!'));
 
@@ -84,7 +85,7 @@ class RaidBossRewardHandler implements ShouldQueue
 
         $this->giveAncientReward($charater, $raid->artifact_item_id);
 
-        $this->giveGearReward($raid, $raidBossRecord, $randomNumberGenerator);
+        $this->giveGearReward($raid, $raidBossRecord, $randomNumberGenerator, $itemSocketEligibility);
 
         $this->zeroKilledBossParticipations($raid, $raidBossRecord);
     }
@@ -111,7 +112,10 @@ class RaidBossRewardHandler implements ShouldQueue
             });
     }
 
-    private function giveGearReward(Raid $raid, RaidBoss $raidBoss, RandomNumberGenerator $randomNumberGenerator): void
+    /**
+     * Give the top participating Characters their random gear reward for the Raid Boss.
+     */
+    private function giveGearReward(Raid $raid, RaidBoss $raidBoss, RandomNumberGenerator $randomNumberGenerator, ItemSocketEligibility $itemSocketEligibility): void
     {
         $raidParticipation = RaidBossParticipation::where('raid_id', $raid->id)
             ->where('raid_boss_id', $raidBoss->id)
@@ -130,16 +134,6 @@ class RaidBossRewardHandler implements ShouldQueue
             }
 
             if (! is_null($item)) {
-                $validSocketTypes = [
-                    'weapon',
-                    'sleeves',
-                    'gloves',
-                    'feet',
-                    'body',
-                    'shield',
-                    'helmet',
-                ];
-
                 $duplicatedItem = $item->duplicate();
 
                 $duplicatedItem->update([
@@ -148,10 +142,10 @@ class RaidBossRewardHandler implements ShouldQueue
 
                 $duplicatedItem = $duplicatedItem->refresh();
 
-                if (in_array($duplicatedItem->type, $validSocketTypes)) {
+                if ($itemSocketEligibility->isEligible($duplicatedItem->type)) {
 
                     $duplicatedItem->update([
-                        'socket_count' => $randomNumberGenerator->numberBetween(0, 6),
+                        'socket_count' => $randomNumberGenerator->numberBetween(0, $itemSocketEligibility->maxSocketCount()),
                     ]);
 
                     $duplicatedItem = $duplicatedItem->refresh();

@@ -57,3 +57,32 @@ Do not stop at “mostly done.”
 For backend/test work, self-review must include the prohibited-pattern audit required by `repository-code-quality-and-clean-as-you-go`. Green tests or 100% coverage never override a skill violation; completion is blocked while any unexplained prohibited match remains.
 
 Do not claim completion while a known rule violation, uncovered task path, failing gate, stale debug code, or requested cleanup remains.
+
+## Task-size and session-size are never blockers
+
+When the user has supplied a complete implementation contract, continue until that contract is complete.
+
+The following are never valid reasons to stop, defer, split the task, or report partial completion:
+
+- the task is large;
+- the task would normally take days or weeks;
+- the current session has already been long;
+- a convenient checkpoint has been reached;
+- many files remain;
+- more local file inspection is required before the next edit;
+- the implementation feels risky merely because it spans several systems;
+- a subset of tests is already green.
+
+Work sequentially, one responsibility at a time. Inspect the exact local files needed for the next responsibility, implement it, verify it, then continue to the next responsibility.
+
+Only stop when an actual technical contradiction or unavailable required dependency makes the requested implementation impossible, or when an explicitly permitted command fails and the failure cannot be corrected within the requested scope.
+
+Do not reinterpret a large task as permission to redefine its completion boundary.
+
+## Inspection is part of implementation, not a permission checkpoint
+
+Read-only repository inspection does not require user confirmation. Use the `readonly-shell` skill freely while work remains.
+
+Do not pause to ask permission to run `rg`, `grep`, `sed`, `find`, `awk`, `cat`, `head`, `tail`, `wc`, `sort`, `uniq`, `cut`, `diff`, `cmp`, `stat`, `file`, or equivalent non-destructive inspection commands.
+
+Do not make the user repeatedly approve ordinary inspection.

@@ -13,7 +13,7 @@ use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Items\Transformers\QuestItemTransformer;
 use App\Game\Core\Services\GameTimerService;
-use App\Game\Gems\Services\AreaGemEffectService;
+use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
 use App\Game\Maps\Cache\CoordinatesCache;
 use App\Game\Maps\Calculations\DistanceCalculation;
 use App\Game\Maps\Console\Commands\UpdateMapCount;
@@ -137,7 +137,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(LocationService::class),
                 $app->make(MapTileValue::class),
                 $app->make(RandomNumberGenerator::class),
-                $app->make(AreaGemEffectService::class),
+                $app->make(CharacterAreaGemEffectService::class),
             );
         });
 

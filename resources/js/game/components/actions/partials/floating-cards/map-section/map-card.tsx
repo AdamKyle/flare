@@ -12,6 +12,7 @@ import { useManageSetSailButtonState } from './hooks/use-manage-set-sail-button-
 import { useManageViewLocationState } from './hooks/use-manage-view-location-state';
 import { MapMovementTypes } from './map-movement-types/map-movement-types';
 import GemWorldSourceDefinition from '../../../../../reusable-components/gems/api/definitions/gem-world-source-definition';
+import { useOpenGemProgressionSidePeek } from '../../../../../reusable-components/gems/progression/hooks/use-open-gem-progression-side-peek';
 import GemWorldEntryDefinition from '../../../../map-section/api/definitions/gem-world-entry-definition';
 import { CharacterPosition } from '../../../../map-section/api/hooks/definitions/base-map-api-definition';
 import { useExitGemWorld } from '../../../../map-section/api/hooks/use-exit-gem-world';
@@ -64,6 +65,7 @@ const MapCard = () => {
   const { openSetSail } = useOpenSetSailSidePeek();
   const { openConjure } = useOpenConjureSidePeek();
   const { openGemWorld } = useOpenGemWorldSidePeek();
+  const { openGemProgression } = useOpenGemProgressionSidePeek();
   const { emitShouldRefreshMap } = useEmitMapRefresh();
 
   const characterId = gameData?.character?.id ?? 0;
@@ -169,6 +171,10 @@ const MapCard = () => {
     openGemWorld(characterId, currentContext, false);
   };
 
+  const handleOpenGemProgression = () => {
+    openGemProgression(characterId);
+  };
+
   const handleExitGemWorld = async () => {
     const exited = await exitGemWorld();
 
@@ -253,6 +259,11 @@ const MapCard = () => {
           <Button
             on_click={handleViewCurrentGemEffects}
             label={'View Gem Effects'}
+            variant={ButtonVariant.PRIMARY}
+          />
+          <Button
+            on_click={handleOpenGemProgression}
+            label={'View Gem Progress'}
             variant={ButtonVariant.PRIMARY}
           />
           <LoadingButton

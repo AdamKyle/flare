@@ -27,10 +27,12 @@ class BuildMonsterCacheService
         private readonly Manager $manager,
         private readonly MonsterTransformer $monsterTransformer,
         private readonly AreaGemEffectService $areaGemEffectService,
+        private readonly MonsterCacheRevisionService $monsterCacheRevisionService,
     ) {}
 
     /**
-     * Build every Monster cache used by gameplay.
+     * Build every Monster cache used by gameplay, then publish a new
+     * canonical cache revision so Character-effective derived caches expire.
      */
     public function buildAll(): void
     {
@@ -39,6 +41,8 @@ class BuildMonsterCacheService
         $this->buildWeeklyFightCache();
         $this->buildRaidCache();
         $this->buildCelestialCache();
+
+        $this->monsterCacheRevisionService->bump();
     }
 
     /**

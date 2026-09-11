@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 
 import LocationGemRangeField from './location-gem-range-field';
-import { gemTypeLabel } from '../../../shared/enums/gem-type';
+import { gemTypeLabel } from '../../../../game/reusable-components/gems/enums/gem-type';
 import LocationGemFormFieldsProps from '../../types/location-gem-form-fields-props';
 import { parseNumberOption } from '../../utils/parse-location-gem-dropdown-value';
 

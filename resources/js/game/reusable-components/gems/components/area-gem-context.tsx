@@ -1,7 +1,7 @@
 import React, { Fragment, ReactNode } from 'react';
 
-import { gemTypeLabel } from '../../../../admin/shared/enums/gem-type';
 import AreaGemContextDefinition from '../api/definitions/area-gem-context-definition';
+import { gemTypeLabel } from '../enums/gem-type';
 import AreaGemContextProps from '../types/area-gem-context-props';
 
 import { formatPercent } from 'game-utils/format-number';

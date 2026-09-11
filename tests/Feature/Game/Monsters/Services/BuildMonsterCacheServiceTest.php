@@ -3,12 +3,19 @@
 namespace Tests\Feature\Game\Monsters\Services;
 
 use App\Flare\GemWorldGeneration\Values\GeneratedGemMapType;
+use App\Game\Gems\Services\AreaGemEffectService;
 use App\Game\Gems\Values\GemTypeValue;
 use App\Game\Maps\Values\LocationType;
 use App\Game\Monsters\Services\BuildMonsterCacheService;
+use App\Game\Monsters\Services\MonsterCacheRevisionService;
+use App\Game\Monsters\Transformers\MonsterTransformer;
 use App\Game\Monsters\Values\MonsterCacheKey;
+use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use League\Fractal\Manager;
+use Mockery;
+use Mockery\MockInterface;
 use Tests\TestCase;
 use Tests\Traits\CreateGameLocationGemParamter;
 use Tests\Traits\CreateGameMap;
@@ -646,5 +653,47 @@ class BuildMonsterCacheServiceTest extends TestCase
         $this->assertArrayHasKey('easier', $cache);
         $this->assertNotEmpty($cache['regular']['data']);
         $this->assertNotEmpty($cache['easier']['data']);
+    }
+
+    public function test_build_all_bumps_the_canonical_revision_only_after_every_cache_build_succeeds(): void
+    {
+        $gameMap = $this->createGameMap(['name' => 'Revision Bump Map', 'default' => false]);
+        $this->createMonster(['game_map_id' => $gameMap->id]);
+
+        $monsterCacheRevisionService = resolve(MonsterCacheRevisionService::class);
+        $revisionBefore = $monsterCacheRevisionService->current();
+
+        resolve(BuildMonsterCacheService::class)->buildAll();
+
+        $this->assertSame($revisionBefore + 1, $monsterCacheRevisionService->current());
+    }
+
+    public function test_a_failed_shared_rebuild_does_not_publish_a_new_revision(): void
+    {
+        $gameMap = $this->createGameMap(['name' => 'Failed Rebuild Map', 'default' => false]);
+        $this->createMonster(['game_map_id' => $gameMap->id]);
+
+        $monsterCacheRevisionService = resolve(MonsterCacheRevisionService::class);
+        $revisionBefore = $monsterCacheRevisionService->current();
+
+        $failingAreaGemEffectService = Mockery::mock(AreaGemEffectService::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('resolveForGameMap')->andThrow(new Exception('Forced failure for revision test.'));
+        });
+
+        $buildMonsterCacheService = new BuildMonsterCacheService(
+            resolve(Manager::class),
+            resolve(MonsterTransformer::class),
+            $failingAreaGemEffectService,
+            $monsterCacheRevisionService,
+        );
+
+        try {
+            $buildMonsterCacheService->buildAll();
+            $this->fail('Expected the forced AreaGemEffectService failure to propagate.');
+        } catch (Exception $exception) {
+            $this->assertSame('Forced failure for revision test.', $exception->getMessage());
+        }
+
+        $this->assertSame($revisionBefore, $monsterCacheRevisionService->current());
     }
 }

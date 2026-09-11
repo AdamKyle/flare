@@ -1,6 +1,6 @@
 import React, { Fragment, ReactNode } from 'react';
 
-import { gemTypeLabel } from '../../../../admin/shared/enums/gem-type';
+import { gemTypeLabel } from '../enums/gem-type';
 import RolledGemStatsProps from '../types/rolled-gem-stats-props';
 
 import { formatPercent } from 'game-utils/format-number';

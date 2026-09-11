@@ -3,6 +3,8 @@
 namespace App\Flare\Models;
 
 use App\Flare\Models\Traits\CalculateSkillBonus;
+use App\Game\Gems\Progression\Values\GemScrollCurrencyType;
+use App\Game\Gems\Progression\Values\GemScrollType;
 use Bkwld\Cloner\Cloneable;
 use Database\Factories\ItemFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -88,6 +90,12 @@ class Item extends Model
         'socket_count',
         'has_gems_socketed',
         'item_skill_id',
+        'randomly_generated',
+        'gem_scroll_type',
+        'gem_scroll_bonus',
+        'gem_scroll_currency_type',
+        'gem_scroll_socket_chance',
+        'gem_scroll_pre_gem_chance',
     ];
 
     protected $casts = [
@@ -151,6 +159,11 @@ class Item extends Model
         'counter_chance' => 'float',
         'counter_resistance' => 'float',
         'is_cosmic' => 'boolean',
+        'gem_scroll_type' => GemScrollType::class,
+        'gem_scroll_bonus' => 'float',
+        'gem_scroll_currency_type' => GemScrollCurrencyType::class,
+        'gem_scroll_socket_chance' => 'float',
+        'gem_scroll_pre_gem_chance' => 'float',
     ];
 
     protected $appends = [

@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 
 import MapGemRangeField from './map-gem-range-field';
-import { gemTypeLabel } from '../../../shared/enums/gem-type';
+import { gemTypeLabel } from '../../../../game/reusable-components/gems/enums/gem-type';
 import MapGemFormFieldsProps from '../../types/map-gem-form-fields-props';
 import { parseNumberOption } from '../../utils/parse-map-gem-dropdown-value';
 

@@ -383,6 +383,10 @@ const UsableItems = ({
               },
               { label: 'Damages Kingdoms', value: 'damages-kingdoms' },
               { label: 'Holy Oils', value: 'holy-oils' },
+              { label: 'Gem Scrolls', value: 'scrolls' },
+              { label: 'Gem XP Scrolls', value: 'xp-scrolls' },
+              { label: 'Gem Currency Scrolls', value: 'currency-scrolls' },
+              { label: 'Gem Item Scrolls', value: 'item-scrolls' },
             ]}
             selection_placeholder={'Filter items by'}
             on_select={handleFilterChange}

@@ -49,6 +49,11 @@ class MarketController extends Controller
         ]);
     }
 
+    /**
+     * List an owned Item on the Market Board for the given Character, rejecting Items that are not market sellable.
+     *
+     * @return JsonResponse
+     */
     public function sellItem(ListPriceRequest $request, Character $character)
     {
         $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::INVENTORY_MANAGEMENT);
@@ -65,6 +70,10 @@ class MarketController extends Controller
 
         if (is_null($slot)) {
             return response()->json(['message' => 'item is not found.'], 422);
+        }
+
+        if (! $slot->item->market_sellable) {
+            return response()->json(['message' => 'This item cannot be sold on the Market.'], 422);
         }
 
         $minCost = SellItemCalculator::fetchMinPrice($slot->item);

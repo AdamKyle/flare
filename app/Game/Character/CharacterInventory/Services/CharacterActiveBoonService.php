@@ -55,9 +55,10 @@ class CharacterActiveBoonService
             return 0;
         }
 
-        return (int) $character->alchemyBag->slots()
+        return $character->alchemyBag->slots()
             ->where('character_id', $character->id)
             ->where('item_id', $boon->item_id)
+            ->get()
             ->sum('amount');
     }
 }
