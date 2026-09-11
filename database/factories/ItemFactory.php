@@ -3,13 +3,24 @@
 namespace Database\Factories;
 
 use App\Flare\Models\Item;
-use App\Game\Gems\Progression\Values\GemProgressionBands;
 use App\Game\Gems\Progression\Values\GemScrollCurrencyType;
 use App\Game\Gems\Progression\Values\GemScrollType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ItemFactory extends Factory
 {
+    private const DEFAULT_XP_SCROLL_BONUS = 0.10;
+
+    private const DEFAULT_CURRENCY_SCROLL_BONUS = 0.10;
+
+    private const DEFAULT_ITEM_SCROLL_BONUS = 0.02;
+
+    private const DEFAULT_SCROLL_SOCKET_CHANCE = 0.02;
+
+    private const DEFAULT_SCROLL_PRE_GEM_CHANCE = 0.01;
+
+    private const DEFAULT_SCROLL_DURATION_MINUTES = 120;
+
     /**
      * The name of the factory's corresponding model.
      *
@@ -34,6 +45,7 @@ class ItemFactory extends Factory
             'can_resurrect' => false,
             'resurrection_chance' => 0.0,
             'can_use_on_other_items' => false,
+            'market_sellable' => true,
         ];
     }
 
@@ -41,10 +53,10 @@ class ItemFactory extends Factory
      * State a generated XP Gem Scroll Item using the same persisted semantics as production.
      */
     public function gemXpScroll(
-        float $bonus = GemProgressionBands::GEM_TEST_SCROLL_DEFAULT_XP_BONUS,
-        int $lastsForMinutes = GemProgressionBands::GEM_TEST_SCROLL_DEFAULT_DURATION_MINUTES,
+        float $bonus = self::DEFAULT_XP_SCROLL_BONUS,
+        int $lastsForMinutes = self::DEFAULT_SCROLL_DURATION_MINUTES,
     ): static {
-        return $this->state(fn (): array => [
+        return $this->state([
             'name' => 'Gem Experience Scroll',
             'type' => 'alchemy',
             'randomly_generated' => true,
@@ -66,11 +78,11 @@ class ItemFactory extends Factory
      * State a generated Currency Gem Scroll Item using the same persisted semantics as production.
      */
     public function gemCurrencyScroll(
-        float $bonus = GemProgressionBands::GEM_TEST_SCROLL_DEFAULT_CURRENCY_BONUS,
+        float $bonus = self::DEFAULT_CURRENCY_SCROLL_BONUS,
         GemScrollCurrencyType $currencyType = GemScrollCurrencyType::GOLD,
-        int $lastsForMinutes = GemProgressionBands::GEM_TEST_SCROLL_DEFAULT_DURATION_MINUTES,
+        int $lastsForMinutes = self::DEFAULT_SCROLL_DURATION_MINUTES,
     ): static {
-        return $this->state(fn (): array => [
+        return $this->state([
             'name' => 'Gold Gem Scroll',
             'type' => 'alchemy',
             'randomly_generated' => true,
@@ -92,12 +104,12 @@ class ItemFactory extends Factory
      * State a generated Item Gem Scroll Item using the same persisted semantics as production.
      */
     public function gemItemScroll(
-        float $bonus = GemProgressionBands::GEM_TEST_SCROLL_DEFAULT_ITEM_BONUS,
-        float $socketChance = GemProgressionBands::GEM_TEST_SCROLL_DEFAULT_SOCKET_CHANCE,
-        float $preGemChance = GemProgressionBands::GEM_TEST_SCROLL_DEFAULT_PRE_GEM_CHANCE,
-        int $lastsForMinutes = GemProgressionBands::GEM_TEST_SCROLL_DEFAULT_DURATION_MINUTES,
+        float $bonus = self::DEFAULT_ITEM_SCROLL_BONUS,
+        float $socketChance = self::DEFAULT_SCROLL_SOCKET_CHANCE,
+        float $preGemChance = self::DEFAULT_SCROLL_PRE_GEM_CHANCE,
+        int $lastsForMinutes = self::DEFAULT_SCROLL_DURATION_MINUTES,
     ): static {
-        return $this->state(fn (): array => [
+        return $this->state([
             'name' => 'Gem Item Scroll',
             'type' => 'alchemy',
             'randomly_generated' => true,

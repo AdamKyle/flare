@@ -32,6 +32,11 @@ class CharacterCurrencyRewardService
         'copper_coins' => 0,
     ];
 
+    /**
+     * @param BattleMessageHandler $battleMessageHandler
+     * @param RandomNumberGenerator $randomNumberGenerator
+     * @param CharacterAreaGemEffectService $characterAreaGemEffectService
+     */
     public function __construct(
         private readonly BattleMessageHandler $battleMessageHandler,
         private readonly RandomNumberGenerator $randomNumberGenerator,
@@ -40,6 +45,9 @@ class CharacterCurrencyRewardService
 
     /**
      * Set the character.
+     *
+     * @param Character $character
+     * @return CharacterCurrencyRewardService
      */
     public function setCharacter(Character $character): CharacterCurrencyRewardService
     {
@@ -56,6 +64,10 @@ class CharacterCurrencyRewardService
 
     /**
      * Give currencies.
+     *
+     * @param Monster $monster
+     * @param int $killCount
+     * @return array
      */
     public function giveCurrencies(Monster $monster, int $killCount = 1): array
     {
@@ -130,6 +142,56 @@ class CharacterCurrencyRewardService
         ];
     }
 
+    /**
+     * Apply already-calculated Gem Scroll currency bonus amounts on top of already-earned base currencies.
+     *
+     * @param Character $character
+     * @param array $bonusAmounts
+     * @return array
+     */
+    public function applyGemScrollBonus(Character $character, array $bonusAmounts): array
+    {
+        return [
+            'gold' => $this->applyCappedBonus($character, 'gold', $bonusAmounts['gold'] ?? 0, CurrencyLimit::MAX_GOLD, CurrenciesMessageTypes::GOLD),
+            'gold_dust' => $this->applyCappedBonus($character, 'gold_dust', $bonusAmounts['gold_dust'] ?? 0, CurrencyLimit::MAX_GOLD_DUST, CurrenciesMessageTypes::GOLD_DUST),
+            'shards' => $this->applyCappedBonus($character, 'shards', $bonusAmounts['shards'] ?? 0, CurrencyLimit::MAX_SHARDS, CurrenciesMessageTypes::SHARDS),
+            'copper_coins' => $this->applyCappedBonus($character, 'copper_coins', $bonusAmounts['copper_coins'] ?? 0, CurrencyLimit::MAX_COPPER, CurrenciesMessageTypes::COPPER_COINS),
+        ];
+    }
+
+    /**
+     * Apply one currency bonus amount to the given Character column, capped at the given limit.
+     *
+     * @param Character $character
+     * @param string $column
+     * @param int $bonusAmount
+     * @param int $limit
+     * @param CurrenciesMessageTypes $messageType
+     * @return array
+     */
+    private function applyCappedBonus(Character $character, string $column, int $bonusAmount, int $limit, CurrenciesMessageTypes $messageType): array
+    {
+        if ($bonusAmount <= 0) {
+            return ['granted' => 0, 'wasted' => 0];
+        }
+
+        $currentAmount = $character->{$column};
+        $uncappedNewAmount = $currentAmount + $bonusAmount;
+        $newAmount = min($uncappedNewAmount, $limit);
+        $granted = $newAmount - $currentAmount;
+        $wasted = $uncappedNewAmount - $newAmount;
+
+        if ($granted <= 0) {
+            return ['granted' => 0, 'wasted' => $bonusAmount];
+        }
+
+        $character->update([$column => $newAmount]);
+
+        $this->battleMessageHandler->handleCurrencyGainMessage($character->user, $messageType, $granted, $newAmount);
+
+        return ['granted' => $granted, 'wasted' => $wasted];
+    }
+
     public function applyPlannedCurrencies(array $plan): array
     {
         $this->earnedCurrencies = [
@@ -151,6 +213,10 @@ class CharacterCurrencyRewardService
 
     /**
      * Handles Currency Event Rewards when the event is running.
+     *
+     * @param Monster $monster
+     * @param int $killCount
+     * @return CharacterCurrencyRewardService
      */
     public function currencyEventReward(Monster $monster, int $killCount = 1): CharacterCurrencyRewardService
     {
@@ -222,6 +288,8 @@ class CharacterCurrencyRewardService
 
     /**
      * Gets the character.
+     *
+     * @return Character
      */
     public function getCharacter(): Character
     {
@@ -230,6 +298,9 @@ class CharacterCurrencyRewardService
 
     /**
      * Gives gold to the player.
+     *
+     * @param Monster $monster
+     * @param int $killCount
      */
     private function distributeGold(Monster $monster, int $killCount): void
     {
@@ -239,6 +310,8 @@ class CharacterCurrencyRewardService
 
     /**
      * Apply the Gem-adjusted gold reward to the character and report the gain.
+     *
+     * @param int $goldToReward
      */
     private function applyGold(int $goldToReward): void
     {
@@ -270,6 +343,9 @@ class CharacterCurrencyRewardService
 
     /**
      * Give copper coins only to those that have the quest item and are on purgatory.
+     *
+     * @param Monster $monster
+     * @param int $killCount
      */
     private function distributeCopperCoins(Monster $monster, int $killCount): void
     {
@@ -323,6 +399,8 @@ class CharacterCurrencyRewardService
 
     /**
      * Apply the Gem-adjusted copper coin reward to the character and report the gain.
+     *
+     * @param int $coins
      */
     private function applyCopperCoins(int $coins): void
     {
@@ -348,6 +426,8 @@ class CharacterCurrencyRewardService
 
     /**
      * Apply the Gem-adjusted planned event currency rewards to the character and report the gains.
+     *
+     * @param array $eventPlan
      */
     private function applyEventCurrencies(array $eventPlan): void
     {
@@ -400,6 +480,9 @@ class CharacterCurrencyRewardService
 
     /**
      * Are we at a location with an effect (special location)?
+     *
+     * @param Map $map
+     * @return ?Location
      */
     private function purgatoryDungeons(Map $map): ?Location
     {

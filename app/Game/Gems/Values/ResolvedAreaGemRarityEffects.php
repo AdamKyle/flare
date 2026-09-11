@@ -2,15 +2,12 @@
 
 namespace App\Game\Gems\Values;
 
-/**
- * Immutable resolved Unique/Mythic/Cosmic Gem rarity modifiers for a Game Map/Location gameplay context.
- */
 class ResolvedAreaGemRarityEffects
 {
     /**
-     * @param  float  $unique  Resolved Unique item drop chance increase.
-     * @param  float  $mythic  Resolved Mythic item drop chance increase.
-     * @param  float  $cosmic  Resolved Cosmic item drop chance increase.
+     * @param float $unique
+     * @param float $mythic
+     * @param float $cosmic
      */
     public function __construct(
         private readonly float $unique,
@@ -20,6 +17,8 @@ class ResolvedAreaGemRarityEffects
 
     /**
      * Build a no-effect resolved rarity result.
+     *
+     * @return self
      */
     public static function none(): self
     {
@@ -28,6 +27,8 @@ class ResolvedAreaGemRarityEffects
 
     /**
      * The resolved Unique item drop chance increase.
+     *
+     * @return float
      */
     public function unique(): float
     {
@@ -36,6 +37,8 @@ class ResolvedAreaGemRarityEffects
 
     /**
      * The resolved Mythic item drop chance increase.
+     *
+     * @return float
      */
     public function mythic(): float
     {
@@ -44,6 +47,8 @@ class ResolvedAreaGemRarityEffects
 
     /**
      * The resolved Cosmic item drop chance increase.
+     *
+     * @return float
      */
     public function cosmic(): float
     {
@@ -53,7 +58,7 @@ class ResolvedAreaGemRarityEffects
     /**
      * Serialize this result into its factual field shape.
      *
-     * @return array<string, float>
+     * @return array
      */
     public function toArray(): array
     {

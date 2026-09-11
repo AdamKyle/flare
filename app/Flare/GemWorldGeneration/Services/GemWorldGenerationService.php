@@ -20,6 +20,11 @@ use Illuminate\Support\Facades\Storage;
 
 class GemWorldGenerationService
 {
+    /**
+     * @param GemWorldImageGenerator $imageGenerator
+     * @param GemWorldLocationPlacementService $placementService
+     * @param MapTileGenerationService $mapTileGenerationService
+     */
     public function __construct(
         private readonly GemWorldImageGenerator $imageGenerator,
         private readonly GemWorldLocationPlacementService $placementService,
@@ -112,17 +117,11 @@ class GemWorldGenerationService
         );
     }
 
-    /**
-     * @return Collection<int, GemWorldGenerationResult>
-     */
     public function generateMapGems(Collection $gemParamters): Collection
     {
         return $this->generateMany($gemParamters, fn (GameMapGemParamter $gemParamter): GemWorldGenerationResult => $this->generateMapGem($gemParamter));
     }
 
-    /**
-     * @return Collection<int, GemWorldGenerationResult>
-     */
     public function generateLocationGems(Collection $gemParamters): Collection
     {
         return $this->generateMany($gemParamters, fn (GameLocationGemParamter $gemParamter): GemWorldGenerationResult => $this->generateLocationGem($gemParamter));

@@ -1,12 +1,12 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useMemo, useState } from 'react';
 
 import ActivateGemScrollSection from './activate-gem-scroll-section';
-import ActiveGemScrollsSection from './active-gem-scrolls-section';
+import CurrentProfileActiveScrollsList from './current-profile-active-scrolls-list';
 import GemProgressionLevelSection from './gem-progression-level-section';
-import GemWorldIntroduction from './gem-world-introduction';
 import GemProgressionPanelProps from './types/gem-progression-panel-props';
-import { useAcknowledgeGemWorldIntroduction } from '../api/hooks/use-acknowledge-gem-world-introduction';
+import GemProgressionStatusDefinition from '../api/definitions/gem-progression-status-definition';
 import { useFetchGemProgressionStatus } from '../api/hooks/use-fetch-gem-progression-status';
+import { useGemProfileProgressionUpdate } from '../api/hooks/use-gem-profile-progression-update';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
 
@@ -18,36 +18,50 @@ import Separator from 'ui/separator/separator';
 const GemProgressionPanel = ({
   character_id: characterId,
 }: GemProgressionPanelProps): ReactNode => {
+  const { data, loading, error } = useFetchGemProgressionStatus(characterId);
   const { gameData } = useGameData();
-  const introductionAcknowledgedAt =
-    gameData?.character?.gem_world_introduction_acknowledged_at ?? null;
+  const [scrollListRefreshToken, setScrollListRefreshToken] = useState(0);
 
-  const { data, loading, error, refetch } =
-    useFetchGemProgressionStatus(characterId);
+  const liveUpdate = gameData?.character?.gem_progression ?? null;
 
-  const {
-    loading: acknowledging,
-    error: acknowledgeError,
-    acknowledge,
-  } = useAcknowledgeGemWorldIntroduction(characterId);
+  const sharedGlobalUpdate = useGemProfileProgressionUpdate(
+    data && data.profile !== null ? data.profile.type : null,
+    data && data.profile !== null ? data.profile.id : null
+  );
 
-  const handleAcknowledge = (): void => {
-    void acknowledge();
+  const mergedData: GemProgressionStatusDefinition | null = useMemo(() => {
+    if (!data || data.profile === null) {
+      return data;
+    }
+
+    let merged = data;
+
+    if (
+      liveUpdate &&
+      liveUpdate.profile.type === data.profile.type &&
+      liveUpdate.profile.id === data.profile.id
+    ) {
+      merged = {
+        ...merged,
+        global: liveUpdate.global,
+        personal: liveUpdate.personal,
+        scroll_drop: liveUpdate.scroll_drop,
+        active_scrolls: liveUpdate.active_scrolls,
+      };
+    }
+
+    if (sharedGlobalUpdate) {
+      merged = { ...merged, global: sharedGlobalUpdate };
+    }
+
+    return merged;
+  }, [data, liveUpdate, sharedGlobalUpdate]);
+
+  const handleScrollActivated = (): void => {
+    setScrollListRefreshToken((previous) => previous + 1);
   };
 
-  if (!introductionAcknowledgedAt) {
-    return (
-      <div className="flex h-full min-h-0 flex-col gap-4 overflow-y-auto px-4 py-4 sm:px-5">
-        <GemWorldIntroduction
-          loading={acknowledging}
-          error={acknowledgeError}
-          on_acknowledge={handleAcknowledge}
-        />
-      </div>
-    );
-  }
-
-  if (loading && !data) {
+  if (loading && !mergedData) {
     return (
       <div className="p-4">
         <InfiniteLoader />
@@ -63,7 +77,7 @@ const GemProgressionPanel = ({
     );
   }
 
-  if (!data || data.profile === null) {
+  if (!mergedData || mergedData.profile === null) {
     return (
       <div className="p-4 text-sm text-gray-600 dark:text-gray-400">
         You are not currently inside a generated Gem World.
@@ -74,34 +88,33 @@ const GemProgressionPanel = ({
   return (
     <div className="flex h-full min-h-0 flex-col gap-4 overflow-y-auto px-4 py-4 sm:px-5">
       <div className="text-sm text-gray-700 dark:text-gray-300">
-        {data.profile.generated_game_map_name}
+        {mergedData.profile.generated_game_map_name}
       </div>
 
       <GemProgressionLevelSection
-        global={data.global}
-        personal={data.personal}
-        scroll_drop={data.scroll_drop}
+        global={mergedData.global}
+        personal={mergedData.personal}
+        scroll_drop={mergedData.scroll_drop}
       />
 
       <Separator />
 
       <ActivateGemScrollSection
         character_id={characterId}
-        on_activated={refetch}
+        on_activated={handleScrollActivated}
       />
 
       <Separator />
 
       <div>
         <h4 className="text-glacier-800 dark:text-glacier-200 mb-2 text-xs font-semibold tracking-wide uppercase">
-          Active Gem Scrolls ({data.active_scrolls.count}) — Total Bonus{' '}
-          {(data.active_scrolls.total_primary_bonus * 100).toFixed(2)}% /{' '}
-          {(data.active_scrolls.cap * 100).toFixed(0)}%
+          Active Gem Scrolls ({mergedData.active_scrolls.count}) — Total Bonus{' '}
+          {(mergedData.active_scrolls.total_primary_bonus * 100).toFixed(2)}% /{' '}
+          {(mergedData.active_scrolls.cap * 100).toFixed(0)}%
         </h4>
-        <ActiveGemScrollsSection
+        <CurrentProfileActiveScrollsList
           character_id={characterId}
-          scrolls={data.active_scroll_rows}
-          on_changed={refetch}
+          refresh_token={scrollListRefreshToken}
         />
       </div>
     </div>

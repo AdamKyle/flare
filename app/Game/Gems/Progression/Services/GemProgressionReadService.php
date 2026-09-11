@@ -4,21 +4,21 @@ namespace App\Game\Gems\Progression\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterGameLocationGemProgression;
-use App\Flare\Models\CharacterGameLocationGemScroll;
 use App\Flare\Models\CharacterGameMapGemProgression;
-use App\Flare\Models\CharacterGameMapGemScroll;
 use App\Game\Gems\Progression\Values\GemProgressionBands;
 use App\Game\Gems\Progression\Values\ResolvedGemWorldProfile;
 use App\Game\Gems\Services\AreaGemEffectService;
-use Illuminate\Support\Collection;
 
-/**
- * Small Player-facing read model for the Character's current Gem
- * progression status. Owns no formulas of its own; every value is resolved
- * through the existing progression/effect/Scroll services.
- */
 class GemProgressionReadService
 {
+    /**
+     * @param GemWorldProfileResolver $gemWorldProfileResolver
+     * @param GemProgressionCurveService $gemProgressionCurveService
+     * @param GemProgressionEffectService $gemProgressionEffectService
+     * @param GemScrollEffectService $gemScrollEffectService
+     * @param CharacterAreaGemEffectService $characterAreaGemEffectService
+     * @param AreaGemEffectService $areaGemEffectService
+     */
     public function __construct(
         private readonly GemWorldProfileResolver $gemWorldProfileResolver,
         private readonly GemProgressionCurveService $gemProgressionCurveService,
@@ -29,8 +29,10 @@ class GemProgressionReadService
     ) {}
 
     /**
-     * Resolve the Character's current Gem progression status, or an empty
-     * result when the Character has no contributing Gem profile right now.
+     * Resolve the Character's current Gem progression status, or an empty result when no profile currently contributes.
+     *
+     * @param Character $character
+     * @return array
      */
     public function currentStatus(Character $character): array
     {
@@ -43,12 +45,38 @@ class GemProgressionReadService
         [$globalLevel, $globalXp] = $this->resolveGlobalProgression($resolvedProfile);
         [$personalLevel, $personalXp] = $this->resolvePersonalProgression($character, $resolvedProfile);
 
+        $rolledEffects = $this->areaGemEffectService->resolveForCharacter($character);
+        $effectiveEffects = $this->characterAreaGemEffectService->resolveForCharacter($character);
+
+        return array_merge(
+            $this->compactStatusPayload($character, $resolvedProfile, $globalLevel, $globalXp, $personalLevel, $personalXp),
+            [
+                'rolled_reward_effects' => $rolledEffects->rewardEffects()->toArray(),
+                'effective_reward_effects' => $effectiveEffects->rewardEffects()->toArray(),
+                'rolled_monster_effects' => $rolledEffects->monsterEffects()->toArray(),
+                'effective_monster_effects' => $effectiveEffects->monsterEffects()->toArray(),
+                'rolled_rarity_effects' => $rolledEffects->rarityEffects()->toArray(),
+                'effective_rarity_effects' => $effectiveEffects->rarityEffects()->toArray(),
+            ],
+        );
+    }
+
+    /**
+     * Build the compact Gem progression dashboard payload shared by the status read endpoint and the live progression broadcasts.
+     *
+     * @param Character $character
+     * @param ResolvedGemWorldProfile $resolvedProfile
+     * @param int $globalLevel
+     * @param int $globalXp
+     * @param int $personalLevel
+     * @param int $personalXp
+     * @return array
+     */
+    public function compactStatusPayload(Character $character, ResolvedGemWorldProfile $resolvedProfile, int $globalLevel, int $globalXp, int $personalLevel, int $personalXp): array
+    {
         $scrollAggregate = $resolvedProfile->isMapProfile()
             ? $this->gemScrollEffectService->aggregateForMapProfile($character, $resolvedProfile->mapProfile())
             : $this->gemScrollEffectService->aggregateForLocationProfile($character, $resolvedProfile->locationProfile());
-
-        $rolledEffects = $this->areaGemEffectService->resolveForCharacter($character);
-        $effectiveEffects = $this->characterAreaGemEffectService->resolveForCharacter($character);
 
         return [
             'profile' => [
@@ -91,18 +119,14 @@ class GemProgressionReadService
                 'shards_bonus' => $scrollAggregate->shardsBonusTotal(),
                 'item_bonus' => $scrollAggregate->itemBonusTotal(),
             ],
-            'active_scroll_rows' => $this->activeScrollRows($character, $resolvedProfile),
-            'rolled_reward_effects' => $rolledEffects->rewardEffects()->toArray(),
-            'effective_reward_effects' => $effectiveEffects->rewardEffects()->toArray(),
-            'rolled_monster_effects' => $rolledEffects->monsterEffects()->toArray(),
-            'effective_monster_effects' => $effectiveEffects->monsterEffects()->toArray(),
-            'rolled_rarity_effects' => $rolledEffects->rarityEffects()->toArray(),
-            'effective_rarity_effects' => $effectiveEffects->rarityEffects()->toArray(),
         ];
     }
 
     /**
      * Resolve the current global level/xp pair for the resolved profile, defaulting to level 1/0 xp.
+     *
+     * @param ResolvedGemWorldProfile $resolvedProfile
+     * @return array
      */
     private function resolveGlobalProgression(ResolvedGemWorldProfile $resolvedProfile): array
     {
@@ -117,6 +141,10 @@ class GemProgressionReadService
 
     /**
      * Resolve the current personal level/xp pair for the Character/resolved profile, defaulting to level 1/0 xp.
+     *
+     * @param Character $character
+     * @param ResolvedGemWorldProfile $resolvedProfile
+     * @return array
      */
     private function resolvePersonalProgression(Character $character, ResolvedGemWorldProfile $resolvedProfile): array
     {
@@ -131,47 +159,5 @@ class GemProgressionReadService
         }
 
         return [$progression?->level ?? 1, $progression?->xp ?? 0];
-    }
-
-    /**
-     * Resolve the Character's active Gem Scroll rows for the resolved profile, with the fields the Fill/Remove UI needs.
-     */
-    private function activeScrollRows(Character $character, ResolvedGemWorldProfile $resolvedProfile): array
-    {
-        if ($resolvedProfile->isMapProfile()) {
-            $rows = CharacterGameMapGemScroll::with('item')
-                ->where('character_id', $character->id)
-                ->where('game_map_gem_paramter_id', $resolvedProfile->profileId())
-                ->active()
-                ->get();
-
-            return $this->formatScrollRows($rows, isMapRow: true);
-        }
-
-        $rows = CharacterGameLocationGemScroll::with('item')
-            ->where('character_id', $character->id)
-            ->where('game_location_gem_paramter_id', $resolvedProfile->profileId())
-            ->active()
-            ->get();
-
-        return $this->formatScrollRows($rows, isMapRow: false);
-    }
-
-    /**
-     * Format a collection of active Gem Scroll rows into the factual shape the Fill/Remove UI needs.
-     */
-    private function formatScrollRows(Collection $rows, bool $isMapRow): array
-    {
-        return $rows->map(fn (CharacterGameMapGemScroll|CharacterGameLocationGemScroll $row): array => [
-            'id' => $row->id,
-            'is_map_scroll' => $isMapRow,
-            'item_id' => $row->item_id,
-            'item_name' => $row->item->name,
-            'gem_scroll_type' => $row->item->gem_scroll_type,
-            'gem_scroll_currency_type' => $row->item->gem_scroll_currency_type,
-            'gem_scroll_bonus' => $row->item->gem_scroll_bonus,
-            'started_at' => $row->started_at,
-            'expires_at' => $row->expires_at,
-        ])->values()->toArray();
     }
 }

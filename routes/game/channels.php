@@ -69,3 +69,8 @@ Broadcast::channel('update-factions-{userId}', function ($user, $userId) {
 Broadcast::channel('update-character-attacks-{userId}', function ($user, $userId) {
     return $user->id === (int) $userId;
 });
+
+// When the character's Gem World progression updates.
+Broadcast::channel('update-gem-progression-{userId}', function ($user, $userId) {
+    return $user->id === (int) $userId;
+});

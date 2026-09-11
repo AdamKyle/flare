@@ -67,6 +67,28 @@ class BattleRewardLedgerService
             ->first(fn (CharacterBattleRewardRequestStep $step): bool => $step->status !== BattleRewardStepStatus::COMPLETED);
     }
 
+    /**
+     * Resolve the persisted result of an already-completed step for the
+     * given request, so a later step can recover its authoritative output
+     * on resume instead of depending on transient in-memory state. Returns
+     * null when the step does not exist or has not completed.
+     *
+     * @param CharacterBattleRewardRequest $request
+     * @param BattleRewardStepName $stepName
+     * @return ?array
+     */
+    public function completedStepResult(CharacterBattleRewardRequest $request, BattleRewardStepName $stepName): ?array
+    {
+        $step = $this->stepsForRequest($request)
+            ->first(fn (CharacterBattleRewardRequestStep $step): bool => $step->step_name === $stepName);
+
+        if (is_null($step) || $step->status !== BattleRewardStepStatus::COMPLETED) {
+            return null;
+        }
+
+        return $step->result_json;
+    }
+
     public function startStep(CharacterBattleRewardRequestStep $step, ?array $payload = null): CharacterBattleRewardRequestStep
     {
         if ($step->status === BattleRewardStepStatus::COMPLETED) {

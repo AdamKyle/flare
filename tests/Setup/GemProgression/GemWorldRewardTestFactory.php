@@ -3,7 +3,10 @@
 namespace Tests\Setup\GemProgression;
 
 use App\Flare\GemWorldGeneration\Values\GeneratedGemMapType;
+use App\Game\Battle\Services\BattleDrop;
 use App\Game\BattleRewardProcessing\Services\BattleRewardLedgerService;
+use App\Game\BattleRewardProcessing\Services\BattleRewardMessageOutboxService;
+use App\Game\BattleRewardProcessing\Services\CharacterCurrencyRewardService;
 use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Items\Builders\BuildCosmicItem;
@@ -17,6 +20,8 @@ use App\Game\Gems\Progression\Services\GemProgressionService;
 use App\Game\Gems\Progression\Services\GemScrollEffectService;
 use App\Game\Gems\Progression\Services\GemScrollGenerator;
 use App\Game\Gems\Progression\Services\GemWorldProfileResolver;
+use App\Game\Gems\Progression\Services\GemWorldRewardDeliveryService;
+use App\Game\Gems\Progression\Services\GemWorldRewardPlanService;
 use App\Game\Gems\Progression\Services\GemWorldRewardService;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Traits\CreateGameLocationGemParamter;
@@ -40,20 +45,33 @@ class GemWorldRewardTestFactory
      */
     public function buildService(?ChanceCalculator $chanceCalculator = null): GemWorldRewardService
     {
-        return new GemWorldRewardService(
-            resolve(GemWorldProfileResolver::class),
-            resolve(GemProgressionService::class),
+        $planService = new GemWorldRewardPlanService(
             resolve(GemProgressionEffectService::class),
-            resolve(GemScrollEffectService::class),
             resolve(GemScrollGenerator::class),
-            resolve(BattleRewardLedgerService::class),
             resolve(RandomNumberGenerator::class),
             $chanceCalculator ?? resolve(ChanceCalculator::class),
+        );
+
+        $deliveryService = new GemWorldRewardDeliveryService(
+            resolve(BattleRewardLedgerService::class),
+            resolve(GemScrollGenerator::class),
             resolve(ItemSocketEligibility::class),
             resolve(GemBuilder::class),
             resolve(BuildUniqueItem::class),
             resolve(BuildMythicItem::class),
             resolve(BuildCosmicItem::class),
+            resolve(BattleDrop::class),
+        );
+
+        return new GemWorldRewardService(
+            resolve(GemWorldProfileResolver::class),
+            resolve(GemProgressionService::class),
+            resolve(GemScrollEffectService::class),
+            $planService,
+            $deliveryService,
+            resolve(BattleRewardLedgerService::class),
+            resolve(BattleRewardMessageOutboxService::class),
+            resolve(CharacterCurrencyRewardService::class),
             resolve(GemProgressionBroadcastService::class),
         );
     }

@@ -19,6 +19,7 @@ beforeEach(function () {
     require base_path('routes/game/messages/channels.php');
     require base_path('routes/game/automation/channels.php');
     require base_path('routes/game/maps/channels.php');
+    require base_path('routes/game/channels.php');
 
     require base_path('routes/game/automation/delve/channels.php');
     require base_path('routes/game/automation/batch-crafting/channels.php');
@@ -133,6 +134,49 @@ test('a different authenticated user is rejected for another users private batch
 
     $response = $this->actingAs($otherUser)->post('/broadcasting/auth', [
         'channel_name' => 'private-batch-crafting-status-updated-'.$owner->id,
+        'socket_id' => '1234.5678',
+    ]);
+
+    $response->assertForbidden();
+});
+
+test('the authenticated owner is authorized for their private gem progression channel', function () {
+    $user = $this->createUser();
+
+    $response = $this->actingAs($user)->post('/broadcasting/auth', [
+        'channel_name' => 'private-update-gem-progression-'.$user->id,
+        'socket_id' => '1234.5678',
+    ]);
+
+    $response->assertOk();
+});
+
+test('a different authenticated user is rejected for another users private gem progression channel', function () {
+    $owner = $this->createUser();
+    $otherUser = $this->createUser();
+
+    $response = $this->actingAs($otherUser)->post('/broadcasting/auth', [
+        'channel_name' => 'private-update-gem-progression-'.$owner->id,
+        'socket_id' => '1234.5678',
+    ]);
+
+    $response->assertForbidden();
+});
+
+test('any authenticated user is authorized for the shared gem profile progression channel', function () {
+    $user = $this->createUser();
+
+    $response = $this->actingAs($user)->post('/broadcasting/auth', [
+        'channel_name' => 'private-gem-profile-progression-map_gem-1',
+        'socket_id' => '1234.5678',
+    ]);
+
+    $response->assertOk();
+});
+
+test('an unauthenticated request is rejected for the shared gem profile progression channel', function () {
+    $response = $this->post('/broadcasting/auth', [
+        'channel_name' => 'private-gem-profile-progression-map_gem-1',
         'socket_id' => '1234.5678',
     ]);
 

@@ -26,6 +26,15 @@ Route::middleware(['auth', 'is.player.banned', 'is.character.who.they.say.they.a
 
     Route::get('/map/gem-world/{character}/progress', ['uses' => 'Api\GemWorldProgressController@current']);
 
+    Route::get('/map/gem-world/{character}/active-scrolls', ['uses' => 'Api\GemWorldProgressController@currentProfileActiveScrolls']);
+
+    Route::get('/map/gem-world/{character}/all-active-scrolls', ['uses' => 'Api\GemWorldProgressController@allActiveScrolls']);
+
+    Route::get('/map/gem-world/{character}/all-profile-participation', ['uses' => 'Api\GemWorldProgressController@allProfileParticipation']);
+
+    // Education acknowledgment is a read/education action, not movement, so it stays outside throttle:moving and is.character.exploring.
+    Route::post('/map/gem-world/acknowledge-introduction/{character}', ['uses' => 'Api\GemWorldController@acknowledgeIntroduction']);
+
     Route::group(['middleware' => 'throttle:moving'], function () {
 
         // Map Movement:
@@ -45,8 +54,6 @@ Route::middleware(['auth', 'is.player.banned', 'is.character.who.they.say.they.a
             Route::post('/map/gem-world/enter/{character}', ['uses' => 'Api\GemWorldController@enter']);
 
             Route::post('/map/gem-world/exit/{character}', ['uses' => 'Api\GemWorldController@exit']);
-
-            Route::post('/map/gem-world/acknowledge-introduction/{character}', ['uses' => 'Api\GemWorldController@acknowledgeIntroduction']);
         });
 
     });

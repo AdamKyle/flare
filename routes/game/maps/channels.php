@@ -66,3 +66,8 @@ broadCast::channel('update-location-base-event-goals-{userId}', function ($user,
 broadCast::channel('update-character-position-{userId}', function ($user, $userId) {
     return $user->id === (int) $userId;
 });
+
+// When a shared Gem World profile's global progression updates for every observing player.
+Broadcast::channel('gem-profile-progression-{profileType}-{profileId}', function ($user) {
+    return ['id' => $user->id];
+});

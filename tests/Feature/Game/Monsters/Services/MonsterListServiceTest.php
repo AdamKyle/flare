@@ -182,6 +182,43 @@ class MonsterListServiceTest extends TestCase
         Cache::flush();
 
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $parentMap = $character->map->gameMap;
+
+        $profile = $this->createGameMapGemParamter(['game_map_id' => $parentMap->id]);
+        $gem = $this->createMapGeneratedGem($profile, ['enemy_strength_increase' => 0.10]);
+        $profile->update(['rolled_gem_id' => $gem->id]);
+
+        $this->createCharacterGameMapGemProgression([
+            'character_id' => $character->id,
+            'game_map_gem_paramter_id' => $profile->id,
+            'level' => 200,
+            'xp' => 0,
+        ]);
+
+        $monster = $this->createMonster(['game_map_id' => $parentMap->id, 'str' => 100, 'damage_stat' => 'str']);
+
+        $generatedMap = $this->createGameMap([
+            'name' => 'Generated Map Gem World Personal Negative Progression',
+            'default' => false,
+            'can_traverse' => false,
+            'generated_map_type' => GeneratedGemMapType::MAP_GEM->value,
+            'generated_parent_game_map_id' => $parentMap->id,
+            'game_map_gem_paramter_id' => $profile->id,
+        ]);
+
+        $character->map->update(['game_map_id' => $generatedMap->id]);
+
+        $effectiveMonster = resolve(MonsterListService::class)->getMonsterForFight($character->refresh(), $monster->id);
+
+        // Rolled 0.10 x the 2.0 Map Gem World monster multiplier (0.20), plus the personal negative bonus at level 200 (0.03) = 0.23.
+        $this->assertSame(123, $effectiveMonster['str']);
+    }
+
+    public function test_personal_negative_progression_does_not_affect_a_normal_map_monster(): void
+    {
+        Cache::flush();
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $gameMap = $character->map->gameMap;
 
         $profile = $this->createGameMapGemParamter(['game_map_id' => $gameMap->id]);
@@ -199,7 +236,7 @@ class MonsterListServiceTest extends TestCase
 
         $effectiveMonster = resolve(MonsterListService::class)->getMonsterForFight($character->refresh(), $monster->id);
 
-        $this->assertSame(113, $effectiveMonster['str']);
+        $this->assertSame(110, $effectiveMonster['str']);
     }
 
     public function test_weekly_fight_monsters_remain_gem_neutral_even_with_personal_progression(): void

@@ -1,6 +1,6 @@
 export const getUrl = (
   chanelUrl: string,
-  params?: Record<string, number>
+  params?: Record<string, number | string>
 ): string => {
   let url = chanelUrl;
   if (params) {

@@ -1,4 +1,3 @@
-import ActiveGemScrollRowDefinition from './active-gem-scroll-row-definition';
 import {
   AreaGemMonsterEffectsDefinition,
   AreaGemRarityEffectsDefinition,
@@ -54,13 +53,21 @@ export interface GemProgressionNoProfileStatusDefinition {
   profile: null;
 }
 
+export interface GemProgressionCompactStatusDefinition {
+  profile: GemProgressionProfileDefinition;
+  global: GemProgressionGlobalDefinition;
+  personal: GemProgressionPersonalDefinition;
+  scroll_drop: GemProgressionScrollDropDefinition;
+  active_scrolls: GemProgressionActiveScrollsDefinition;
+  currently_in_this_gem_world: boolean;
+}
+
 export interface GemProgressionActiveStatusDefinition {
   profile: GemProgressionProfileDefinition;
   global: GemProgressionGlobalDefinition;
   personal: GemProgressionPersonalDefinition;
   scroll_drop: GemProgressionScrollDropDefinition;
   active_scrolls: GemProgressionActiveScrollsDefinition;
-  active_scroll_rows: ActiveGemScrollRowDefinition[];
   rolled_reward_effects: AreaGemRewardEffectsDefinition;
   effective_reward_effects: AreaGemRewardEffectsDefinition;
   rolled_monster_effects: AreaGemMonsterEffectsDefinition;

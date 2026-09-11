@@ -2,11 +2,6 @@
 
 namespace App\Game\Gems\Progression\Values;
 
-/**
- * The closed set of level-band constants shared by Gem progression math, the
- * Gem Scroll generator, and their tests. Numeric thresholds/ranges live here
- * once so no other class duplicates them.
- */
 class GemProgressionBands
 {
     public const int GLOBAL_MIN_LEVEL = 1;
@@ -68,16 +63,4 @@ class GemProgressionBands
     public const int ITEM_SCROLL_MAX_BONUS_OPPORTUNITIES = 5;
 
     public const float ITEM_SCROLL_OPPORTUNITY_BONUS_STEP = 1.0;
-
-    public const float GEM_TEST_SCROLL_DEFAULT_XP_BONUS = 0.10;
-
-    public const float GEM_TEST_SCROLL_DEFAULT_CURRENCY_BONUS = 0.10;
-
-    public const float GEM_TEST_SCROLL_DEFAULT_ITEM_BONUS = 0.02;
-
-    public const float GEM_TEST_SCROLL_DEFAULT_SOCKET_CHANCE = 0.02;
-
-    public const float GEM_TEST_SCROLL_DEFAULT_PRE_GEM_CHANCE = 0.01;
-
-    public const int GEM_TEST_SCROLL_DEFAULT_DURATION_MINUTES = 120;
 }

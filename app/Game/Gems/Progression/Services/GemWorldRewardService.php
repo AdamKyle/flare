@@ -4,53 +4,50 @@ namespace App\Game\Gems\Progression\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterBattleRewardRequestStep;
-use App\Flare\Models\Item;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardStepName;
 use App\Game\BattleRewardProcessing\Services\BattleRewardLedgerService;
-use App\Game\Core\Chance\ChanceCalculator;
-use App\Game\Core\Chance\RandomNumberGenerator;
-use App\Game\Core\Currency\Services\CurrencyLimit;
-use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
-use App\Game\Core\Items\Builders\BuildCosmicItem;
-use App\Game\Core\Items\Builders\BuildMythicItem;
-use App\Game\Core\Items\Builders\BuildUniqueItem;
-use App\Game\Core\Items\Values\ItemSocketEligibility;
-use App\Game\Gems\Builders\GemBuilder;
+use App\Game\BattleRewardProcessing\Services\BattleRewardMessageOutboxService;
+use App\Game\BattleRewardProcessing\Services\CharacterCurrencyRewardService;
 use App\Game\Gems\Progression\Values\GemProgressionBands;
 use App\Game\Gems\Progression\Values\GemScrollAggregate;
+use App\Game\Gems\Progression\Values\GemWorldRewardPlan;
 use App\Game\Gems\Progression\Values\ResolvedGemWorldProfile;
-use App\Game\Gems\Values\GemTierValue;
+use Illuminate\Support\Facades\DB;
 
-/**
- * Owns the Gem World reward pipeline shared by manual battle and Exploration:
- * per-kill Gem progression XP, Gem Scroll drops, level-700+ enhanced
- * equipment, Item Scroll rarity opportunities, and Currency Scroll bonuses.
- * Runs behind the `GEM_WORLD_REWARDS` battle-reward ledger step and begins
- * with the cheapest possible generated-world gate so normal battle rewards
- * stay fast.
- */
 class GemWorldRewardService
 {
+    /**
+     * @param GemWorldProfileResolver $gemWorldProfileResolver
+     * @param GemProgressionService $gemProgressionService
+     * @param GemScrollEffectService $gemScrollEffectService
+     * @param GemWorldRewardPlanService $gemWorldRewardPlanService
+     * @param GemWorldRewardDeliveryService $gemWorldRewardDeliveryService
+     * @param BattleRewardLedgerService $battleRewardLedgerService
+     * @param BattleRewardMessageOutboxService $battleRewardMessageOutboxService
+     * @param CharacterCurrencyRewardService $characterCurrencyRewardService
+     * @param GemProgressionBroadcastService $gemProgressionBroadcastService
+     */
     public function __construct(
         private readonly GemWorldProfileResolver $gemWorldProfileResolver,
         private readonly GemProgressionService $gemProgressionService,
-        private readonly GemProgressionEffectService $gemProgressionEffectService,
         private readonly GemScrollEffectService $gemScrollEffectService,
-        private readonly GemScrollGenerator $gemScrollGenerator,
+        private readonly GemWorldRewardPlanService $gemWorldRewardPlanService,
+        private readonly GemWorldRewardDeliveryService $gemWorldRewardDeliveryService,
         private readonly BattleRewardLedgerService $battleRewardLedgerService,
-        private readonly RandomNumberGenerator $randomNumberGenerator,
-        private readonly ChanceCalculator $chanceCalculator,
-        private readonly ItemSocketEligibility $itemSocketEligibility,
-        private readonly GemBuilder $gemBuilder,
-        private readonly BuildUniqueItem $buildUniqueItem,
-        private readonly BuildMythicItem $buildMythicItem,
-        private readonly BuildCosmicItem $buildCosmicItem,
+        private readonly BattleRewardMessageOutboxService $battleRewardMessageOutboxService,
+        private readonly CharacterCurrencyRewardService $characterCurrencyRewardService,
         private readonly GemProgressionBroadcastService $gemProgressionBroadcastService,
     ) {}
 
     /**
-     * Apply the Gem World reward step for one battle reward request. Returns
-     * immediately with a no-op result when the Character is not currently
-     * inside a generated Gem World, before loading any progression state.
+     * Apply the Gem World reward step for one battle reward request, or a no-op result when not inside a generated Gem World.
+     *
+     * @param CharacterBattleRewardRequestStep $step
+     * @param Character $character
+     * @param array $effectiveMonster
+     * @param int $qualifyingKills
+     * @param array $earnedCurrencies
+     * @return array
      */
     public function applyToLedgerStep(
         CharacterBattleRewardRequestStep $step,
@@ -68,21 +65,23 @@ class GemWorldRewardService
         $checkpoint = $step->checkpoint_json ?? [];
 
         if (! ($checkpoint['xp_applied'] ?? false)) {
-            $checkpoint = array_merge($checkpoint, $this->applyGemXp($character, $resolvedProfile, $effectiveMonster, $qualifyingKills));
-            $checkpoint['xp_applied'] = true;
-            $step = $this->battleRewardLedgerService->checkpointStep($step, $checkpoint);
+            [$step, $checkpoint] = $this->applyXpPhase($step, $checkpoint, $character, $resolvedProfile, $effectiveMonster, $qualifyingKills);
         }
 
-        if (! ($checkpoint['rewards_applied'] ?? false)) {
-            $checkpoint['rewards_result'] = $this->applyRewards($character->fresh(), $resolvedProfile, $checkpoint['personal_level'], $qualifyingKills);
-            $checkpoint['rewards_applied'] = true;
-            $step = $this->battleRewardLedgerService->checkpointStep($step, $checkpoint);
+        if (! ($checkpoint['reward_plan'] ?? null)) {
+            [$step, $checkpoint] = $this->planRewardsPhase($step, $checkpoint, $character, $resolvedProfile, $qualifyingKills);
+        }
+
+        if (! ($checkpoint['rewards_delivered'] ?? false)) {
+            [$step, $checkpoint] = $this->deliverRewardsPhase($step, $checkpoint, $character);
         }
 
         if (! ($checkpoint['currency_scroll_applied'] ?? false)) {
-            $checkpoint['currency_scroll_result'] = $this->applyCurrencyScrollBonus($character->fresh(), $resolvedProfile, $earnedCurrencies);
-            $checkpoint['currency_scroll_applied'] = true;
-            $this->battleRewardLedgerService->checkpointStep($step, $checkpoint);
+            [$step, $checkpoint] = $this->applyCurrencyScrollBonusPhase($step, $checkpoint, $character, $resolvedProfile, $earnedCurrencies);
+        }
+
+        if (! ($checkpoint['messages_stored'] ?? false)) {
+            [$step, $checkpoint] = $this->storeLostRewardMessagesPhase($step, $checkpoint, $character);
         }
 
         $this->gemProgressionBroadcastService->broadcastForProfile(
@@ -103,7 +102,41 @@ class GemWorldRewardService
     }
 
     /**
+     * Apply global and personal Gem progression XP and its ledger checkpoint atomically.
+     *
+     * @param CharacterBattleRewardRequestStep $step
+     * @param array $checkpoint
+     * @param Character $character
+     * @param ResolvedGemWorldProfile $resolvedProfile
+     * @param array $effectiveMonster
+     * @param int $qualifyingKills
+     * @return array
+     */
+    private function applyXpPhase(
+        CharacterBattleRewardRequestStep $step,
+        array $checkpoint,
+        Character $character,
+        ResolvedGemWorldProfile $resolvedProfile,
+        array $effectiveMonster,
+        int $qualifyingKills,
+    ): array {
+        return DB::transaction(function () use ($step, $checkpoint, $character, $resolvedProfile, $effectiveMonster, $qualifyingKills): array {
+            $checkpoint = array_merge($checkpoint, $this->applyGemXp($character, $resolvedProfile, $effectiveMonster, $qualifyingKills));
+            $checkpoint['xp_applied'] = true;
+            $step = $this->battleRewardLedgerService->checkpointStep($step, $checkpoint);
+
+            return [$step, $checkpoint];
+        });
+    }
+
+    /**
      * Apply global and personal Gem progression XP for this reward request.
+     *
+     * @param Character $character
+     * @param ResolvedGemWorldProfile $resolvedProfile
+     * @param array $effectiveMonster
+     * @param int $qualifyingKills
+     * @return array
      */
     private function applyGemXp(Character $character, ResolvedGemWorldProfile $resolvedProfile, array $effectiveMonster, int $qualifyingKills): array
     {
@@ -132,227 +165,94 @@ class GemWorldRewardService
     }
 
     /**
-     * Roll and apply the Gem Scroll drops, level-700+ enhanced equipment,
-     * and Item Scroll rarity opportunities for every qualifying kill.
+     * Roll and checkpoint the complete random reward plan for this reward request.
+     *
+     * @param CharacterBattleRewardRequestStep $step
+     * @param array $checkpoint
+     * @param Character $character
+     * @param ResolvedGemWorldProfile $resolvedProfile
+     * @param int $qualifyingKills
+     * @return array
      */
-    private function applyRewards(Character $character, ResolvedGemWorldProfile $resolvedProfile, int $personalLevel, int $qualifyingKills): array
+    private function planRewardsPhase(
+        CharacterBattleRewardRequestStep $step,
+        array $checkpoint,
+        Character $character,
+        ResolvedGemWorldProfile $resolvedProfile,
+        int $qualifyingKills,
+    ): array {
+        $scrollAggregate = $this->resolveScrollAggregate($character->fresh(), $resolvedProfile);
+        $plan = $this->gemWorldRewardPlanService->plan($checkpoint['personal_level'], $qualifyingKills, $scrollAggregate);
+
+        $checkpoint['reward_plan'] = $plan->toArray();
+        $step = $this->battleRewardLedgerService->checkpointStep($step, $checkpoint);
+
+        return [$step, $checkpoint];
+    }
+
+    /**
+     * Deliver every planned reward and mark the delivery phase complete.
+     *
+     * @param CharacterBattleRewardRequestStep $step
+     * @param array $checkpoint
+     * @param Character $character
+     * @return array
+     */
+    private function deliverRewardsPhase(CharacterBattleRewardRequestStep $step, array $checkpoint, Character $character): array
     {
-        $scrollsDelivered = 0;
-        $scrollsLostToFullBag = 0;
-        $enhancedItemsDelivered = 0;
-        $enhancedItemsLostToFullInventory = 0;
-        $itemOpportunityItemsDelivered = 0;
-        $itemOpportunityItemsLostToFullInventory = 0;
+        $plan = GemWorldRewardPlan::fromArray($checkpoint['reward_plan']);
 
-        $scrollAggregate = $this->resolveScrollAggregate($character, $resolvedProfile);
+        $this->gemWorldRewardDeliveryService->deliver($step->fresh(), $character->fresh(), $plan, $checkpoint);
 
-        for ($kill = 0; $kill < $qualifyingKills; $kill++) {
-            $character = $character->fresh();
+        $step = $step->fresh();
+        $checkpoint = $step->checkpoint_json ?? $checkpoint;
+        $checkpoint['rewards_delivered'] = true;
+        $step = $this->battleRewardLedgerService->checkpointStep($step, $checkpoint);
 
-            if ($this->gemProgressionEffectService->isScrollDropEligible($personalLevel)
-                && $this->chanceCalculator->passesPercentage(GemProgressionBands::GEM_SCROLL_DROP_CHANCE * 100)) {
-                if ($character->canAddToAlchemyBag()) {
-                    $this->deliverScroll($character, $resolvedProfile, $personalLevel);
-                    $scrollsDelivered++;
-                } else {
-                    $scrollsLostToFullBag++;
-                }
-            }
+        return [$step, $checkpoint];
+    }
 
-            if ($personalLevel >= GemProgressionBands::PERSONAL_ENHANCED_EQUIPMENT_LEVEL
-                && $this->chanceCalculator->passesPercentage(GemProgressionBands::PERSONAL_ENHANCED_EQUIPMENT_CHANCE * 100)) {
-                if ($character->fresh()->isInventoryFull()) {
-                    $enhancedItemsLostToFullInventory++;
-                } else {
-                    $this->deliverEnhancedItem($character);
-                    $enhancedItemsDelivered++;
-                }
-            }
+    /**
+     * Apply the active Currency Scroll bonus on top of the completed `CURRENCY_REWARDS` step's ledger-recovered currency amounts.
+     *
+     * @param CharacterBattleRewardRequestStep $step
+     * @param array $checkpoint
+     * @param Character $character
+     * @param ResolvedGemWorldProfile $resolvedProfile
+     * @param array $earnedCurrencies
+     * @return array
+     */
+    private function applyCurrencyScrollBonusPhase(
+        CharacterBattleRewardRequestStep $step,
+        array $checkpoint,
+        Character $character,
+        ResolvedGemWorldProfile $resolvedProfile,
+        array $earnedCurrencies,
+    ): array {
+        $completedCurrencyStep = $this->battleRewardLedgerService->completedStepResult($step->request, BattleRewardStepName::CURRENCY_REWARDS);
+        $currencies = $completedCurrencyStep['currencies'] ?? $earnedCurrencies;
 
-            $itemOpportunities = $this->itemScrollOpportunityCount($scrollAggregate->itemBonusTotal());
-
-            for ($opportunity = 0; $opportunity < $itemOpportunities; $opportunity++) {
-                $character = $character->fresh();
-                $rarityChance = ($this->gemProgressionEffectService->personalUniqueMythicBonus($personalLevel) + $scrollAggregate->itemBonusTotal()) * 100;
-
-                if (! $this->chanceCalculator->passesPercentage($rarityChance)) {
-                    continue;
-                }
-
-                if ($character->isInventoryFull()) {
-                    $itemOpportunityItemsLostToFullInventory++;
-
-                    continue;
-                }
-
-                $this->deliverRarityItem($character, $scrollAggregate);
-                $itemOpportunityItemsDelivered++;
-            }
-        }
-
-        return [
-            'scrolls_delivered' => $scrollsDelivered,
-            'scrolls_lost_to_full_bag' => $scrollsLostToFullBag,
-            'enhanced_items_delivered' => $enhancedItemsDelivered,
-            'enhanced_items_lost_to_full_inventory' => $enhancedItemsLostToFullInventory,
-            'item_opportunity_items_delivered' => $itemOpportunityItemsDelivered,
-            'item_opportunity_items_lost_to_full_inventory' => $itemOpportunityItemsLostToFullInventory,
+        $scrollAggregate = $this->resolveScrollAggregate($character->fresh(), $resolvedProfile);
+        $bonusAmounts = [
+            'gold' => $this->currencyScrollBonusAmount($currencies['gold'] ?? 0, $scrollAggregate->goldBonusTotal()),
+            'gold_dust' => $this->currencyScrollBonusAmount($currencies['gold_dust'] ?? 0, $scrollAggregate->goldDustBonusTotal()),
+            'shards' => $this->currencyScrollBonusAmount($currencies['shards'] ?? 0, $scrollAggregate->shardsBonusTotal()),
+            'copper_coins' => $this->currencyScrollBonusAmount($currencies['copper_coins'] ?? 0, $scrollAggregate->copperCoinBonusTotal()),
         ];
-    }
 
-    /**
-     * Generate one Gem Scroll Item and deliver it to the Character's Alchemy Bag.
-     */
-    private function deliverScroll(Character $character, ResolvedGemWorldProfile $resolvedProfile, int $personalLevel): void
-    {
-        $scrollItem = $this->gemScrollGenerator->generateForPersonalLevel($personalLevel);
+        $checkpoint['currency_scroll_result'] = $this->characterCurrencyRewardService->applyGemScrollBonus($character->fresh(), $bonusAmounts);
+        $checkpoint['currency_scroll_applied'] = true;
+        $step = $this->battleRewardLedgerService->checkpointStep($step, $checkpoint);
 
-        $character->alchemyBag->slots()->create([
-            'alchemy_bag_id' => $character->alchemyBag->id,
-            'character_id' => $character->id,
-            'item_id' => $scrollItem->id,
-            'amount' => 1,
-        ]);
-
-        event(new UpdateCharacterInventoryCountEvent($character));
-    }
-
-    /**
-     * Build one random Unique/Mythic/Cosmic enhanced equipment Item, apply
-     * sockets/pre-gemmed Tier Four Gems, and deliver it to the Character's inventory.
-     */
-    private function deliverEnhancedItem(Character $character): void
-    {
-        $item = $this->buildRandomRarityItem($character);
-
-        if (is_null($item)) {
-            return;
-        }
-
-        if ($this->itemSocketEligibility->isEligible($item->type)) {
-            $socketCount = $this->randomNumberGenerator->numberBetween(1, $this->itemSocketEligibility->maxSocketCount());
-            $item->update(['socket_count' => $socketCount]);
-            $item = $item->refresh();
-
-            $gemCount = $this->randomNumberGenerator->numberBetween(1, $socketCount);
-            $this->attachTierFourGems($item, $gemCount);
-        }
-
-        $character->inventory->slots()->create([
-            'inventory_id' => $character->inventory->id,
-            'item_id' => $item->id,
-        ]);
-
-        event(new UpdateCharacterInventoryCountEvent($character));
-    }
-
-    /**
-     * Build one random Unique/Mythic/Cosmic Item Scroll rarity opportunity
-     * Item, apply the active Item Scroll socket/pre-gemmed chances, and
-     * deliver it to the Character's inventory.
-     */
-    private function deliverRarityItem(Character $character, GemScrollAggregate $scrollAggregate): void
-    {
-        $item = $this->buildRandomRarityItem($character);
-
-        if (is_null($item)) {
-            return;
-        }
-
-        if ($this->itemSocketEligibility->isEligible($item->type)
-            && $this->chanceCalculator->passesPercentage($scrollAggregate->itemSocketChance() * 100)) {
-            $socketCount = $this->randomNumberGenerator->numberBetween(1, $this->itemSocketEligibility->maxSocketCount());
-            $item->update(['socket_count' => $socketCount]);
-            $item = $item->refresh();
-
-            if ($this->chanceCalculator->passesPercentage($scrollAggregate->itemPreGemChance() * 100) && $item->socket_count > 0) {
-                $gemCount = $this->randomNumberGenerator->numberBetween(1, $item->socket_count);
-                $this->attachTierFourGems($item, $gemCount);
-            }
-        }
-
-        $character->inventory->slots()->create([
-            'inventory_id' => $character->inventory->id,
-            'item_id' => $item->id,
-        ]);
-
-        event(new UpdateCharacterInventoryCountEvent($character));
-    }
-
-    /**
-     * Build one random Unique/Mythic/Cosmic Item with equal probability using
-     * the existing Item builders.
-     */
-    private function buildRandomRarityItem(Character $character): ?Item
-    {
-        return match ($this->randomNumberGenerator->numberBetween(1, 3)) {
-            1 => $this->buildUniqueItem->fetchUniqueItem($character),
-            2 => $this->buildMythicItem->fetchMythicItem($character),
-            default => $this->buildCosmicItem->fetchCosmicItem($character),
-        };
-    }
-
-    /**
-     * Generate and attach the given number of Tier Four Character Gems to the Item's sockets.
-     */
-    private function attachTierFourGems(Item $item, int $gemCount): void
-    {
-        for ($index = 0; $index < $gemCount; $index++) {
-            $gem = $this->gemBuilder->buildGem(GemTierValue::TIER_FOUR);
-
-            $item->sockets()->create([
-                'item_id' => $item->id,
-                'gem_id' => $gem->id,
-            ]);
-        }
-
-        $item->update(['has_gems_socketed' => true]);
-    }
-
-    /**
-     * Resolve the number of additional Item Scroll rarity opportunities
-     * granted by the combined active Item Scroll primary bonus, capped at five.
-     */
-    private function itemScrollOpportunityCount(float $itemBonusTotal): int
-    {
-        if ($itemBonusTotal < 1.0) {
-            return 0;
-        }
-
-        return min(GemProgressionBands::ITEM_SCROLL_MAX_BONUS_OPPORTUNITIES, intval(floor($itemBonusTotal)));
-    }
-
-    /**
-     * Apply the active Currency Scroll bonus on top of the currency amounts
-     * already awarded by the CURRENCY_REWARDS step this request, respecting
-     * the existing Character currency caps and without re-paying the base reward.
-     */
-    private function applyCurrencyScrollBonus(Character $character, ResolvedGemWorldProfile $resolvedProfile, array $earnedCurrencies): array
-    {
-        $scrollAggregate = $this->resolveScrollAggregate($character, $resolvedProfile);
-
-        $goldBonus = $this->currencyScrollBonusAmount($earnedCurrencies['gold'] ?? 0, $scrollAggregate->goldBonusTotal());
-        $goldDustBonus = $this->currencyScrollBonusAmount($earnedCurrencies['gold_dust'] ?? 0, $scrollAggregate->goldDustBonusTotal());
-        $shardsBonus = $this->currencyScrollBonusAmount($earnedCurrencies['shards'] ?? 0, $scrollAggregate->shardsBonusTotal());
-        $copperCoinsBonus = $this->currencyScrollBonusAmount($earnedCurrencies['copper_coins'] ?? 0, $scrollAggregate->copperCoinBonusTotal());
-
-        $character->update([
-            'gold' => min($character->gold + $goldBonus, CurrencyLimit::MAX_GOLD),
-            'gold_dust' => min($character->gold_dust + $goldDustBonus, CurrencyLimit::MAX_GOLD_DUST),
-            'shards' => min($character->shards + $shardsBonus, CurrencyLimit::MAX_SHARDS),
-            'copper_coins' => min($character->copper_coins + $copperCoinsBonus, CurrencyLimit::MAX_COPPER),
-        ]);
-
-        return [
-            'gold' => $goldBonus,
-            'gold_dust' => $goldDustBonus,
-            'shards' => $shardsBonus,
-            'copper_coins' => $copperCoinsBonus,
-        ];
+        return [$step, $checkpoint];
     }
 
     /**
      * Resolve the extra currency amount granted by an active Currency Scroll bonus.
+     *
+     * @param int $baseAmount
+     * @param float $bonusRatio
+     * @return int
      */
     private function currencyScrollBonusAmount(int $baseAmount, float $bonusRatio): int
     {
@@ -364,7 +264,70 @@ class GemWorldRewardService
     }
 
     /**
+     * Store a one-time warning message for every reward lost to a full Alchemy Bag/inventory or a currency cap this request.
+     *
+     * @param CharacterBattleRewardRequestStep $step
+     * @param array $checkpoint
+     * @param Character $character
+     * @return array
+     */
+    private function storeLostRewardMessagesPhase(CharacterBattleRewardRequestStep $step, array $checkpoint, Character $character): array
+    {
+        foreach ($this->buildLostRewardMessages($checkpoint) as $message) {
+            $this->battleRewardMessageOutboxService->storeMessage(
+                $step->character_battle_reward_request_id,
+                $character->id,
+                $character->user_id,
+                $step->step_name->value,
+                $message,
+            );
+        }
+
+        $checkpoint['messages_stored'] = true;
+        $step = $this->battleRewardLedgerService->checkpointStep($step, $checkpoint);
+
+        return [$step, $checkpoint];
+    }
+
+    /**
+     * Build the factual lost-reward warning messages for this request's checkpointed results.
+     *
+     * @param array $checkpoint
+     * @return array
+     */
+    private function buildLostRewardMessages(array $checkpoint): array
+    {
+        $messages = [];
+        $tally = $checkpoint['rewards_tally'] ?? [];
+        $currencyResult = $checkpoint['currency_scroll_result'] ?? [];
+
+        if (($tally['scrolls_lost_to_full_bag'] ?? 0) > 0) {
+            $messages[] = 'Your Alchemy Bag was full: '.$tally['scrolls_lost_to_full_bag'].' Gem Scroll reward(s) were lost.';
+        }
+
+        $lostItems = ($tally['enhanced_items_lost_to_full_inventory'] ?? 0) + ($tally['item_opportunity_items_lost_to_full_inventory'] ?? 0);
+
+        if ($lostItems > 0) {
+            $messages[] = 'Your inventory was full: '.$lostItems.' Gem World item reward(s) were lost.';
+        }
+
+        foreach (['gold' => 'Gold', 'gold_dust' => 'Gold Dust', 'shards' => 'Shards', 'copper_coins' => 'Copper Coins'] as $currency => $label) {
+            $wasted = $currencyResult[$currency]['wasted'] ?? 0;
+
+            if ($wasted > 0) {
+                $messages[] = 'You reached the '.$label.' cap: '.$wasted.' '.$label.' from your Gem Scroll bonus was lost.';
+            }
+        }
+
+        return $messages;
+    }
+
+    /**
      * Resolve the active Gem Scroll aggregate for the Character's current exact profile.
+     *
+     * @param Character $character
+     * @param ResolvedGemWorldProfile $resolvedProfile
+     * @return GemScrollAggregate
      */
     private function resolveScrollAggregate(Character $character, ResolvedGemWorldProfile $resolvedProfile): GemScrollAggregate
     {

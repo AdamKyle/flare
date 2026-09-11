@@ -2,6 +2,7 @@ import React, { ReactNode, useState } from 'react';
 
 import GemScrollPicker from './gem-scroll-picker';
 import ActiveGemScrollCardProps from './types/active-gem-scroll-card-props';
+import GemScrollFamily from '../types/gem-scroll-family';
 
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import LoadingButton from 'ui/buttons/loading-button';
@@ -10,7 +11,7 @@ import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
 import TimerBar from 'ui/timer-bar/timer-bar';
 
-const scrollTypeLabel = (gemScrollType: string): string => {
+const scrollTypeLabel = (gemScrollType: GemScrollFamily): string => {
   if (gemScrollType === 'xp') {
     return 'XP Scroll';
   }
@@ -51,7 +52,7 @@ const ActiveGemScrollCard = ({
     return (
       <GemScrollPicker
         character_id={characterId}
-        gem_scroll_type={scroll.gem_scroll_type as 'xp' | 'currency' | 'item'}
+        gem_scroll_type={scroll.gem_scroll_type}
         gem_scroll_currency_type={scroll.gem_scroll_currency_type}
         disabled={acting}
         on_select={handleFillSelect}
@@ -60,9 +61,20 @@ const ActiveGemScrollCard = ({
   };
 
   return (
-    <article className="border-glacier-800 dark:border-glacier-500 bg-glacier-100 dark:bg-glacier-100 text-glacier-900 dark:text-glacier-900 w-full rounded-lg border-2 p-4">
+    <article className="border-glacier-200 bg-glacier-50 text-glacier-900 dark:border-glacier-700 dark:bg-glacier-900 dark:text-glacier-100 w-full rounded-lg border-2 p-4">
       <div className="flex flex-col gap-2">
-        <span className="text-base font-semibold">{scroll.item_name}</span>
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-base font-semibold">{scroll.item_name}</span>
+          {scroll.is_current_profile ? (
+            <span className="bg-de-york-100 text-de-york-800 dark:bg-de-york-900 dark:text-de-york-100 rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap">
+              Currently Applied
+            </span>
+          ) : (
+            <span className="bg-glacier-100 text-glacier-800 dark:bg-glacier-800 dark:text-glacier-200 rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap">
+              Not Current
+            </span>
+          )}
+        </div>
 
         <Dl>
           <Dt>Type</Dt>
@@ -73,6 +85,10 @@ const ActiveGemScrollCard = ({
               <Dd>{scroll.gem_scroll_currency_type}</Dd>
             </>
           )}
+          <Dt>Gem World</Dt>
+          <Dd>
+            {scroll.generated_game_map_name ?? scroll.profile_name ?? '—'}
+          </Dd>
         </Dl>
 
         <TimerBar

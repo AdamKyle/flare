@@ -9,6 +9,7 @@ use App\Game\Gems\Values\AreaGemMonsterEffect;
 use App\Game\Gems\Values\AreaGemRewardEffect;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\Setup\GemProgression\GemWorldRewardTestFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterGameLocationGemProgression;
 use Tests\Traits\CreateCharacterGameMapGemProgression;
@@ -79,7 +80,7 @@ class CharacterAreaGemEffectServiceTest extends TestCase
         $this->assertEqualsWithDelta(0.15, $result->rewardEffect(AreaGemRewardEffect::GOLD_GAIN), 0.0000001);
     }
 
-    public function test_location_over_map_monster_precedence_is_preserved_with_progression_overlay(): void
+    public function test_normal_map_location_precedence_does_not_receive_personal_negative_progression(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $gameMap = $character->map->gameMap;
@@ -113,10 +114,10 @@ class CharacterAreaGemEffectServiceTest extends TestCase
 
         $result = $this->characterAreaGemEffectService->resolveForCharacter($character->refresh());
 
-        $this->assertEqualsWithDelta(0.23, $result->monsterEffect(AreaGemMonsterEffect::ENEMY_STRENGTH_INCREASE), 0.0000001);
+        $this->assertEqualsWithDelta(0.20, $result->monsterEffect(AreaGemMonsterEffect::ENEMY_STRENGTH_INCREASE), 0.0000001);
     }
 
-    public function test_map_owned_character_power_reduction_receives_personal_negative_progression(): void
+    public function test_map_owned_character_power_reduction_on_a_normal_map_does_not_receive_personal_negative_progression(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $gameMap = $character->map->gameMap;
@@ -134,7 +135,45 @@ class CharacterAreaGemEffectServiceTest extends TestCase
 
         $result = $this->characterAreaGemEffectService->resolveForCharacter($character->refresh());
 
-        $this->assertEqualsWithDelta(0.13, $result->characterPowerReduction(), 0.0000001);
+        $this->assertEqualsWithDelta(0.10, $result->characterPowerReduction(), 0.0000001);
+    }
+
+    public function test_generated_map_gem_world_monster_effect_receives_personal_negative_progression(): void
+    {
+        $graph = (new GemWorldRewardTestFactory)->buildGeneratedMapGemWorldCharacter();
+
+        $graph->mapProfile->rolledGem()->update(['enemy_strength_increase' => 0.10]);
+
+        $this->createCharacterGameMapGemProgression([
+            'character_id' => $graph->character->id,
+            'game_map_gem_paramter_id' => $graph->mapProfile->id,
+            'level' => 200,
+            'xp' => 0,
+        ]);
+
+        $result = $this->characterAreaGemEffectService->resolveForCharacter($graph->character->refresh());
+
+        // Rolled 0.10 x the established 2.0 Map Gem World monster multiplier = 0.20, plus the personal negative bonus (0.03 at level 200).
+        $this->assertEqualsWithDelta(0.23, $result->monsterEffect(AreaGemMonsterEffect::ENEMY_STRENGTH_INCREASE), 0.0000001);
+    }
+
+    public function test_generated_location_gem_world_monster_effect_receives_personal_negative_progression(): void
+    {
+        $graph = (new GemWorldRewardTestFactory)->buildGeneratedLocationGemWorldCharacter();
+
+        $graph->locationProfile->rolledGem()->update(['enemy_strength_increase' => 0.20]);
+
+        $this->createCharacterGameLocationGemProgression([
+            'character_id' => $graph->character->id,
+            'game_location_gem_paramter_id' => $graph->locationProfile->id,
+            'level' => 200,
+            'xp' => 0,
+        ]);
+
+        $result = $this->characterAreaGemEffectService->resolveForCharacter($graph->character->refresh());
+
+        // Rolled 0.20 x the established 2.0 Location Gem World monster multiplier = 0.40, plus the personal negative bonus (0.03 at level 200).
+        $this->assertEqualsWithDelta(0.43, $result->monsterEffect(AreaGemMonsterEffect::ENEMY_STRENGTH_INCREASE), 0.0000001);
     }
 
     public function test_location_source_does_not_gain_character_power_reduction(): void

@@ -11,17 +11,27 @@ class BuildMythicItem
 {
     private RandomAffixGenerator $randomAffixGenerator;
 
+    /**
+     * @param RandomAffixGenerator $randomAffixGenerator
+     */
     public function __construct(RandomAffixGenerator $randomAffixGenerator)
     {
         $this->randomAffixGenerator = $randomAffixGenerator;
     }
 
     /**
-     * Build Mythic Item for winner.
+     * Build Mythic Item for winner. When given, `$onlyTypes` narrows the
+     * candidate catalog Item to exactly those types (e.g. socket-eligible
+     * equipment only) instead of every non-excluded type.
+     *
+     *
+     * @param Character $character
+     * @param array $onlyTypes
+     * @return Item
      *
      * @throws Exception
      */
-    public function fetchMythicItem(Character $character): Item
+    public function fetchMythicItem(Character $character, array $onlyTypes = []): Item
     {
         $prefix = $this->randomAffixGenerator->setCharacter($character)
             ->setPaidAmount(RandomAffixTier::MYTHIC->value)
@@ -35,6 +45,7 @@ class BuildMythicItem
             ->doesntHave('itemSuffix')
             ->doesntHave('itemPrefix')
             ->whereNotIn('type', ['quest', 'alchemy', 'trinket', 'artifact'])
+            ->when(! empty($onlyTypes), fn ($query) => $query->whereIn('type', $onlyTypes))
             ->whereNull('specialty_type')
             ->first();
 

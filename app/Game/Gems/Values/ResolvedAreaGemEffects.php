@@ -2,27 +2,23 @@
 
 namespace App\Game\Gems\Values;
 
-/**
- * Immutable resolved Map/Location Gem effects for a single Game Map/Location
- * gameplay context (normal Map, normal Location, Map Gem World, or Location
- * Gem World).
- */
 class ResolvedAreaGemEffects
 {
     /**
-     * @param  ResolvedAreaGemMonsterEffects  $monsterEffects  Combined Monster combat effects and resolved atonement.
-     * @param  ResolvedAreaGemRewardEffects  $rewardEffects  Combined player/reward effects.
-     * @param  float  $characterPowerReduction  Combined Character power reduction contributed by Map Gems only.
-     * @param  array<int, float>  $craftingSkillBonuses  Combined crafting bonus keyed by GameSkill id.
-     * @param  ResolvedAreaGemRarityEffects  $rarityEffects  Resolved Unique/Mythic/Cosmic rarity modifiers.
-     * @param  array<int, ResolvedAreaGemSource>  $sources  Source metadata for each contributing Gem.
-     * @param  AreaGemContext|null  $contextType  The resolved Area Gem gameplay context.
-     * @param  string|null  $contextLabel  Human readable label for the resolved context.
-     * @param  int|null  $sourceGameMapId  The Game Map id whose persisted Monster population is used for this context.
-     * @param  int|null  $currentGameMapId  The actual/effective Game Map id the Character/cache entry belongs to.
-     * @param  string|null  $currentGameMapName  The actual/effective Game Map name.
-     * @param  int|null  $locationId  The Location id, when the context is Location-based.
-     * @param  string|null  $locationName  The Location name, when the context is Location-based.
+     * @param ResolvedAreaGemMonsterEffects $monsterEffects
+     * @param ResolvedAreaGemRewardEffects $rewardEffects
+     * @param float $characterPowerReduction
+     * @param array $craftingSkillBonuses
+     * @param ResolvedAreaGemRarityEffects $rarityEffects
+     * @param array $sources
+     * @param array $progressionLevelsBySource
+     * @param ?AreaGemContext $contextType
+     * @param ?string $contextLabel
+     * @param ?int $sourceGameMapId
+     * @param ?int $currentGameMapId
+     * @param ?string $currentGameMapName
+     * @param ?int $locationId
+     * @param ?string $locationName
      */
     public function __construct(
         private readonly ResolvedAreaGemMonsterEffects $monsterEffects,
@@ -31,6 +27,7 @@ class ResolvedAreaGemEffects
         private readonly array $craftingSkillBonuses = [],
         private readonly ResolvedAreaGemRarityEffects $rarityEffects = new ResolvedAreaGemRarityEffects(0.0, 0.0, 0.0),
         private readonly array $sources = [],
+        private readonly array $progressionLevelsBySource = [],
         private readonly ?AreaGemContext $contextType = null,
         private readonly ?string $contextLabel = null,
         private readonly ?int $sourceGameMapId = null,
@@ -42,6 +39,8 @@ class ResolvedAreaGemEffects
 
     /**
      * Build a no-effect resolved result for Gem-neutral contexts and Monsters.
+     *
+     * @return self
      */
     public static function none(): self
     {
@@ -50,6 +49,9 @@ class ResolvedAreaGemEffects
 
     /**
      * The resolved crafting bonus contributed for the given GameSkill id.
+     *
+     * @param int $gameSkillId
+     * @return float
      */
     public function craftingSkillBonusFor(int $gameSkillId): float
     {
@@ -59,7 +61,7 @@ class ResolvedAreaGemEffects
     /**
      * The already-resolved crafting bonus keyed by GameSkill id.
      *
-     * @return array<int, float>
+     * @return array
      */
     public function craftingSkillBonuses(): array
     {
@@ -68,6 +70,8 @@ class ResolvedAreaGemEffects
 
     /**
      * The resolved Unique/Mythic/Cosmic rarity modifiers for this context.
+     *
+     * @return ResolvedAreaGemRarityEffects
      */
     public function rarityEffects(): ResolvedAreaGemRarityEffects
     {
@@ -76,6 +80,9 @@ class ResolvedAreaGemEffects
 
     /**
      * Resolve the value for the given closed Monster combat effect for this context.
+     *
+     * @param AreaGemMonsterEffect $effect
+     * @return float
      */
     public function monsterEffect(AreaGemMonsterEffect $effect): float
     {
@@ -84,6 +91,9 @@ class ResolvedAreaGemEffects
 
     /**
      * Resolve the value for the given closed player/reward effect for this context.
+     *
+     * @param AreaGemRewardEffect $effect
+     * @return float
      */
     public function rewardEffect(AreaGemRewardEffect $effect): float
     {
@@ -92,6 +102,8 @@ class ResolvedAreaGemEffects
 
     /**
      * The resolved Monster atonement for this context.
+     *
+     * @return ResolvedAreaGemAtonement
      */
     public function monsterAtonement(): ResolvedAreaGemAtonement
     {
@@ -100,6 +112,8 @@ class ResolvedAreaGemEffects
 
     /**
      * The typed resolved Monster combat effects and atonement for this context.
+     *
+     * @return ResolvedAreaGemMonsterEffects
      */
     public function monsterEffects(): ResolvedAreaGemMonsterEffects
     {
@@ -108,6 +122,8 @@ class ResolvedAreaGemEffects
 
     /**
      * The typed resolved player/reward effects for this context.
+     *
+     * @return ResolvedAreaGemRewardEffects
      */
     public function rewardEffects(): ResolvedAreaGemRewardEffects
     {
@@ -116,6 +132,8 @@ class ResolvedAreaGemEffects
 
     /**
      * The combined Character power reduction for this context.
+     *
+     * @return float
      */
     public function characterPowerReduction(): float
     {
@@ -125,7 +143,7 @@ class ResolvedAreaGemEffects
     /**
      * The source metadata for each contributing Gem.
      *
-     * @return array<int, ResolvedAreaGemSource>
+     * @return array
      */
     public function sources(): array
     {
@@ -133,7 +151,42 @@ class ResolvedAreaGemEffects
     }
 
     /**
+     * Resolve the already-resolved personal progression level for the given source.
+     *
+     * @param ResolvedAreaGemSource $source
+     * @return int
+     */
+    public function personalLevelForSource(ResolvedAreaGemSource $source): int
+    {
+        return $this->progressionLevelsBySource[$this->sourceKey($source)]['personal'] ?? 1;
+    }
+
+    /**
+     * Resolve the already-resolved global progression level for the given source, or null when that source cannot affect a Monster-transformed reward field.
+     *
+     * @param ResolvedAreaGemSource $source
+     * @return ?int
+     */
+    public function globalLevelForSource(ResolvedAreaGemSource $source): ?int
+    {
+        return $this->progressionLevelsBySource[$this->sourceKey($source)]['global'] ?? null;
+    }
+
+    /**
+     * Build the progression-levels-by-source lookup key for the given source.
+     *
+     * @param ResolvedAreaGemSource $source
+     * @return string
+     */
+    private function sourceKey(ResolvedAreaGemSource $source): string
+    {
+        return ($source->type() === GemSourceType::MAP_GEM ? 'map-' : 'location-').$source->profileId();
+    }
+
+    /**
      * Determine whether this context contributes any Monster combat effects.
+     *
+     * @return bool
      */
     public function hasMonsterEffects(): bool
     {
@@ -142,6 +195,8 @@ class ResolvedAreaGemEffects
 
     /**
      * Determine whether this context contributes any player/reward effects.
+     *
+     * @return bool
      */
     public function hasRewardEffects(): bool
     {
@@ -162,6 +217,8 @@ class ResolvedAreaGemEffects
 
     /**
      * Determine whether this context contributes any Gem effect at all.
+     *
+     * @return bool
      */
     public function hasAnyEffects(): bool
     {
@@ -170,6 +227,8 @@ class ResolvedAreaGemEffects
 
     /**
      * The resolved context type for cache/detail metadata.
+     *
+     * @return ?AreaGemContext
      */
     public function contextType(): ?AreaGemContext
     {
@@ -178,6 +237,8 @@ class ResolvedAreaGemEffects
 
     /**
      * The resolved human readable context label for cache/detail metadata.
+     *
+     * @return ?string
      */
     public function contextLabel(): ?string
     {
@@ -186,6 +247,8 @@ class ResolvedAreaGemEffects
 
     /**
      * The Game Map id whose persisted Monster population is used for this context.
+     *
+     * @return ?int
      */
     public function sourceGameMapId(): ?int
     {
@@ -194,6 +257,8 @@ class ResolvedAreaGemEffects
 
     /**
      * The actual/effective Game Map id for this context.
+     *
+     * @return ?int
      */
     public function currentGameMapId(): ?int
     {
@@ -202,6 +267,8 @@ class ResolvedAreaGemEffects
 
     /**
      * The actual/effective Game Map name for this context.
+     *
+     * @return ?string
      */
     public function currentGameMapName(): ?string
     {
@@ -210,6 +277,8 @@ class ResolvedAreaGemEffects
 
     /**
      * The Location id for this context, when applicable.
+     *
+     * @return ?int
      */
     public function locationId(): ?int
     {
@@ -218,6 +287,8 @@ class ResolvedAreaGemEffects
 
     /**
      * The Location name for this context, when applicable.
+     *
+     * @return ?string
      */
     public function locationName(): ?string
     {

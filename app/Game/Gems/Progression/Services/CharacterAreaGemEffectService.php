@@ -10,6 +10,7 @@ use App\Flare\Models\GameMapGemParamter;
 use App\Flare\Models\Gem;
 use App\Game\Gems\Progression\Values\SourceProgressionContext;
 use App\Game\Gems\Services\AreaGemEffectService;
+use App\Game\Gems\Values\AreaGemContext;
 use App\Game\Gems\Values\AreaGemMonsterEffect;
 use App\Game\Gems\Values\AreaGemRewardEffect;
 use App\Game\Gems\Values\GemSourceType;
@@ -20,14 +21,12 @@ use App\Game\Gems\Values\ResolvedAreaGemRarityEffects;
 use App\Game\Gems\Values\ResolvedAreaGemRewardEffects;
 use App\Game\Gems\Values\ResolvedAreaGemSource;
 
-/**
- * Character-facing resolved Gem effects. Wraps the existing, Character-neutral
- * `AreaGemEffectService` result with the additive global/personal Gem
- * progression overlays owned by this module, while preserving every existing
- * Map/Location source precedence rule the base resolver already enforces.
- */
 class CharacterAreaGemEffectService
 {
+    /**
+     * @param AreaGemEffectService $areaGemEffectService
+     * @param GemProgressionEffectService $gemProgressionEffectService
+     */
     public function __construct(
         private readonly AreaGemEffectService $areaGemEffectService,
         private readonly GemProgressionEffectService $gemProgressionEffectService,
@@ -36,6 +35,9 @@ class CharacterAreaGemEffectService
     /**
      * Resolve the Character-aware Gem effects for the Character's current
      * Map/Location context, adjusted by global/personal Gem progression.
+     *
+     * @param Character $character
+     * @return ResolvedAreaGemEffects
      */
     public function resolveForCharacter(Character $character): ResolvedAreaGemEffects
     {
@@ -51,13 +53,20 @@ class CharacterAreaGemEffectService
             return $baseResolved;
         }
 
+        $inGeneratedGemWorld = in_array($baseResolved->contextType(), [AreaGemContext::MAP_GEM_WORLD, AreaGemContext::LOCATION_GEM_WORLD], true);
+
         return new ResolvedAreaGemEffects(
-            monsterEffects: $this->overlayMonsterEffects($baseResolved->monsterEffects(), $sourceContexts),
+            monsterEffects: $inGeneratedGemWorld
+                ? $this->overlayMonsterEffects($baseResolved->monsterEffects(), $sourceContexts)
+                : $baseResolved->monsterEffects(),
             rewardEffects: $this->overlayRewardEffects($baseResolved->rewardEffects(), $sourceContexts),
-            characterPowerReduction: $this->overlayCharacterPowerReduction($baseResolved->characterPowerReduction(), $sourceContexts),
+            characterPowerReduction: $inGeneratedGemWorld
+                ? $this->overlayCharacterPowerReduction($baseResolved->characterPowerReduction(), $sourceContexts)
+                : $baseResolved->characterPowerReduction(),
             craftingSkillBonuses: $baseResolved->craftingSkillBonuses(),
             rarityEffects: $this->overlayRarityEffects($baseResolved->rarityEffects(), $sourceContexts),
             sources: $baseResolved->sources(),
+            progressionLevelsBySource: $this->progressionLevelsBySource($sourceContexts),
             contextType: $baseResolved->contextType(),
             contextLabel: $baseResolved->contextLabel(),
             sourceGameMapId: $baseResolved->sourceGameMapId(),
@@ -69,8 +78,54 @@ class CharacterAreaGemEffectService
     }
 
     /**
+     * Build the compact global/personal-level-by-source map consumed by Character-derived Monster cache key construction.
+     *
+     * @param array $sourceContexts
+     * @return array
+     */
+    private function progressionLevelsBySource(array $sourceContexts): array
+    {
+        $levels = [];
+
+        foreach ($sourceContexts as $context) {
+            $key = ($context->source->type() === GemSourceType::MAP_GEM ? 'map-' : 'location-').$context->source->profileId();
+            $levels[$key] = [
+                'global' => $this->contributesMonsterTransformedReward($context) ? $context->globalLevel : null,
+                'personal' => $context->personalLevel,
+            ];
+        }
+
+        return $levels;
+    }
+
+    /**
+     * Determine whether a source's rolled Gem has a non-zero value for a Monster-transformed reward field.
+     *
+     * @param SourceProgressionContext $context
+     * @return bool
+     */
+    private function contributesMonsterTransformedReward(SourceProgressionContext $context): bool
+    {
+        if ($context->source->rewardMultiplier() <= 0.0) {
+            return false;
+        }
+
+        foreach (AreaGemRewardEffect::monsterTransformedCases() as $rewardEffect) {
+            if ($context->rewardFieldValue($rewardEffect) > 0.0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Resolve the rolled Gem and global/personal progression level for every
      * contributing resolved source.
+     *
+     * @param Character $character
+     * @param array $sources
+     * @return array
      */
     private function resolveSourceContexts(Character $character, array $sources): array
     {
@@ -90,6 +145,10 @@ class CharacterAreaGemEffectService
     /**
      * Resolve the progression context for one resolved source, or null when
      * the rolled Gem or profile can no longer be found.
+     *
+     * @param Character $character
+     * @param ResolvedAreaGemSource $source
+     * @return ?SourceProgressionContext
      */
     private function resolveSourceContext(Character $character, ResolvedAreaGemSource $source): ?SourceProgressionContext
     {
@@ -108,6 +167,11 @@ class CharacterAreaGemEffectService
 
     /**
      * Resolve the progression context for a Map Gem source.
+     *
+     * @param Character $character
+     * @param ResolvedAreaGemSource $source
+     * @param Gem $gem
+     * @return ?SourceProgressionContext
      */
     private function resolveMapSourceContext(Character $character, ResolvedAreaGemSource $source, Gem $gem): ?SourceProgressionContext
     {
@@ -127,6 +191,11 @@ class CharacterAreaGemEffectService
 
     /**
      * Resolve the progression context for a Location Gem source.
+     *
+     * @param Character $character
+     * @param ResolvedAreaGemSource $source
+     * @param Gem $gem
+     * @return ?SourceProgressionContext
      */
     private function resolveLocationSourceContext(Character $character, ResolvedAreaGemSource $source, Gem $gem): ?SourceProgressionContext
     {
@@ -147,6 +216,10 @@ class CharacterAreaGemEffectService
     /**
      * Overlay global/personal progression on every additive reward effect
      * field, summing each contributing source's own progression bonus.
+     *
+     * @param ResolvedAreaGemRewardEffects $base
+     * @param array $sourceContexts
+     * @return ResolvedAreaGemRewardEffects
      */
     private function overlayRewardEffects(ResolvedAreaGemRewardEffects $base, array $sourceContexts): ResolvedAreaGemRewardEffects
     {
@@ -179,6 +252,10 @@ class CharacterAreaGemEffectService
     /**
      * Overlay global/personal progression on the Unique/Mythic/Cosmic rolled
      * rarity values, summing each contributing source's own progression bonus.
+     *
+     * @param ResolvedAreaGemRarityEffects $base
+     * @param array $sourceContexts
+     * @return ResolvedAreaGemRarityEffects
      */
     private function overlayRarityEffects(ResolvedAreaGemRarityEffects $base, array $sourceContexts): ResolvedAreaGemRarityEffects
     {
@@ -193,6 +270,11 @@ class CharacterAreaGemEffectService
      * Resolve the effective value of one additive positive Gem effect field
      * by summing every contributing source's global and personal progression
      * bonus on top of the already-combined base value.
+     *
+     * @param float $baseValue
+     * @param array $sourceContexts
+     * @param callable $rolledFieldResolver
+     * @return float
      */
     private function overlayPositiveField(float $baseValue, array $sourceContexts, callable $rolledFieldResolver): float
     {
@@ -219,6 +301,10 @@ class CharacterAreaGemEffectService
      * Overlay the personal negative progression bonus on every Monster
      * combat effect field, using only the single source that actually wins
      * Monster-effect precedence (Location over Map).
+     *
+     * @param ResolvedAreaGemMonsterEffects $base
+     * @param array $sourceContexts
+     * @return ResolvedAreaGemMonsterEffects
      */
     private function overlayMonsterEffects(ResolvedAreaGemMonsterEffects $base, array $sourceContexts): ResolvedAreaGemMonsterEffects
     {
@@ -249,6 +335,10 @@ class CharacterAreaGemEffectService
     /**
      * Overlay the personal negative progression bonus on the resolved
      * Monster atonement amount, when an atonement is actually active.
+     *
+     * @param ResolvedAreaGemMonsterEffects $base
+     * @param int $personalLevel
+     * @return ResolvedAreaGemAtonement
      */
     private function overlayAtonement(ResolvedAreaGemMonsterEffects $base, int $personalLevel): ResolvedAreaGemAtonement
     {
@@ -268,6 +358,9 @@ class CharacterAreaGemEffectService
      * Resolve the single source context that actually wins Monster-effect
      * precedence: the Location Gem source when one is present, otherwise the
      * Map Gem source.
+     *
+     * @param array $sourceContexts
+     * @return ?SourceProgressionContext
      */
     private function resolveWinningMonsterContext(array $sourceContexts): ?SourceProgressionContext
     {
@@ -290,6 +383,10 @@ class CharacterAreaGemEffectService
      * Overlay the personal negative progression bonus on the Map-owned
      * Character power reduction, only when the Map source actually
      * contributes a reduction.
+     *
+     * @param float $baseReduction
+     * @param array $sourceContexts
+     * @return float
      */
     private function overlayCharacterPowerReduction(float $baseReduction, array $sourceContexts): float
     {

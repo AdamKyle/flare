@@ -25,7 +25,10 @@ const GemProgressionLevelSection = ({
   const personalAtCap = personal.level >= personal.max_level;
 
   const personalBonusRows: PersonalBonusRow[] = [
-    { label: 'Negative Effect Reduction', value: personal.negative_bonus },
+    {
+      label: 'Personal Enemy/Negative Effect Increase',
+      value: personal.negative_bonus,
+    },
     { label: 'Unique Drop Chance Bonus', value: personal.unique_chance_bonus },
     { label: 'Mythic Drop Chance Bonus', value: personal.mythic_chance_bonus },
     { label: 'Cosmic Drop Chance Bonus', value: personal.cosmic_chance_bonus },
@@ -56,7 +59,7 @@ const GemProgressionLevelSection = ({
           label="Personal Level"
           value={personal.xp}
           max={Math.max(personal.next_level_xp, 1)}
-          variant={ProgressBarVariant.SUMMER}
+          variant={ProgressBarVariant.PRIMARY}
           value_label={
             personalAtCap
               ? `Level ${personal.level} (Max)`

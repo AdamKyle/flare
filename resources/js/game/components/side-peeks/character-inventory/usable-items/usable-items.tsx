@@ -32,6 +32,13 @@ import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 import { useSidePeekOptions } from 'ui/side-peek/options/hooks/use-side-peek-options';
 import SidePeekOptionDefinition from 'ui/side-peek/options/types/side-peek-option-definition';
 
+const SCROLL_SUBFILTERS: DropdownItem[] = [
+  { label: 'All Scrolls', value: 'scrolls' },
+  { label: 'XP Scrolls', value: 'xp-scrolls' },
+  { label: 'Currency Scrolls', value: 'currency-scrolls' },
+  { label: 'Item Scrolls', value: 'item-scrolls' },
+];
+
 const UsableItems = ({
   character_id,
   initial_item,
@@ -48,6 +55,8 @@ const UsableItems = ({
   >(null);
   const [detailQuantityMode, setDetailQuantityMode] = useState(false);
   const [detailQuantity, setDetailQuantity] = useState(1);
+  const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [scrollSubfilter, setScrollSubfilter] = useState<string>('scrolls');
 
   const {
     data,
@@ -140,12 +149,30 @@ const UsableItems = ({
   });
 
   const handleFilterChange = (dropDownValue: DropdownItem) => {
-    setFilters({
-      [dropDownValue.value]: true,
-    });
+    const value = String(dropDownValue.value);
+
+    setActiveFilter(value);
+
+    if (value === 'scrolls') {
+      setScrollSubfilter('scrolls');
+      setFilters({ scrolls: true });
+
+      return;
+    }
+
+    setFilters({ [value]: true });
+  };
+
+  const handleScrollSubfilterChange = (dropDownValue: DropdownItem) => {
+    const value = String(dropDownValue.value);
+
+    setScrollSubfilter(value);
+    setFilters({ [value]: true });
   };
 
   const handleClearFilters = () => {
+    setActiveFilter(null);
+    setScrollSubfilter('scrolls');
     setFilters({});
   };
 
@@ -372,7 +399,7 @@ const UsableItems = ({
             clearable
           />
         </div>
-        <div className="mt-4 px-4 pb-4">
+        <div className="mt-4 flex flex-col gap-2 px-4 pb-4">
           <Dropdown
             items={[
               { label: 'Increase Stats', value: 'increase-stats' },
@@ -383,15 +410,24 @@ const UsableItems = ({
               },
               { label: 'Damages Kingdoms', value: 'damages-kingdoms' },
               { label: 'Holy Oils', value: 'holy-oils' },
-              { label: 'Gem Scrolls', value: 'scrolls' },
-              { label: 'Gem XP Scrolls', value: 'xp-scrolls' },
-              { label: 'Gem Currency Scrolls', value: 'currency-scrolls' },
-              { label: 'Gem Item Scrolls', value: 'item-scrolls' },
+              { label: 'Scrolls', value: 'scrolls' },
             ]}
             selection_placeholder={'Filter items by'}
             on_select={handleFilterChange}
             on_clear={handleClearFilters}
           />
+          {activeFilter === 'scrolls' && (
+            <Dropdown
+              items={SCROLL_SUBFILTERS}
+              pre_selected_item={
+                SCROLL_SUBFILTERS.find(
+                  (subfilter) => subfilter.value === scrollSubfilter
+                ) ?? SCROLL_SUBFILTERS[0]
+              }
+              selection_placeholder={'Scroll type'}
+              on_select={handleScrollSubfilterChange}
+            />
+          )}
         </div>
         <div className="min-h-0 flex-1" aria-busy={loading}>
           <UsableItemsList

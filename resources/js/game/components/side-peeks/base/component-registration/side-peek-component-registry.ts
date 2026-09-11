@@ -76,8 +76,6 @@ import AdminQuestDetailSidePeek from '../../../../../admin/quests/components/sid
 import AdminQuestDetailSidePeekProps from '../../../../../admin/quests/components/side-peeks/types/admin-quest-detail-side-peek-props';
 import RaceImportSidePeek from '../../../../../admin/races/components/side-peeks/race-import-side-peek';
 import RaceImportSidePeekProps from '../../../../../admin/races/components/side-peeks/types/race-import-side-peek-props';
-import GemProgressionPanel from '../../../../reusable-components/gems/progression/components/gem-progression-panel';
-import GemProgressionPanelProps from '../../../../reusable-components/gems/progression/components/types/gem-progression-panel-props';
 import BackPack from '../../character-inventory/backpack/backpack';
 import BackpackProps from '../../character-inventory/backpack/types/backpack-props';
 import GemBag from '../../character-inventory/gem-bag/gem-bag';
@@ -102,10 +100,16 @@ import PlayerGameMapDetailSidePeekProps from '../../game-data/types/player-game-
 import PlayerNpcDetailSidePeekProps from '../../game-data/types/player-npc-detail-side-peek-props';
 import ItemDetails from '../../item-details/item-details';
 import ItemDetailsProps from '../../item-details/types/item-details-props';
+import AllActiveGemScrollsSidePeek from '../../map-actions/all-active-gem-scrolls/all-active-gem-scrolls-side-peek';
+import AllActiveGemScrollsSidePeekProps from '../../map-actions/all-active-gem-scrolls/types/all-active-gem-scrolls-side-peek-props';
 import Conjure from '../../map-actions/conjure/conjure';
 import ConjureProps from '../../map-actions/conjure/types/conjure-props';
+import GemProgressHistorySidePeek from '../../map-actions/gem-progress-history/gem-progress-history-side-peek';
+import GemProgressHistorySidePeekProps from '../../map-actions/gem-progress-history/types/gem-progress-history-side-peek-props';
 import GemWorld from '../../map-actions/gem-world/gem-world';
 import GemWorldProps from '../../map-actions/gem-world/types/gem-world-props';
+import GemWorldIntroductionSidePeek from '../../map-actions/gem-world-introduction/gem-world-introduction-side-peek';
+import GemWorldIntroductionSidePeekProps from '../../map-actions/gem-world-introduction/types/gem-world-introduction-side-peek-props';
 import CharacterKingdomDetails from '../../map-actions/kingdom-details/character-kingdom-details';
 import CharacterKingdomDetailsProps from '../../map-actions/kingdom-details/types/character-kingdom-details-props';
 import LocationDetails from '../../map-actions/location-details/location-details';
@@ -180,9 +184,18 @@ export const SidePeekComponentRegistry: {
     props: {} as GemWorldProps,
     content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
   },
-  [SidePeekComponentRegistrationEnum.MAP_ACTIONS_GEM_PROGRESSION]: {
-    component: GemProgressionPanel,
-    props: {} as GemProgressionPanelProps,
+  [SidePeekComponentRegistrationEnum.MAP_ACTIONS_GEM_WORLD_INTRODUCTION]: {
+    component: GemWorldIntroductionSidePeek,
+    props: {} as GemWorldIntroductionSidePeekProps,
+  },
+  [SidePeekComponentRegistrationEnum.MAP_ACTIONS_GEM_PROGRESS_HISTORY]: {
+    component: GemProgressHistorySidePeek,
+    props: {} as GemProgressHistorySidePeekProps,
+    content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
+  },
+  [SidePeekComponentRegistrationEnum.MAP_ACTIONS_ALL_ACTIVE_GEM_SCROLLS]: {
+    component: AllActiveGemScrollsSidePeek,
+    props: {} as AllActiveGemScrollsSidePeekProps,
     content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
   },
   [SidePeekComponentRegistrationEnum.SERVER_CHAT_ITEM]: {

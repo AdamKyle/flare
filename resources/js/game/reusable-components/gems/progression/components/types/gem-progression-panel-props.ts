@@ -1,5 +1,3 @@
-import SidePeekProps from 'ui/side-peek/types/side-peek-props';
-
-export default interface GemProgressionPanelProps extends SidePeekProps {
+export default interface GemProgressionPanelProps {
   character_id: number;
 }

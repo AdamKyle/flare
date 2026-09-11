@@ -3,7 +3,6 @@
 namespace Tests\Traits;
 
 use App\Flare\Models\Item;
-use App\Game\Gems\Progression\Values\GemProgressionBands;
 use App\Game\Gems\Progression\Values\GemScrollCurrencyType;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -21,8 +20,8 @@ trait CreateItem
      * Create a generated XP Gem Scroll Item for tests.
      */
     public function createGemXpScrollItem(
-        float $bonus = GemProgressionBands::GEM_TEST_SCROLL_DEFAULT_XP_BONUS,
-        int $lastsForMinutes = GemProgressionBands::GEM_TEST_SCROLL_DEFAULT_DURATION_MINUTES,
+        float $bonus = 0.10,
+        int $lastsForMinutes = 120,
         array $options = [],
     ): Item {
         return Item::factory()->gemXpScroll($bonus, $lastsForMinutes)->create($options);
@@ -32,9 +31,9 @@ trait CreateItem
      * Create a generated Currency Gem Scroll Item for tests.
      */
     public function createGemCurrencyScrollItem(
-        float $bonus = GemProgressionBands::GEM_TEST_SCROLL_DEFAULT_CURRENCY_BONUS,
+        float $bonus = 0.10,
         GemScrollCurrencyType $currencyType = GemScrollCurrencyType::GOLD,
-        int $lastsForMinutes = GemProgressionBands::GEM_TEST_SCROLL_DEFAULT_DURATION_MINUTES,
+        int $lastsForMinutes = 120,
         array $options = [],
     ): Item {
         return Item::factory()->gemCurrencyScroll($bonus, $currencyType, $lastsForMinutes)->create($options);
@@ -44,10 +43,10 @@ trait CreateItem
      * Create a generated Item Gem Scroll Item for tests.
      */
     public function createGemItemScrollItem(
-        float $bonus = GemProgressionBands::GEM_TEST_SCROLL_DEFAULT_ITEM_BONUS,
-        float $socketChance = GemProgressionBands::GEM_TEST_SCROLL_DEFAULT_SOCKET_CHANCE,
-        float $preGemChance = GemProgressionBands::GEM_TEST_SCROLL_DEFAULT_PRE_GEM_CHANCE,
-        int $lastsForMinutes = GemProgressionBands::GEM_TEST_SCROLL_DEFAULT_DURATION_MINUTES,
+        float $bonus = 0.02,
+        float $socketChance = 0.02,
+        float $preGemChance = 0.01,
+        int $lastsForMinutes = 120,
         array $options = [],
     ): Item {
         return Item::factory()->gemItemScroll($bonus, $socketChance, $preGemChance, $lastsForMinutes)->create($options);

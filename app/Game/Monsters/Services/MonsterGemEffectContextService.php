@@ -7,14 +7,11 @@ use App\Flare\Pagination\Pagination;
 use App\Game\Monsters\Values\MonsterCacheKey;
 use Illuminate\Support\Facades\Cache;
 
-/**
- * Reads the cached, already Gem-transformed Monster payloads and exposes the
- * deduplicated set of Gem effect contexts a persisted Monster currently
- * appears in, for factual detail/report display only. No Gem math is
- * recalculated here.
- */
 class MonsterGemEffectContextService
 {
+    /**
+     * @param Pagination $pagination
+     */
     public function __construct(
         private readonly Pagination $pagination,
     ) {}
@@ -22,7 +19,7 @@ class MonsterGemEffectContextService
     /**
      * The cached effective field, its factual label, its base Monster attribute, and its display type.
      *
-     * @var array<string, array{label: string, base: string, type: string}>
+     * @var array
      */
     private const FIELD_MAP = [
         'criticality' => ['label' => 'Criticality', 'base' => 'criticality', 'type' => 'percent'],
@@ -62,7 +59,7 @@ class MonsterGemEffectContextService
     /**
      * Sort order for each closed Gem effect context type.
      *
-     * @var array<string, int>
+     * @var array
      */
     private const CONTEXT_TYPE_ORDER = [
         'map' => 0,
@@ -73,6 +70,9 @@ class MonsterGemEffectContextService
 
     /**
      * Build the deduplicated, sorted list of cached Gem effect contexts a Monster currently appears in.
+     *
+     * @param Monster $monster
+     * @return array
      */
     public function forMonster(Monster $monster): array
     {
@@ -90,6 +90,9 @@ class MonsterGemEffectContextService
 
     /**
      * Build the factual count/preview summary of cached Gem effect contexts for a Monster.
+     *
+     * @param Monster $monster
+     * @return array
      */
     public function summary(Monster $monster): array
     {
@@ -103,6 +106,11 @@ class MonsterGemEffectContextService
 
     /**
      * Build the append-paginated set of cached Gem effect contexts for a Monster.
+     *
+     * @param Monster $monster
+     * @param int $perPage
+     * @param int $page
+     * @return array
      */
     public function paginate(Monster $monster, int $perPage, int $page): array
     {
@@ -115,6 +123,10 @@ class MonsterGemEffectContextService
 
     /**
      * Build the single current Gem effect context for an already-resolved effective Monster row, when one exists.
+     *
+     * @param Monster $monster
+     * @param array $effectiveMonster
+     * @return ?array
      */
     public function forEffectiveMonster(Monster $monster, array $effectiveMonster): ?array
     {
@@ -139,6 +151,9 @@ class MonsterGemEffectContextService
 
     /**
      * Determine whether a Monster is eligible to carry Gem effect contexts at all.
+     *
+     * @param Monster $monster
+     * @return bool
      */
     private function isEligibleForGemContexts(Monster $monster): bool
     {
@@ -150,6 +165,10 @@ class MonsterGemEffectContextService
 
     /**
      * Scan every cache entry (including the regular/easier event-map tiers) for the Monster.
+     *
+     * @param array $cache
+     * @param Monster $monster
+     * @param array $contexts
      */
     private function collectFromCache(array $cache, Monster $monster, array &$contexts): void
     {
@@ -170,6 +189,10 @@ class MonsterGemEffectContextService
 
     /**
      * Collect the Monster's matching, Gem-affected cache row from a single cached data set.
+     *
+     * @param array $dataset
+     * @param Monster $monster
+     * @param array $contexts
      */
     private function collectFromDataset(array $dataset, Monster $monster, array &$contexts): void
     {
@@ -196,6 +219,9 @@ class MonsterGemEffectContextService
 
     /**
      * Build the stable deduplication key for a resolved Gem effect context.
+     *
+     * @param array $gemEffectContext
+     * @return ?string
      */
     private function buildContextKey(array $gemEffectContext): ?string
     {
@@ -214,6 +240,12 @@ class MonsterGemEffectContextService
 
     /**
      * Build one Monster Gem effect context row for the Admin/Info detail contract.
+     *
+     * @param string $key
+     * @param array $gemEffectContext
+     * @param array $cachedMonster
+     * @param Monster $monster
+     * @return array
      */
     private function buildContext(string $key, array $gemEffectContext, array $cachedMonster, Monster $monster): array
     {
@@ -231,6 +263,10 @@ class MonsterGemEffectContextService
 
     /**
      * Identify only the effective Monster fields that actually changed from the factual base.
+     *
+     * @param Monster $monster
+     * @param array $cachedMonster
+     * @return array
      */
     private function buildChangedValues(Monster $monster, array $cachedMonster): array
     {
@@ -267,6 +303,13 @@ class MonsterGemEffectContextService
 
     /**
      * Build a changed-value row when the effective Monster value meaningfully differs.
+     *
+     * @param string $field
+     * @param string $label
+     * @param string $displayType
+     * @param mixed $baseValue
+     * @param mixed $effectiveValue
+     * @return ?array
      */
     private function buildChange(string $field, string $label, string $displayType, mixed $baseValue, mixed $effectiveValue): ?array
     {
@@ -289,6 +332,10 @@ class MonsterGemEffectContextService
 
     /**
      * Determine whether a base and effective value are factually equal, tolerating float rounding.
+     *
+     * @param mixed $base
+     * @param mixed $effective
+     * @return bool
      */
     private function valuesEqual(mixed $base, mixed $effective): bool
     {
@@ -301,6 +348,9 @@ class MonsterGemEffectContextService
 
     /**
      * Determine whether an effective value is meaningless and should be omitted from display.
+     *
+     * @param mixed $value
+     * @return bool
      */
     private function isMeaninglessValue(mixed $value): bool
     {
@@ -317,6 +367,9 @@ class MonsterGemEffectContextService
 
     /**
      * Sort contexts: normal Map, then Locations by label, then Map Gem Worlds, then Location Gem Worlds.
+     *
+     * @param array $contexts
+     * @return array
      */
     private function sortContexts(array $contexts): array
     {

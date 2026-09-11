@@ -39,7 +39,6 @@ import NpcFormSidePeekProps from '../../../../../admin/npcs/components/side-peek
 import NpcImportSidePeekProps from '../../../../../admin/npcs/components/side-peeks/types/npc-import-side-peek-props';
 import AdminQuestDetailSidePeekProps from '../../../../../admin/quests/components/side-peeks/types/admin-quest-detail-side-peek-props';
 import RaceImportSidePeekProps from '../../../../../admin/races/components/side-peeks/types/race-import-side-peek-props';
-import GemProgressionPanelProps from '../../../../reusable-components/gems/progression/components/types/gem-progression-panel-props';
 import BackpackProps from '../../character-inventory/backpack/types/backpack-props';
 import GemBagProps from '../../character-inventory/gem-bag/types/gem-bag-props';
 import SetsProps from '../../character-inventory/sets/types/sets-props';
@@ -52,8 +51,11 @@ import ClassMasteryDetailSidePeekProps from '../../game-data/types/class-mastery
 import PlayerGameMapDetailSidePeekProps from '../../game-data/types/player-game-map-detail-side-peek-props';
 import PlayerNpcDetailSidePeekProps from '../../game-data/types/player-npc-detail-side-peek-props';
 import ItemDetailsProps from '../../item-details/types/item-details-props';
+import AllActiveGemScrollsSidePeekProps from '../../map-actions/all-active-gem-scrolls/types/all-active-gem-scrolls-side-peek-props';
 import ConjureProps from '../../map-actions/conjure/types/conjure-props';
+import GemProgressHistorySidePeekProps from '../../map-actions/gem-progress-history/types/gem-progress-history-side-peek-props';
 import GemWorldProps from '../../map-actions/gem-world/types/gem-world-props';
+import GemWorldIntroductionSidePeekProps from '../../map-actions/gem-world-introduction/types/gem-world-introduction-side-peek-props';
 import CharacterKingdomDetailsProps from '../../map-actions/kingdom-details/types/character-kingdom-details-props';
 import LocationDetailsProps from '../../map-actions/location-details/types/location-details-props';
 import SetSailProps from '../../map-actions/set-sail/types/set-sail-props';
@@ -75,7 +77,9 @@ export type SidePeekComponentPropsMap = {
   [SidePeekComponentRegistrationEnum.MAP_ACTIONS_SET_SAIL]: SetSailProps;
   [SidePeekComponentRegistrationEnum.MAP_ACTIONS_CONJURE]: ConjureProps;
   [SidePeekComponentRegistrationEnum.MAP_ACTIONS_GEM_WORLD]: GemWorldProps;
-  [SidePeekComponentRegistrationEnum.MAP_ACTIONS_GEM_PROGRESSION]: GemProgressionPanelProps;
+  [Registration.MAP_ACTIONS_GEM_WORLD_INTRODUCTION]: GemWorldIntroductionSidePeekProps;
+  [Registration.MAP_ACTIONS_GEM_PROGRESS_HISTORY]: GemProgressHistorySidePeekProps;
+  [Registration.MAP_ACTIONS_ALL_ACTIVE_GEM_SCROLLS]: AllActiveGemScrollsSidePeekProps;
   [SidePeekComponentRegistrationEnum.SERVER_CHAT_ITEM]: ServerChatItemProps;
   [SidePeekComponentRegistrationEnum.CRAFTED_ITEM]: CraftedItemProps;
   [SidePeekComponentRegistrationEnum.ITEM_DETAILS]: ItemDetailsProps;

@@ -1,6 +1,5 @@
-import ApiErrorAlert from 'api-handler/components/api-error-alert';
-import { isEmpty, isNil } from 'lodash';
-import React, { ReactNode, useEffect, useState } from 'react';
+import { isNil } from 'lodash';
+import React, { useEffect, useState } from 'react';
 
 import { useDirectionallyMoveCharacter } from './hooks/use-directionally-move-character';
 import { useFetchMovementTimeoutData } from './hooks/use-fetch-movement-timeout-data';
@@ -10,32 +9,28 @@ import { useManageMapSectionVisibility } from './hooks/use-manage-map-section-vi
 import { useManagePlayerKingdomManagementVisibility } from './hooks/use-manage-player-kingdom-management-visibility';
 import { useManageSetSailButtonState } from './hooks/use-manage-set-sail-button-state';
 import { useManageViewLocationState } from './hooks/use-manage-view-location-state';
+import MapCardTabs from './map-card-tabs';
 import { MapMovementTypes } from './map-movement-types/map-movement-types';
-import GemWorldSourceDefinition from '../../../../../reusable-components/gems/api/definitions/gem-world-source-definition';
-import { useOpenGemProgressionSidePeek } from '../../../../../reusable-components/gems/progression/hooks/use-open-gem-progression-side-peek';
-import GemWorldEntryDefinition from '../../../../map-section/api/definitions/gem-world-entry-definition';
+import MapTabContent from './map-tab-content';
 import { CharacterPosition } from '../../../../map-section/api/hooks/definitions/base-map-api-definition';
 import { useExitGemWorld } from '../../../../map-section/api/hooks/use-exit-gem-world';
 import { useGemWorldContext } from '../../../../map-section/api/hooks/use-gem-world-context';
 import { useEmitCharacterPosition } from '../../../../map-section/hooks/use-emit-character-position';
+import { useOpenAllActiveGemScrollsSidePeek } from '../../../../map-section/hooks/use-open-all-active-gem-scrolls-side-peek';
 import { useOpenConjureSidePeek } from '../../../../map-section/hooks/use-open-conjure-side-peek';
+import { useOpenGemProgressHistorySidePeek } from '../../../../map-section/hooks/use-open-gem-progress-history-side-peek';
+import { useOpenGemWorldIntroductionSidePeek } from '../../../../map-section/hooks/use-open-gem-world-introduction-side-peek';
 import { useOpenGemWorldSidePeek } from '../../../../map-section/hooks/use-open-gem-world-side-peek';
 import { useOpenLocationInfoSidePeek } from '../../../../map-section/hooks/use-open-location-info-side-peek';
 import { useOpenSetSailSidePeek } from '../../../../map-section/hooks/use-open-set-sail-side-peek';
 import { UseOpenTeleportSidePeek } from '../../../../map-section/hooks/use-open-teleport-side-peek';
 import { UseOpenTraverseSidePeek } from '../../../../map-section/hooks/use-open-traverse-side-peek';
-import Map from '../../../../map-section/map';
 import { useEmitMapRefresh } from '../../../../side-peeks/map-actions/traverse/hooks/use-emit-map-refresh';
 import FloatingCard from '../../../components/icon-section/floating-card';
 
 import CharacterSheetDefinition from 'game-data/api-data-definitions/character/character-sheet-definition';
 import { GameDataError } from 'game-data/components/game-data-error';
 import { useGameData } from 'game-data/hooks/use-game-data';
-
-import Button from 'ui/buttons/button';
-import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
-import LoadingButton from 'ui/buttons/loading-button';
-import TimerBar from 'ui/timer-bar/timer-bar';
 
 const MapCard = () => {
   const [characterData, setCharacterData] =
@@ -65,11 +60,15 @@ const MapCard = () => {
   const { openSetSail } = useOpenSetSailSidePeek();
   const { openConjure } = useOpenConjureSidePeek();
   const { openGemWorld } = useOpenGemWorldSidePeek();
-  const { openGemProgression } = useOpenGemProgressionSidePeek();
+  const { openGemWorldIntroduction } = useOpenGemWorldIntroductionSidePeek();
+  const { openGemProgressHistory } = useOpenGemProgressHistorySidePeek();
+  const { openAllActiveGemScrolls } = useOpenAllActiveGemScrollsSidePeek();
   const { emitShouldRefreshMap } = useEmitMapRefresh();
 
   const characterId = gameData?.character?.id ?? 0;
   const gemWorldGameMapId = gameData?.character?.game_map_id ?? 0;
+  const gemWorldIntroductionAcknowledgedAt =
+    gameData?.character?.gem_world_introduction_acknowledged_at ?? null;
 
   const {
     data: gemWorldStatus,
@@ -110,11 +109,7 @@ const MapCard = () => {
     });
   }, [characterPosition]);
 
-  const handleCloseAlert = () => {
-    resetErrorMessage();
-  };
-
-  const handleViewLocationDetails = () => {
+  const handleViewLocationDetails = (): void => {
     if (isNil(locationData)) {
       return;
     }
@@ -127,41 +122,23 @@ const MapCard = () => {
     );
   };
 
-  const handleOpenTraverseSidePeek = () => {
-    if (!gameData?.character) {
-      return;
-    }
-
-    openTraverse(gameData.character);
-  };
-
-  const handleOpenSetSailSidePeek = () => {
-    if (!gameData?.character) {
-      return;
-    }
-
-    openSetSail(gameData.character);
-  };
-
-  const handleOpenConjureSidePeek = () => {
-    if (!gameData?.character) {
-      return;
-    }
-
-    openConjure(gameData.character);
-  };
-
-  const handleOpenGemWorldEntrySidePeek = () => {
+  const handleOpenGemWorldEntrySidePeek = (): void => {
     const entry = gemWorldStatus?.entry;
 
     if (isNil(entry)) {
       return;
     }
 
+    if (isNil(gemWorldIntroductionAcknowledgedAt)) {
+      openGemWorldIntroduction(characterId, entry.context, true);
+
+      return;
+    }
+
     openGemWorld(characterId, entry.context, true);
   };
 
-  const handleViewCurrentGemEffects = () => {
+  const handleViewCurrentGemEffects = (): void => {
     const currentContext = gemWorldStatus?.current_context;
 
     if (isNil(currentContext)) {
@@ -171,11 +148,7 @@ const MapCard = () => {
     openGemWorld(characterId, currentContext, false);
   };
 
-  const handleOpenGemProgression = () => {
-    openGemProgression(characterId);
-  };
-
-  const handleExitGemWorld = async () => {
+  const handleExitGemWorld = async (): Promise<void> => {
     const exited = await exitGemWorld();
 
     if (!exited) {
@@ -185,181 +158,8 @@ const MapCard = () => {
     emitShouldRefreshMap(true);
   };
 
-  const renderTimerBar = () => {
-    if (!showTimerBar) {
-      return;
-    }
-
-    return (
-      <TimerBar
-        length={lengthOfTime}
-        title={'Movement Timeout'}
-        additional_css={'my-2'}
-      />
-    );
-  };
-
-  const renderMapError = () => {
-    if (isEmpty(errorMessage)) {
-      return null;
-    }
-
-    return (
-      <ApiErrorAlert apiError={errorMessage} on_close={handleCloseAlert} />
-    );
-  };
-
-  const isSetSailDisabled = () => {
-    if (!isSetSailEnabled) {
-      return true;
-    }
-
-    return !canMove;
-  };
-
-  const describeGemSources = (sources: GemWorldSourceDefinition[]): string =>
-    sources
-      .map(
-        (source) =>
-          `${source.type === 'map_gem' ? 'Map Gem' : 'Location Gem'}: ${source.profile_name}`
-      )
-      .join(' · ');
-
-  const renderGemEntrySourceText = (
-    entry: GemWorldEntryDefinition
-  ): ReactNode => {
-    const matchingSource = entry.context.sources.find(
-      (source) => source.type === entry.type
-    );
-
-    if (!matchingSource) {
-      return null;
-    }
-
-    return (
-      <div className="text-sm text-gray-700 dark:text-gray-300">
-        {describeGemSources([matchingSource])}
-      </div>
-    );
-  };
-
-  const renderGemWorldInsideSection = (): ReactNode => {
-    const currentContext = gemWorldStatus?.current_context;
-
-    if (isNil(currentContext)) {
-      return null;
-    }
-
-    return (
-      <div className="my-2 flex flex-col gap-2 p-2">
-        <div className="text-sm text-gray-700 dark:text-gray-300">
-          Gem World: {currentContext.label}
-        </div>
-        <div className="flex flex-col justify-center gap-2 md:flex-row">
-          <Button
-            on_click={handleViewCurrentGemEffects}
-            label={'View Gem Effects'}
-            variant={ButtonVariant.PRIMARY}
-          />
-          <Button
-            on_click={handleOpenGemProgression}
-            label={'View Gem Progress'}
-            variant={ButtonVariant.PRIMARY}
-          />
-          <LoadingButton
-            on_click={() => void handleExitGemWorld()}
-            label={'Exit Gem World'}
-            loading_label={'Exiting Gem World…'}
-            variant={ButtonVariant.DANGER}
-            is_loading={exitingGemWorld}
-            disabled={!canMove}
-          />
-        </div>
-        {!isNil(exitGemWorldError) && (
-          <ApiErrorAlert apiError={exitGemWorldError} />
-        )}
-      </div>
-    );
-  };
-
-  const renderGemWorldEntrySection = (
-    entry: GemWorldEntryDefinition
-  ): ReactNode => (
-    <div className="my-2 flex flex-col gap-2 p-2">
-      {renderGemEntrySourceText(entry)}
-      <Button
-        on_click={handleOpenGemWorldEntrySidePeek}
-        label={entry.label}
-        variant={ButtonVariant.PRIMARY}
-        additional_css={'w-full'}
-      />
-    </div>
-  );
-
-  const renderGemWorldCurrentEffectsSection = (): ReactNode => {
-    const currentContext = gemWorldStatus?.current_context;
-
-    if (isNil(currentContext)) {
-      return null;
-    }
-
-    return (
-      <div className="my-2 flex flex-col gap-2 p-2">
-        <div className="text-sm text-gray-700 dark:text-gray-300">
-          {describeGemSources(currentContext.sources)}
-        </div>
-        <Button
-          on_click={handleViewCurrentGemEffects}
-          label={'View Gem Effects'}
-          variant={ButtonVariant.PRIMARY}
-          additional_css={'w-full'}
-        />
-      </div>
-    );
-  };
-
-  const renderGemWorldSection = (): ReactNode => {
-    if (isNil(gemWorldStatus)) {
-      return null;
-    }
-
-    if (gemWorldStatus.inside_gem_world) {
-      return renderGemWorldInsideSection();
-    }
-
-    if (!isNil(gemWorldStatus.entry)) {
-      return renderGemWorldEntrySection(gemWorldStatus.entry);
-    }
-
-    return renderGemWorldCurrentEffectsSection();
-  };
-
-  const renderGemWorldContextError = (): ReactNode => {
-    if (isNil(gemWorldContextError)) {
-      return null;
-    }
-
-    return (
-      <div className="my-2 p-2">
-        <ApiErrorAlert apiError={gemWorldContextError} />
-      </div>
-    );
-  };
-
-  const renderGemWorldLoadingStatus = (): ReactNode => {
-    if (!gemWorldContextLoading || !isNil(gemWorldStatus)) {
-      return null;
-    }
-
-    return (
-      <div
-        className="my-2 p-2 text-sm text-gray-500 dark:text-gray-400"
-        role="status"
-      >
-        Loading Gem effects…
-      </div>
-    );
-  };
+  const isSetSailDisabled = !isSetSailEnabled || !canMove;
+  const insideGemWorld = gemWorldStatus?.inside_gem_world ?? false;
 
   if (isNil(characterData)) {
     return (
@@ -369,104 +169,66 @@ const MapCard = () => {
     );
   }
 
+  const mapTabContentProps = {
+    character_map_position: characterMapPosition,
+    can_move: canMove,
+    show_timer_bar: showTimerBar,
+    length_of_time: lengthOfTime,
+    error_message: errorMessage,
+    on_close_alert: resetErrorMessage,
+    on_move: (amount: number, direction: MapMovementTypes) =>
+      moveCharacterDirectionally(amount, direction),
+    on_teleport: () =>
+      openTeleport(characterData, characterPosition.x, characterPosition.y),
+    is_set_sail_disabled: isSetSailDisabled,
+    on_set_sail: () => {
+      if (gameData?.character) {
+        openSetSail(gameData.character);
+      }
+    },
+    on_traverse: () => {
+      if (gameData?.character) {
+        openTraverse(gameData.character);
+      }
+    },
+    is_conjure_enabled: isConjureEnabled,
+    on_conjure: () => {
+      if (gameData?.character) {
+        openConjure(gameData.character);
+      }
+    },
+    is_view_location_enabled: isViewLocationEnabled,
+    on_view_location: handleViewLocationDetails,
+    on_open_kingdoms: openPlayerKingdoms,
+    gem_world_actions_props: {
+      status: gemWorldStatus,
+      loading: gemWorldContextLoading,
+      context_error: gemWorldContextError,
+      can_move: canMove,
+      exiting: exitingGemWorld,
+      exit_error: exitGemWorldError,
+      on_enter: handleOpenGemWorldEntrySidePeek,
+      on_view_effects: handleViewCurrentGemEffects,
+      on_exit: () => void handleExitGemWorld(),
+      on_open_gem_progress_history: () => openGemProgressHistory(characterId),
+      on_open_all_active_gem_scrolls: () =>
+        openAllActiveGemScrolls(characterId),
+    },
+  };
+
   return (
     <FloatingCard
       title={`Map: ${characterData.map_name}`}
       close_action={closeMapCard}
     >
-      <div className="text-center">
-        <Map additional_css={'h-[350px] border-2 border-slate-600'} zoom={2} />
-      </div>
-      {renderTimerBar()}
-      {renderMapError()}
-      <div className="my-2 p-2">
-        Map Position (X/Y): {characterMapPosition.x_position}/
-        {characterMapPosition.y_position})
-      </div>
-      <div className="my-2 flex flex-col justify-center gap-2 p-2 md:flex-row">
-        <Button
-          on_click={() =>
-            moveCharacterDirectionally(-16, MapMovementTypes.NORTH)
-          }
-          label={'North'}
-          variant={ButtonVariant.PRIMARY}
-          disabled={!canMove}
+      {insideGemWorld ? (
+        <MapCardTabs
+          character_id={characterId}
+          map_tab_content_props={mapTabContentProps}
         />
-        <Button
-          on_click={() =>
-            moveCharacterDirectionally(16, MapMovementTypes.SOUTH)
-          }
-          label={'South'}
-          variant={ButtonVariant.PRIMARY}
-          disabled={!canMove}
-        />
-        <Button
-          on_click={() =>
-            moveCharacterDirectionally(-16, MapMovementTypes.WEST)
-          }
-          label={'West'}
-          variant={ButtonVariant.PRIMARY}
-          disabled={!canMove}
-        />
-        <Button
-          on_click={() => moveCharacterDirectionally(16, MapMovementTypes.EAST)}
-          label={'East'}
-          variant={ButtonVariant.PRIMARY}
-          disabled={!canMove}
-        />
-      </div>
-
-      <div className="my-2 flex flex-col justify-center gap-2 p-2 md:flex-row">
-        <Button
-          on_click={() =>
-            openTeleport(
-              characterData,
-              characterPosition.x,
-              characterPosition.y
-            )
-          }
-          label={'Teleport'}
-          variant={ButtonVariant.PRIMARY}
-          disabled={!canMove}
-        />
-        <Button
-          on_click={handleOpenSetSailSidePeek}
-          label={'Set Sail'}
-          variant={ButtonVariant.PRIMARY}
-          disabled={isSetSailDisabled()}
-        />
-        <Button
-          on_click={handleOpenTraverseSidePeek}
-          label={'Traverse'}
-          variant={ButtonVariant.PRIMARY}
-          disabled={!canMove}
-        />
-        <Button
-          on_click={handleOpenConjureSidePeek}
-          label={'Conjure'}
-          variant={ButtonVariant.PRIMARY}
-          disabled={!isConjureEnabled}
-        />
-      </div>
-      <div className="my-2 w-full p-2">
-        <Button
-          on_click={handleViewLocationDetails}
-          label={'View Location'}
-          variant={ButtonVariant.SUCCESS}
-          additional_css={'w-full'}
-          disabled={!isViewLocationEnabled}
-        />
-      </div>
-      <div className="my-2 flex flex-col justify-center gap-2 p-2 md:flex-row">
-        <Button
-          on_click={openPlayerKingdoms}
-          label={'My Kingdoms'}
-          variant={ButtonVariant.PRIMARY}
-        />
-      </div>
-      {renderGemWorldContextError()}
-      {renderGemWorldLoadingStatus()}
-      {renderGemWorldSection()}
+      ) : (
+        <MapTabContent {...mapTabContentProps} />
+      )}
     </FloatingCard>
   );
 };

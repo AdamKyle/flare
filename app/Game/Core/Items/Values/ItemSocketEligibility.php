@@ -2,11 +2,6 @@
 
 namespace App\Game\Core\Items\Values;
 
-/**
- * The one shared rule for which Item types may receive random sockets and
- * the maximum socket count any Item may hold. Reused by every reward path
- * that randomly assigns sockets to a generated Item.
- */
 class ItemSocketEligibility
 {
     public const int MAX_SOCKET_COUNT = 6;
@@ -26,6 +21,9 @@ class ItemSocketEligibility
 
     /**
      * Determine whether the given Item type may receive random sockets.
+     *
+     * @param string $itemType
+     * @return bool
      */
     public function isEligible(string $itemType): bool
     {
@@ -33,7 +31,19 @@ class ItemSocketEligibility
     }
 
     /**
+     * The closed set of Item types that may receive random sockets.
+     *
+     * @return array
+     */
+    public function eligibleTypes(): array
+    {
+        return self::ELIGIBLE_TYPES;
+    }
+
+    /**
      * The maximum socket count any Item may hold.
+     *
+     * @return int
      */
     public function maxSocketCount(): int
     {

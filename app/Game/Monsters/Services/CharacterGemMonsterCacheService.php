@@ -3,10 +3,6 @@
 namespace App\Game\Monsters\Services;
 
 use App\Flare\Models\Character;
-use App\Flare\Models\CharacterGameLocationGemProgression;
-use App\Flare\Models\CharacterGameMapGemProgression;
-use App\Flare\Models\GameLocationGemParamter;
-use App\Flare\Models\GameMapGemParamter;
 use App\Flare\Models\Monster;
 use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
 use App\Game\Gems\Services\AreaGemEffectService;
@@ -19,17 +15,17 @@ use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 
-/**
- * Lazily resolves the Character-effective Monster dataset when a
- * Character's global/personal Gem progression actually changes the
- * Monster-relevant Gem effects for their current context. Shared,
- * Character-neutral Monster cache entries remain the fast default path;
- * this service is only consulted when a progressed Gem context exists.
- */
 class CharacterGemMonsterCacheService
 {
     private const int CACHE_TTL_SECONDS = 900;
 
+    /**
+     * @param AreaGemEffectService $areaGemEffectService
+     * @param CharacterAreaGemEffectService $characterAreaGemEffectService
+     * @param MonsterCacheRevisionService $monsterCacheRevisionService
+     * @param MonsterTransformer $monsterTransformer
+     * @param Manager $manager
+     */
     public function __construct(
         private readonly AreaGemEffectService $areaGemEffectService,
         private readonly CharacterAreaGemEffectService $characterAreaGemEffectService,
@@ -39,10 +35,11 @@ class CharacterGemMonsterCacheService
     ) {}
 
     /**
-     * Resolve the Monster dataset for the Character's current context,
-     * overlaying global/personal Gem progression only when it actually
-     * changes a Monster-relevant Gem effect; otherwise returns the given
-     * shared dataset unchanged.
+     * Resolve the Character-effective Monster dataset, falling back to the given shared dataset when progression changes nothing Monster-relevant.
+     *
+     * @param Character $character
+     * @param array $sharedDataset
+     * @return array
      */
     public function resolveForCharacter(Character $character, array $sharedDataset): array
     {
@@ -62,8 +59,11 @@ class CharacterGemMonsterCacheService
     }
 
     /**
-     * Determine whether progression changed any Monster-relevant Gem effect
-     * field between the base (Character-neutral) and adjusted resolutions.
+     * Determine whether progression changed any Monster-relevant Gem effect field.
+     *
+     * @param ResolvedAreaGemEffects $baseEffects
+     * @param ResolvedAreaGemEffects $adjustedEffects
+     * @return bool
      */
     private function monsterRelevantEffectsDiffer(ResolvedAreaGemEffects $baseEffects, ResolvedAreaGemEffects $adjustedEffects): bool
     {
@@ -71,13 +71,7 @@ class CharacterGemMonsterCacheService
             return true;
         }
 
-        $monsterRelevantRewardEffects = [
-            AreaGemRewardEffect::MONSTER_XP_INCREASE,
-            AreaGemRewardEffect::MONSTER_GOLD_DROP_INCREASE,
-            AreaGemRewardEffect::ENEMY_QUEST_ITEM_DROP_CHANCE_INCREASE,
-        ];
-
-        foreach ($monsterRelevantRewardEffects as $rewardEffect) {
+        foreach (AreaGemRewardEffect::monsterTransformedCases() as $rewardEffect) {
             if ($baseEffects->rewardEffect($rewardEffect) !== $adjustedEffects->rewardEffect($rewardEffect)) {
                 return true;
             }
@@ -87,9 +81,11 @@ class CharacterGemMonsterCacheService
     }
 
     /**
-     * Resolve the Character-effective Monster dataset, transforming the
-     * real persisted source Monsters through the real MonsterTransformer on
-     * a cache miss and caching the result under a level-identity-scoped key.
+     * Resolve and cache the Character-effective Monster dataset for a cache miss.
+     *
+     * @param Character $character
+     * @param ResolvedAreaGemEffects $adjustedEffects
+     * @return array
      */
     private function resolveDerivedDataset(Character $character, ResolvedAreaGemEffects $adjustedEffects): array
     {
@@ -114,14 +110,17 @@ class CharacterGemMonsterCacheService
     }
 
     /**
-     * Build the Character-effective Monster cache key from the Character id,
-     * current Game Map id, canonical Monster cache revision, and every
-     * currently contributing global/personal progression level.
+     * Build the Character-effective Monster cache key from Character, Game Map, canonical revision, and per-source progression signature.
+     *
+     * @param Character $character
+     * @param int $gameMapId
+     * @param ResolvedAreaGemEffects $adjustedEffects
+     * @return string
      */
     private function buildCacheKey(Character $character, int $gameMapId, ResolvedAreaGemEffects $adjustedEffects): string
     {
         $levelSignature = collect($adjustedEffects->sources())
-            ->map(fn (ResolvedAreaGemSource $source): string => $this->levelSignatureForSource($character, $source))
+            ->map(fn (ResolvedAreaGemSource $source): string => $this->levelSignatureForSource($adjustedEffects, $source))
             ->implode('-');
 
         return sprintf(
@@ -134,26 +133,18 @@ class CharacterGemMonsterCacheService
     }
 
     /**
-     * Resolve the current global/personal progression level pair contributing from one resolved source.
+     * Resolve the already-resolved progression level signature for one contributing source.
+     *
+     * @param ResolvedAreaGemEffects $adjustedEffects
+     * @param ResolvedAreaGemSource $source
+     * @return string
      */
-    private function levelSignatureForSource(Character $character, ResolvedAreaGemSource $source): string
+    private function levelSignatureForSource(ResolvedAreaGemEffects $adjustedEffects, ResolvedAreaGemSource $source): string
     {
-        if ($source->type() === GemSourceType::MAP_GEM) {
-            $profile = GameMapGemParamter::find($source->profileId());
-            $globalLevel = $profile?->progression?->level ?? 1;
-            $personalLevel = CharacterGameMapGemProgression::where('character_id', $character->id)
-                ->where('game_map_gem_paramter_id', $source->profileId())
-                ->value('level') ?? 1;
+        $prefix = $source->type() === GemSourceType::MAP_GEM ? 'map-' : 'location-';
+        $globalLevel = $adjustedEffects->globalLevelForSource($source);
+        $globalSignature = is_null($globalLevel) ? '' : '-g'.$globalLevel;
 
-            return 'map-'.$source->profileId().'-'.$globalLevel.'-'.$personalLevel;
-        }
-
-        $profile = GameLocationGemParamter::find($source->profileId());
-        $globalLevel = $profile?->progression?->level ?? 1;
-        $personalLevel = CharacterGameLocationGemProgression::where('character_id', $character->id)
-            ->where('game_location_gem_paramter_id', $source->profileId())
-            ->value('level') ?? 1;
-
-        return 'location-'.$source->profileId().'-'.$globalLevel.'-'.$personalLevel;
+        return $prefix.$source->profileId().$globalSignature.'-p'.$adjustedEffects->personalLevelForSource($source);
     }
 }
