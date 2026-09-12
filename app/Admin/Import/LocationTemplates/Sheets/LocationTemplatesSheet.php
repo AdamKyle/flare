@@ -10,6 +10,9 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 
 class LocationTemplatesSheet implements ToCollection
 {
+    /**
+     * Import Location Template rows from the uploaded spreadsheet, updating an existing Location Template by name or creating a new one.
+     */
     public function collection(Collection $rows): void
     {
         foreach ($rows as $index => $row) {
@@ -24,22 +27,33 @@ class LocationTemplatesSheet implements ToCollection
                 continue;
             }
 
-            if (LocationTemplate::where('name', $data['name'])->exists()) {
-                throw ValidationException::withMessages([
-                    'name' => 'Location template names must be unique.',
-                ]);
-            }
+            $this->assertDescriptionIsUnique($data);
 
-            if (LocationTemplate::where('description', $data['description'])->exists()) {
-                throw ValidationException::withMessages([
-                    'description' => 'Location template descriptions must be unique.',
-                ]);
-            }
-
-            LocationTemplate::create($data);
+            LocationTemplate::updateOrCreate([
+                'name' => $data['name'],
+            ], $data);
         }
     }
 
+    /**
+     * Guard against a workbook row reusing a description already claimed by a differently named Location Template.
+     */
+    private function assertDescriptionIsUnique(array $data): void
+    {
+        $descriptionTaken = LocationTemplate::where('description', $data['description'])
+            ->where('name', '!=', $data['name'])
+            ->exists();
+
+        if ($descriptionTaken) {
+            throw ValidationException::withMessages([
+                'description' => 'Location template descriptions must be unique.',
+            ]);
+        }
+    }
+
+    /**
+     * Normalize and validate a raw Location Template workbook row into persistable attributes.
+     */
     private function cleanData(array $row): array
     {
         $type = LocationTemplateType::tryFrom((string) ($row['type'] ?? ''));

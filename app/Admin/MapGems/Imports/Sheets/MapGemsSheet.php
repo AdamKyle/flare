@@ -20,15 +20,9 @@ class MapGemsSheet implements ToCollection
         $validatedRows = $this->normalizeAndValidateRows($rows);
 
         foreach ($validatedRows as $profileData) {
-            $existingProfile = GameMapGemParamter::where('name', $profileData['name'])->first();
-
-            if (! is_null($existingProfile)) {
-                $existingProfile->update($profileData);
-
-                continue;
-            }
-
-            GameMapGemParamter::create($profileData);
+            GameMapGemParamter::updateOrCreate([
+                'name' => $profileData['name'],
+            ], $profileData);
         }
     }
 

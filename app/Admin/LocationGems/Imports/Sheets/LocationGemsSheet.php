@@ -20,15 +20,9 @@ class LocationGemsSheet implements ToCollection
         $validatedRows = $this->normalizeAndValidateRows($rows);
 
         foreach ($validatedRows as $profileData) {
-            $existingProfile = GameLocationGemParamter::where('name', $profileData['name'])->first();
-
-            if (! is_null($existingProfile)) {
-                $existingProfile->update($profileData);
-
-                continue;
-            }
-
-            GameLocationGemParamter::create($profileData);
+            GameLocationGemParamter::updateOrCreate([
+                'name' => $profileData['name'],
+            ], $profileData);
         }
     }
 

@@ -48,6 +48,7 @@ class MassImportCustomData extends Command
             $this->importGameMaps();
         }
 
+        Artisan::call('break:maps-into-pieces');
         Artisan::call('create:gem-worlds');
         Artisan::call('create:character-attack-data');
         Artisan::call('generate:monster-cache');
