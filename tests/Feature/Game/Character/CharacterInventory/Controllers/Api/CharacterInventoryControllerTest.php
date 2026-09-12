@@ -492,6 +492,26 @@ class CharacterInventoryControllerTest extends TestCase
         $response->assertOk();
     }
 
+    public function test_use_alchemy_item_endpoint_rejects_a_gem_scroll_item(): void
+    {
+        Queue::fake();
+
+        $item = $this->createGemXpScrollItem();
+        $character = $this->character->getCharacter();
+        $alchemySlot = $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 1,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->postJson('/api/character/'.$character->id.'/inventory/use-alchemy-item/'.$alchemySlot->id);
+
+        $response->assertUnprocessable();
+        $this->assertEmpty($character->refresh()->boons);
+    }
+
     public function test_use_alchemy_item_uses_all_when_use_all_flag_is_set(): void
     {
         Queue::fake();

@@ -8,11 +8,12 @@ use Tests\Setup\GemProgression\GemWorldRewardTestFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterGameMapGemProgression;
 use Tests\Traits\CreateCharacterGameMapGemScroll;
+use Tests\Traits\CreateGameMapGemProgression;
 use Tests\Traits\CreateItem;
 
 class GemWorldProgressControllerTest extends TestCase
 {
-    use CreateCharacterGameMapGemProgression, CreateCharacterGameMapGemScroll, CreateItem, RefreshDatabase;
+    use CreateCharacterGameMapGemProgression, CreateCharacterGameMapGemScroll, CreateGameMapGemProgression, CreateItem, RefreshDatabase;
 
     private GemWorldRewardTestFactory $gemWorldRewardTestFactory;
 
@@ -60,6 +61,7 @@ class GemWorldProgressControllerTest extends TestCase
         $this->assertSame(200, $jsonData['personal']['xp']);
         $this->assertTrue($jsonData['scroll_drop']['eligible']);
         $this->assertEqualsWithDelta(0.02, $jsonData['scroll_drop']['chance'], 0.0000001);
+        $this->assertSame(200, $jsonData['personal']['next_unlock']['level']);
     }
 
     public function test_current_status_does_not_eagerly_return_active_scroll_rows(): void
@@ -136,6 +138,42 @@ class GemWorldProgressControllerTest extends TestCase
         $this->assertSame(200, $response->getStatusCode());
         $this->assertCount(1, $jsonData['data']);
         $this->assertSame('Scroll of Testing', $jsonData['data'][0]['item_name']);
+    }
+
+    public function test_returns_the_reward_effect_breakdown_with_base_global_and_personal_layers(): void
+    {
+        $graph = $this->gemWorldRewardTestFactory->buildGeneratedMapGemWorldCharacter();
+
+        $graph->mapProfile->rolledGem()->update(['gold_gain' => 0.05]);
+
+        $this->createGameMapGemProgression([
+            'game_map_gem_paramter_id' => $graph->mapProfile->id,
+            'level' => 100,
+            'xp' => 0,
+        ]);
+
+        $this->createCharacterGameMapGemProgression([
+            'character_id' => $graph->character->id,
+            'game_map_gem_paramter_id' => $graph->mapProfile->id,
+            'level' => 100,
+            'xp' => 0,
+        ]);
+
+        $response = $this->actingAs($graph->character->user)
+            ->call('GET', '/api/map/gem-world/'.$graph->character->id.'/progress');
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $goldGainBreakdown = collect($jsonData['reward_effect_breakdown'])
+            ->firstWhere('field', 'gold_gain');
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertNotNull($goldGainBreakdown);
+        $this->assertEqualsWithDelta(0.10, $goldGainBreakdown['base'], 0.0000001);
+        $this->assertEqualsWithDelta(0.10, $goldGainBreakdown['global'], 0.0000001);
+        $this->assertEqualsWithDelta(0.10, $goldGainBreakdown['personal'], 0.0000001);
+        $this->assertEqualsWithDelta(0.20, $goldGainBreakdown['global_effective'], 0.0000001);
+        $this->assertEqualsWithDelta(0.30, $goldGainBreakdown['effective'], 0.0000001);
     }
 
     public function test_all_profile_participation_is_paginated_and_flags_the_current_profile(): void

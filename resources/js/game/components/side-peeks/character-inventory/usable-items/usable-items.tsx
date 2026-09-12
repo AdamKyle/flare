@@ -5,6 +5,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import { useUseAlchemyItemApi } from './api/hooks/use-use-alchemy-item-api';
 import { useUseManyAlchemyItemsApi } from './api/hooks/use-use-many-alchemy-items-api';
+import GemScrollUsableItemAction from './components/gem-scroll-usable-item-action';
 import SpecialUsableItemGuidance from './components/special-usable-item-guidance';
 import UsableItemsProps from './types/usable-items-props';
 import UsableItem from './usable-item';
@@ -82,6 +83,17 @@ const UsableItems = ({
     setDetailQuantityMode(false);
     setDetailQuantity(1);
     setMutationSource(null);
+  };
+
+  const handleGemScrollActivated = (source: 'list' | 'detail'): void => {
+    setRefresh((previousValue) => !previousValue);
+
+    if (source === 'detail') {
+      setItemToView(null);
+    }
+
+    setDetailQuantityMode(false);
+    setDetailQuantity(1);
   };
 
   const {
@@ -358,6 +370,24 @@ const UsableItems = ({
     );
   };
 
+  const renderGemScrollAction = () => {
+    if (!itemToView || itemToView.slot_id === null) {
+      return null;
+    }
+
+    if (itemToView.gem_scroll_type === null) {
+      return null;
+    }
+
+    return (
+      <GemScrollUsableItemAction
+        item={itemToView}
+        character_id={character_id}
+        on_activated={() => handleGemScrollActivated('detail')}
+      />
+    );
+  };
+
   const renderUsableItemView = () => {
     if (!itemToView) {
       return null;
@@ -382,6 +412,7 @@ const UsableItems = ({
             </Alert>
           )}
           {isSpecialItem && <SpecialUsableItemGuidance item={itemToView} />}
+          {renderGemScrollAction()}
           {renderDetailQuantityControl()}
         </div>
       </StackedCard>
@@ -436,11 +467,13 @@ const UsableItems = ({
             on_item_clicked={onViewItem}
             active_boons={activeBoons}
             using_slot_id={usingSlotId}
+            character_id={character_id}
             on_use_one={(slotId) => handleUseOne(slotId, 'list')}
             on_use_quantity={(slotId, quantity) =>
               handleUseQuantity(slotId, quantity, 'list')
             }
             on_use_all={(slotId) => handleUseAll(slotId, 'list')}
+            on_gem_scroll_activated={() => handleGemScrollActivated('list')}
           />
         </div>
       </div>

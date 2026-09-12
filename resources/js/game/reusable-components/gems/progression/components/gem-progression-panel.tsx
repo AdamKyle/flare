@@ -95,6 +95,8 @@ const GemProgressionPanel = ({
         global={mergedData.global}
         personal={mergedData.personal}
         scroll_drop={mergedData.scroll_drop}
+        reward_effect_breakdown={mergedData.reward_effect_breakdown}
+        rarity_effect_breakdown={mergedData.rarity_effect_breakdown}
       />
 
       <Separator />

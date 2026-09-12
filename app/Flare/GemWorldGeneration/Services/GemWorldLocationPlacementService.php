@@ -27,7 +27,10 @@ class GemWorldLocationPlacementService
     ) {}
 
     /**
-     * @return array<int, GemWorldLocationPlacement>
+     * Resolve the placed generated Locations for the given generated Gem World Map.
+     *
+     * @param GameMap $gameMap
+     * @return array
      */
     public function placements(GameMap $gameMap): array
     {
@@ -83,10 +86,10 @@ class GemWorldLocationPlacementService
     }
 
     /**
-     * @param  int[]  $shuffledX
-     * @param  int[]  $shuffledY
-     * @param  int[]  $orderedX
-     * @param  int[]  $orderedY
+     * @param int[] $shuffledX
+     * @param int[] $shuffledY
+     * @param int[] $orderedX
+     * @param int[] $orderedY
      */
     private function nextPlacement(
         string $type,

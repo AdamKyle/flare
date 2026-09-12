@@ -2,7 +2,11 @@ import React, { ReactNode, useState } from 'react';
 
 import GemScrollPicker from './gem-scroll-picker';
 import ActiveGemScrollCardProps from './types/active-gem-scroll-card-props';
+import ActiveGemScrollRowDefinition from '../api/definitions/active-gem-scroll-row-definition';
 import GemScrollFamily from '../types/gem-scroll-family';
+import { resolveGemScrollCurrencyLabel } from '../utils/gem-scroll-currency-label';
+
+import { formatPercent } from 'game-utils/format-number';
 
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import LoadingButton from 'ui/buttons/loading-button';
@@ -21,6 +25,55 @@ const scrollTypeLabel = (gemScrollType: GemScrollFamily): string => {
   }
 
   return 'Item Scroll';
+};
+
+const renderScrollEffectRows = (
+  scroll: ActiveGemScrollRowDefinition
+): ReactNode => {
+  if (scroll.gem_scroll_type === 'xp') {
+    return (
+      <>
+        <Dt>Gem XP</Dt>
+        <Dd>
+          <span className="text-emerald-600 dark:text-emerald-400">
+            +{formatPercent(scroll.gem_scroll_bonus)}
+          </span>
+        </Dd>
+      </>
+    );
+  }
+
+  if (scroll.gem_scroll_type === 'currency') {
+    return (
+      <>
+        <Dt>
+          {scroll.gem_scroll_currency_type
+            ? resolveGemScrollCurrencyLabel(scroll.gem_scroll_currency_type)
+            : 'Currency'}
+        </Dt>
+        <Dd>
+          <span className="text-emerald-600 dark:text-emerald-400">
+            +{formatPercent(scroll.gem_scroll_bonus)}
+          </span>
+        </Dd>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <Dt>Item Bonus</Dt>
+      <Dd>
+        <span className="text-emerald-600 dark:text-emerald-400">
+          +{formatPercent(scroll.gem_scroll_bonus)}
+        </span>
+      </Dd>
+      <Dt>Socket Chance</Dt>
+      <Dd>{formatPercent(scroll.gem_scroll_socket_chance ?? 0)}</Dd>
+      <Dt>Pre-Gemmed Chance</Dt>
+      <Dd>{formatPercent(scroll.gem_scroll_pre_gem_chance ?? 0)}</Dd>
+    </>
+  );
 };
 
 const ActiveGemScrollCard = ({
@@ -79,12 +132,7 @@ const ActiveGemScrollCard = ({
         <Dl>
           <Dt>Type</Dt>
           <Dd>{scrollTypeLabel(scroll.gem_scroll_type)}</Dd>
-          {scroll.gem_scroll_currency_type && (
-            <>
-              <Dt>Currency</Dt>
-              <Dd>{scroll.gem_scroll_currency_type}</Dd>
-            </>
-          )}
+          {renderScrollEffectRows(scroll)}
           <Dt>Gem World</Dt>
           <Dd>
             {scroll.generated_game_map_name ?? scroll.profile_name ?? '—'}

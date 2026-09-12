@@ -46,12 +46,12 @@ class MassImportCustomData extends Command
 
         if (config('app.env') !== 'production') {
             $this->importGameMaps();
-
-            Artisan::call('create:gem-worlds');
-            Artisan::call('create:character-attack-data');
-            Artisan::call('generate:monster-cache');
-            Artisan::call('create:quest-cache');
         }
+
+        Artisan::call('create:gem-worlds');
+        Artisan::call('create:character-attack-data');
+        Artisan::call('generate:monster-cache');
+        Artisan::call('create:quest-cache');
     }
 
     /**

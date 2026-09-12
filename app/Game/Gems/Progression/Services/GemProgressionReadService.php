@@ -7,7 +7,6 @@ use App\Flare\Models\CharacterGameLocationGemProgression;
 use App\Flare\Models\CharacterGameMapGemProgression;
 use App\Game\Gems\Progression\Values\GemProgressionBands;
 use App\Game\Gems\Progression\Values\ResolvedGemWorldProfile;
-use App\Game\Gems\Services\AreaGemEffectService;
 
 class GemProgressionReadService
 {
@@ -17,7 +16,6 @@ class GemProgressionReadService
      * @param GemProgressionEffectService $gemProgressionEffectService
      * @param GemScrollEffectService $gemScrollEffectService
      * @param CharacterAreaGemEffectService $characterAreaGemEffectService
-     * @param AreaGemEffectService $areaGemEffectService
      */
     public function __construct(
         private readonly GemWorldProfileResolver $gemWorldProfileResolver,
@@ -25,7 +23,6 @@ class GemProgressionReadService
         private readonly GemProgressionEffectService $gemProgressionEffectService,
         private readonly GemScrollEffectService $gemScrollEffectService,
         private readonly CharacterAreaGemEffectService $characterAreaGemEffectService,
-        private readonly AreaGemEffectService $areaGemEffectService,
     ) {}
 
     /**
@@ -45,19 +42,9 @@ class GemProgressionReadService
         [$globalLevel, $globalXp] = $this->resolveGlobalProgression($resolvedProfile);
         [$personalLevel, $personalXp] = $this->resolvePersonalProgression($character, $resolvedProfile);
 
-        $rolledEffects = $this->areaGemEffectService->resolveForCharacter($character);
-        $effectiveEffects = $this->characterAreaGemEffectService->resolveForCharacter($character);
-
         return array_merge(
             $this->compactStatusPayload($character, $resolvedProfile, $globalLevel, $globalXp, $personalLevel, $personalXp),
-            [
-                'rolled_reward_effects' => $rolledEffects->rewardEffects()->toArray(),
-                'effective_reward_effects' => $effectiveEffects->rewardEffects()->toArray(),
-                'rolled_monster_effects' => $rolledEffects->monsterEffects()->toArray(),
-                'effective_monster_effects' => $effectiveEffects->monsterEffects()->toArray(),
-                'rolled_rarity_effects' => $rolledEffects->rarityEffects()->toArray(),
-                'effective_rarity_effects' => $effectiveEffects->rarityEffects()->toArray(),
-            ],
+            $this->characterAreaGemEffectService->resolveEffectBreakdownsForCharacter($character),
         );
     }
 
@@ -102,6 +89,7 @@ class GemProgressionReadService
                 'cosmic_chance_bonus' => $this->gemProgressionEffectService->personalCosmicBonus($personalLevel),
                 'enhanced_equipment_chance' => $this->gemProgressionEffectService->enhancedEquipmentChance($personalLevel),
                 'enhanced_equipment_unlocked' => $personalLevel >= GemProgressionBands::PERSONAL_ENHANCED_EQUIPMENT_LEVEL,
+                'next_unlock' => $this->resolveNextPersonalUnlock($personalLevel),
             ],
             'scroll_drop' => [
                 'eligible' => $this->gemProgressionEffectService->isScrollDropEligible($personalLevel),
@@ -120,6 +108,31 @@ class GemProgressionReadService
                 'item_bonus' => $scrollAggregate->itemBonusTotal(),
             ],
         ];
+    }
+
+    /**
+     * Resolve the next personal progression unlock milestone still ahead of
+     * the given personal level, or null once every milestone is reached.
+     *
+     * @param int $personalLevel
+     * @return ?array
+     */
+    private function resolveNextPersonalUnlock(int $personalLevel): ?array
+    {
+        $unlocks = [
+            GemProgressionBands::PERSONAL_RARITY_UNLOCK_LEVEL => 'Unique and Mythic Gem drop chance bonus',
+            GemProgressionBands::PERSONAL_COSMIC_UNLOCK_LEVEL => 'Cosmic Gem drop chance bonus',
+            GemProgressionBands::PERSONAL_ENHANCED_EQUIPMENT_LEVEL => 'Pre-gemmed enhanced equipment reward chance',
+            GemProgressionBands::PERSONAL_MAX_LEVEL => 'Maximum personal Gem progression',
+        ];
+
+        foreach ($unlocks as $level => $description) {
+            if ($personalLevel < $level) {
+                return ['level' => $level, 'description' => $description];
+            }
+        }
+
+        return null;
     }
 
     /**

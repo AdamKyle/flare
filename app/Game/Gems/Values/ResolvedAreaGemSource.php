@@ -9,18 +9,18 @@ namespace App\Game\Gems\Values;
 class ResolvedAreaGemSource
 {
     /**
-     * @param  GemSourceType  $type  The Gem profile source type.
-     * @param  int  $profileId  The contributing Map/Location Gem profile id.
-     * @param  string  $profileName  The contributing Map/Location Gem profile name.
-     * @param  int  $rolledGemId  The id of the currently rolled Gem for this profile.
-     * @param  string  $rolledGemName  The name of the currently rolled Gem for this profile.
-     * @param  float  $monsterMultiplier  The Monster combat effect multiplier applied for this source.
-     * @param  float  $rewardMultiplier  The player/reward effect multiplier applied for this source.
-     * @param  float|null  $reductionMultiplier  The Character power reduction multiplier applied for this source, when applicable.
-     * @param  int|null  $gameMapId  The Game Map id associated with this source, when applicable.
-     * @param  string|null  $gameMapName  The Game Map name associated with this source, when applicable.
-     * @param  int|null  $locationId  The Location id associated with this source, when applicable.
-     * @param  string|null  $locationName  The Location name associated with this source, when applicable.
+     * @param GemSourceType $type The Gem profile source type.
+     * @param int $profileId The contributing Map/Location Gem profile id.
+     * @param string $profileName The contributing Map/Location Gem profile name.
+     * @param int $rolledGemId The id of the currently rolled Gem for this profile.
+     * @param string $rolledGemName The name of the currently rolled Gem for this profile.
+     * @param float $monsterMultiplier The Monster combat effect multiplier applied for this source.
+     * @param float $rewardMultiplier The player/reward effect multiplier applied for this source.
+     * @param float|null $reductionMultiplier The Character power reduction multiplier applied for this source, when applicable.
+     * @param int|null $gameMapId The Game Map id associated with this source, when applicable.
+     * @param string|null $gameMapName The Game Map name associated with this source, when applicable.
+     * @param int|null $locationId The Location id associated with this source, when applicable.
+     * @param string|null $locationName The Location name associated with this source, when applicable.
      */
     public function __construct(
         private readonly GemSourceType $type,
@@ -136,7 +136,7 @@ class ResolvedAreaGemSource
     /**
      * Serialize this source into the legacy/cache compatible field shape.
      *
-     * @return array<string, mixed>
+     * @return array
      */
     public function toArray(): array
     {

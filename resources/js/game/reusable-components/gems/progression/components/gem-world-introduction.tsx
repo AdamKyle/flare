@@ -45,8 +45,9 @@ const PAGES: IntroductionPage[] = [
   {
     title: 'Using Gem Scrolls',
     paragraphs: [
-      'Gem Scrolls live in your Alchemy Bag and can only be activated while you are inside the exact Gem World they are rolled for.',
-      "Once activated, a Scroll's timer counts down in real time and never pauses — even after you leave. Fill Up extends an active Scroll's duration; Remove cancels it without a refund.",
+      'Gem Scrolls are generated Items that live in your Alchemy Bag. A Scroll becomes bound to the exact Gem profile where you consume it, and its active effect applies only to that profile.',
+      'You may enter another Gem World and consume separate Scrolls there — this does not affect a Scroll already active in a different profile.',
+      "Once activated, a Scroll's timer counts down in real time and never pauses. Leaving the Gem World does not stop the timer, and returning before it expires makes the still-active effect applicable again. Fill Up extends an active Scroll's duration; Remove cancels it without a refund.",
       "All of your active Scrolls' primary bonuses for one Gem profile share a combined 2000% cap.",
     ],
   },

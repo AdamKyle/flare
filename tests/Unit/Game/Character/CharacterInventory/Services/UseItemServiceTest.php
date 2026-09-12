@@ -1897,4 +1897,23 @@ class UseItemServiceTest extends TestCase
         $this->assertEquals(60, $boon->fresh()->last_for_minutes);
         $this->assertNotNull($character->refresh()->inventory->slots->where('item.type', 'alchemy')->first());
     }
+
+    public function test_a_gem_scroll_item_cannot_be_turned_into_a_boon(): void
+    {
+        $item = $this->createGemXpScrollItem();
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 1,
+        ]);
+
+        $result = $this->useItemService->useSingleItemFromInventory($character->refresh(), $item);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEmpty($character->refresh()->boons);
+        $this->assertEquals(1, AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag->id)->where('item_id', $item->id)->value('amount'));
+    }
 }

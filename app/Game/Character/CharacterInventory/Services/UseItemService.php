@@ -347,6 +347,10 @@ class UseItemService
      */
     private function useAlchemyBagItem(AlchemyBagSlot $slot, Character $character): bool
     {
+        if (! is_null($slot->item->gem_scroll_type)) {
+            return false;
+        }
+
         $foundBoon = $character->boons()
             ->active()
             ->where('item_id', $slot->item_id)
@@ -446,7 +450,8 @@ class UseItemService
             && $item->usable
             && $item->lasts_for > 0
             && ! $item->damages_kingdoms
-            && ! $item->can_use_on_other_items;
+            && ! $item->can_use_on_other_items
+            && is_null($item->gem_scroll_type);
     }
 
     /**

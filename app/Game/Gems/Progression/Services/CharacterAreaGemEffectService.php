@@ -8,6 +8,7 @@ use App\Flare\Models\CharacterGameMapGemProgression;
 use App\Flare\Models\GameLocationGemParamter;
 use App\Flare\Models\GameMapGemParamter;
 use App\Flare\Models\Gem;
+use App\Game\Gems\Progression\Values\GemFieldProgressionBreakdown;
 use App\Game\Gems\Progression\Values\SourceProgressionContext;
 use App\Game\Gems\Services\AreaGemEffectService;
 use App\Game\Gems\Values\AreaGemContext;
@@ -75,6 +76,116 @@ class CharacterAreaGemEffectService
             locationId: $baseResolved->locationId(),
             locationName: $baseResolved->locationName(),
         );
+    }
+
+    /**
+     * Resolve the Character-facing base/global/personal/effective breakdown
+     * for every currently applicable positive reward and rarity effect
+     * field, in a single resolution pass over the Character's Gem sources.
+     *
+     * @param Character $character
+     * @return array
+     */
+    public function resolveEffectBreakdownsForCharacter(Character $character): array
+    {
+        $baseResolved = $this->areaGemEffectService->resolveForCharacter($character);
+        $sourceContexts = $this->resolveSourceContexts($character, $baseResolved->sources());
+
+        return [
+            'reward_effect_breakdown' => $this->rewardEffectBreakdowns($baseResolved->rewardEffects(), $sourceContexts),
+            'rarity_effect_breakdown' => $this->rarityEffectBreakdowns($baseResolved->rarityEffects(), $sourceContexts),
+        ];
+    }
+
+    /**
+     * Build the applicable reward effect breakdowns for every closed reward effect field.
+     *
+     * @param ResolvedAreaGemRewardEffects $base
+     * @param array $sourceContexts
+     * @return array
+     */
+    private function rewardEffectBreakdowns(ResolvedAreaGemRewardEffects $base, array $sourceContexts): array
+    {
+        $breakdowns = [];
+
+        foreach (AreaGemRewardEffect::cases() as $case) {
+            $breakdown = $this->resolveFieldBreakdown(
+                $case->value,
+                $base->effect($case),
+                $sourceContexts,
+                fn (SourceProgressionContext $context): float => $context->rewardFieldValue($case),
+            );
+
+            if ($breakdown->isApplicable()) {
+                $breakdowns[] = $breakdown->toArray();
+            }
+        }
+
+        return $breakdowns;
+    }
+
+    /**
+     * Build the applicable rarity effect breakdowns for the Unique/Mythic/Cosmic fields.
+     *
+     * @param ResolvedAreaGemRarityEffects $base
+     * @param array $sourceContexts
+     * @return array
+     */
+    private function rarityEffectBreakdowns(ResolvedAreaGemRarityEffects $base, array $sourceContexts): array
+    {
+        $rolledFieldResolvers = [
+            'unique' => fn (SourceProgressionContext $context): float => $context->gem->unique_item_drop_chance_increase ?? 0.0,
+            'mythic' => fn (SourceProgressionContext $context): float => $context->gem->mythic_item_drop_chance_increase ?? 0.0,
+            'cosmic' => fn (SourceProgressionContext $context): float => $context->gem->cosmic_item_drop_chance_increase ?? 0.0,
+        ];
+
+        $baseValues = ['unique' => $base->unique(), 'mythic' => $base->mythic(), 'cosmic' => $base->cosmic()];
+
+        $breakdowns = [];
+
+        foreach ($rolledFieldResolvers as $field => $rolledFieldResolver) {
+            $breakdown = $this->resolveFieldBreakdown($field, $baseValues[$field], $sourceContexts, $rolledFieldResolver);
+
+            if ($breakdown->isApplicable()) {
+                $breakdowns[] = $breakdown->toArray();
+            }
+        }
+
+        return $breakdowns;
+    }
+
+    /**
+     * Resolve the base/global/personal/effective breakdown for one additive
+     * positive Gem effect field, summing every contributing source's own
+     * global and personal progression bonus on top of the already-combined
+     * base value.
+     *
+     * @param string $field
+     * @param float $baseValue
+     * @param array $sourceContexts
+     * @param callable $rolledFieldResolver
+     * @return GemFieldProgressionBreakdown
+     */
+    private function resolveFieldBreakdown(string $field, float $baseValue, array $sourceContexts, callable $rolledFieldResolver): GemFieldProgressionBreakdown
+    {
+        $globalBonus = 0.0;
+        $personalBonus = 0.0;
+
+        foreach ($sourceContexts as $context) {
+            $sourceMultiplier = $context->source->rewardMultiplier();
+
+            if ($sourceMultiplier <= 0.0) {
+                continue;
+            }
+
+            $originalRolledValue = $rolledFieldResolver($context) * $sourceMultiplier;
+
+            $globalBonus += $this->gemProgressionEffectService->globalPositiveBonus($originalRolledValue, $context->globalLevel);
+            $personalBonus += $this->gemProgressionEffectService->personalBaseBonus($originalRolledValue, $context->personalLevel)
+                + $this->gemProgressionEffectService->personalPositiveBandBonus($originalRolledValue, $context->personalLevel);
+        }
+
+        return new GemFieldProgressionBreakdown($field, $baseValue, $globalBonus, $personalBonus, $baseValue + $globalBonus + $personalBonus);
     }
 
     /**
@@ -278,23 +389,7 @@ class CharacterAreaGemEffectService
      */
     private function overlayPositiveField(float $baseValue, array $sourceContexts, callable $rolledFieldResolver): float
     {
-        $bonus = 0.0;
-
-        foreach ($sourceContexts as $context) {
-            $sourceMultiplier = $context->source->rewardMultiplier();
-
-            if ($sourceMultiplier <= 0.0) {
-                continue;
-            }
-
-            $originalRolledValue = $rolledFieldResolver($context) * $sourceMultiplier;
-
-            $bonus += $this->gemProgressionEffectService->globalPositiveBonus($originalRolledValue, $context->globalLevel)
-                + $this->gemProgressionEffectService->personalBaseBonus($originalRolledValue, $context->personalLevel)
-                + $this->gemProgressionEffectService->personalPositiveBandBonus($originalRolledValue, $context->personalLevel);
-        }
-
-        return $baseValue + $bonus;
+        return $this->resolveFieldBreakdown('', $baseValue, $sourceContexts, $rolledFieldResolver)->effective();
     }
 
     /**

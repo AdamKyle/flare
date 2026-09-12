@@ -1,8 +1,11 @@
-import {
-  AreaGemMonsterEffectsDefinition,
-  AreaGemRarityEffectsDefinition,
-  AreaGemRewardEffectsDefinition,
-} from '../../../api/definitions/area-gem-context-definition';
+export interface GemFieldProgressionBreakdownDefinition {
+  field: string;
+  base: number;
+  global: number;
+  personal: number;
+  global_effective: number;
+  effective: number;
+}
 
 export interface GemProgressionProfileDefinition {
   type: string;
@@ -18,6 +21,11 @@ export interface GemProgressionGlobalDefinition {
   max_level: number;
 }
 
+export interface GemProgressionNextUnlockDefinition {
+  level: number;
+  description: string;
+}
+
 export interface GemProgressionPersonalDefinition {
   level: number;
   xp: number;
@@ -29,6 +37,7 @@ export interface GemProgressionPersonalDefinition {
   cosmic_chance_bonus: number;
   enhanced_equipment_chance: number;
   enhanced_equipment_unlocked: boolean;
+  next_unlock: GemProgressionNextUnlockDefinition | null;
 }
 
 export interface GemProgressionScrollDropDefinition {
@@ -68,12 +77,8 @@ export interface GemProgressionActiveStatusDefinition {
   personal: GemProgressionPersonalDefinition;
   scroll_drop: GemProgressionScrollDropDefinition;
   active_scrolls: GemProgressionActiveScrollsDefinition;
-  rolled_reward_effects: AreaGemRewardEffectsDefinition;
-  effective_reward_effects: AreaGemRewardEffectsDefinition;
-  rolled_monster_effects: AreaGemMonsterEffectsDefinition;
-  effective_monster_effects: AreaGemMonsterEffectsDefinition;
-  rolled_rarity_effects: AreaGemRarityEffectsDefinition;
-  effective_rarity_effects: AreaGemRarityEffectsDefinition;
+  reward_effect_breakdown: GemFieldProgressionBreakdownDefinition[];
+  rarity_effect_breakdown: GemFieldProgressionBreakdownDefinition[];
 }
 
 type GemProgressionStatusDefinition =

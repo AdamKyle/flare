@@ -9,18 +9,18 @@ namespace App\Game\Gems\Values;
 class ResolvedAreaGemRewardEffects
 {
     /**
-     * @param  float  $characterXpBonus  Resolved Character XP bonus.
-     * @param  float  $characterClassRankXpBonus  Resolved Class Rank XP bonus.
-     * @param  float  $kingdomPassiveTrainingReduction  Resolved Kingdom passive training time reduction.
-     * @param  float  $goldGain  Resolved Gold gain bonus.
-     * @param  float  $goldDustGain  Resolved Gold Dust gain bonus.
-     * @param  float  $shardsGain  Resolved Shards gain bonus.
-     * @param  float  $copperCoinGain  Resolved Copper Coin gain bonus.
-     * @param  float  $characterClassSpecialtyXpGain  Resolved Class Specialty XP gain bonus.
-     * @param  float  $itemDropChanceIncrease  Resolved item drop chance increase.
-     * @param  float  $enemyQuestItemDropChanceIncrease  Resolved quest item drop chance increase.
-     * @param  float  $monsterXpIncrease  Resolved Monster XP increase.
-     * @param  float  $monsterGoldDropIncrease  Resolved Monster Gold drop increase.
+     * @param float $characterXpBonus Resolved Character XP bonus.
+     * @param float $characterClassRankXpBonus Resolved Class Rank XP bonus.
+     * @param float $kingdomPassiveTrainingReduction Resolved Kingdom passive training time reduction.
+     * @param float $goldGain Resolved Gold gain bonus.
+     * @param float $goldDustGain Resolved Gold Dust gain bonus.
+     * @param float $shardsGain Resolved Shards gain bonus.
+     * @param float $copperCoinGain Resolved Copper Coin gain bonus.
+     * @param float $characterClassSpecialtyXpGain Resolved Class Specialty XP gain bonus.
+     * @param float $itemDropChanceIncrease Resolved item drop chance increase.
+     * @param float $enemyQuestItemDropChanceIncrease Resolved quest item drop chance increase.
+     * @param float $monsterXpIncrease Resolved Monster XP increase.
+     * @param float $monsterGoldDropIncrease Resolved Monster Gold drop increase.
      */
     public function __construct(
         private readonly float $characterXpBonus,
@@ -98,7 +98,7 @@ class ResolvedAreaGemRewardEffects
     /**
      * Serialize this result into the legacy/cache compatible field shape.
      *
-     * @return array<string, float>
+     * @return array
      */
     public function toArray(): array
     {

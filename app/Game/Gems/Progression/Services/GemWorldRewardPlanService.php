@@ -141,21 +141,45 @@ class GemWorldRewardPlanService
             return GemSpecialItemRollPlan::failed($candidateRarity);
         }
 
-        $socketed = $this->chanceCalculator->passesPercentage($scrollAggregate->itemSocketChance() * 100);
-        $socketCount = null;
-        $preGemmed = false;
-        $gemCount = null;
+        $socketCount = $this->resolveItemOpportunitySocketCount($scrollAggregate);
+        $gemCount = $this->resolveItemOpportunityGemCount($scrollAggregate, $socketCount);
 
-        if ($socketed) {
-            $socketCount = $this->randomNumberGenerator->numberBetween(1, ItemSocketEligibility::MAX_SOCKET_COUNT);
-            $preGemmed = $this->chanceCalculator->passesPercentage($scrollAggregate->itemPreGemChance() * 100);
+        return new GemSpecialItemRollPlan($candidateRarity, true, ! is_null($socketCount), $socketCount, ! is_null($gemCount), $gemCount);
+    }
 
-            if ($preGemmed) {
-                $gemCount = $this->randomNumberGenerator->numberBetween(1, $socketCount);
-            }
+    /**
+     * Roll the independent socket count for one Item Scroll rarity opportunity, or null when the socket chance fails.
+     *
+     * @param GemScrollAggregate $scrollAggregate
+     * @return ?int
+     */
+    private function resolveItemOpportunitySocketCount(GemScrollAggregate $scrollAggregate): ?int
+    {
+        if (! $this->chanceCalculator->passesPercentage($scrollAggregate->itemSocketChance() * 100)) {
+            return null;
         }
 
-        return new GemSpecialItemRollPlan($candidateRarity, true, $socketed, $socketCount, $preGemmed, $gemCount);
+        return $this->randomNumberGenerator->numberBetween(1, ItemSocketEligibility::MAX_SOCKET_COUNT);
+    }
+
+    /**
+     * Roll the independent pre-gemmed Gem count for one Item Scroll rarity opportunity, or null when unsocketed or the pre-gem chance fails.
+     *
+     * @param GemScrollAggregate $scrollAggregate
+     * @param ?int $socketCount
+     * @return ?int
+     */
+    private function resolveItemOpportunityGemCount(GemScrollAggregate $scrollAggregate, ?int $socketCount): ?int
+    {
+        if (is_null($socketCount)) {
+            return null;
+        }
+
+        if (! $this->chanceCalculator->passesPercentage($scrollAggregate->itemPreGemChance() * 100)) {
+            return null;
+        }
+
+        return $this->randomNumberGenerator->numberBetween(1, $socketCount);
     }
 
     /**

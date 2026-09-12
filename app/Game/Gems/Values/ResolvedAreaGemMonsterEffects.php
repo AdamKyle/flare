@@ -9,18 +9,18 @@ namespace App\Game\Gems\Values;
 class ResolvedAreaGemMonsterEffects
 {
     /**
-     * @param  float  $enemyStrengthIncrease  Resolved enemy strength increase.
-     * @param  float  $enemyHealingIncrease  Resolved enemy healing increase.
-     * @param  float  $enemySpellEvasion  Resolved enemy spell evasion increase.
-     * @param  float  $enemyAffixResistance  Resolved enemy affix resistance increase.
-     * @param  float  $enemyEntrancingChance  Resolved enemy entrancing chance increase.
-     * @param  float  $enemyDevouringLightChance  Resolved enemy devouring light chance increase.
-     * @param  float  $enemyDevouringDarknessChance  Resolved enemy devouring darkness chance increase.
-     * @param  float  $enemyAmbushChance  Resolved enemy ambush chance increase.
-     * @param  float  $enemyAmbushResistance  Resolved enemy ambush resistance increase.
-     * @param  float  $enemyCounterChance  Resolved enemy counter chance increase.
-     * @param  float  $enemyCounterResistance  Resolved enemy counter resistance increase.
-     * @param  ResolvedAreaGemAtonement  $atonement  Resolved Monster elemental atonement.
+     * @param float $enemyStrengthIncrease Resolved enemy strength increase.
+     * @param float $enemyHealingIncrease Resolved enemy healing increase.
+     * @param float $enemySpellEvasion Resolved enemy spell evasion increase.
+     * @param float $enemyAffixResistance Resolved enemy affix resistance increase.
+     * @param float $enemyEntrancingChance Resolved enemy entrancing chance increase.
+     * @param float $enemyDevouringLightChance Resolved enemy devouring light chance increase.
+     * @param float $enemyDevouringDarknessChance Resolved enemy devouring darkness chance increase.
+     * @param float $enemyAmbushChance Resolved enemy ambush chance increase.
+     * @param float $enemyAmbushResistance Resolved enemy ambush resistance increase.
+     * @param float $enemyCounterChance Resolved enemy counter chance increase.
+     * @param float $enemyCounterResistance Resolved enemy counter resistance increase.
+     * @param ResolvedAreaGemAtonement $atonement Resolved Monster elemental atonement.
      */
     public function __construct(
         private readonly float $enemyStrengthIncrease,
@@ -104,7 +104,7 @@ class ResolvedAreaGemMonsterEffects
     /**
      * Serialize this result into the legacy/cache compatible field shape.
      *
-     * @return array<string, float|int|null>
+     * @return array
      */
     public function toArray(): array
     {

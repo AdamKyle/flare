@@ -11,8 +11,8 @@ namespace App\Game\Gems\Values;
 class ResolvedAreaGemAtonement
 {
     /**
-     * @param  int|null  $type  The resolved atonement elemental type, using the `GemTypeValue` constants.
-     * @param  float|null  $amount  The resolved atonement amount.
+     * @param int|null $type The resolved atonement elemental type, using the `GemTypeValue` constants.
+     * @param float|null $amount The resolved atonement amount.
      */
     public function __construct(
         private readonly ?int $type,
@@ -58,7 +58,7 @@ class ResolvedAreaGemAtonement
     /**
      * Serialize this atonement into the legacy/cache compatible field shape.
      *
-     * @return array<string, int|float|null>
+     * @return array
      */
     public function toArray(): array
     {

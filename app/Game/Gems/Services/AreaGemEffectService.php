@@ -275,7 +275,11 @@ class AreaGemEffectService
      * Combine the Map/Location Gem crafting bonus per selected GameSkill id. Each source only
      * contributes its bonus to the Skills it selected; a Skill selected by both sources adds.
      *
-     * @return array<int, float>
+     * @param ?Gem $mapGem
+     * @param float $mapMultiplier
+     * @param ?Gem $locationGem
+     * @param float $locationMultiplier
+     * @return array
      */
     private function combineCraftingSkillBonuses(?Gem $mapGem, float $mapMultiplier, ?Gem $locationGem, float $locationMultiplier): array
     {

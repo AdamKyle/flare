@@ -1,5 +1,6 @@
 import React, { ReactNode, useState } from 'react';
 
+import GemScrollUsableItemAction from './gem-scroll-usable-item-action';
 import UsableAlchemyActionCardProps from './types/usable-alchemy-action-card-props';
 import UsableItem from '../../../components/items/usable-item';
 
@@ -12,16 +13,20 @@ const UsableAlchemyActionCard = ({
   item,
   legal_use_count: legalUseCount,
   using_slot_id: usingSlotId,
+  character_id: characterId,
   on_click: onClick,
   on_use_one: onUseOne,
   on_use_quantity: onUseQuantity,
   on_use_all: onUseAll,
+  on_gem_scroll_activated: onGemScrollActivated,
 }: UsableAlchemyActionCardProps): ReactNode => {
   const [showQuantity, setShowQuantity] = useState(false);
   const [quantity, setQuantity] = useState(1);
 
   const isSpecialItem = item.holy_level !== null || item.damages_kingdoms;
-  const canShowActions = item.slot_id !== null && item.usable && !isSpecialItem;
+  const isGemScroll = item.gem_scroll_type !== null;
+  const canShowActions =
+    item.slot_id !== null && item.usable && !isSpecialItem && !isGemScroll;
   const isBusy = usingSlotId !== null && usingSlotId === item.slot_id;
 
   const handleQuantityChange = (value: string): void => {
@@ -92,6 +97,20 @@ const UsableAlchemyActionCard = ({
     );
   };
 
+  const renderGemScrollAction = (): ReactNode => {
+    if (!isGemScroll || item.slot_id === null) {
+      return null;
+    }
+
+    return (
+      <GemScrollUsableItemAction
+        item={item}
+        character_id={characterId}
+        on_activated={onGemScrollActivated}
+      />
+    );
+  };
+
   const renderActionButtons = (): ReactNode => {
     if (item.slot_id === null || legalUseCount <= 0) {
       return null;
@@ -158,6 +177,8 @@ const UsableAlchemyActionCard = ({
       </div>
 
       <UsableItem item={item} on_click={onClick} />
+
+      {renderGemScrollAction()}
 
       {canShowActions && (
         <div className="flex flex-wrap items-center gap-2">

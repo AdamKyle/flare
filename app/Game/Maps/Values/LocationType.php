@@ -62,7 +62,7 @@ enum LocationType: int
      * The authoritative set of Location Types that make up the Weekly Fight category.
      * Cave of Memories is intentionally excluded.
      *
-     * @return array<int, int>
+     * @return array
      */
     public static function weeklyFightLocationTypes(): array
     {

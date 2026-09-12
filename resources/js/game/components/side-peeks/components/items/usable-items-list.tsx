@@ -14,9 +14,11 @@ const UsableItemsList = ({
   on_item_clicked,
   active_boons: activeBoons,
   using_slot_id: usingSlotId,
+  character_id: characterId,
   on_use_one: onUseOne,
   on_use_quantity: onUseQuantity,
   on_use_all: onUseAll,
+  on_gem_scroll_activated: onGemScrollActivated,
 }: UsableItemsListProps) => {
   const now = new Date();
 
@@ -38,10 +40,12 @@ const UsableItemsList = ({
         item={item}
         legal_use_count={resolveAlchemyLegalUseCount(item, activeBoons, now)}
         using_slot_id={usingSlotId}
+        character_id={characterId}
         on_click={on_item_clicked}
         on_use_one={onUseOne}
         on_use_quantity={onUseQuantity}
         on_use_all={onUseAll}
+        on_gem_scroll_activated={onGemScrollActivated}
       />
     ));
   };
