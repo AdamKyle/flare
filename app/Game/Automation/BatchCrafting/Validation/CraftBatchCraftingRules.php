@@ -15,7 +15,7 @@ class CraftBatchCraftingRules
     /**
      * Build the Craft batch type's validation rules for the requested craft mode.
      *
-     * @param  array  $requestData  The raw Batch Crafting request data.
+     * @param array $requestData The raw Batch Crafting request data.
      * @return array The Craft validation rules.
      */
     public function rules(array $requestData): array
@@ -32,7 +32,7 @@ class CraftBatchCraftingRules
     /**
      * Return the client-owned progress keys allowed for the requested craft mode.
      *
-     * @param  string|null  $mode  The requested craft mode value.
+     * @param string|null $mode The requested craft mode value.
      * @return array<int, string> The allowed client-owned progress keys.
      */
     private function allowedProgressKeys(?string $mode): array
@@ -47,7 +47,7 @@ class CraftBatchCraftingRules
     /**
      * Return the mode-specific validation rules for the requested craft mode.
      *
-     * @param  string|null  $mode  The requested craft mode value.
+     * @param string|null $mode The requested craft mode value.
      * @return array The mode-specific validation rules.
      */
     private function modeSpecificRules(?string $mode): array
@@ -110,7 +110,7 @@ class CraftBatchCraftingRules
     /**
      * Return the shared output destination validation rules for a mode that supports retained output.
      *
-     * @param  CraftingBatchMode  $mode  The requested craft mode.
+     * @param CraftingBatchMode $mode The requested craft mode.
      * @return array The output destination validation rules.
      */
     private function outputDestinationRules(CraftingBatchMode $mode): array

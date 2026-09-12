@@ -42,8 +42,8 @@ class ShowTimeOutEvent implements ShouldBroadcastNow
     /**
      * Create a new event instance.
      *
-     * @param  int  $forLength  | 0
-     * @param  bool  $setSail  | false
+     * @param int $forLength | 0
+     * @param bool $setSail | false
      * @return void
      */
     public function __construct(User $user, bool $activateBar, bool $canMove, int $forLength = 0, bool $setSail = false)

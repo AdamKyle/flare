@@ -14,7 +14,7 @@ class BaseStatCalculator
     /**
      * Set the Class used to calculate base stats.
      *
-     * @param  GameClass  $class  Class supplying base-stat modifiers.
+     * @param GameClass $class Class supplying base-stat modifiers.
      * @return BaseStatCalculator This calculator, configured with the supplied Class.
      */
     public function setClass(GameClass $class): BaseStatCalculator

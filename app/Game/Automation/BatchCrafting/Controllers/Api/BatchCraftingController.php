@@ -21,8 +21,8 @@ class BatchCraftingController
     /**
      * Start a new Batch Crafting run for the character.
      *
-     * @param  BatchCraftingRequest  $request  The validated Batch Crafting start request.
-     * @param  Character  $character  The character starting the run.
+     * @param BatchCraftingRequest $request The validated Batch Crafting start request.
+     * @param Character $character The character starting the run.
      * @return JsonResponse The lifecycle service's start result.
      */
     public function start(BatchCraftingRequest $request, Character $character): JsonResponse
@@ -33,8 +33,8 @@ class BatchCraftingController
     /**
      * Preview the Craft Amount request before starting a Batch Crafting run.
      *
-     * @param  BatchCraftingRequest  $request  The validated Batch Crafting preview request.
-     * @param  Character  $character  The character requesting the preview.
+     * @param BatchCraftingRequest $request The validated Batch Crafting preview request.
+     * @param Character $character The character requesting the preview.
      * @return JsonResponse The Craft Amount preview payload.
      */
     public function preview(BatchCraftingRequest $request, Character $character): JsonResponse
@@ -45,7 +45,7 @@ class BatchCraftingController
     /**
      * Cancel the character's currently running Batch Crafting run.
      *
-     * @param  Character  $character  The character cancelling the run.
+     * @param Character $character The character cancelling the run.
      * @return JsonResponse The lifecycle service's cancel result.
      */
     public function cancel(Character $character): JsonResponse
@@ -56,7 +56,7 @@ class BatchCraftingController
     /**
      * Return the character's current Batch Crafting panel status.
      *
-     * @param  Character  $character  The character requesting status.
+     * @param Character $character The character requesting status.
      * @return JsonResponse The current Batch Crafting panel status.
      */
     public function status(Character $character): JsonResponse
@@ -67,7 +67,7 @@ class BatchCraftingController
     /**
      * Dismiss the character's finished Batch Crafting panel.
      *
-     * @param  Character  $character  The character dismissing the panel.
+     * @param Character $character The character dismissing the panel.
      * @return JsonResponse The lifecycle service's dismiss result.
      */
     public function dismiss(Character $character): JsonResponse
@@ -78,7 +78,7 @@ class BatchCraftingController
     /**
      * Acknowledge the Batch Crafting introduction for the character.
      *
-     * @param  Character  $character  The character acknowledging the introduction.
+     * @param Character $character The character acknowledging the introduction.
      * @return JsonResponse The lifecycle service's acknowledgement result.
      */
     public function acknowledgeInfo(Character $character): JsonResponse
@@ -89,7 +89,7 @@ class BatchCraftingController
     /**
      * Return the authoritative Craft Set recommendation for the character.
      *
-     * @param  Character  $character  The character requesting the recommendation.
+     * @param Character $character The character requesting the recommendation.
      * @return JsonResponse The recommended Craft Set positions and any missing required positions.
      */
     public function craftSetRecommendation(Character $character): JsonResponse
@@ -100,8 +100,8 @@ class BatchCraftingController
     /**
      * Recommend the best currently craftable item for one explicitly selected Craft Set hand type.
      *
-     * @param  Request  $request  The incoming hand recommendation request.
-     * @param  Character  $character  The character requesting the recommendation.
+     * @param Request $request The incoming hand recommendation request.
+     * @param Character $character The character requesting the recommendation.
      * @return JsonResponse The recommended hand item, or a null item when nothing is craftable for the hand type.
      */
     public function craftSetHandRecommendation(Request $request, Character $character): JsonResponse
@@ -125,7 +125,7 @@ class BatchCraftingController
     /**
      * Convert a ResponseBuilder service result into a JSON response.
      *
-     * @param  array  $response  The service result containing a status key.
+     * @param array $response The service result containing a status key.
      * @return JsonResponse The response with the status key applied as the HTTP status.
      */
     private function respond(array $response): JsonResponse

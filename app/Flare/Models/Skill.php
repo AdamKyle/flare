@@ -89,7 +89,7 @@ class Skill extends Model
     /**
      * Build the list of equipped/quest items contributing to this Skill's bonus.
      *
-     * @param  string  $skillAttribute  Skill attribute whose contributing items are being resolved.
+     * @param string $skillAttribute Skill attribute whose contributing items are being resolved.
      * @return array Item bonus breakdown entries, each describing the contributing item and its bonus amount.
      */
     public function getItemSkillBreakdown(string $skillAttribute = 'skill_bonus'): array
@@ -441,7 +441,7 @@ class Skill extends Model
     /**
      * Resolve the flat training bonus granted for a Class specific crafting Skill.
      *
-     * @param  Character  $character  Character whose Class-specific training bonus is being calculated.
+     * @param Character $character Character whose Class-specific training bonus is being calculated.
      * @return float Calculated Class-specific training bonus.
      */
     private function getClassSpecificTrainingBonus(Character $character): float
@@ -463,9 +463,9 @@ class Skill extends Model
     /**
      * Resolve the total Skill bonus contributed by equipped and, optionally, quest items.
      *
-     * @param  GameSkill  $skill  Base Game Skill whose item bonuses are being resolved.
-     * @param  string  $skillAttribute  Requested Skill attribute to sum bonuses for.
-     * @param  bool  $equippedOnly  Whether to restrict the bonus to equipped items only.
+     * @param GameSkill $skill Base Game Skill whose item bonuses are being resolved.
+     * @param string $skillAttribute Requested Skill attribute to sum bonuses for.
+     * @param bool $equippedOnly Whether to restrict the bonus to equipped items only.
      * @return float Total Skill bonus contributed by the matching items.
      */
     private function getItemBonuses(GameSkill $skill, string $skillAttribute = 'skill_bonus', bool $equippedOnly = false): float
@@ -489,8 +489,8 @@ class Skill extends Model
     /**
      * Build the list of equipped/quest items contributing a positive bonus for the given Skill attribute.
      *
-     * @param  GameSkill  $skill  Base Game Skill whose contributing items are being resolved.
-     * @param  string  $skillAttribute  Requested Skill attribute to build the breakdown for.
+     * @param GameSkill $skill Base Game Skill whose contributing items are being resolved.
+     * @param string $skillAttribute Requested Skill attribute to build the breakdown for.
      * @return array Item bonus breakdown entries, each describing the contributing item and its bonus amount.
      */
     private function getItemBonusBreakDown(GameSkill $skill, string $skillAttribute = 'skill_bonus'): array
@@ -544,7 +544,7 @@ class Skill extends Model
     /**
      * Resolve the total bonus contributed by the Character's active Boons for the given attribute.
      *
-     * @param  string  $skillBonusAttribute  Requested Skill bonus attribute to sum across active Boons.
+     * @param string $skillBonusAttribute Requested Skill bonus attribute to sum across active Boons.
      * @return float Total bonus contributed by the Character's active Boons for the given attribute.
      */
     private function getCharacterBoonsBonus(string $skillBonusAttribute)

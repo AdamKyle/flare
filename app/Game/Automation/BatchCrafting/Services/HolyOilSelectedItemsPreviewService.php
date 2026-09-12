@@ -15,8 +15,8 @@ class HolyOilSelectedItemsPreviewService
     /**
      * Build the Holy Oils Selected Items preview payload for the validated Batch Crafting request.
      *
-     * @param  Character  $character  The character requesting the preview.
-     * @param  array  $validated  The validated Batch Crafting request data.
+     * @param Character $character The character requesting the preview.
+     * @param array $validated The validated Batch Crafting request data.
      * @return array The lean Holy Oils Selected Items preview payload.
      */
     public function build(Character $character, array $validated): array
@@ -43,8 +43,8 @@ class HolyOilSelectedItemsPreviewService
     /**
      * Resolve the requested target Inventory slots the character actually owns.
      *
-     * @param  Character  $character  The character requesting the preview.
-     * @param  array<int, int>  $targetSlotIds  The requested target Inventory slot ids.
+     * @param Character $character The character requesting the preview.
+     * @param array<int, int> $targetSlotIds The requested target Inventory slot ids.
      * @return Collection<int, InventorySlot> The resolved target slots.
      */
     private function resolveTargets(Character $character, array $targetSlotIds): Collection
@@ -64,8 +64,8 @@ class HolyOilSelectedItemsPreviewService
     /**
      * Resolve the requested Holy Oil Alchemy Bag slots the character actually owns.
      *
-     * @param  Character  $character  The character requesting the preview.
-     * @param  array<int, int>  $oilSlotIds  The requested Holy Oil Alchemy Bag slot ids.
+     * @param Character $character The character requesting the preview.
+     * @param array<int, int> $oilSlotIds The requested Holy Oil Alchemy Bag slot ids.
      * @return Collection<int, AlchemyBagSlot> The resolved oil slots.
      */
     private function resolveOilSlots(Character $character, array $oilSlotIds): Collection
@@ -87,10 +87,10 @@ class HolyOilSelectedItemsPreviewService
     /**
      * Build the blocking messages for the Holy Oils Selected Items preview.
      *
-     * @param  Collection  $targets  The resolved target slots.
-     * @param  Collection  $oilSlots  The resolved oil slots.
-     * @param  array  $plan  The simulated application plan.
-     * @param  int  $goldDustAvailable  The character's available Gold Dust.
+     * @param Collection $targets The resolved target slots.
+     * @param Collection $oilSlots The resolved oil slots.
+     * @param array $plan The simulated application plan.
+     * @param int $goldDustAvailable The character's available Gold Dust.
      * @return array<int, string> The blocking messages, empty when nothing blocks the request.
      */
     private function buildBlockers(Collection $targets, Collection $oilSlots, array $plan, int $goldDustAvailable): array

@@ -17,7 +17,7 @@ class TrinketryBatchCraftingCapabilityService
     /**
      * Build the complete Trinketry capability facts for the character.
      *
-     * @param  Character  $character  The character requesting capability facts.
+     * @param Character $character The character requesting capability facts.
      * @return array The Trinketry capability facts payload.
      */
     public function build(Character $character): array
@@ -34,7 +34,7 @@ class TrinketryBatchCraftingCapabilityService
     /**
      * Build the factual current Trinketry skill progress used by the setup/runtime UI.
      *
-     * @param  Skill|null  $skill  The character's already-resolved Trinketry skill, when present.
+     * @param Skill|null $skill The character's already-resolved Trinketry skill, when present.
      * @return array|null The Trinketry skill progress facts, or null when the skill does not exist.
      */
     private function trinketrySkillFacts(?Skill $skill): ?array

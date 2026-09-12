@@ -26,7 +26,7 @@ class CelestialConjureType
      *
      * Throws if the value does not exist in the array of const values.
      *
-     * @param  string  $value
+     * @param string $value
      *
      * @throws \Exception
      */

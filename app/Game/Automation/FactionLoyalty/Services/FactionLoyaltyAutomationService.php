@@ -26,16 +26,16 @@ class FactionLoyaltyAutomationService
     const int TIME_DELAY = 1;
 
     /**
-     * @param  CharacterCacheData  $characterCacheData  The character cache data service.
+     * @param CharacterCacheData $characterCacheData The character cache data service.
      */
     public function __construct(private readonly CharacterCacheData $characterCacheData) {}
 
     /**
      * Begin the automation.
      *
-     * @param  Character  $character  The character starting Faction Loyalty automation.
-     * @param  FactionLoyaltyNpc  $factionLoyaltyNpc  The NPC being assisted.
-     * @param  string  $attackType  The selected attack type.
+     * @param Character $character The character starting Faction Loyalty automation.
+     * @param FactionLoyaltyNpc $factionLoyaltyNpc The NPC being assisted.
+     * @param string $attackType The selected attack type.
      * @return void This method does not return a value.
      */
     public function beginAutomation(Character $character, FactionLoyaltyNpc $factionLoyaltyNpc, string $attackType): void
@@ -112,7 +112,7 @@ class FactionLoyaltyAutomationService
     /**
      * Stop the automation.
      *
-     * @param  Character  $character  The character stopping Faction Loyalty automation.
+     * @param Character $character The character stopping Faction Loyalty automation.
      * @return array The stop result.
      */
     public function stopAutomation(Character $character): array
@@ -170,8 +170,8 @@ class FactionLoyaltyAutomationService
     /**
      * Set whether the character can craft.
      *
-     * @param  Character  $character  The character to update.
-     * @param  bool  $canCraft  Whether the character can craft.
+     * @param Character $character The character to update.
+     * @param bool $canCraft Whether the character can craft.
      * @return Character The refreshed character.
      */
     private function setCharacterCanCraft(Character $character, bool $canCraft): Character

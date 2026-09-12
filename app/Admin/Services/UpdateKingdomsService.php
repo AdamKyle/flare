@@ -100,7 +100,7 @@ class UpdateKingdomsService
      *
      * Called from the livewire admin view to handle giving new buildings to players.
      *
-     * @param  array  $selectedUnits
+     * @param array $selectedUnits
      */
     public function updateKingdomKingdomBuildings(GameBuilding $gameBuilding, $selectedUnits = [], int $levels = 0): void
     {

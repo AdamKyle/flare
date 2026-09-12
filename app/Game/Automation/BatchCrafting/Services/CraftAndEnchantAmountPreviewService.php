@@ -24,8 +24,8 @@ class CraftAndEnchantAmountPreviewService
     /**
      * Build the Craft and Enchant Amount preview payload for the validated Batch Crafting request.
      *
-     * @param  Character  $character  The character requesting the preview.
-     * @param  array  $validated  The validated Batch Crafting request data.
+     * @param Character $character The character requesting the preview.
+     * @param array $validated The validated Batch Crafting request data.
      * @return array The lean Craft and Enchant Amount preview payload.
      */
     public function build(Character $character, array $validated): array
@@ -101,8 +101,8 @@ class CraftAndEnchantAmountPreviewService
      * Items Set; a normal specified Inventory Set is reserved for Set-based crafting workflows
      * and is rejected by validation before this method is ever reached.
      *
-     * @param  Character  $character  The character requesting the preview.
-     * @param  array  $progress  The requested Craft and Enchant Amount progress data.
+     * @param Character $character The character requesting the preview.
+     * @param array $progress The requested Craft and Enchant Amount progress data.
      */
     private function prepareDestination(Character $character, array $progress): void
     {
@@ -116,9 +116,9 @@ class CraftAndEnchantAmountPreviewService
     /**
      * Resolve the Gold cost to apply the resolved affixes to the item, when the affixes are valid.
      *
-     * @param  Character  $character  The character requesting the preview.
-     * @param  Item  $item  The item being enchanted.
-     * @param  array{prefix: ItemAffix|null, suffix: ItemAffix|null, error: string|null}  $affixes  The resolved affixes.
+     * @param Character $character The character requesting the preview.
+     * @param Item $item The item being enchanted.
+     * @param array{prefix: ItemAffix|null, suffix: ItemAffix|null, error: string|null} $affixes The resolved affixes.
      * @return int The Gold cost to apply the resolved affixes.
      */
     private function resolveEnchantingCost(Character $character, Item $item, array $affixes): int
@@ -135,7 +135,7 @@ class CraftAndEnchantAmountPreviewService
     /**
      * Build the factual preview facts for one resolved affix.
      *
-     * @param  ItemAffix|null  $affix  The resolved affix, when one was selected.
+     * @param ItemAffix|null $affix The resolved affix, when one was selected.
      * @return array{id: int, name: string, cost: int, int_required: int}|null The affix preview facts, or null when unselected.
      */
     private function affixFacts(?ItemAffix $affix): ?array
@@ -155,8 +155,8 @@ class CraftAndEnchantAmountPreviewService
     /**
      * Build the lean preview payload for a requested item that is no longer craftable.
      *
-     * @param  Character  $character  The character requesting the preview.
-     * @param  array  $progress  The requested Craft and Enchant Amount progress data.
+     * @param Character $character The character requesting the preview.
+     * @param array $progress The requested Craft and Enchant Amount progress data.
      * @return array The lean unavailable-item preview payload.
      */
     private function buildUnavailableItemPreview(Character $character, array $progress): array

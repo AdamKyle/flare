@@ -28,7 +28,7 @@ class BatchCraftingJob implements ShouldQueue
     /**
      * Process the queued Batch Crafting run and re-dispatch itself when a recurring window remains.
      *
-     * @param  BatchCraftingAutomationService  $batchCraftingAutomationService  The Batch Crafting lifecycle service.
+     * @param BatchCraftingAutomationService $batchCraftingAutomationService The Batch Crafting lifecycle service.
      * @return void This method does not return a value.
      */
     public function handle(BatchCraftingAutomationService $batchCraftingAutomationService): void
@@ -49,7 +49,7 @@ class BatchCraftingJob implements ShouldQueue
     /**
      * Re-dispatch this job for the next recurring execution window.
      *
-     * @param  Carbon  $nextAttemptAt  The next execution time to schedule.
+     * @param Carbon $nextAttemptAt The next execution time to schedule.
      * @return void This method does not return a value.
      *
      * @codeCoverageIgnore

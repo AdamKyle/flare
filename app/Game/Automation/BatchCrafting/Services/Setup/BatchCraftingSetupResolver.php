@@ -8,14 +8,14 @@ use InvalidArgumentException;
 class BatchCraftingSetupResolver
 {
     /**
-     * @param  array<int, BatchCraftingSetupService>  $setupServices  The registered setup services.
+     * @param array<int, BatchCraftingSetupService> $setupServices The registered setup services.
      */
     public function __construct(private readonly array $setupServices) {}
 
     /**
      * Resolve the registered setup service for the given Batch Crafting type.
      *
-     * @param  BatchCraftingType  $type  The requested Batch Crafting type.
+     * @param BatchCraftingType $type The requested Batch Crafting type.
      * @return BatchCraftingSetupService The resolved setup service.
      */
     public function resolve(BatchCraftingType $type): BatchCraftingSetupService

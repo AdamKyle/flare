@@ -26,8 +26,8 @@ class AlchemyAmountHandler implements BatchCraftingHandler
     /**
      * Execute one Alchemy Amount Batch Crafting operation for the running batch.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  Character  $character  The character running the batch.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param Character $character The character running the batch.
      * @return BatchCraftingOperationResult The outcome of the operation.
      */
     public function handle(BatchCrafting $batchCrafting, Character $character): BatchCraftingOperationResult
@@ -89,7 +89,7 @@ class AlchemyAmountHandler implements BatchCraftingHandler
     /**
      * Resolve the requested Alchemy item, when it is still a valid craftable Alchemy item.
      *
-     * @param  int  $itemId  The requested Alchemy item id.
+     * @param int $itemId The requested Alchemy item id.
      * @return Item|null The resolved item, or null when it is no longer valid.
      */
     private function findAlchemyItem(int $itemId): ?Item

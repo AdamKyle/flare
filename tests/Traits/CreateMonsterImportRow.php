@@ -7,7 +7,7 @@ trait CreateMonsterImportRow
     /**
      * Build a minimal, otherwise-valid Monsters import row, keyed by header name.
      *
-     * @param  array<string, mixed>  $overrides  Values to override on top of the minimal valid row.
+     * @param array<string, mixed> $overrides Values to override on top of the minimal valid row.
      * @return array<string, mixed> Row values keyed by header name.
      */
     public function minimalMonsterImportRow(array $overrides = []): array

@@ -20,7 +20,7 @@ class ExplorationController extends Controller
     private ExplorationAutomationService $explorationAutomationService;
 
     /**
-     * @param  ExplorationAutomationService  $explorationAutomationService  The Exploration automation service.
+     * @param ExplorationAutomationService $explorationAutomationService The Exploration automation service.
      */
     public function __construct(ExplorationAutomationService $explorationAutomationService)
     {
@@ -30,8 +30,8 @@ class ExplorationController extends Controller
     /**
      * Start Exploration automation for the character with the validated request options.
      *
-     * @param  ExplorationRequest  $request  The validated Exploration start request.
-     * @param  Character  $character  The character starting Exploration.
+     * @param ExplorationRequest $request The validated Exploration start request.
+     * @param Character $character The character starting Exploration.
      * @return JsonResponse The start confirmation or validation error response.
      */
     public function begin(ExplorationRequest $request, Character $character): JsonResponse
@@ -81,7 +81,7 @@ class ExplorationController extends Controller
     /**
      * Stop the character's active Exploration automation.
      *
-     * @param  Character  $character  The character stopping Exploration.
+     * @param Character $character The character stopping Exploration.
      * @return JsonResponse Empty confirmation response.
      */
     public function stop(Character $character): JsonResponse

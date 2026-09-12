@@ -16,7 +16,7 @@ class EnchantBatchCraftingSetupService implements BatchCraftingSetupService
     /**
      * Determine whether this setup service owns preview/start resolution for the given Batch Crafting type.
      *
-     * @param  BatchCraftingType  $type  The requested Batch Crafting type.
+     * @param BatchCraftingType $type The requested Batch Crafting type.
      * @return bool True when this setup service owns the given type.
      */
     public function supports(BatchCraftingType $type): bool
@@ -29,8 +29,8 @@ class EnchantBatchCraftingSetupService implements BatchCraftingSetupService
      *
      * Enchant For Event requires no manual item or affix selection, so no preview payload applies.
      *
-     * @param  Character  $character  The character requesting the preview.
-     * @param  array  $validated  The validated Batch Crafting request data.
+     * @param Character $character The character requesting the preview.
+     * @param array $validated The validated Batch Crafting request data.
      * @return array|null Always null; Enchant For Event has no preview.
      */
     public function preview(Character $character, array $validated): ?array
@@ -41,8 +41,8 @@ class EnchantBatchCraftingSetupService implements BatchCraftingSetupService
     /**
      * Resolve the mode-specific starting progress data and any blockers preventing the start.
      *
-     * @param  Character  $character  The character starting the run.
-     * @param  array  $validated  The validated Batch Crafting request data.
+     * @param Character $character The character starting the run.
+     * @param array $validated The validated Batch Crafting request data.
      * @return array{progress: array, blockers: array<int, string>} The starting progress data and any blockers.
      */
     public function resolveStart(Character $character, array $validated): array

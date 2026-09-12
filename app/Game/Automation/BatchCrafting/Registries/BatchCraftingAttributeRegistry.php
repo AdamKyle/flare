@@ -20,8 +20,8 @@ class BatchCraftingAttributeRegistry
     private readonly array $handlers;
 
     /**
-     * @param  array<int, class-string<BatchCraftingOrchestrator>>  $orchestratorCandidates
-     * @param  array<int, class-string<BatchCraftingHandler>>  $handlerCandidates
+     * @param array<int, class-string<BatchCraftingOrchestrator>> $orchestratorCandidates
+     * @param array<int, class-string<BatchCraftingHandler>> $handlerCandidates
      */
     public function __construct(array $orchestratorCandidates, array $handlerCandidates)
     {
@@ -32,7 +32,7 @@ class BatchCraftingAttributeRegistry
     /**
      * Resolve the registered orchestrator class for the given Batch Crafting type.
      *
-     * @param  BatchCraftingType  $type  The Batch Crafting type to resolve.
+     * @param BatchCraftingType $type The Batch Crafting type to resolve.
      * @return string The registered orchestrator class name.
      */
     public function orchestratorFor(BatchCraftingType $type): string
@@ -49,8 +49,8 @@ class BatchCraftingAttributeRegistry
     /**
      * Resolve the registered handler class for the given Batch Crafting type and mode.
      *
-     * @param  BatchCraftingType  $type  The Batch Crafting type to resolve.
-     * @param  BackedEnum  $mode  The craft mode to resolve.
+     * @param BatchCraftingType $type The Batch Crafting type to resolve.
+     * @param BackedEnum $mode The craft mode to resolve.
      * @return string The registered handler class name.
      */
     public function handlerFor(BatchCraftingType $type, BackedEnum $mode): string
@@ -67,7 +67,7 @@ class BatchCraftingAttributeRegistry
     /**
      * Build the batch-crafting-type-to-orchestrator-class map from the candidate orchestrator classes.
      *
-     * @param  array<int, class-string<BatchCraftingOrchestrator>>  $candidates
+     * @param array<int, class-string<BatchCraftingOrchestrator>> $candidates
      * @return array<string, class-string<BatchCraftingOrchestrator>>
      */
     private function buildOrchestratorMap(array $candidates): array
@@ -103,7 +103,7 @@ class BatchCraftingAttributeRegistry
     /**
      * Build the handler-key-to-handler-class map from the candidate handler classes.
      *
-     * @param  array<int, class-string<BatchCraftingHandler>>  $candidates
+     * @param array<int, class-string<BatchCraftingHandler>> $candidates
      * @return array<string, class-string<BatchCraftingHandler>>
      */
     private function buildHandlerMap(array $candidates): array
@@ -139,8 +139,8 @@ class BatchCraftingAttributeRegistry
     /**
      * Build the composite map key identifying a handler for a batch crafting type and mode.
      *
-     * @param  BatchCraftingType  $type  The Batch Crafting type component of the key.
-     * @param  BackedEnum  $mode  The craft mode component of the key.
+     * @param BatchCraftingType $type The Batch Crafting type component of the key.
+     * @param BackedEnum $mode The craft mode component of the key.
      * @return string The composite handler map key.
      */
     private function handlerKey(BatchCraftingType $type, BackedEnum $mode): string

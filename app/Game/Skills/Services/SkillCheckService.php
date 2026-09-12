@@ -12,7 +12,7 @@ class SkillCheckService
     /**
      * Fetches the DC check.
      *
-     * @param  int  $dcIncrease  | 0
+     * @param int $dcIncrease | 0
      */
     public function getDCCheck(Skill $skill, int $dcIncrease = 0): int
     {

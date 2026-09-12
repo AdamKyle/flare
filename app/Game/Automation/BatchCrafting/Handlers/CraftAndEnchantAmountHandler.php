@@ -27,8 +27,8 @@ class CraftAndEnchantAmountHandler implements BatchCraftingHandler
     /**
      * Execute one Craft and Enchant Amount Batch Crafting operation for the running batch.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  Character  $character  The character running the batch.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param Character $character The character running the batch.
      * @return BatchCraftingOperationResult The outcome of the operation.
      */
     public function handle(BatchCrafting $batchCrafting, Character $character): BatchCraftingOperationResult

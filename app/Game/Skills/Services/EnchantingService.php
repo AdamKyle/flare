@@ -127,10 +127,10 @@ class EnchantingService
     /**
      * Fetch the paginated Global Event Crafting Inventory items eligible for enchanting.
      *
-     * @param  Character  $character  The character requesting event items.
-     * @param  int  $perPage  The number of items to return per page.
-     * @param  int  $page  The page number to return.
-     * @param  string  $search  The search text to filter items by name.
+     * @param Character $character The character requesting event items.
+     * @param int $perPage The number of items to return per page.
+     * @param int $page The page number to return.
+     * @param string $search The search text to filter items by name.
      * @return array The paginated event item payload.
      */
     private function fetchPaginatedEventItems(Character $character, int $perPage, int $page, string $search): array
@@ -382,9 +382,9 @@ class EnchantingService
      * non-random affix of the correct type, and that the character's Enchanting skill level meets
      * each requested affix's requirement. Never substitutes a different affix than the one requested.
      *
-     * @param  Character  $character  The character resolving the affixes.
-     * @param  int|null  $prefixId  The requested Prefix affix id, when selected.
-     * @param  int|null  $suffixId  The requested Suffix affix id, when selected.
+     * @param Character $character The character resolving the affixes.
+     * @param int|null $prefixId The requested Prefix affix id, when selected.
+     * @param int|null $suffixId The requested Suffix affix id, when selected.
      * @return array{prefix: ItemAffix|null, suffix: ItemAffix|null, error: string|null} The resolved affixes, or a factual error code.
      */
     public function resolveBatchAffixes(Character $character, ?int $prefixId, ?int $suffixId): array
@@ -424,7 +424,7 @@ class EnchantingService
      * current Enchanting skill level can meaningfully learn from. Never selects a weaker affix
      * because Intelligence is insufficient for the resolved combination.
      *
-     * @param  Character  $character  The character resolving the affixes.
+     * @param Character $character The character resolving the affixes.
      * @return array{prefix: ItemAffix|null, suffix: ItemAffix|null, skill: Skill, intelligence_blocked: bool} The resolved affixes, the resolved Enchanting skill, and whether Intelligence blocks the resolved combination.
      */
     public function findMeaningfulBatchAffixes(Character $character): array
@@ -449,7 +449,7 @@ class EnchantingService
      * current Enchanting skill level and Gold allow. Never selects a weaker affix because
      * Intelligence is insufficient for the resolved combination.
      *
-     * @param  Character  $character  The character resolving the affixes.
+     * @param Character $character The character resolving the affixes.
      * @return array{prefix: ItemAffix|null, suffix: ItemAffix|null, intelligence_blocked: bool} The resolved affixes and whether Intelligence blocks the resolved combination.
      */
     public function findEventBatchAffixes(Character $character): array
@@ -469,9 +469,9 @@ class EnchantingService
     /**
      * Resolve one exact requested Batch Crafting affix by id, type, and skill level requirement.
      *
-     * @param  int  $affixId  The requested affix id.
-     * @param  string  $type  The required affix type (prefix or suffix).
-     * @param  Skill  $enchantingSkill  The character's resolved Enchanting skill.
+     * @param int $affixId The requested affix id.
+     * @param string $type The required affix type (prefix or suffix).
+     * @param Skill $enchantingSkill The character's resolved Enchanting skill.
      * @return ItemAffix|null The resolved affix, or null when it does not exist or is currently ineligible.
      */
     private function resolveExactBatchAffix(int $affixId, string $type, Skill $enchantingSkill): ?ItemAffix
@@ -491,8 +491,8 @@ class EnchantingService
     /**
      * Resolve the strongest non-trivial affix of the given type the Enchanting skill can meaningfully learn from.
      *
-     * @param  string  $type  The affix type to resolve (prefix or suffix).
-     * @param  Skill  $enchantingSkill  The character's resolved Enchanting skill.
+     * @param string $type The affix type to resolve (prefix or suffix).
+     * @param Skill $enchantingSkill The character's resolved Enchanting skill.
      * @return ItemAffix|null The resolved affix, or null when none is currently meaningful.
      */
     private function findMeaningfulAffix(string $type, Skill $enchantingSkill): ?ItemAffix
@@ -509,9 +509,9 @@ class EnchantingService
     /**
      * Resolve the cheapest eligible affix of the given type the character can currently afford.
      *
-     * @param  string  $type  The affix type to resolve (prefix or suffix).
-     * @param  Skill  $enchantingSkill  The character's resolved Enchanting skill.
-     * @param  int  $availableGold  The character's currently available Gold.
+     * @param string $type The affix type to resolve (prefix or suffix).
+     * @param Skill $enchantingSkill The character's resolved Enchanting skill.
+     * @param int $availableGold The character's currently available Gold.
      * @return ItemAffix|null The resolved affix, or null when none is currently eligible/affordable.
      */
     private function findAffordableAffix(string $type, Skill $enchantingSkill, int $availableGold): ?ItemAffix
@@ -528,9 +528,9 @@ class EnchantingService
     /**
      * Determine whether the character's Intelligence blocks the resolved affix combination.
      *
-     * @param  Character  $character  The character being checked.
-     * @param  ItemAffix|null  $prefix  The resolved Prefix affix, when one was found.
-     * @param  ItemAffix|null  $suffix  The resolved Suffix affix, when one was found.
+     * @param Character $character The character being checked.
+     * @param ItemAffix|null $prefix The resolved Prefix affix, when one was found.
+     * @param ItemAffix|null $suffix The resolved Suffix affix, when one was found.
      * @return bool True when Intelligence is insufficient for a resolved affix.
      */
     private function isIntelligenceBlocked(Character $character, ?ItemAffix $prefix, ?ItemAffix $suffix): bool
@@ -548,7 +548,7 @@ class EnchantingService
     /**
      * Resolve the crafting-time multiplier label for an item's currently applied affixes.
      *
-     * @param  Item  $item  The item being timed.
+     * @param Item $item The item being timed.
      * @return string|null The time multiplier label, or null when no affix is applied.
      */
     public function timeForEnchanting(Item $item)
@@ -568,8 +568,8 @@ class EnchantingService
     /**
      * Resolve the target slot for enchanting from the character's normal Inventory or their Global Event Crafting Inventory.
      *
-     * @param  Character  $character  The character requesting the slot.
-     * @param  int  $slotId  The requested slot id.
+     * @param Character $character The character requesting the slot.
+     * @param int $slotId The requested slot id.
      * @return InventorySlot|GlobalEventCraftingInventorySlot|null The resolved slot, or null when it does not exist.
      */
     public function getSlotFromInventory(Character $character, int $slotId): InventorySlot|GlobalEventCraftingInventorySlot|null
@@ -602,7 +602,7 @@ class EnchantingService
     /**
      * Resolve the character's Enchanting skill, tolerating its absence.
      *
-     * @param  Character  $character  The character being checked.
+     * @param Character $character The character being checked.
      * @return Skill|null The character's Enchanting skill, or null when it does not exist.
      */
     public function findEnchantingSkill(Character $character): ?Skill
@@ -619,7 +619,7 @@ class EnchantingService
     /**
      * Resolve the character's Enchanting skill, assuming it exists.
      *
-     * @param  Character  $character  The character being checked.
+     * @param Character $character The character being checked.
      * @return Skill The character's Enchanting skill.
      */
     private function getEnchantingSkill(Character $character): Skill
@@ -632,9 +632,9 @@ class EnchantingService
     /**
      * Resolve the currently available non-random affixes for the character's Enchanting skill level.
      *
-     * @param  CharacterStatBuilder  $builder  The character stat builder used to resolve the character.
-     * @param  Skill  $enchantingSkill  The character's Enchanting skill.
-     * @param  bool  $showMerchantMessage  Whether to send the Merchant cost-reduction server message.
+     * @param CharacterStatBuilder $builder The character stat builder used to resolve the character.
+     * @param Skill $enchantingSkill The character's Enchanting skill.
+     * @param bool $showMerchantMessage Whether to send the Merchant cost-reduction server message.
      * @return Collection The available affixes.
      */
     private function getAvailableAffixes(CharacterStatBuilder $builder, Skill $enchantingSkill, bool $showMerchantMessage = true): Collection
@@ -658,10 +658,10 @@ class EnchantingService
     /**
      * Attach every requested affix to the target slot's item in order, stopping at the first failure.
      *
-     * @param  array  $affixes  The requested affix ids.
-     * @param  InventorySlot|GlobalEventCraftingInventorySlot  $slot  The target slot.
-     * @param  Skill  $enchantingSkill  The character's Enchanting skill.
-     * @param  Character  $character  The character enchanting the item.
+     * @param array $affixes The requested affix ids.
+     * @param InventorySlot|GlobalEventCraftingInventorySlot $slot The target slot.
+     * @param Skill $enchantingSkill The character's Enchanting skill.
+     * @param Character $character The character enchanting the item.
      * @return bool True when every requested affix attached successfully.
      */
     private function attachAffixes(array $affixes, InventorySlot|GlobalEventCraftingInventorySlot $slot, Skill $enchantingSkill, Character $character): bool
@@ -720,11 +720,11 @@ class EnchantingService
     /**
      * Attempt to attach one affix to the target slot's item and record the outcome.
      *
-     * @param  InventorySlot|GlobalEventCraftingInventorySlot  $slot  The target slot.
-     * @param  ItemAffix  $affix  The affix being attached.
-     * @param  Character  $character  The character enchanting the item.
-     * @param  Skill  $enchantingSkill  The character's Enchanting skill.
-     * @param  bool  $tooEasy  Whether the attempt is trivial and should not award XP.
+     * @param InventorySlot|GlobalEventCraftingInventorySlot $slot The target slot.
+     * @param ItemAffix $affix The affix being attached.
+     * @param Character $character The character enchanting the item.
+     * @param Skill $enchantingSkill The character's Enchanting skill.
+     * @param bool $tooEasy Whether the attempt is trivial and should not award XP.
      * @return bool True when the affix attached successfully.
      */
     private function processedEnchant(InventorySlot|GlobalEventCraftingInventorySlot $slot, ItemAffix $affix, Character $character, Skill $enchantingSkill, bool $tooEasy = false)
@@ -745,11 +745,11 @@ class EnchantingService
     /**
      * Send the applied-enchantment server message and award Enchanting skill XP when applicable.
      *
-     * @param  InventorySlot|GlobalEventCraftingInventorySlot  $slot  The target slot.
-     * @param  ItemAffix  $affix  The affix that was attached.
-     * @param  Character  $character  The character enchanting the item.
-     * @param  Skill  $enchantingSkill  The character's Enchanting skill.
-     * @param  bool  $tooEasy  Whether the attempt was trivial and should not award XP.
+     * @param InventorySlot|GlobalEventCraftingInventorySlot $slot The target slot.
+     * @param ItemAffix $affix The affix that was attached.
+     * @param Character $character The character enchanting the item.
+     * @param Skill $enchantingSkill The character's Enchanting skill.
+     * @param bool $tooEasy Whether the attempt was trivial and should not award XP.
      * @return void This method does not return a value.
      */
     private function appliedEnchantment(InventorySlot|GlobalEventCraftingInventorySlot $slot, ItemAffix $affix, Character $character, Skill $enchantingSkill, bool $tooEasy = false)
@@ -766,9 +766,9 @@ class EnchantingService
     /**
      * Send the failed-enchantment server message and delete the shattered slot.
      *
-     * @param  InventorySlot|GlobalEventCraftingInventorySlot  $slot  The target slot.
-     * @param  ItemAffix  $affix  The affix that failed to attach.
-     * @param  Character  $character  The character enchanting the item.
+     * @param InventorySlot|GlobalEventCraftingInventorySlot $slot The target slot.
+     * @param ItemAffix $affix The affix that failed to attach.
+     * @param Character $character The character enchanting the item.
      * @return void This method does not return a value.
      */
     private function failedToApplyEnchantment(InventorySlot|GlobalEventCraftingInventorySlot $slot, ItemAffix $affix, Character $character)
@@ -787,7 +787,7 @@ class EnchantingService
     /**
      * Build the lean Global Event Crafting Inventory item payload for enchanting selection.
      *
-     * @param  Character  $character  The character requesting event items.
+     * @param Character $character The character requesting event items.
      * @return array The lean event item payload.
      */
     private function fetchEventItemsForEnchanting(Character $character): array

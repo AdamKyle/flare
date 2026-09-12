@@ -418,7 +418,7 @@ class CapitalCityManagementService
     /**
      * Fetch buildings data from other kingdoms for upgrades or repairs.
      *
-     * @param  EloquentCollection  $kingdoms
+     * @param EloquentCollection $kingdoms
      */
     private function fetchBuildingsData(Kingdom $kingdom, SupportCollection $kingdoms): array
     {

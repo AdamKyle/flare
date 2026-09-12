@@ -32,8 +32,8 @@ class TrinketryHandler implements BatchCraftingHandler
     /**
      * Execute one Trinketry Batch Crafting operation for the running batch.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  Character  $character  The character running the batch.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param Character $character The character running the batch.
      * @return BatchCraftingOperationResult The outcome of the operation.
      */
     public function handle(BatchCrafting $batchCrafting, Character $character): BatchCraftingOperationResult
@@ -71,9 +71,9 @@ class TrinketryHandler implements BatchCraftingHandler
     /**
      * Craft the resolved item and apply the Keep Best comparison to the outcome.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  Character  $character  The character running the batch.
-     * @param  Item  $item  The resolved Trinket to craft.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param Character $character The character running the batch.
+     * @param Item $item The resolved Trinket to craft.
      * @return BatchCraftingOperationResult The outcome of the craft attempt.
      */
     private function handleKeepBest(BatchCrafting $batchCrafting, Character $character, Item $item): BatchCraftingOperationResult
@@ -90,9 +90,9 @@ class TrinketryHandler implements BatchCraftingHandler
     /**
      * Craft the resolved item and apply a direct Keep/Destroy disposition to the outcome.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  Item  $item  The resolved Trinket to craft.
-     * @param  BatchCraftingDisposition  $disposition  The selected direct disposition.
+     * @param Character $character The character running the batch.
+     * @param Item $item The resolved Trinket to craft.
+     * @param BatchCraftingDisposition $disposition The selected direct disposition.
      * @return BatchCraftingOperationResult The outcome of the craft attempt.
      */
     private function handleDirect(Character $character, Item $item, BatchCraftingDisposition $disposition): BatchCraftingOperationResult
@@ -127,9 +127,9 @@ class TrinketryHandler implements BatchCraftingHandler
     /**
      * Persist the batch's cumulative Trinketry XP and current item facts.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  Item  $item  The resolved Trinket for this operation.
-     * @param  int  $xpGained  The factual XP gained by this operation.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param Item $item The resolved Trinket for this operation.
+     * @param int $xpGained The factual XP gained by this operation.
      * @return void This method does not return a value.
      */
     private function persistProgress(BatchCrafting $batchCrafting, Item $item, int $xpGained): void
@@ -144,7 +144,7 @@ class TrinketryHandler implements BatchCraftingHandler
     /**
      * Resolve the factual reason no Trinketry target is currently actionable.
      *
-     * @param  Skill|null  $skill  The character's already-resolved Trinketry skill, when present.
+     * @param Skill|null $skill The character's already-resolved Trinketry skill, when present.
      * @return BatchCraftingEndReason SKILL_MAXED when the Trinketry skill is maxed, otherwise NO_TRINKETRY_ITEMS.
      */
     private function resolveNoTargetReason(?Skill $skill): BatchCraftingEndReason

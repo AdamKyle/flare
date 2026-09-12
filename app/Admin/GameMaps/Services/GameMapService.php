@@ -221,7 +221,7 @@ class GameMapService
     /**
      * Apply a case-insensitive `LIKE` search filter to a query when search text is present.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     private function applySearch($query, string $column, ?string $searchText): void
     {

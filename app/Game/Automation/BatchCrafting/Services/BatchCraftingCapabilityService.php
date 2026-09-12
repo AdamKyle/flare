@@ -24,7 +24,7 @@ class BatchCraftingCapabilityService
     /**
      * Build the complete Batch Crafting capability facts for the character, across every batch type.
      *
-     * @param  Character  $character  The character requesting capability facts.
+     * @param Character $character The character requesting capability facts.
      * @return array The aggregated capability facts payload.
      */
     public function build(Character $character): array

@@ -15,7 +15,7 @@ class DropCheckCalculator
      *
      * If true, the check passed and the character should be rewarded.
      *
-     * @param  float  $lootingChance  | 0.0
+     * @param float $lootingChance | 0.0
      */
     public function fetchDropCheckChance(Monster $monster, int $characterLevel, float $lootingChance = 0.0, float $gameMapBonus = 0.0): bool
     {

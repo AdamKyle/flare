@@ -73,9 +73,9 @@ class CraftingService
     /**
      * Fetch all craftable items for a character matching the requested crafting type(s).
      *
-     * @param  Character  $character  The character requesting craftable items.
-     * @param  array  $params  The request params, including the requested crafting type(s).
-     * @param  bool  $merchantMessage  Whether to send the Merchant cost-reduction server message.
+     * @param Character $character The character requesting craftable items.
+     * @param array $params The request params, including the requested crafting type(s).
+     * @param bool $merchantMessage Whether to send the Merchant cost-reduction server message.
      * @return Collection The craftable items available to the character.
      */
     public function fetchCraftableItems(Character $character, array $params, bool $merchantMessage = true): Collection
@@ -99,14 +99,14 @@ class CraftingService
     /**
      * Fetch paginated craftable items for a character, with optional search, armour subtype, and item type filtering.
      *
-     * @param  Character  $character  The character requesting craftable items.
-     * @param  array  $craftingParams  The request params, including the requested crafting type(s).
-     * @param  int  $perPage  The number of items to return per page.
-     * @param  int  $page  The page number to return.
-     * @param  string  $searchText  The optional search text to filter items by name, type, or crafting type.
-     * @param  string  $armourSubtype  The optional armour subtype to filter items by.
-     * @param  string  $itemType  The optional specific item type to filter items by.
-     * @param  bool  $merchantMessage  Whether to send the Merchant cost-reduction server message.
+     * @param Character $character The character requesting craftable items.
+     * @param array $craftingParams The request params, including the requested crafting type(s).
+     * @param int $perPage The number of items to return per page.
+     * @param int $page The page number to return.
+     * @param string $searchText The optional search text to filter items by name, type, or crafting type.
+     * @param string $armourSubtype The optional armour subtype to filter items by.
+     * @param string $itemType The optional specific item type to filter items by.
+     * @param bool $merchantMessage Whether to send the Merchant cost-reduction server message.
      * @return array The paginated, transformed craftable items.
      */
     public function fetchPaginatedCraftableItems(
@@ -163,8 +163,8 @@ class CraftingService
     /**
      * Return the character's current crafting XP progress for the requested crafting type.
      *
-     * @param  Character  $character  The character requesting crafting XP.
-     * @param  string|array  $type  The requested crafting type(s).
+     * @param Character $character The character requesting crafting XP.
+     * @param string|array $type The requested crafting type(s).
      * @return array{current_xp: int, next_level_xp: int, skill_name: string, level: int} The crafting XP progress.
      */
     public function getCraftingXP(Character $character, string|array $type): array
@@ -192,7 +192,7 @@ class CraftingService
     /**
      * Return the character's current and maximum Inventory counts.
      *
-     * @param  Character  $character  The character being checked.
+     * @param Character $character The character being checked.
      * @return array{current_count: int, max_inventory: int} The current and maximum Inventory counts.
      */
     public function getInventoryCount(Character $character): array
@@ -206,7 +206,7 @@ class CraftingService
     /**
      * Return the character's current and maximum Alchemy Bag counts.
      *
-     * @param  Character  $character  The character being checked.
+     * @param Character $character The character being checked.
      * @return array{current_count: int, max_inventory: int} The current and maximum Alchemy Bag counts.
      */
     public function getAlchemyBagCount(Character $character): array
@@ -220,7 +220,7 @@ class CraftingService
     /**
      * Return the character's current and maximum Gem Bag counts.
      *
-     * @param  Character  $character  The character being checked.
+     * @param Character $character The character being checked.
      * @return array{current_count: int, max_inventory: int} The current and maximum Gem Bag counts.
      */
     public function getGemBagCount(Character $character): array
@@ -237,9 +237,9 @@ class CraftingService
      * Used by Craft Set recommendation to default every required position to the best
      * craftable equipment item for its discipline without querying once per item type.
      *
-     * @param  Skill  $skill  The character's already-resolved Crafting skill for the group.
-     * @param  string  $craftingType  The Crafting group used to query craftable items.
-     * @param  array<int, string>  $itemTypes  The requested item types to resolve.
+     * @param Skill $skill The character's already-resolved Crafting skill for the group.
+     * @param string $craftingType The Crafting group used to query craftable items.
+     * @param array<int, string> $itemTypes The requested item types to resolve.
      * @return Collection<string, Item> The highest craftable item for each resolved item type, keyed by item type.
      */
     public function fetchBestCraftableItemsByTypeForAutomation(Skill $skill, string $craftingType, array $itemTypes): Collection
@@ -259,8 +259,8 @@ class CraftingService
      * Used by Craft Set hand recommendation to default a selected hand weapon type to the
      * character's best currently craftable candidate for that type.
      *
-     * @param  Character  $character  The character requesting the recommendation.
-     * @param  string  $weaponType  The requested weapon type.
+     * @param Character $character The character requesting the recommendation.
+     * @param string $weaponType The requested weapon type.
      * @return Item|null The highest craftable candidate, or null when the character has no Weapon Crafting skill or nothing is craftable.
      */
     public function findBestCraftableWeaponForAutomation(Character $character, string $weaponType): ?Item
@@ -287,7 +287,7 @@ class CraftingService
      * Used by Craft Set hand recommendation to default a selected Shield hand type to the
      * character's best currently craftable Shield through the Armour Crafting discipline.
      *
-     * @param  Character  $character  The character requesting the recommendation.
+     * @param Character $character The character requesting the recommendation.
      * @return Item|null The highest craftable Shield, or null when the character has no Armour Crafting skill or nothing is craftable.
      */
     public function findBestCraftableShieldForAutomation(Character $character): ?Item
@@ -312,8 +312,8 @@ class CraftingService
      * Gold is only taken from a player if they can pick up the item they crafted or
      * if they fail to craft the item.
      *
-     * @param  Character  $character  The character crafting the item.
-     * @param  array  $params  The request params, including the item to craft and crafting type.
+     * @param Character $character The character crafting the item.
+     * @param array $params The request params, including the item to craft and crafting type.
      * @return bool True when the item was successfully crafted.
      */
     public function craft(Character $character, array $params): bool
@@ -369,11 +369,11 @@ class CraftingService
      * attempt is reported back as a normal failure with reason "destination_failed"
      * rather than throwing.
      *
-     * @param  Character  $character  The character crafting the item.
-     * @param  Item  $item  The item to craft.
-     * @param  string  $craftingType  The crafting type used to craft the item.
-     * @param  CraftingMessageMode  $messageMode  The server-message mode controlling which messages are sent.
-     * @param  callable|null  $destinationCreator  The optional callback that places the crafted item and returns its destination.
+     * @param Character $character The character crafting the item.
+     * @param Item $item The item to craft.
+     * @param string $craftingType The crafting type used to craft the item.
+     * @param CraftingMessageMode $messageMode The server-message mode controlling which messages are sent.
+     * @param callable|null $destinationCreator The optional callback that places the crafted item and returns its destination.
      * @return array{success: bool, item: Item|null, reason: string|null, xp_gained: int, destination: array|null} The outcome of the craft attempt.
      */
     public function craftForBatch(
@@ -417,10 +417,10 @@ class CraftingService
      * messages are suppressed because the batch handler sends one canonical outcome
      * message instead. Failure messages are never suppressed.
      *
-     * @param  Character  $character  The character crafting the item.
-     * @param  Skill  $skill  The character's crafting skill for the item's crafting type.
-     * @param  Item  $item  The item to craft.
-     * @param  CraftingMessageMode  $messageMode  The server-message mode controlling which messages are sent.
+     * @param Character $character The character crafting the item.
+     * @param Skill $skill The character's crafting skill for the item's crafting type.
+     * @param Item $item The item to craft.
+     * @param CraftingMessageMode $messageMode The server-message mode controlling which messages are sent.
      * @return array{success: bool, item: Item|null, reason: string|null, xp_gained: int} The outcome of the craft attempt.
      */
     private function attemptToCraftItemForBatch(Character $character, Skill $skill, Item $item, CraftingMessageMode $messageMode = CraftingMessageMode::STANDARD): array
@@ -472,8 +472,8 @@ class CraftingService
     /**
      * Return the character's crafting skill for the requested crafting type, for automation use.
      *
-     * @param  Character  $character  The character requesting the skill.
-     * @param  string  $craftingType  The requested crafting type.
+     * @param Character $character The character requesting the skill.
+     * @param string $craftingType The requested crafting type.
      * @return Skill|null The character's crafting skill, or null when the crafting type has no matching skill.
      */
     public function getCraftingSkillForAutomation(Character $character, string $craftingType): ?Skill
@@ -500,8 +500,8 @@ class CraftingService
      * Experience cycle across all four disciplines) so the same skills are not re-queried once
      * per group encountered.
      *
-     * @param  Character  $character  The character requesting the skills.
-     * @param  array<int, CraftingSkillGroup>  $craftingGroups  The requested Crafting skill groups.
+     * @param Character $character The character requesting the skills.
+     * @param array<int, CraftingSkillGroup> $craftingGroups The requested Crafting skill groups.
      * @return SupportCollection<string, Skill|null> The resolved skills keyed by their requested Crafting skill group value.
      */
     public function resolveCraftingSkillsForGroups(Character $character, array $craftingGroups): SupportCollection
@@ -525,8 +525,8 @@ class CraftingService
     /**
      * Return the Gold cost to craft the item for the character, for automation use.
      *
-     * @param  Character  $character  The character crafting the item.
-     * @param  Item  $item  The item being crafted.
+     * @param Character $character The character crafting the item.
+     * @param Item $item The item being crafted.
      * @return int The Gold cost to craft the item.
      */
     public function getItemCostForAutomation(Character $character, Item $item): int
@@ -541,8 +541,8 @@ class CraftingService
      * targets within the same discipline can preload candidates once instead of querying
      * per target.
      *
-     * @param  Skill  $skill  The character's already-resolved Crafting skill for the group.
-     * @param  CraftingSkillGroup  $group  The Crafting skill group being queried.
+     * @param Skill $skill The character's already-resolved Crafting skill for the group.
+     * @param CraftingSkillGroup $group The Crafting skill group being queried.
      * @return Collection The non-trivial craftable candidate items for the group.
      */
     public function fetchMeaningfulExperienceCandidates(Skill $skill, CraftingSkillGroup $group): Collection
@@ -569,9 +569,9 @@ class CraftingService
      * Orders by cost first, with a stable secondary order by item id, so a tie between equally
      * cheap candidates always resolves to the same Item for the same database state.
      *
-     * @param  Skill  $skill  The character's already-resolved crafting skill for the target's discipline.
-     * @param  string|array  $craftingType  The crafting type group used to query craftable items.
-     * @param  string|null  $itemType  The optional specific item type narrowing the target within the group.
+     * @param Skill $skill The character's already-resolved crafting skill for the target's discipline.
+     * @param string|array $craftingType The crafting type group used to query craftable items.
+     * @param string|null $itemType The optional specific item type narrowing the target within the group.
      * @return Item|null The cheapest currently craftable item, or null when no candidate exists.
      */
     public function findInexpensiveCraftableItem(Skill $skill, string|array $craftingType, ?string $itemType = null): ?Item
@@ -591,7 +591,7 @@ class CraftingService
      * Used when a caller needs the fallback candidate for every Crafting discipline (there are
      * only four closed groups) without executing a query per group from inside a loop.
      *
-     * @param  SupportCollection<string, Skill|null>  $skillsByGroup  The character's already-resolved Crafting skills, keyed by Crafting skill group value.
+     * @param SupportCollection<string, Skill|null> $skillsByGroup The character's already-resolved Crafting skills, keyed by Crafting skill group value.
      * @return SupportCollection<string, Item|null> The cheapest craftable item per Crafting skill group value.
      */
     public function findInexpensiveCraftableItemsForGroups(SupportCollection $skillsByGroup): SupportCollection
@@ -617,8 +617,8 @@ class CraftingService
     /**
      * Fetch every currently craftable candidate item across the requested Crafting skill groups, in one query.
      *
-     * @param  SupportCollection<int, CraftingSkillGroup>  $eligibleGroups  The Crafting skill groups with a resolved skill.
-     * @param  SupportCollection<string, Skill|null>  $skillsByGroup  The character's already-resolved Crafting skills, keyed by Crafting skill group value.
+     * @param SupportCollection<int, CraftingSkillGroup> $eligibleGroups The Crafting skill groups with a resolved skill.
+     * @param SupportCollection<string, Skill|null> $skillsByGroup The character's already-resolved Crafting skills, keyed by Crafting skill group value.
      * @return SupportCollection<string, Collection<int, Item>> The candidate items, grouped by their Crafting skill group value.
      */
     private function fetchCraftableCandidatesForGroups(SupportCollection $eligibleGroups, SupportCollection $skillsByGroup): SupportCollection
@@ -646,8 +646,8 @@ class CraftingService
     /**
      * Constrain a query to items belonging to the given Crafting skill group.
      *
-     * @param  Builder  $query  The query being constrained.
-     * @param  CraftingSkillGroup  $group  The Crafting skill group to constrain to.
+     * @param Builder $query The query being constrained.
+     * @param CraftingSkillGroup $group The Crafting skill group to constrain to.
      * @return Builder The constrained query.
      */
     private function constrainQueryToCraftingGroup(Builder $query, CraftingSkillGroup $group): Builder
@@ -663,7 +663,7 @@ class CraftingService
     /**
      * Determine whether the given Crafting skill has reached its maximum level.
      *
-     * @param  Skill  $skill  The Crafting skill being checked.
+     * @param Skill $skill The Crafting skill being checked.
      * @return bool True when the skill is at or above its maximum level.
      */
     public function isSkillMaxed(Skill $skill): bool
@@ -677,8 +677,8 @@ class CraftingService
      * Applies the same craftability constraints used by the normal Crafting query path
      * (skill level, prefix/suffix, holy stacks, sockets) scoped to the requested item id.
      *
-     * @param  Character  $character  The character requesting the item.
-     * @param  int  $itemId  The exact item id to resolve.
+     * @param Character $character The character requesting the item.
+     * @param int $itemId The exact item id to resolve.
      * @return Item|null The exact item when it exists and is currently craftable, otherwise null.
      */
     public function findCraftableItemForAutomation(Character $character, int $itemId): ?Item
@@ -708,8 +708,8 @@ class CraftingService
      * Used by Set-based automation planning so per-position/per-hand item resolution does not run
      * one query per requested item.
      *
-     * @param  Character  $character  The character resolving craftable items.
-     * @param  array<int, int>  $itemIds  The requested item ids.
+     * @param Character $character The character resolving craftable items.
+     * @param array<int, int> $itemIds The requested item ids.
      * @return SupportCollection<int, Item> The currently craftable items among the requested ids, keyed by item id.
      */
     public function findCraftableItemsForAutomation(Character $character, array $itemIds): SupportCollection
@@ -737,8 +737,8 @@ class CraftingService
     /**
      * Determine whether a resolved item is craftable given the character's already-resolved Crafting skills.
      *
-     * @param  Item  $item  The candidate item.
-     * @param  SupportCollection<string, Skill|null>  $skillsByGroup  The character's Crafting skills, keyed by Crafting skill group value.
+     * @param Item $item The candidate item.
+     * @param SupportCollection<string, Skill|null> $skillsByGroup The character's Crafting skills, keyed by Crafting skill group value.
      * @return bool True when the item's Crafting skill group has a skill meeting its level requirement.
      */
     private function itemIsCraftableWithResolvedSkills(Item $item, SupportCollection $skillsByGroup): bool
@@ -752,7 +752,7 @@ class CraftingService
     /**
      * Resolve the Crafting skill group that owns a given item's crafting discipline.
      *
-     * @param  Item  $item  The item being classified.
+     * @param Item $item The item being classified.
      * @return CraftingSkillGroup|null The owning Crafting skill group, or null when the item has no known group.
      */
     private function resolveCraftingSkillGroupForItem(Item $item): ?CraftingSkillGroup
@@ -773,8 +773,8 @@ class CraftingService
     /**
      * Apply the character's class-specific crafting timeout adjustment for the item.
      *
-     * @param  Character  $character  The character crafting the item.
-     * @param  Item  $item  The item being crafted.
+     * @param Character $character The character crafting the item.
+     * @param Item $item The item being crafted.
      * @return void This method does not return a value.
      */
     private function handleCraftingTimeOut(Character $character, Item $item): void
@@ -809,8 +809,8 @@ class CraftingService
     /**
      * Return the character's class-adjusted Gold cost to craft the item.
      *
-     * @param  Character  $character  The character crafting the item.
-     * @param  Item  $item  The item being crafted.
+     * @param Character $character The character crafting the item.
+     * @param Item $item The item being crafted.
      * @return int The class-adjusted Gold cost.
      */
     private function getItemCost(Character $character, Item $item): int
@@ -836,9 +836,9 @@ class CraftingService
     /**
      * Attempt to craft and pick up the item, applying skill checks, gold cost, and XP.
      *
-     * @param  Character  $character  The character crafting the item.
-     * @param  Skill  $skill  The character's crafting skill for the item's crafting type.
-     * @param  Item  $item  The item to craft.
+     * @param Character $character The character crafting the item.
+     * @param Skill $skill The character's crafting skill for the item's crafting type.
+     * @param Item $item The item to craft.
      * @return bool True when the item was successfully crafted and picked up.
      */
     private function attemptToCraftItem(Character $character, Skill $skill, Item $item): bool
@@ -876,8 +876,8 @@ class CraftingService
     /**
      * Fetch the character's crafting skill for the requested crafting type.
      *
-     * @param  Character  $character  The character requesting the skill.
-     * @param  string  $craftingType  The requested crafting type.
+     * @param Character $character The character requesting the skill.
+     * @param string $craftingType The requested crafting type.
      * @return Skill The character's crafting skill.
      */
     private function fetchCraftingSkill(Character $character, string $craftingType): Skill
@@ -897,10 +897,10 @@ class CraftingService
     /**
      * Return a list of items the player can craft for the requested crafting type(s), cost-reduced.
      *
-     * @param  Character  $character  The character requesting craftable items.
-     * @param  Skill  $skill  The character's crafting skill for the requested crafting type(s).
-     * @param  string|array  $craftingType  The requested crafting type(s).
-     * @param  bool  $merchantMessage  Whether to send the Merchant cost-reduction server message.
+     * @param Character $character The character requesting craftable items.
+     * @param Skill $skill The character's crafting skill for the requested crafting type(s).
+     * @param string|array $craftingType The requested crafting type(s).
+     * @param bool $merchantMessage Whether to send the Merchant cost-reduction server message.
      * @return SupportCollection The cost-reduced craftable items.
      */
     private function getItems(Character $character, Skill $skill, string|array $craftingType, bool $merchantMessage = true): SupportCollection
@@ -918,7 +918,7 @@ class CraftingService
      * Orders by cost first, with a stable secondary order by item id, so a tie between equally
      * cheap weapons always resolves to the same Item for the same database state.
      *
-     * @param  Skill  $skill  The character's already-resolved weapon crafting skill.
+     * @param Skill $skill The character's already-resolved weapon crafting skill.
      * @return Item|null The cheapest currently craftable weapon, or null when nothing is craftable.
      */
     public function findInexpensiveCraftableWeaponForAutomation(Skill $skill): ?Item
@@ -933,7 +933,7 @@ class CraftingService
     /**
      * Build the shared eligible-craftable-items base query constraints for a character's skill.
      *
-     * @param  Skill  $skill  The character's crafting skill.
+     * @param Skill $skill The character's crafting skill.
      * @return Builder The base eligible-craftable-items query.
      */
     private function baseCraftableItemsQuery(Skill $skill): Builder
@@ -950,8 +950,8 @@ class CraftingService
     /**
      * Build the base eligible-craftable-items query for a character's skill and requested crafting type(s).
      *
-     * @param  Skill  $skill  The character's crafting skill for the requested crafting type(s).
-     * @param  string|array  $craftingType  The requested crafting type(s).
+     * @param Skill $skill The character's crafting skill for the requested crafting type(s).
+     * @param string|array $craftingType The requested crafting type(s).
      * @return Builder The base eligible-craftable-items query.
      */
     private function buildCraftableItemsQuery(Skill $skill, string|array $craftingType): Builder
@@ -983,11 +983,11 @@ class CraftingService
     /**
      * Handle picking up the crafted item into inventory, NPC handoff, or event handoff.
      *
-     * @param  Character  $character  The character who crafted the item.
-     * @param  Item  $item  The crafted item.
-     * @param  Skill  $skill  The character's crafting skill for the item's crafting type.
-     * @param  bool  $tooEasy  Whether the craft was trivial and should not award XP.
-     * @param  bool  $updateGoldCost  Whether to charge the character's Gold for the craft.
+     * @param Character $character The character who crafted the item.
+     * @param Item $item The crafted item.
+     * @param Skill $skill The character's crafting skill for the item's crafting type.
+     * @param bool $tooEasy Whether the craft was trivial and should not award XP.
+     * @param bool $updateGoldCost Whether to charge the character's Gold for the craft.
      * @return void This method does not return a value.
      */
     public function pickUpItem(Character $character, Item $item, Skill $skill, bool $tooEasy = false, bool $updateGoldCost = true): void
@@ -1024,11 +1024,11 @@ class CraftingService
     /**
      * Hand the crafted item over to an active NPC faction loyalty crafting task, when one exists.
      *
-     * @param  Character  $character  The character who crafted the item.
-     * @param  Item  $item  The crafted item.
-     * @param  Skill  $skill  The character's crafting skill for the item's crafting type.
-     * @param  bool  $tooEasy  Whether the craft was trivial and should not award XP.
-     * @param  bool  $updateGoldCost  Whether to charge the character's Gold for the craft.
+     * @param Character $character The character who crafted the item.
+     * @param Item $item The crafted item.
+     * @param Skill $skill The character's crafting skill for the item's crafting type.
+     * @param bool $tooEasy Whether the craft was trivial and should not award XP.
+     * @param bool $updateGoldCost Whether to charge the character's Gold for the craft.
      * @return bool True when the item was handed over to an NPC faction loyalty task.
      */
     private function handleCraftingForNpc(Character $character, Item $item, Skill $skill, bool $tooEasy, bool $updateGoldCost): bool
@@ -1055,11 +1055,11 @@ class CraftingService
     /**
      * Hand the crafted item over to an active global event crafting goal, when one exists.
      *
-     * @param  Character  $character  The character who crafted the item.
-     * @param  Item  $item  The crafted item.
-     * @param  Skill  $skill  The character's crafting skill for the item's crafting type.
-     * @param  bool  $tooEasy  Whether the craft was trivial and should not award XP.
-     * @param  bool  $updateGoldCost  Whether to charge the character's Gold for the craft.
+     * @param Character $character The character who crafted the item.
+     * @param Item $item The crafted item.
+     * @param Skill $skill The character's crafting skill for the item's crafting type.
+     * @param bool $tooEasy Whether the craft was trivial and should not award XP.
+     * @param bool $updateGoldCost Whether to charge the character's Gold for the craft.
      * @return bool True when the item was handed over to a global event crafting goal.
      */
     private function handleCraftingForEvent(Character $character, Item $item, Skill $skill, bool $tooEasy, bool $updateGoldCost): bool
@@ -1084,8 +1084,8 @@ class CraftingService
     /**
      * Attempt to pick up the crafted item into the character's inventory.
      *
-     * @param  Character  $character  The character who crafted the item.
-     * @param  Item  $item  The crafted item.
+     * @param Character $character The character who crafted the item.
+     * @param Item $item The crafted item.
      * @return bool True when the item was picked up into inventory.
      */
     private function attemptToPickUpItem(Character $character, Item $item): bool

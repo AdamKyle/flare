@@ -16,7 +16,7 @@ class CraftExperienceCycleTarget
     /**
      * Determine whether the given item satisfies this Experience cycle target.
      *
-     * @param  Item  $item  The candidate item being checked.
+     * @param Item $item The candidate item being checked.
      * @return bool True when the item matches this target.
      */
     public function matches(Item $item): bool

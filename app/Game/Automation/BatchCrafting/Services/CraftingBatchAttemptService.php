@@ -31,8 +31,8 @@ class CraftingBatchAttemptService
     /**
      * Return the character's current class-adjusted Gold cost to craft the item.
      *
-     * @param  Character  $character  The character crafting the item.
-     * @param  Item  $item  The item being crafted.
+     * @param Character $character The character crafting the item.
+     * @param Item $item The item being crafted.
      * @return int The Gold cost to craft the item.
      */
     public function goldCostFor(Character $character, Item $item): int
@@ -43,12 +43,12 @@ class CraftingBatchAttemptService
     /**
      * Attempt to craft the item and apply the requested Batch Crafting disposition to the outcome.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  BatchCraftingDisposition  $disposition  The configured crafting disposition.
-     * @param  Item  $item  The item to craft.
-     * @param  string  $craftingType  The crafting type used to craft the item.
-     * @param  int  $goldCost  The Gold cost of this attempt.
-     * @param  Closure|null  $placeItem  The retained-item placement callback, when keeping the item.
+     * @param Character $character The character running the batch.
+     * @param BatchCraftingDisposition $disposition The configured crafting disposition.
+     * @param Item $item The item to craft.
+     * @param string $craftingType The crafting type used to craft the item.
+     * @param int $goldCost The Gold cost of this attempt.
+     * @param Closure|null $placeItem The retained-item placement callback, when keeping the item.
      * @return BatchCraftingOperationResult The outcome of the craft attempt.
      */
     public function attempt(Character $character, BatchCraftingDisposition $disposition, Item $item, string $craftingType, int $goldCost, ?Closure $placeItem): BatchCraftingOperationResult
@@ -73,9 +73,9 @@ class CraftingBatchAttemptService
     /**
      * Resolve the retained item's output destination placement callback, or a capacity end reason.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  string  $outputDestination  The requested output destination value.
-     * @param  int|null  $outputSetId  The selected target Inventory Set id, required only for the Inventory Set destination.
+     * @param Character $character The character running the batch.
+     * @param string $outputDestination The requested output destination value.
+     * @param int|null $outputSetId The selected target Inventory Set id, required only for the Inventory Set destination.
      * @return BatchCraftingEndReason|Closure The capacity end reason, or the placement callback.
      */
     public function resolveRetainedDestination(Character $character, string $outputDestination, ?int $outputSetId = null): BatchCraftingEndReason|Closure
@@ -92,8 +92,8 @@ class CraftingBatchAttemptService
     /**
      * Sell the crafted item for Gold on behalf of a disposition that discards a displaced item.
      *
-     * @param  Character  $character  The character who crafted the item.
-     * @param  Item  $item  The item being sold.
+     * @param Character $character The character who crafted the item.
+     * @param Item $item The item being sold.
      * @return int The Gold gained from the sale.
      */
     public function sellForDisplacement(Character $character, Item $item): int
@@ -111,8 +111,8 @@ class CraftingBatchAttemptService
     /**
      * Destroy a displaced item on behalf of a disposition that discards it.
      *
-     * @param  Character  $character  The character who crafted the item.
-     * @param  Item  $item  The item being destroyed.
+     * @param Character $character The character who crafted the item.
+     * @param Item $item The item being destroyed.
      * @return void This method does not return a value.
      */
     public function destroyForDisplacement(Character $character, Item $item): void
@@ -125,8 +125,8 @@ class CraftingBatchAttemptService
     /**
      * Translate a CraftingService failure reason into a Batch Crafting operation result.
      *
-     * @param  string  $reason  The CraftingService failure reason value.
-     * @param  int  $goldCost  The Gold cost of the attempt.
+     * @param string $reason The CraftingService failure reason value.
+     * @param int $goldCost The Gold cost of the attempt.
      * @return BatchCraftingOperationResult The translated operation result.
      */
     public function translateFailure(string $reason, int $goldCost): BatchCraftingOperationResult
@@ -142,10 +142,10 @@ class CraftingBatchAttemptService
     /**
      * Send the Keep server message and record the kept crafting outcome.
      *
-     * @param  Character  $character  The character who crafted the item.
-     * @param  Item  $item  The crafted item.
-     * @param  array{destination: string, id: int}  $destination  The resolved retained-item destination.
-     * @param  int  $goldCost  The Gold cost of the attempt.
+     * @param Character $character The character who crafted the item.
+     * @param Item $item The crafted item.
+     * @param array{destination: string, id: int} $destination The resolved retained-item destination.
+     * @param int $goldCost The Gold cost of the attempt.
      * @return BatchCraftingOperationResult The kept operation result.
      */
     private function applyKeep(Character $character, Item $item, array $destination, int $goldCost): BatchCraftingOperationResult
@@ -168,9 +168,9 @@ class CraftingBatchAttemptService
     /**
      * Sell the crafted item and record the sold crafting outcome.
      *
-     * @param  Character  $character  The character who crafted the item.
-     * @param  Item  $item  The crafted item.
-     * @param  int  $goldCost  The Gold cost of the attempt.
+     * @param Character $character The character who crafted the item.
+     * @param Item $item The crafted item.
+     * @param int $goldCost The Gold cost of the attempt.
      * @return BatchCraftingOperationResult The sold operation result.
      */
     private function applySell(Character $character, Item $item, int $goldCost): BatchCraftingOperationResult
@@ -183,9 +183,9 @@ class CraftingBatchAttemptService
     /**
      * Destroy the crafted item and record the destroyed crafting outcome.
      *
-     * @param  Character  $character  The character who crafted the item.
-     * @param  Item  $item  The crafted item.
-     * @param  int  $goldCost  The Gold cost of the attempt.
+     * @param Character $character The character who crafted the item.
+     * @param Item $item The crafted item.
+     * @param int $goldCost The Gold cost of the attempt.
      * @return BatchCraftingOperationResult The destroyed operation result.
      */
     private function applyDestroy(Character $character, Item $item, int $goldCost): BatchCraftingOperationResult
@@ -198,7 +198,7 @@ class CraftingBatchAttemptService
     /**
      * Resolve the Inventory destination placement callback, or a capacity end reason.
      *
-     * @param  Character  $character  The character running the batch.
+     * @param Character $character The character running the batch.
      * @return BatchCraftingEndReason|Closure The capacity end reason, or the placement callback.
      */
     private function resolveInventoryDestination(Character $character): BatchCraftingEndReason|Closure
@@ -229,7 +229,7 @@ class CraftingBatchAttemptService
     /**
      * Resolve the Crafted Items Set destination placement callback, or a capacity end reason.
      *
-     * @param  Character  $character  The character running the batch.
+     * @param Character $character The character running the batch.
      * @return BatchCraftingEndReason|Closure The capacity end reason, or the placement callback.
      */
     private function resolveCraftedItemsSetDestination(Character $character): BatchCraftingEndReason|Closure
@@ -255,8 +255,8 @@ class CraftingBatchAttemptService
     /**
      * Resolve the selected normal Inventory Set destination placement callback, or a capacity end reason.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  int|null  $outputSetId  The selected target Inventory Set id.
+     * @param Character $character The character running the batch.
+     * @param int|null $outputSetId The selected target Inventory Set id.
      * @return BatchCraftingEndReason|Closure The capacity end reason, or the placement callback.
      */
     private function resolveInventorySetDestination(Character $character, ?int $outputSetId): BatchCraftingEndReason|Closure

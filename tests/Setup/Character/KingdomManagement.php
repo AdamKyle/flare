@@ -81,7 +81,7 @@ class KingdomManagement
      * The kingdom building will be assigned to the kingdom itself, additional options may be
      * passed in. These options match the kingdom_buildings attributes.
      *
-     * @param  array  $gameBuildingOptions  | []
+     * @param array $gameBuildingOptions | []
      * @param array kingdomBuildingOptions | []
      *
      * @throws Exception
@@ -272,7 +272,7 @@ class KingdomManagement
      *
      * The amount of units, by default, is 500.
      *
-     * @param  array  $gameUnitOptions  | []
+     * @param array $gameUnitOptions | []
      *
      * @throws Exception
      */

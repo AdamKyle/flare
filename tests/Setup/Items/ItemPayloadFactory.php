@@ -7,7 +7,7 @@ class ItemPayloadFactory
     /**
      * Build a valid, minimal Admin Item creation/update request payload.
      *
-     * @param  array<string, mixed>  $overrides  Field overrides.
+     * @param array<string, mixed> $overrides Field overrides.
      * @return array<string, mixed> Complete Item form payload.
      */
     public function valid(array $overrides = []): array

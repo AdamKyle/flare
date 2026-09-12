@@ -30,8 +30,8 @@ class HolyOilSelectedItemsHandler implements BatchCraftingHandler
     /**
      * Execute one Holy Oils Selected Items Batch Crafting operation for the running batch.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  Character  $character  The character running the batch.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param Character $character The character running the batch.
      * @return BatchCraftingOperationResult The outcome of the operation.
      */
     public function handle(BatchCrafting $batchCrafting, Character $character): BatchCraftingOperationResult
@@ -80,7 +80,7 @@ class HolyOilSelectedItemsHandler implements BatchCraftingHandler
     /**
      * Determine the target item's remaining Holy stack capacity.
      *
-     * @param  InventorySlot  $slot  The target slot.
+     * @param InventorySlot $slot The target slot.
      * @return int The remaining Holy stack capacity.
      */
     private function remainingCapacity(InventorySlot $slot): int
@@ -91,9 +91,9 @@ class HolyOilSelectedItemsHandler implements BatchCraftingHandler
     /**
      * Persist the current target/oil/stack facts after a successful application.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  InventorySlot  $resultingSlot  The resulting target slot after the application.
-     * @param  AlchemyBagSlot  $oilSlot  The Holy Oil slot consumed by the application.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param InventorySlot $resultingSlot The resulting target slot after the application.
+     * @param AlchemyBagSlot $oilSlot The Holy Oil slot consumed by the application.
      * @return void This method does not return a value.
      */
     private function updateCurrentFacts(BatchCrafting $batchCrafting, InventorySlot $resultingSlot, AlchemyBagSlot $oilSlot): void
@@ -113,11 +113,11 @@ class HolyOilSelectedItemsHandler implements BatchCraftingHandler
     /**
      * Apply the selected disposition to a completed target and advance the plan.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  Character  $character  The character running the batch.
-     * @param  InventorySlot  $slot  The completed target slot.
-     * @param  array  $progress  The persisted Batch Crafting progress data.
-     * @param  int  $goldDustSpentThisTick  The Gold Dust spent applying this tick's final oil, when applicable.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param Character $character The character running the batch.
+     * @param InventorySlot $slot The completed target slot.
+     * @param array $progress The persisted Batch Crafting progress data.
+     * @param int $goldDustSpentThisTick The Gold Dust spent applying this tick's final oil, when applicable.
      * @return BatchCraftingOperationResult The outcome of the disposition transition.
      */
     private function completeTarget(BatchCrafting $batchCrafting, Character $character, InventorySlot $slot, array $progress, int $goldDustSpentThisTick): BatchCraftingOperationResult
@@ -132,8 +132,8 @@ class HolyOilSelectedItemsHandler implements BatchCraftingHandler
     /**
      * Translate a failed Holy Oil application into the appropriate outcome.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  HolyOilBatchApplicationResult  $applicationResult  The failed application outcome.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param HolyOilBatchApplicationResult $applicationResult The failed application outcome.
      * @return BatchCraftingOperationResult The translated outcome.
      */
     private function handleApplicationFailure(BatchCrafting $batchCrafting, HolyOilBatchApplicationResult $applicationResult): BatchCraftingOperationResult
@@ -148,8 +148,8 @@ class HolyOilSelectedItemsHandler implements BatchCraftingHandler
     /**
      * Advance the plan to its next target, resetting the current target/oil/stack facts.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  BatchCraftingOperationResult  $result  The outcome reached before advancing.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param BatchCraftingOperationResult $result The outcome reached before advancing.
      * @return BatchCraftingOperationResult The outcome, carrying an end reason when the plan is now exhausted.
      */
     private function advance(BatchCrafting $batchCrafting, BatchCraftingOperationResult $result): BatchCraftingOperationResult

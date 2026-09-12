@@ -15,8 +15,8 @@ class FactionLoyaltyAutomationActionCoordinator
     /**
      * Set up the coordinator.
      *
-     * @param  FactionLoyaltyAutomation  $factionLoyaltyAutomation  The Faction Loyalty automation record.
-     * @param  FactionLoyaltyNpc  $factionLoyaltyNpc  The NPC being assisted.
+     * @param FactionLoyaltyAutomation $factionLoyaltyAutomation The Faction Loyalty automation record.
+     * @param FactionLoyaltyNpc $factionLoyaltyNpc The NPC being assisted.
      * @return FactionLoyaltyAutomationActionCoordinator The configured coordinator instance.
      */
     public function setUp(FactionLoyaltyAutomation $factionLoyaltyAutomation, FactionLoyaltyNpc $factionLoyaltyNpc): FactionLoyaltyAutomationActionCoordinator
@@ -91,7 +91,7 @@ class FactionLoyaltyAutomationActionCoordinator
     /**
      * Get failed crafting task.
      *
-     * @param  array  $incompleteTasks  The NPC's incomplete fame tasks.
+     * @param array $incompleteTasks The NPC's incomplete fame tasks.
      * @return array|null The previously failed crafting task, if any.
      */
     private function getFailedCraftingTask(array $incompleteTasks): ?array
@@ -116,7 +116,7 @@ class FactionLoyaltyAutomationActionCoordinator
     /**
      * Get failed bounty task.
      *
-     * @param  array  $incompleteTasks  The NPC's incomplete fame tasks.
+     * @param array $incompleteTasks The NPC's incomplete fame tasks.
      * @return array|null The previously failed bounty task, if any.
      */
     private function getFailedBountyTask(array $incompleteTasks): ?array
@@ -141,7 +141,7 @@ class FactionLoyaltyAutomationActionCoordinator
     /**
      * Get crafting task.
      *
-     * @param  array  $incompleteTasks  The NPC's incomplete fame tasks.
+     * @param array $incompleteTasks The NPC's incomplete fame tasks.
      * @return array|null The next available crafting task, if any.
      */
     private function getCraftingTask(array $incompleteTasks): ?array
@@ -158,7 +158,7 @@ class FactionLoyaltyAutomationActionCoordinator
     /**
      * Get bounty task.
      *
-     * @param  array  $incompleteTasks  The NPC's incomplete fame tasks.
+     * @param array $incompleteTasks The NPC's incomplete fame tasks.
      * @return array|null The next available bounty task, if any.
      */
     private function getBountyTask(array $incompleteTasks): ?array
@@ -175,8 +175,8 @@ class FactionLoyaltyAutomationActionCoordinator
     /**
      * Resolve rotating action.
      *
-     * @param  array  $craftingTask  The available crafting task.
-     * @param  array  $bountyTask  The available bounty task.
+     * @param array $craftingTask The available crafting task.
+     * @param array $bountyTask The available bounty task.
      * @return array The resolved action, alternating with the last performed action.
      */
     private function resolveRotatingAction(array $craftingTask, array $bountyTask): array
@@ -219,7 +219,7 @@ class FactionLoyaltyAutomationActionCoordinator
     /**
      * Build craft action.
      *
-     * @param  array  $task  The crafting task.
+     * @param array $task The crafting task.
      * @return array The built craft action.
      */
     private function buildCraftAction(array $task): array
@@ -233,7 +233,7 @@ class FactionLoyaltyAutomationActionCoordinator
     /**
      * Build fight action.
      *
-     * @param  array  $task  The bounty task.
+     * @param array $task The bounty task.
      * @return array The built fight action.
      */
     private function buildFightAction(array $task): array

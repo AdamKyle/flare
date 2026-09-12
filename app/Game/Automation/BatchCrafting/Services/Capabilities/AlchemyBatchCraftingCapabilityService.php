@@ -17,7 +17,7 @@ class AlchemyBatchCraftingCapabilityService
     /**
      * Build the complete Alchemy capability facts for the character.
      *
-     * @param  Character  $character  The character requesting capability facts.
+     * @param Character $character The character requesting capability facts.
      * @return array The Alchemy capability facts payload.
      */
     public function build(Character $character): array
@@ -35,7 +35,7 @@ class AlchemyBatchCraftingCapabilityService
     /**
      * Determine whether at least one meaningful Alchemy Experience target currently exists.
      *
-     * @param  Character  $character  The character being checked.
+     * @param Character $character The character being checked.
      * @return bool True when a meaningful target currently exists.
      */
     private function hasMeaningfulTarget(Character $character): bool
@@ -46,7 +46,7 @@ class AlchemyBatchCraftingCapabilityService
     /**
      * Build the factual current Alchemy skill progress used by the setup/runtime UI.
      *
-     * @param  Skill|null  $skill  The character's already-resolved Alchemy skill, when present.
+     * @param Skill|null $skill The character's already-resolved Alchemy skill, when present.
      * @return array|null The Alchemy skill progress facts, or null when the skill does not exist.
      */
     private function alchemySkillFacts(?Skill $skill): ?array

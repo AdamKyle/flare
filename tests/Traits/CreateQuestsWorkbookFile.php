@@ -21,7 +21,7 @@ trait CreateQuestsWorkbookFile
     /**
      * Build a real, on-disk Quests import workbook fixture from named row values.
      *
-     * @param  array<int, array<string, mixed>>  $rowsByHeaderName  Each row's values, keyed by header name; any header not present in a row is written blank.
+     * @param array<int, array<string, mixed>> $rowsByHeaderName Each row's values, keyed by header name; any header not present in a row is written blank.
      */
     public function createQuestsWorkbookFile(array $rowsByHeaderName): UploadedFile
     {

@@ -37,9 +37,9 @@ class ItemComparison
      * 4) Dedupe by position.
      * 5) Enrich the candidate item, compare against each equipped slot item, and return rows.
      *
-     * @param  Item  $itemToCompare  The item the player is considering equipping; enriched prior to compare.
-     * @param  Collection<int, object>  $inventorySlots  Slot models/records with at least: ->position(string), ->equipped(bool), ->item(Item)
-     * @param  Character  $character  Unused placeholder for future needs/signature parity.
+     * @param Item $itemToCompare The item the player is considering equipping; enriched prior to compare.
+     * @param Collection<int, object> $inventorySlots Slot models/records with at least: ->position(string), ->equipped(bool), ->item(Item)
+     * @param Character $character Unused placeholder for future needs/signature parity.
      * @return array<int, array<string, mixed>> A list of comparison row payloads ready for the frontend.
      */
     public function fetchDetails(Item $itemToCompare, Collection $inventorySlots, Character $character): array
@@ -81,7 +81,7 @@ class ItemComparison
      * Weapons (non-spell, non-ring) → ['left-hand','right-hand']
      * Armour → Positions provided by ArmourType::getArmourPositions()
      *
-     * @param  Item  $item  The raw item model whose type determines valid positions.
+     * @param Item $item The raw item model whose type determines valid positions.
      * @return array<int, string> Ordered positions used for filtering and sorting.
      */
     private function resolveEquipPositions(Item $item): array
@@ -121,8 +121,8 @@ class ItemComparison
      * - Have a position included in the allowed positions list, and
      * - Are currently equipped.
      *
-     * @param  Collection<int, object>  $inventorySlots  Slot records with ->position and ->equipped.
-     * @param  array<int, string>  $equipPositions  Allowed slot position identifiers.
+     * @param Collection<int, object> $inventorySlots Slot records with ->position and ->equipped.
+     * @param array<int, string> $equipPositions Allowed slot position identifiers.
      * @return Collection<int, object> Filtered, still-indexed slot collection.
      */
     private function filterSlotsByPositions(Collection $inventorySlots, array $equipPositions): Collection
@@ -135,8 +135,8 @@ class ItemComparison
     /**
      * Build a single comparison row for a matched equipped slot.
      *
-     * @param  Item  $enrichedItemToCompare  The candidate item after enrichment.
-     * @param  InventorySlot|SetSlot  $equippedSlot  Slot record containing ->position(string) and ->item(Item Eloquent model).
+     * @param Item $enrichedItemToCompare The candidate item after enrichment.
+     * @param InventorySlot|SetSlot $equippedSlot Slot record containing ->position(string) and ->item(Item Eloquent model).
      * @return array<string, mixed> Comparison row payload including metadata and computed adjustments.
      */
     private function buildComparisonRow(Item $enrichedItemToCompare, InventorySlot|SetSlot $equippedSlot, int $enrichedItemToCompareSlotId): array

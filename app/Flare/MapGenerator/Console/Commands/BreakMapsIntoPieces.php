@@ -17,7 +17,7 @@ class BreakMapsIntoPieces extends Command
     /**
      * Generate missing 250-by-250 tile sets for every persisted Game Map.
      *
-     * @param  MapTileGenerationService  $mapTileGenerationService  Map tile generation service.
+     * @param MapTileGenerationService $mapTileGenerationService Map tile generation service.
      * @return void Missing tile sets are generated and progress is reported.
      */
     public function handle(MapTileGenerationService $mapTileGenerationService): void

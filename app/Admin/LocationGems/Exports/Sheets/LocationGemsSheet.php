@@ -25,7 +25,7 @@ class LocationGemsSheet implements FromCollection, ShouldAutoSize, WithHeadings,
     /**
      * Map a Location Gem profile into its workbook row, using human-readable Map/Location/Skill/atonement names.
      *
-     * @param  mixed  $gameLocationGemParamter
+     * @param mixed $gameLocationGemParamter
      */
     public function map($gameLocationGemParamter): array
     {

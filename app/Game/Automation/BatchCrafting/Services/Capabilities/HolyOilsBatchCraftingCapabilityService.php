@@ -12,7 +12,7 @@ class HolyOilsBatchCraftingCapabilityService
     /**
      * Build the complete Holy Oils capability facts for the character.
      *
-     * @param  Character  $character  The character requesting capability facts.
+     * @param Character $character The character requesting capability facts.
      * @return array The Holy Oils capability facts payload.
      */
     public function build(Character $character): array

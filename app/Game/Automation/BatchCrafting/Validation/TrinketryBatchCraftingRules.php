@@ -13,7 +13,7 @@ class TrinketryBatchCraftingRules
      *
      * No item selector, no amount, no output destination, and no listing price.
      *
-     * @param  array  $requestData  The raw Batch Crafting request data.
+     * @param array $requestData The raw Batch Crafting request data.
      * @return array The Trinketry validation rules.
      */
     public function rules(array $requestData): array

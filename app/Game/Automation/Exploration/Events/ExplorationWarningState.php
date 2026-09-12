@@ -20,9 +20,9 @@ class ExplorationWarningState implements ShouldBroadcastNow
     public ?array $warning;
 
     /**
-     * @param  User  $user  The user to broadcast the Exploration warning state to.
-     * @param  bool  $hasWarning  Whether the character has an active Exploration warning.
-     * @param  array  $warnings  The character's active Exploration warnings.
+     * @param User $user The user to broadcast the Exploration warning state to.
+     * @param bool $hasWarning Whether the character has an active Exploration warning.
+     * @param array $warnings The character's active Exploration warnings.
      */
     public function __construct(private readonly User $user, bool $hasWarning, array $warnings)
     {

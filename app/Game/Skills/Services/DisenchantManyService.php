@@ -29,7 +29,7 @@ class DisenchantManyService
     /**
      * Disenchant many items and return a summary payload.
      *
-     * @param  array{ids?: array<int|string>, exclude?: array<int|string>}  $params
+     * @param array{ids?: array<int|string>, exclude?: array<int|string>} $params
      * @return array{
      *   status:int,
      *   message:string,
@@ -94,7 +94,7 @@ class DisenchantManyService
     /**
      * Fetch eligible inventory slots based on filters and constraints.
      *
-     * @param  array{ids?: array<int|string>, exclude?: array<int|string>}  $params
+     * @param array{ids?: array<int|string>, exclude?: array<int|string>} $params
      * @return EloquentCollection<int, InventorySlot>
      */
     private function fetchEligibleSlots(Character $character, array $params): EloquentCollection
@@ -131,7 +131,7 @@ class DisenchantManyService
     /**
      * Apply to include/exclude item_id filters on the base query.
      *
-     * @param  array{ids?: array<int|string>, exclude?: array<int|string>}  $params
+     * @param array{ids?: array<int|string>, exclude?: array<int|string>} $params
      */
     private function applyIncludeExcludeFilters(Builder $query, array $params): void
     {
@@ -253,7 +253,7 @@ class DisenchantManyService
     /**
      * Persist final state and clean up processed slots.
      *
-     * @param  array<int,int>  $processedSlotIds
+     * @param array<int,int> $processedSlotIds
      */
     private function finalize(
         Character $character,

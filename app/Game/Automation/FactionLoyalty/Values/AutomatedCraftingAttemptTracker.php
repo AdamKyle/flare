@@ -23,7 +23,7 @@ class AutomatedCraftingAttemptTracker
     /**
      * Set up the tracker.
      *
-     * @param  bool  $startedBelowTargetLevel  Whether the character started below the target item level.
+     * @param bool $startedBelowTargetLevel Whether the character started below the target item level.
      * @return AutomatedCraftingAttemptTracker The reset tracker instance.
      */
     public function setUp(bool $startedBelowTargetLevel): AutomatedCraftingAttemptTracker
@@ -42,10 +42,10 @@ class AutomatedCraftingAttemptTracker
     /**
      * Track a crafting attempt.
      *
-     * @param  Item  $item  The item attempted.
-     * @param  int  $goldSpent  The gold spent on the attempt.
-     * @param  bool  $crafted  Whether the attempt produced an item.
-     * @param  bool  $craftedTargetItem  Whether the attempt produced the target item.
+     * @param Item $item The item attempted.
+     * @param int $goldSpent The gold spent on the attempt.
+     * @param bool $crafted Whether the attempt produced an item.
+     * @param bool $craftedTargetItem Whether the attempt produced the target item.
      * @return void This method does not return a value.
      */
     public function trackAttempt(Item $item, int $goldSpent, bool $crafted, bool $craftedTargetItem): void

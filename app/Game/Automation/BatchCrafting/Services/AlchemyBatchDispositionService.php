@@ -22,11 +22,11 @@ class AlchemyBatchDispositionService
     /**
      * Apply the selected disposition to one successfully transmuted Alchemy item.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  BatchCraftingDisposition  $disposition  The selected Alchemy disposition.
-     * @param  Item  $item  The transmuted item.
-     * @param  int  $alchemyBagSlotId  The Alchemy Bag slot holding the produced item.
-     * @param  int|null  $listingPrice  The requested listing price, when listing.
+     * @param Character $character The character running the batch.
+     * @param BatchCraftingDisposition $disposition The selected Alchemy disposition.
+     * @param Item $item The transmuted item.
+     * @param int $alchemyBagSlotId The Alchemy Bag slot holding the produced item.
+     * @param int|null $listingPrice The requested listing price, when listing.
      * @return BatchCraftingOperationResult The outcome of applying the disposition.
      */
     public function apply(Character $character, BatchCraftingDisposition $disposition, Item $item, int $alchemyBagSlotId, ?int $listingPrice): BatchCraftingOperationResult
@@ -42,8 +42,8 @@ class AlchemyBatchDispositionService
     /**
      * Destroy the produced item's Alchemy Bag slot.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  int  $alchemyBagSlotId  The Alchemy Bag slot holding the produced item.
+     * @param Character $character The character running the batch.
+     * @param int $alchemyBagSlotId The Alchemy Bag slot holding the produced item.
      * @return BatchCraftingOperationResult The destroyed operation result.
      */
     private function destroy(Character $character, int $alchemyBagSlotId): BatchCraftingOperationResult
@@ -56,10 +56,10 @@ class AlchemyBatchDispositionService
     /**
      * List the produced item on the Market and remove it from the Alchemy Bag.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  Item  $item  The transmuted item.
-     * @param  int  $alchemyBagSlotId  The Alchemy Bag slot holding the produced item.
-     * @param  int|null  $listingPrice  The requested listing price.
+     * @param Character $character The character running the batch.
+     * @param Item $item The transmuted item.
+     * @param int $alchemyBagSlotId The Alchemy Bag slot holding the produced item.
+     * @param int|null $listingPrice The requested listing price.
      * @return BatchCraftingOperationResult The listed operation result.
      */
     private function list(Character $character, Item $item, int $alchemyBagSlotId, ?int $listingPrice): BatchCraftingOperationResult
@@ -75,8 +75,8 @@ class AlchemyBatchDispositionService
      *
      * When the domain rule prevents immediate use, the item remains retained in the Alchemy Bag.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  int  $alchemyBagSlotId  The Alchemy Bag slot holding the produced item.
+     * @param Character $character The character running the batch.
+     * @param int $alchemyBagSlotId The Alchemy Bag slot holding the produced item.
      * @return BatchCraftingOperationResult The used operation result, or a kept result when use was blocked.
      */
     private function useNow(Character $character, int $alchemyBagSlotId): BatchCraftingOperationResult

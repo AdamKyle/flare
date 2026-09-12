@@ -10,15 +10,15 @@ use Illuminate\Http\JsonResponse;
 class FactionLoyaltyAutomationWarningController
 {
     /**
-     * @param  FactionLoyaltyAutomationWarningService  $factionLoyaltyAutomationWarningService  The Faction Loyalty warning service.
+     * @param FactionLoyaltyAutomationWarningService $factionLoyaltyAutomationWarningService The Faction Loyalty warning service.
      */
     public function __construct(private readonly FactionLoyaltyAutomationWarningService $factionLoyaltyAutomationWarningService) {}
 
     /**
      * Dismiss an active Faction Loyalty automation warning for the character.
      *
-     * @param  FactionLoyaltyAutomationWarningRequest  $request  The dismiss request, optionally naming a warning id.
-     * @param  Character  $character  The character dismissing the warning.
+     * @param FactionLoyaltyAutomationWarningRequest $request The dismiss request, optionally naming a warning id.
+     * @param Character $character The character dismissing the warning.
      * @return JsonResponse The updated warning state.
      */
     public function dismiss(FactionLoyaltyAutomationWarningRequest $request, Character $character): JsonResponse

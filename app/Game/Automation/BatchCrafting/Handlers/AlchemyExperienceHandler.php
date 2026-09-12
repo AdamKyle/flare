@@ -30,8 +30,8 @@ class AlchemyExperienceHandler implements BatchCraftingHandler
     /**
      * Execute one Alchemy For Experience Batch Crafting operation for the running batch.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  Character  $character  The character running the batch.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param Character $character The character running the batch.
      * @return BatchCraftingOperationResult The outcome of the operation.
      */
     public function handle(BatchCrafting $batchCrafting, Character $character): BatchCraftingOperationResult
@@ -82,7 +82,7 @@ class AlchemyExperienceHandler implements BatchCraftingHandler
     /**
      * Resolve the factual reason no Alchemy Experience target is currently actionable.
      *
-     * @param  Skill|null  $skill  The character's already-resolved Alchemy skill, when present.
+     * @param Skill|null $skill The character's already-resolved Alchemy skill, when present.
      * @return BatchCraftingEndReason SKILL_MAXED when the Alchemy skill is maxed, otherwise MAXED_OR_NOTHING_LEFT.
      */
     private function resolveNoTargetReason(?Skill $skill): BatchCraftingEndReason

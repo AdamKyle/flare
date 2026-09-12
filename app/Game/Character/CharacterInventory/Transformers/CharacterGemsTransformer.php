@@ -12,7 +12,7 @@ class CharacterGemsTransformer extends TransformerAbstract
     /**
      * Gets the response data for the inventory sheet
      *
-     * @param  Gem  $gem  gem
+     * @param Gem $gem gem
      *
      * @throws Exception
      */

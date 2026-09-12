@@ -29,14 +29,14 @@ class CraftAndEnchantBatchAttemptService
     /**
      * Craft one item and apply the requested enchantment, then apply the given disposition.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  BatchCraftingDisposition  $disposition  The configured disposition (Keep, Sell, Destroy, List, or Disenchant).
-     * @param  Item  $item  The item to craft.
-     * @param  string  $craftingType  The crafting type used to craft the item.
-     * @param  int|null  $prefixId  The requested Prefix affix id, when selected.
-     * @param  int|null  $suffixId  The requested Suffix affix id, when selected.
-     * @param  Closure|null  $placeItem  The retained-item placement callback, required only for Keep.
-     * @param  int|null  $listingPrice  The requested Market listing price, required only for List.
+     * @param Character $character The character running the batch.
+     * @param BatchCraftingDisposition $disposition The configured disposition (Keep, Sell, Destroy, List, or Disenchant).
+     * @param Item $item The item to craft.
+     * @param string $craftingType The crafting type used to craft the item.
+     * @param int|null $prefixId The requested Prefix affix id, when selected.
+     * @param int|null $suffixId The requested Suffix affix id, when selected.
+     * @param Closure|null $placeItem The retained-item placement callback, required only for Keep.
+     * @param int|null $listingPrice The requested Market listing price, required only for List.
      * @return BatchCraftingOperationResult The outcome of the attempt.
      */
     public function attempt(
@@ -66,12 +66,12 @@ class CraftAndEnchantBatchAttemptService
      * Shared by the plain attempt() flow and by workflows that must apply a disposition after
      * comparing the finished item against other criteria (for example, Keep Best).
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  BatchCraftingDisposition  $disposition  The configured disposition (Keep, Sell, Destroy, List, or Disenchant).
-     * @param  Item  $item  The finished enchanted item.
-     * @param  Closure|null  $placeItem  The retained-item placement callback, required only for Keep.
-     * @param  int|null  $listingPrice  The requested Market listing price, required only for List.
-     * @param  int  $goldCost  The total Gold cost already spent on this item.
+     * @param Character $character The character running the batch.
+     * @param BatchCraftingDisposition $disposition The configured disposition (Keep, Sell, Destroy, List, or Disenchant).
+     * @param Item $item The finished enchanted item.
+     * @param Closure|null $placeItem The retained-item placement callback, required only for Keep.
+     * @param int|null $listingPrice The requested Market listing price, required only for List.
+     * @param int $goldCost The total Gold cost already spent on this item.
      * @return BatchCraftingOperationResult The outcome of applying the disposition.
      */
     public function applyDisposition(Character $character, BatchCraftingDisposition $disposition, Item $item, ?Closure $placeItem, ?int $listingPrice, int $goldCost): BatchCraftingOperationResult
@@ -91,11 +91,11 @@ class CraftAndEnchantBatchAttemptService
      * Shared by the plain attempt() flow and by Keep Best callers that must inspect the
      * finished enchanted item's quality before deciding how to dispose of it.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  Item  $item  The item to craft.
-     * @param  string  $craftingType  The crafting type used to craft the item.
-     * @param  int|null  $prefixId  The requested Prefix affix id, when selected.
-     * @param  int|null  $suffixId  The requested Suffix affix id, when selected.
+     * @param Character $character The character running the batch.
+     * @param Item $item The item to craft.
+     * @param string $craftingType The crafting type used to craft the item.
+     * @param int|null $prefixId The requested Prefix affix id, when selected.
+     * @param int|null $suffixId The requested Suffix affix id, when selected.
      * @return array{success: bool, item: Item|null, gold_cost: int, xp_gained: int, result: BatchCraftingOperationResult|null} The craft and enchant outcome.
      */
     public function craftAndEnchant(Character $character, Item $item, string $craftingType, ?int $prefixId, ?int $suffixId): array
@@ -155,8 +155,8 @@ class CraftAndEnchantBatchAttemptService
     /**
      * Sell a displaced enchanted item on behalf of a disposition that discards it.
      *
-     * @param  Character  $character  The character who crafted the item.
-     * @param  Item  $item  The item being sold.
+     * @param Character $character The character who crafted the item.
+     * @param Item $item The item being sold.
      * @return int The Gold gained from the sale.
      */
     public function sellForDisplacement(Character $character, Item $item): int
@@ -167,8 +167,8 @@ class CraftAndEnchantBatchAttemptService
     /**
      * Destroy a displaced enchanted item on behalf of a disposition that discards it.
      *
-     * @param  Character  $character  The character who crafted the item.
-     * @param  Item  $item  The item being destroyed.
+     * @param Character $character The character who crafted the item.
+     * @param Item $item The item being destroyed.
      * @return void This method does not return a value.
      */
     public function destroyForDisplacement(Character $character, Item $item): void
@@ -179,7 +179,7 @@ class CraftAndEnchantBatchAttemptService
     /**
      * Disenchant a displaced enchanted item on behalf of a disposition that discards it.
      *
-     * @param  Character  $character  The character who crafted the item.
+     * @param Character $character The character who crafted the item.
      * @return void This method does not return a value.
      */
     public function disenchantForDisplacement(Character $character): void
@@ -190,10 +190,10 @@ class CraftAndEnchantBatchAttemptService
     /**
      * Send the Keep server message and record the kept crafting outcome.
      *
-     * @param  Character  $character  The character who crafted the item.
-     * @param  Item  $item  The enchanted item.
-     * @param  Closure|null  $placeItem  The retained-item placement callback.
-     * @param  int  $goldCost  The total Gold cost of this attempt.
+     * @param Character $character The character who crafted the item.
+     * @param Item $item The enchanted item.
+     * @param Closure|null $placeItem The retained-item placement callback.
+     * @param int $goldCost The total Gold cost of this attempt.
      * @return BatchCraftingOperationResult The kept operation result.
      */
     private function applyKeep(Character $character, Item $item, ?Closure $placeItem, int $goldCost): BatchCraftingOperationResult
@@ -221,9 +221,9 @@ class CraftAndEnchantBatchAttemptService
     /**
      * Sell the enchanted item and record the sold crafting outcome.
      *
-     * @param  Character  $character  The character who crafted the item.
-     * @param  Item  $item  The enchanted item.
-     * @param  int  $goldCost  The total Gold cost of this attempt.
+     * @param Character $character The character who crafted the item.
+     * @param Item $item The enchanted item.
+     * @param int $goldCost The total Gold cost of this attempt.
      * @return BatchCraftingOperationResult The sold operation result.
      */
     private function applySell(Character $character, Item $item, int $goldCost): BatchCraftingOperationResult
@@ -236,9 +236,9 @@ class CraftAndEnchantBatchAttemptService
     /**
      * Destroy the enchanted item and record the destroyed crafting outcome.
      *
-     * @param  Character  $character  The character who crafted the item.
-     * @param  Item  $item  The enchanted item.
-     * @param  int  $goldCost  The total Gold cost of this attempt.
+     * @param Character $character The character who crafted the item.
+     * @param Item $item The enchanted item.
+     * @param int $goldCost The total Gold cost of this attempt.
      * @return BatchCraftingOperationResult The destroyed operation result.
      */
     private function applyDestroy(Character $character, Item $item, int $goldCost): BatchCraftingOperationResult
@@ -251,10 +251,10 @@ class CraftAndEnchantBatchAttemptService
     /**
      * List the enchanted item on the Market and record the listed crafting outcome.
      *
-     * @param  Character  $character  The character who crafted the item.
-     * @param  Item  $item  The enchanted item.
-     * @param  int|null  $listingPrice  The requested Market listing price.
-     * @param  int  $goldCost  The total Gold cost of this attempt.
+     * @param Character $character The character who crafted the item.
+     * @param Item $item The enchanted item.
+     * @param int|null $listingPrice The requested Market listing price.
+     * @param int $goldCost The total Gold cost of this attempt.
      * @return BatchCraftingOperationResult The listed operation result.
      */
     private function applyList(Character $character, Item $item, ?int $listingPrice, int $goldCost): BatchCraftingOperationResult
@@ -267,8 +267,8 @@ class CraftAndEnchantBatchAttemptService
     /**
      * Disenchant the enchanted item and record the disenchanted crafting outcome.
      *
-     * @param  Character  $character  The character who crafted the item.
-     * @param  int  $goldCost  The total Gold cost of this attempt.
+     * @param Character $character The character who crafted the item.
+     * @param int $goldCost The total Gold cost of this attempt.
      * @return BatchCraftingOperationResult The disenchanted operation result.
      */
     private function applyDisenchant(Character $character, int $goldCost): BatchCraftingOperationResult

@@ -24,8 +24,8 @@ class BatchCraftingOperationResult
     /**
      * Build a result that ends the Batch Crafting run with the given reason.
      *
-     * @param  BatchCraftingEndReason  $reason  The reason the run ended.
-     * @param  int  $goldSpent  The Gold spent before the run ended, when applicable.
+     * @param BatchCraftingEndReason $reason The reason the run ended.
+     * @param int $goldSpent The Gold spent before the run ended, when applicable.
      * @return self A result carrying the end reason.
      */
     public static function ended(BatchCraftingEndReason $reason, int $goldSpent = 0): self
@@ -36,7 +36,7 @@ class BatchCraftingOperationResult
     /**
      * Build a result representing a crafted item that was kept.
      *
-     * @param  int  $goldSpent  The Gold spent crafting the item.
+     * @param int $goldSpent The Gold spent crafting the item.
      * @return self A result with the kept action status.
      */
     public static function kept(int $goldSpent): self
@@ -47,8 +47,8 @@ class BatchCraftingOperationResult
     /**
      * Build a result representing a crafted item that was sold.
      *
-     * @param  int  $goldSpent  The Gold spent crafting the item.
-     * @param  int  $goldGained  The Gold gained selling the item.
+     * @param int $goldSpent The Gold spent crafting the item.
+     * @param int $goldGained The Gold gained selling the item.
      * @return self A result with the sold action status.
      */
     public static function sold(int $goldSpent, int $goldGained): self
@@ -59,8 +59,8 @@ class BatchCraftingOperationResult
     /**
      * Build a result representing a new best item that displaced and sold the previous best.
      *
-     * @param  int  $goldSpent  The Gold spent crafting the new best item.
-     * @param  int  $goldGained  The Gold gained selling the displaced previous best item.
+     * @param int $goldSpent The Gold spent crafting the new best item.
+     * @param int $goldGained The Gold gained selling the displaced previous best item.
      * @return self A result with the kept action status, the sale Gold gained, and one additional sold count.
      */
     public static function keptWithDisplacedSale(int $goldSpent, int $goldGained): self
@@ -71,7 +71,7 @@ class BatchCraftingOperationResult
     /**
      * Build a result representing a new best item that displaced and destroyed the previous best.
      *
-     * @param  int  $goldSpent  The Gold spent crafting the new best item.
+     * @param int $goldSpent The Gold spent crafting the new best item.
      * @return self A result with the kept action status and one additional destroyed count.
      */
     public static function keptWithDisplacedDestroy(int $goldSpent): self
@@ -82,7 +82,7 @@ class BatchCraftingOperationResult
     /**
      * Build a result representing a new best item that displaced and disenchanted the previous best.
      *
-     * @param  int  $goldSpent  The Gold spent crafting the new best item.
+     * @param int $goldSpent The Gold spent crafting the new best item.
      * @return self A result with the kept action status and one additional disenchanted count.
      */
     public static function keptWithDisplacedDisenchant(int $goldSpent): self
@@ -93,7 +93,7 @@ class BatchCraftingOperationResult
     /**
      * Build a result representing a crafted item that was destroyed.
      *
-     * @param  int  $goldSpent  The Gold spent crafting the item.
+     * @param int $goldSpent The Gold spent crafting the item.
      * @return self A result with the destroyed action status.
      */
     public static function destroyed(int $goldSpent): self
@@ -104,7 +104,7 @@ class BatchCraftingOperationResult
     /**
      * Build a result representing a crafted item that was listed on the Market.
      *
-     * @param  int  $goldSpent  The Gold spent crafting the item.
+     * @param int $goldSpent The Gold spent crafting the item.
      * @return self A result with the listed action status.
      */
     public static function listed(int $goldSpent = 0): self
@@ -115,7 +115,7 @@ class BatchCraftingOperationResult
     /**
      * Build a result representing a crafted item that was disenchanted.
      *
-     * @param  int  $goldSpent  The Gold spent crafting the item.
+     * @param int $goldSpent The Gold spent crafting the item.
      * @return self A result with the disenchanted action status.
      */
     public static function disenchanted(int $goldSpent = 0): self
@@ -136,7 +136,7 @@ class BatchCraftingOperationResult
     /**
      * Build a result representing a target item that had a Holy Oil or Event enchantment applied to it.
      *
-     * @param  int  $goldSpent  The Gold spent applying it, when applicable.
+     * @param int $goldSpent The Gold spent applying it, when applicable.
      * @return self A result with the applied action status.
      */
     public static function applied(int $goldSpent = 0): self
@@ -147,7 +147,7 @@ class BatchCraftingOperationResult
     /**
      * Build a result representing a failed crafting attempt.
      *
-     * @param  int  $goldSpent  The Gold spent on the failed attempt.
+     * @param int $goldSpent The Gold spent on the failed attempt.
      * @return self A result with the failed action status.
      */
     public static function failed(int $goldSpent): self
@@ -158,7 +158,7 @@ class BatchCraftingOperationResult
     /**
      * Build a result representing an item that was successfully crafted and contributed rather than retained.
      *
-     * @param  int  $goldSpent  The Gold spent crafting the item.
+     * @param int $goldSpent The Gold spent crafting the item.
      * @return self A result with the crafted action status.
      */
     public static function crafted(int $goldSpent): self
@@ -194,8 +194,8 @@ class BatchCraftingOperationResult
     /**
      * Build a result representing an attempt that charged Gold but ended the run at commit time.
      *
-     * @param  BatchCraftingEndReason  $reason  The reason the run ended.
-     * @param  int  $goldSpent  The Gold spent on the attempt before it ended the run.
+     * @param BatchCraftingEndReason $reason The reason the run ended.
+     * @param int $goldSpent The Gold spent on the attempt before it ended the run.
      * @return self A result with the failed action status and the supplied end reason.
      */
     public static function failedAndEnded(BatchCraftingEndReason $reason, int $goldSpent): self
@@ -206,7 +206,7 @@ class BatchCraftingOperationResult
     /**
      * Build a copy of this result carrying the supplied terminal end reason.
      *
-     * @param  BatchCraftingEndReason  $reason  The reason the run ended.
+     * @param BatchCraftingEndReason $reason The reason the run ended.
      * @return self A result with the same action status and totals, carrying the end reason.
      */
     public function withEndReason(BatchCraftingEndReason $reason): self
@@ -229,7 +229,7 @@ class BatchCraftingOperationResult
     /**
      * Build a copy of this result carrying the supplied factual XP gained by the craft attempt.
      *
-     * @param  int  $xpGained  The factual XP gained by the craft attempt.
+     * @param int $xpGained The factual XP gained by the craft attempt.
      * @return self A result with the same action status and totals, carrying the XP gained.
      */
     public function withXpGained(int $xpGained): self
@@ -252,9 +252,9 @@ class BatchCraftingOperationResult
     /**
      * Build a copy of this result carrying the supplied factual resource spending.
      *
-     * @param  int  $goldDustSpent  The Gold Dust spent by the operation.
-     * @param  int  $shardsSpent  The Shards spent by the operation.
-     * @param  int  $copperCoinsSpent  The Copper Coins spent by the operation.
+     * @param int $goldDustSpent The Gold Dust spent by the operation.
+     * @param int $shardsSpent The Shards spent by the operation.
+     * @param int $copperCoinsSpent The Copper Coins spent by the operation.
      * @return self A result with the same action status and totals, carrying the resource spending.
      */
     public function withResourceSpending(int $goldDustSpent = 0, int $shardsSpent = 0, int $copperCoinsSpent = 0): self

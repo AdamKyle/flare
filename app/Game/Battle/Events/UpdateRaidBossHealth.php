@@ -22,7 +22,7 @@ class UpdateRaidBossHealth implements ShouldBroadcastNow
     public int $raidBossId;
 
     /**
-     * @param  User  $user
+     * @param User $user
      */
     public function __construct(int $raidBossId, int $raidBossHealth)
     {

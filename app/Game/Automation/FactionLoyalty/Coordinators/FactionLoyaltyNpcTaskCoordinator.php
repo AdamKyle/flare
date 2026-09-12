@@ -27,9 +27,9 @@ class FactionLoyaltyNpcTaskCoordinator
     private bool $skippedUnmaxedFactionWithIncompleteTasks = false;
 
     /**
-     * @param  FactionLoyaltyService  $factionLoyaltyService  The Faction Loyalty domain service.
-     * @param  MovementService  $movementService  The character movement service.
-     * @param  TraverseService  $traverseService  The map traversal service.
+     * @param FactionLoyaltyService $factionLoyaltyService The Faction Loyalty domain service.
+     * @param MovementService $movementService The character movement service.
+     * @param TraverseService $traverseService The map traversal service.
      */
     public function __construct(
         private readonly FactionLoyaltyService $factionLoyaltyService,
@@ -40,8 +40,8 @@ class FactionLoyaltyNpcTaskCoordinator
     /**
      * Set up the coordinator.
      *
-     * @param  Character  $character  The character being assisted by automation.
-     * @param  FactionLoyaltyAutomation  $factionLoyaltyAutomation  The Faction Loyalty automation record.
+     * @param Character $character The character being assisted by automation.
+     * @param FactionLoyaltyAutomation $factionLoyaltyAutomation The Faction Loyalty automation record.
      * @return FactionLoyaltyNpcTaskCoordinator The configured coordinator instance.
      */
     public function setUp(Character $character, FactionLoyaltyAutomation $factionLoyaltyAutomation): FactionLoyaltyNpcTaskCoordinator
@@ -107,7 +107,7 @@ class FactionLoyaltyNpcTaskCoordinator
     /**
      * Find an NPC on the same map with incomplete tasks.
      *
-     * @param  FactionLoyaltyNpc  $currentFactionLoyaltyNpc  The NPC currently being assisted.
+     * @param FactionLoyaltyNpc $currentFactionLoyaltyNpc The NPC currently being assisted.
      * @return FactionLoyaltyNpc|null The next same-map NPC with incomplete tasks, if any.
      */
     private function findSameMapNpcWithIncompleteTasks(FactionLoyaltyNpc $currentFactionLoyaltyNpc): ?FactionLoyaltyNpc
@@ -130,7 +130,7 @@ class FactionLoyaltyNpcTaskCoordinator
     /**
      * Find an existing faction loyalty NPC with incomplete tasks.
      *
-     * @param  FactionLoyaltyNpc  $currentFactionLoyaltyNpc  The NPC currently being assisted.
+     * @param FactionLoyaltyNpc $currentFactionLoyaltyNpc The NPC currently being assisted.
      * @return FactionLoyaltyNpc|null The next reachable existing-faction NPC with incomplete tasks, if any.
      */
     private function findExistingFactionLoyaltyNpcWithIncompleteTasks(FactionLoyaltyNpc $currentFactionLoyaltyNpc): ?FactionLoyaltyNpc
@@ -196,7 +196,7 @@ class FactionLoyaltyNpcTaskCoordinator
     /**
      * Find an NPC with incomplete tasks.
      *
-     * @param  FactionLoyaltyModel  $factionLoyalty  The faction loyalty record to search.
+     * @param FactionLoyaltyModel $factionLoyalty The faction loyalty record to search.
      * @return FactionLoyaltyNpc|null The first NPC with incomplete tasks, if any.
      */
     private function findNpcWithIncompleteTasks(FactionLoyaltyModel $factionLoyalty): ?FactionLoyaltyNpc
@@ -213,7 +213,7 @@ class FactionLoyaltyNpcTaskCoordinator
     /**
      * Travel, pledge, and assist an existing NPC.
      *
-     * @param  FactionLoyaltyNpc  $factionLoyaltyNpc  The NPC to assist.
+     * @param FactionLoyaltyNpc $factionLoyaltyNpc The NPC to assist.
      * @return FactionLoyaltyNpc|null The assisted NPC, or null when travel or pledging failed.
      *
      * @throws Exception
@@ -238,7 +238,7 @@ class FactionLoyaltyNpcTaskCoordinator
     /**
      * Travel, pledge, and find the first incomplete NPC.
      *
-     * @param  Faction  $faction  The faction to pledge to.
+     * @param Faction $faction The faction to pledge to.
      * @return FactionLoyaltyNpc|null The first NPC with incomplete tasks, or null when unavailable.
      *
      * @throws Exception
@@ -272,7 +272,7 @@ class FactionLoyaltyNpcTaskCoordinator
     /**
      * Assist an NPC after changing maps.
      *
-     * @param  FactionLoyaltyNpc  $factionLoyaltyNpc  The NPC to assist.
+     * @param FactionLoyaltyNpc $factionLoyaltyNpc The NPC to assist.
      * @return FactionLoyaltyNpc The assisted NPC.
      */
     private function assistNpcAfterMapChange(FactionLoyaltyNpc $factionLoyaltyNpc): FactionLoyaltyNpc
@@ -288,8 +288,8 @@ class FactionLoyaltyNpcTaskCoordinator
     /**
      * Switch assistance to an NPC.
      *
-     * @param  FactionLoyaltyNpc  $factionLoyaltyNpc  The NPC to assist.
-     * @param  string  $message  The log message describing the switch.
+     * @param FactionLoyaltyNpc $factionLoyaltyNpc The NPC to assist.
+     * @param string $message The log message describing the switch.
      * @return FactionLoyaltyNpc The assisted NPC.
      */
     private function switchToNpc(FactionLoyaltyNpc $factionLoyaltyNpc, string $message): FactionLoyaltyNpc
@@ -310,7 +310,7 @@ class FactionLoyaltyNpcTaskCoordinator
     /**
      * Can the character pledge to the faction?
      *
-     * @param  Faction  $faction  The faction to check.
+     * @param Faction $faction The faction to check.
      * @return bool True when the character can pledge to the faction.
      */
     private function canPledgeToFaction(Faction $faction): bool
@@ -327,7 +327,7 @@ class FactionLoyaltyNpcTaskCoordinator
     /**
      * Can the character travel to the faction map?
      *
-     * @param  Faction  $faction  The faction to check.
+     * @param Faction $faction The faction to check.
      * @return bool True when the character can travel to the faction's map.
      */
     private function canTravelToFaction(Faction $faction): bool
@@ -338,7 +338,7 @@ class FactionLoyaltyNpcTaskCoordinator
     /**
      * Travel to the faction map.
      *
-     * @param  Faction  $faction  The faction to travel to.
+     * @param Faction $faction The faction to travel to.
      * @return bool True when travel succeeded.
      */
     private function travelToFaction(Faction $faction): bool
@@ -357,8 +357,8 @@ class FactionLoyaltyNpcTaskCoordinator
     /**
      * Get same map switch message.
      *
-     * @param  FactionLoyaltyNpc  $currentFactionLoyaltyNpc  The NPC previously assisted.
-     * @param  FactionLoyaltyNpc  $nextFactionLoyaltyNpc  The NPC now being assisted.
+     * @param FactionLoyaltyNpc $currentFactionLoyaltyNpc The NPC previously assisted.
+     * @param FactionLoyaltyNpc $nextFactionLoyaltyNpc The NPC now being assisted.
      * @return string The switch log message.
      */
     private function getSameMapSwitchMessage(FactionLoyaltyNpc $currentFactionLoyaltyNpc, FactionLoyaltyNpc $nextFactionLoyaltyNpc): string
@@ -383,9 +383,9 @@ class FactionLoyaltyNpcTaskCoordinator
     /**
      * Send the automation log update.
      *
-     * @param  string  $message  The log message text.
-     * @param  bool  $makeItalic  Whether the message should render italicized.
-     * @param  bool  $isReward  Whether the message represents a reward.
+     * @param string $message The log message text.
+     * @param bool $makeItalic Whether the message should render italicized.
+     * @param bool $isReward Whether the message represents a reward.
      * @return void This method does not return a value.
      */
     private function sendOutEventLogUpdate(string $message, bool $makeItalic = false, bool $isReward = false): void

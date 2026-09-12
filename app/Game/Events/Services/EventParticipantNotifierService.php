@@ -17,7 +17,7 @@ class EventParticipantNotifierService
     /**
      * Construct the notifier with the event goals service dependency.
      *
-     * @param  EventGoalsService  $eventGoalsService  Service used to build goal payloads.
+     * @param EventGoalsService $eventGoalsService Service used to build goal payloads.
      */
     public function __construct(private EventGoalsService $eventGoalsService) {}
 
@@ -27,8 +27,8 @@ class EventParticipantNotifierService
      * Skips when participant count is zero, when there is no participation,
      * or when there is no map associated with the goal's event type.
      *
-     * @param  GlobalEventGoal  $goal  The active global event goal.
-     * @param  int  $participantsCount  Precomputed number of participants.
+     * @param GlobalEventGoal $goal The active global event goal.
+     * @param int $participantsCount Precomputed number of participants.
      */
     public function notifyForGoal(GlobalEventGoal $goal, int $participantsCount): void
     {
@@ -65,8 +65,8 @@ class EventParticipantNotifierService
     /**
      * Extract only unseen character IDs and mark them as seen.
      *
-     * @param  array<int,int|null>  $ids  Raw character IDs from the chunk.
-     * @param  array<int,bool>  $seen  Reference map of already processed IDs.
+     * @param array<int,int|null> $ids Raw character IDs from the chunk.
+     * @param array<int,bool> $seen Reference map of already processed IDs.
      * @return array<int,int> Unique, unseen character IDs.
      */
     private function extractNewCharacterIds(array $ids, array &$seen): array
@@ -89,8 +89,8 @@ class EventParticipantNotifierService
     /**
      * Load per-character aggregate totals for the specified goal and characters.
      *
-     * @param  int  $goalId  The global event goal ID.
-     * @param  array<int,int>  $ids  Character IDs to aggregate.
+     * @param int $goalId The global event goal ID.
+     * @param array<int,int> $ids Character IDs to aggregate.
      * @return array{0: array<int,int>, 1: array<int,int>, 2: array<int,int>} Tuple of [kills, crafts, enchants] keyed by character_id.
      */
     private function loadAggregates(int $goalId, array $ids): array
@@ -128,12 +128,12 @@ class EventParticipantNotifierService
     /**
      * Dispatch update events for each character with precomputed totals.
      *
-     * @param  array<int,int>  $ids  Character IDs to notify.
-     * @param  GlobalEventGoal  $goal  The active global event goal.
-     * @param  int  $participantsCount  Precomputed number of participants.
-     * @param  array<int,int>  $kills  Map of character_id => kills.
-     * @param  array<int,int>  $crafts  Map of character_id => crafts.
-     * @param  array<int,int>  $enchants  Map of character_id => enchants.
+     * @param array<int,int> $ids Character IDs to notify.
+     * @param GlobalEventGoal $goal The active global event goal.
+     * @param int $participantsCount Precomputed number of participants.
+     * @param array<int,int> $kills Map of character_id => kills.
+     * @param array<int,int> $crafts Map of character_id => crafts.
+     * @param array<int,int> $enchants Map of character_id => enchants.
      */
     private function notifyCharacters(
         array $ids,

@@ -26,7 +26,7 @@ class CraftEventTargetService
     /**
      * Resolve the Craft For Event target for the given persisted cycle position.
      *
-     * @param  int  $cyclePosition  The persisted Event cycle position.
+     * @param int $cyclePosition The persisted Event cycle position.
      * @return CraftEventTargetType The resolved target for this cycle position.
      */
     public function resolveTarget(int $cyclePosition): CraftEventTargetType
@@ -37,8 +37,8 @@ class CraftEventTargetService
     /**
      * Resolve a currently craftable, inexpensive item for the resolved Event target.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  CraftEventTargetType  $target  The resolved cycle target.
+     * @param Character $character The character running the batch.
+     * @param CraftEventTargetType $target The resolved cycle target.
      * @return Item|null The resolved item, or null when no eligible target item can currently resolve.
      */
     public function resolveTargetItem(Character $character, CraftEventTargetType $target): ?Item

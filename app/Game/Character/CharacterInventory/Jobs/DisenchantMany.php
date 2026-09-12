@@ -24,7 +24,7 @@ class DisenchantMany implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param  array  $slotIds
+     * @param array $slotIds
      */
     public function __construct(protected readonly Character $character, protected readonly array $itemIds) {}
 

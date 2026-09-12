@@ -18,7 +18,7 @@ class DelveStatusUpdated implements ShouldBroadcast
     private string $occurredAt;
 
     /**
-     * @param  int  $userId  The user id to broadcast the Delve status update to.
+     * @param int $userId The user id to broadcast the Delve status update to.
      */
     public function __construct(int $userId)
     {

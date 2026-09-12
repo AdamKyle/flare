@@ -34,7 +34,7 @@ class GenericMail extends Mailable
     /**
      * Create a new message instance.
      *
-     * @param  bool  $dontShowLogin  | false
+     * @param bool $dontShowLogin | false
      */
     public function __construct(User $user, string $genericMessage, string $genericSubject, bool $dontShowLogin = false)
     {

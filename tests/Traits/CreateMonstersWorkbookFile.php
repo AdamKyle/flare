@@ -23,7 +23,7 @@ trait CreateMonstersWorkbookFile
     /**
      * Build a real, on-disk Monsters import workbook fixture from named row values.
      *
-     * @param  array<int, array<string, mixed>>  $rowsByHeaderName  Each row's values, keyed by header name; any header not present in a row is written blank.
+     * @param array<int, array<string, mixed>> $rowsByHeaderName Each row's values, keyed by header name; any header not present in a row is written blank.
      */
     public function createMonstersWorkbookFile(array $rowsByHeaderName): UploadedFile
     {

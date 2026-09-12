@@ -41,10 +41,10 @@ class AutomatedCraftingHandler
     private ?FactionLoyaltyNpc $factionLoyaltyNpc = null;
 
     /**
-     * @param  CraftingService  $craftingService  The domain crafting service.
-     * @param  ShopService  $shopService  The shop service.
-     * @param  AutomatedCraftingAttemptTracker  $automatedCraftingAttemptTracker  The crafting attempt tracker.
-     * @param  AutomatedCraftingResult  $automatedCraftingResult  The crafting result builder.
+     * @param CraftingService $craftingService The domain crafting service.
+     * @param ShopService $shopService The shop service.
+     * @param AutomatedCraftingAttemptTracker $automatedCraftingAttemptTracker The crafting attempt tracker.
+     * @param AutomatedCraftingResult $automatedCraftingResult The crafting result builder.
      */
     public function __construct(
         private readonly CraftingService $craftingService,
@@ -56,9 +56,9 @@ class AutomatedCraftingHandler
     /**
      * Set up the handler.
      *
-     * @param  Character  $character  The character crafting.
-     * @param  int  $targetItemId  The target item id.
-     * @param  AutomatedCraftingLogger  $automatedCraftingLogger  The crafting logger.
+     * @param Character $character The character crafting.
+     * @param int $targetItemId The target item id.
+     * @param AutomatedCraftingLogger $automatedCraftingLogger The crafting logger.
      * @return AutomatedCraftingHandler The configured handler instance.
      */
     public function setUp(
@@ -107,7 +107,7 @@ class AutomatedCraftingHandler
     /**
      * Set the faction loyalty NPC.
      *
-     * @param  FactionLoyaltyNpc  $factionLoyaltyNpc  The NPC being assisted.
+     * @param FactionLoyaltyNpc $factionLoyaltyNpc The NPC being assisted.
      * @return AutomatedCraftingHandler The handler instance.
      */
     public function setFactionLoyaltyNpc(FactionLoyaltyNpc $factionLoyaltyNpc): AutomatedCraftingHandler
@@ -120,7 +120,7 @@ class AutomatedCraftingHandler
     /**
      * Set max failed roll attempts.
      *
-     * @param  int  $maxAttempts  The maximum failed roll attempts allowed.
+     * @param int $maxAttempts The maximum failed roll attempts allowed.
      * @return AutomatedCraftingHandler The handler instance.
      */
     public function setMaxAttempts(int $maxAttempts): AutomatedCraftingHandler
@@ -334,7 +334,7 @@ class AutomatedCraftingHandler
     /**
      * Can the character afford the item?
      *
-     * @param  Item  $item  The item to price.
+     * @param Item $item The item to price.
      * @return bool True when the character can afford the item.
      */
     private function canAfford(Item $item): bool
@@ -345,7 +345,7 @@ class AutomatedCraftingHandler
     /**
      * Craft the item.
      *
-     * @param  Item  $item  The item to craft.
+     * @param Item $item The item to craft.
      * @return bool True when the item was crafted.
      */
     private function craftItem(Item $item): bool
@@ -380,7 +380,7 @@ class AutomatedCraftingHandler
     /**
      * Sell a crafted training item.
      *
-     * @param  int|null  $inventorySlotId  The crafted item's inventory slot id.
+     * @param int|null $inventorySlotId The crafted item's inventory slot id.
      * @return void This method does not return a value.
      */
     private function sellTrainingItem(?int $inventorySlotId): void
@@ -397,7 +397,7 @@ class AutomatedCraftingHandler
     /**
      * Is the item the target item?
      *
-     * @param  Item  $item  The item to check.
+     * @param Item $item The item to check.
      * @return bool True when the item is the target item.
      */
     private function isTargetItem(Item $item): bool
@@ -436,7 +436,7 @@ class AutomatedCraftingHandler
     /**
      * Is the item crafted through weapon crafting?
      *
-     * @param  Item  $item  The item to check.
+     * @param Item $item The item to check.
      * @return bool True when the item is a weapon.
      */
     private function isWeaponCraftingItem(Item $item): bool
@@ -447,7 +447,7 @@ class AutomatedCraftingHandler
     /**
      * Should use the crafting type instead of item type?
      *
-     * @param  Item  $item  The item to check.
+     * @param Item $item The item to check.
      * @return bool True when the item's crafting type should be used.
      */
     private function shouldUseCraftingType(Item $item): bool
@@ -458,7 +458,7 @@ class AutomatedCraftingHandler
     /**
      * Get the crafting type.
      *
-     * @param  Item  $item  The item to resolve the crafting type for.
+     * @param Item $item The item to resolve the crafting type for.
      * @return string The resolved crafting type.
      */
     private function getCraftingType(Item $item): string
@@ -489,9 +489,9 @@ class AutomatedCraftingHandler
     /**
      * Finish automated crafting.
      *
-     * @param  AutomatedCraftingResultType  $automatedCraftingResultType  The crafting result type.
-     * @param  Item|null  $craftedItem  The last crafted or attempted item, if any.
-     * @param  bool  $craftedTargetItem  Whether the target item was crafted.
+     * @param AutomatedCraftingResultType $automatedCraftingResultType The crafting result type.
+     * @param Item|null $craftedItem The last crafted or attempted item, if any.
+     * @param bool $craftedTargetItem Whether the target item was crafted.
      * @return AutomatedCraftingResult The finished crafting result.
      */
     private function finish(

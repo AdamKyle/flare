@@ -272,7 +272,7 @@ class InfoPageController extends Controller
     /**
      * Show the public, read-only Quest detail page for the given Quest.
      *
-     * @param  Quest  $quest  Quest to view.
+     * @param Quest $quest Quest to view.
      * @return View Quest detail view.
      */
     public function viewQuest(Quest $quest): View

@@ -11,7 +11,7 @@ class SkillLeveledUpServerMessageListener
     /**
      * Handle the event.
      *
-     * @param  CreateCharacterEvent  $event
+     * @param CreateCharacterEvent $event
      * @return void
      */
     public function handle(SkillLeveledUpServerMessageEvent $event)

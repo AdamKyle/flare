@@ -84,9 +84,9 @@ class MarketBoard
      * falls below it, since a batch run cannot pause to ask the character to correct the price
      * the way the manual listing form does.
      *
-     * @param  Character  $character  The character listing the item.
-     * @param  Item  $item  The item being listed.
-     * @param  int  $listingPrice  The requested listing price.
+     * @param Character $character The character listing the item.
+     * @param Item $item The item being listed.
+     * @param int $listingPrice The requested listing price.
      * @return void This method does not return a value.
      */
     public function listBatchCraftedItem(Character $character, Item $item, int $listingPrice): void

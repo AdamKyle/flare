@@ -19,14 +19,14 @@ use League\Fractal\Resource\Item as FractalItem;
 class DelveStatusService
 {
     /**
-     * @param  ItemTransformer  $itemTransformer  The item transformer.
+     * @param ItemTransformer $itemTransformer The item transformer.
      */
     public function __construct(private readonly ItemTransformer $itemTransformer) {}
 
     /**
      * Transform a Delve quest item into its API representation.
      *
-     * @param  Item  $item  The quest item to transform.
+     * @param Item $item The quest item to transform.
      * @return array The transformed item data.
      */
     public function questItemDetail(Item $item): array
@@ -39,7 +39,7 @@ class DelveStatusService
     /**
      * Return the character's current Delve status panel: active or completed.
      *
-     * @param  Character  $character  The character to resolve status for.
+     * @param Character $character The character to resolve status for.
      * @return array The current Delve status panel.
      */
     public function statusForCharacter(Character $character): array
@@ -93,7 +93,7 @@ class DelveStatusService
     /**
      * Dismiss the character's completed Delve status panel.
      *
-     * @param  Character  $character  The character dismissing the panel.
+     * @param Character $character The character dismissing the panel.
      * @return void This method does not return a value.
      */
     public function dismissForCharacter(Character $character): void
@@ -107,8 +107,8 @@ class DelveStatusService
     /**
      * Build the status panel for a completed Delve run.
      *
-     * @param  Character  $character  The character who completed the Delve run.
-     * @param  DelveExploration  $delve  The completed Delve exploration record.
+     * @param Character $character The character who completed the Delve run.
+     * @param DelveExploration $delve The completed Delve exploration record.
      * @return array The completed Delve status panel.
      */
     private function completedStatus(Character $character, DelveExploration $delve): array
@@ -142,8 +142,8 @@ class DelveStatusService
     /**
      * Resolve the current foe's display stats from the latest Delve log or the active delve's monster.
      *
-     * @param  DelveExploration  $delve  The active or completed Delve record.
-     * @param  DelveLog|null  $latestLog  The most recent Delve round log, if any.
+     * @param DelveExploration $delve The active or completed Delve record.
+     * @param DelveLog|null $latestLog The most recent Delve round log, if any.
      * @return array The current foe's display stats.
      */
     private function currentFoe(DelveExploration $delve, ?DelveLog $latestLog): array
@@ -218,7 +218,7 @@ class DelveStatusService
     /**
      * Normalize a monster model's stats into the Delve current-foe stats shape.
      *
-     * @param  Monster  $monster  The monster model to normalize.
+     * @param Monster $monster The monster model to normalize.
      * @return array The normalized monster stats.
      */
     private function normalizeMonsterModelStats(Monster $monster): array
@@ -244,7 +244,7 @@ class DelveStatusService
     /**
      * Resolve the character's current Cave of Memories location, if standing in one.
      *
-     * @param  Character  $character  The character to resolve the location for.
+     * @param Character $character The character to resolve the location for.
      * @return Location|null The character's current Cave of Memories location, if any.
      */
     private function caveLocation(Character $character): ?Location
@@ -260,9 +260,9 @@ class DelveStatusService
     /**
      * Calculate the countdown until the Delve location's quest item becomes available.
      *
-     * @param  DelveExploration  $delve  The active Delve record.
-     * @param  Location|null  $location  The character's current Delve location, if any.
-     * @param  int  $elapsedSeconds  The number of seconds elapsed in the Delve run.
+     * @param DelveExploration $delve The active Delve record.
+     * @param Location|null $location The character's current Delve location, if any.
+     * @param int $elapsedSeconds The number of seconds elapsed in the Delve run.
      * @return array The quest item drop countdown data.
      */
     private function questItemDropCountdown(DelveExploration $delve, ?Location $location, int $elapsedSeconds): array
@@ -301,8 +301,8 @@ class DelveStatusService
     /**
      * Build the character's Delve quest item availability list for the location.
      *
-     * @param  Character  $character  The character to resolve availability for.
-     * @param  Location  $location  The Delve location.
+     * @param Character $character The character to resolve availability for.
+     * @param Location $location The Delve location.
      * @return array The quest item availability list.
      */
     private function questItems(Character $character, Location $location): array
@@ -370,7 +370,7 @@ class DelveStatusService
     /**
      * Build the Delve duration-based reward checkpoint list with their reached state.
      *
-     * @param  float  $elapsedHours  The number of hours elapsed in the Delve run.
+     * @param float $elapsedHours The number of hours elapsed in the Delve run.
      * @return array The reward checkpoint list.
      */
     private function rewardCheckpoints(float $elapsedHours): array

@@ -21,7 +21,7 @@ class RemoveRacialStatBonuses extends Command
     protected $description = 'Recalculate Character base stats using the Class-only formula after Race stat modifiers were removed.';
 
     /**
-     * @param  BaseStatCalculator  $baseStatCalculator  Race-neutral, Class-only base stat calculator.
+     * @param BaseStatCalculator $baseStatCalculator Race-neutral, Class-only base stat calculator.
      */
     public function __construct(
         private readonly BaseStatCalculator $baseStatCalculator,
@@ -65,7 +65,7 @@ class RemoveRacialStatBonuses extends Command
      * Determine whether the Character is exempt from recalculation: level 5,000 with every base
      * stat already at or above the reincarnation maximum.
      *
-     * @param  Character  $character  Character to evaluate.
+     * @param Character $character Character to evaluate.
      * @return bool Whether the Character is exempt.
      */
     private function isExempt(Character $character): bool
@@ -87,7 +87,7 @@ class RemoveRacialStatBonuses extends Command
      * Recalculate the Character's base stats using the Class-only formula, preserving earned
      * reincarnation history, and persist any changed values.
      *
-     * @param  Character  $character  Character to recalculate.
+     * @param Character $character Character to recalculate.
      * @return bool Whether any base stat changed.
      */
     private function recalculate(Character $character): bool

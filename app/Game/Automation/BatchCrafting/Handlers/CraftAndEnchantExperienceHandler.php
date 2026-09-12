@@ -32,8 +32,8 @@ class CraftAndEnchantExperienceHandler implements BatchCraftingHandler
     /**
      * Execute one Craft and Enchant For Experience Batch Crafting operation for the running batch.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  Character  $character  The character running the batch.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param Character $character The character running the batch.
      * @return BatchCraftingOperationResult The outcome of the operation.
      */
     public function handle(BatchCrafting $batchCrafting, Character $character): BatchCraftingOperationResult
@@ -89,11 +89,11 @@ class CraftAndEnchantExperienceHandler implements BatchCraftingHandler
     /**
      * Apply the run's selected Experience disposition to the finished enchanted item.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  Character  $character  The character running the batch.
-     * @param  BatchCraftingDisposition  $disposition  The selected Experience disposition.
-     * @param  Item  $enchantedItem  The finished enchanted item.
-     * @param  int  $goldCost  The combined Gold cost of this crafting and enchanting attempt.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param Character $character The character running the batch.
+     * @param BatchCraftingDisposition $disposition The selected Experience disposition.
+     * @param Item $enchantedItem The finished enchanted item.
+     * @param int $goldCost The combined Gold cost of this crafting and enchanting attempt.
      * @return BatchCraftingOperationResult The outcome of applying the disposition.
      */
     private function applyDisposition(BatchCrafting $batchCrafting, Character $character, BatchCraftingDisposition $disposition, Item $enchantedItem, int $goldCost): BatchCraftingOperationResult
@@ -122,9 +122,9 @@ class CraftAndEnchantExperienceHandler implements BatchCraftingHandler
     /**
      * Persist the batch's cumulative Crafting and Enchanting XP using this attempt's factual XP gained.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  int  $craftingXpGained  The factual Crafting XP gained by this attempt.
-     * @param  int  $enchantingXpGained  The factual Enchanting XP gained by this attempt.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param int $craftingXpGained The factual Crafting XP gained by this attempt.
+     * @param int $enchantingXpGained The factual Enchanting XP gained by this attempt.
      * @return void This method does not return a value.
      */
     private function persistXpGained(BatchCrafting $batchCrafting, int $craftingXpGained, int $enchantingXpGained): void

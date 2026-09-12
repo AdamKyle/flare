@@ -18,15 +18,15 @@ class UpdateCharacterFactions implements ShouldBroadcastNow
     public $factions;
 
     /**
-     * @param  User  $user
+     * @param User $user
      */
     private $user;
 
     /**
      * Create a new event instance.
      *
-     * @param  array  $marketListings
-     * @param  int  $characterGold
+     * @param array $marketListings
+     * @param int $characterGold
      * @return void
      */
     public function __construct(User $user, Collection $factions)

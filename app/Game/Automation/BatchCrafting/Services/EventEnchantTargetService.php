@@ -23,7 +23,7 @@ class EventEnchantTargetService
     /**
      * Resolve the character's currently eligible Enchant Event goal, when one exists.
      *
-     * @param  Character  $character  The character running the batch.
+     * @param Character $character The character running the batch.
      * @return GlobalEventGoal|null The currently eligible Enchant Event goal, or null when none is eligible.
      */
     public function currentGoal(Character $character): ?GlobalEventGoal
@@ -34,8 +34,8 @@ class EventEnchantTargetService
     /**
      * Resolve the next real Event Crafting Inventory item eligible for enchanting.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  GlobalEventGoal  $goal  The current Enchant Event goal.
+     * @param Character $character The character running the batch.
+     * @param GlobalEventGoal $goal The current Enchant Event goal.
      * @return ResolvedEventEnchantTarget|null The resolved slot and item, or null when the inventory is empty.
      */
     public function resolveNextInventoryTarget(Character $character, GlobalEventGoal $goal): ?ResolvedEventEnchantTarget
@@ -74,8 +74,8 @@ class EventEnchantTargetService
     /**
      * Resolve a real currently craftable fallback item for the given fallback cycle position.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  int  $cyclePosition  The persisted fallback cycle position.
+     * @param Character $character The character running the batch.
+     * @param int $cyclePosition The persisted fallback cycle position.
      * @return array{target: CraftEventTargetType, item: Item}|null The resolved fallback target and item, or null when unavailable.
      */
     public function resolveFallbackCraftTarget(Character $character, int $cyclePosition): ?array
@@ -95,9 +95,9 @@ class EventEnchantTargetService
      *
      * Never counts as an Event Enchant contribution on its own; only a completed enchant contributes.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  GlobalEventGoal  $goal  The current Enchant Event goal.
-     * @param  Item  $item  The successfully crafted fallback item.
+     * @param Character $character The character running the batch.
+     * @param GlobalEventGoal $goal The current Enchant Event goal.
+     * @param Item $item The successfully crafted fallback item.
      * @return void This method does not return a value.
      */
     public function addFallbackItemToInventory(Character $character, GlobalEventGoal $goal, Item $item): void
@@ -116,7 +116,7 @@ class EventEnchantTargetService
     /**
      * Resolve the specific factual reason Enchant For Event is not currently available.
      *
-     * @param  Character  $character  The character running the batch.
+     * @param Character $character The character running the batch.
      * @return BatchCraftingEndReason The factual terminal Event reason.
      */
     public function resolveUnavailableReason(Character $character): BatchCraftingEndReason

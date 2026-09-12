@@ -155,7 +155,7 @@ class TheOldChurchRewardHandler
     /**
      * Handle item Reward for player.
      *
-     * @param  bool  $isMythic
+     * @param bool $isMythic
      *
      * @throws Exception
      */

@@ -18,8 +18,8 @@ class BatchCraftingRuleResolver
     /**
      * Build the type-specific validation rules for the requested Batch Crafting type.
      *
-     * @param  BatchCraftingType  $type  The requested Batch Crafting type.
-     * @param  array  $requestData  The raw Batch Crafting request data.
+     * @param BatchCraftingType $type The requested Batch Crafting type.
+     * @param array $requestData The raw Batch Crafting request data.
      * @return array The type-specific validation rules.
      */
     public function rules(BatchCraftingType $type, array $requestData): array

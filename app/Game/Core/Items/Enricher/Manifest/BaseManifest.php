@@ -38,7 +38,7 @@ abstract class BaseManifest implements ManifestSchema
      * Default behavior keeps the original flat property name. Override to group
      * properties into dot-paths (e.g., "total_damage" -> "totals.damage").
      *
-     * @param  string  $prop  The concrete property name on the item.
+     * @param string $prop The concrete property name on the item.
      * @return string|null The mapped dot-path or null to skip this property.
      */
     public function map(string $prop): ?string
@@ -89,8 +89,8 @@ abstract class BaseManifest implements ManifestSchema
      *
      * Subclasses may override to specialize by path (e.g., per-field rules).
      *
-     * @param  string  $path  Dot-path for the field (post-mapping).
-     * @param  string  $type  Logical type returned by {@see typeFor()} or the builder.
+     * @param string $path Dot-path for the field (post-mapping).
+     * @param string $type Logical type returned by {@see typeFor()} or the builder.
      * @return 'delta'|'flag-diff'|'noop'|null
      */
     public function compareFor(string $path, string $type): ?string

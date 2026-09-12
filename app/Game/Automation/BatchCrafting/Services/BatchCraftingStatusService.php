@@ -18,7 +18,7 @@ class BatchCraftingStatusService
     /**
      * Build the complete Batch Crafting status snapshot, including full chart history and capabilities.
      *
-     * @param  Character  $character  The character requesting status.
+     * @param Character $character The character requesting status.
      * @return array The complete Batch Crafting status snapshot.
      */
     public function build(Character $character): array
@@ -32,7 +32,7 @@ class BatchCraftingStatusService
      * Carries an empty chart-point history and does not recalculate the general setup
      * capabilities, since a runtime broadcast always belongs to an already-visible batch.
      *
-     * @param  Character  $character  The character the broadcast belongs to.
+     * @param Character $character The character the broadcast belongs to.
      * @return array The Batch Crafting runtime status snapshot.
      */
     public function buildForBroadcast(Character $character): array
@@ -51,8 +51,8 @@ class BatchCraftingStatusService
     /**
      * Build the shared Batch Crafting status snapshot for the character.
      *
-     * @param  Character  $character  The character requesting status.
-     * @param  bool  $includeCapabilities  Whether to recalculate the general setup capabilities.
+     * @param Character $character The character requesting status.
+     * @param bool $includeCapabilities Whether to recalculate the general setup capabilities.
      * @return array The Batch Crafting status snapshot.
      */
     private function buildSnapshot(Character $character, bool $includeCapabilities): array
@@ -106,9 +106,9 @@ class BatchCraftingStatusService
      * last authoritative capabilities it received until a later status genuinely recalculates
      * them (initial/reopen GET, or the no-visible-batch state reached after completion/dismissal).
      *
-     * @param  Character  $character  The character requesting status.
-     * @param  BatchCrafting|null  $batchCrafting  The character's visible Batch Crafting record, if any.
-     * @param  bool  $includeCapabilities  Whether the caller explicitly requested capability recalculation.
+     * @param Character $character The character requesting status.
+     * @param BatchCrafting|null $batchCrafting The character's visible Batch Crafting record, if any.
+     * @param bool $includeCapabilities Whether the caller explicitly requested capability recalculation.
      * @return array|null The authoritative general setup capability facts, or null for a runtime broadcast.
      */
     private function resolveCapabilities(Character $character, ?BatchCrafting $batchCrafting, bool $includeCapabilities): ?array
@@ -123,8 +123,8 @@ class BatchCraftingStatusService
     /**
      * Build the nested player-facing batch payload for a visible Batch Crafting record.
      *
-     * @param  Character  $character  The character the batch belongs to.
-     * @param  BatchCrafting  $batchCrafting  The visible Batch Crafting record.
+     * @param Character $character The character the batch belongs to.
+     * @param BatchCrafting $batchCrafting The visible Batch Crafting record.
      * @return array The nested batch status payload.
      */
     private function buildBatch(Character $character, BatchCrafting $batchCrafting): array
@@ -194,7 +194,7 @@ class BatchCraftingStatusService
     /**
      * Return the character's currently visible Batch Crafting record, if any.
      *
-     * @param  Character  $character  The character being checked.
+     * @param Character $character The character being checked.
      * @return BatchCrafting|null The visible record, or null when nothing is visible.
      */
     private function resolveVisibleBatchCrafting(Character $character): ?BatchCrafting
@@ -218,7 +218,7 @@ class BatchCraftingStatusService
     /**
      * Determine whether the character has acknowledged the Batch Crafting introduction.
      *
-     * @param  Character  $character  The character being checked.
+     * @param Character $character The character being checked.
      * @return bool True when the character has acknowledged the introduction.
      */
     private function hasAcknowledgedInfo(Character $character): bool

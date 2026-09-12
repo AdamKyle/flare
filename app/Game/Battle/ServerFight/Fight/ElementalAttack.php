@@ -76,9 +76,9 @@ class ElementalAttack extends BattleBase
     /**
      * Deal the elemental damage.
      *
-     * @param  float  $highestDefendingElement  [defending]
-     * @param  float  $highestElement  [attacking]
-     * @param  string  $type  - hald, double or regular
+     * @param float $highestDefendingElement [defending]
+     * @param float $highestElement [attacking]
+     * @param string $type - hald, double or regular
      * @return void
      */
     private function dealDamage(int $damage, float $highestDefendingElement, float $highestElement, bool $isMonster, string $type)

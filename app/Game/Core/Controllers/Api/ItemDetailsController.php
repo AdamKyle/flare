@@ -14,7 +14,7 @@ class ItemDetailsController extends Controller
     /**
      * Return the transformed catalog details for the given Item.
      *
-     * @param  Item  $item  The Item to transform.
+     * @param Item $item The Item to transform.
      * @return JsonResponse The transformed Item details.
      */
     public function show(Item $item): JsonResponse

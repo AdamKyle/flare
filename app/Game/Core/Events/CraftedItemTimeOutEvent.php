@@ -18,7 +18,7 @@ class CraftedItemTimeOutEvent
     /**
      * Constructor
      *
-     * @param  string|null  $extraTime  | null
+     * @param string|null $extraTime | null
      */
     public function __construct(Character $character, ?string $extraTime = null, ?int $setTime = null)
     {

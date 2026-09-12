@@ -19,9 +19,9 @@ class CraftSetPreviewService
     /**
      * Build the factual Craft Set preview payload for the requested plan and disposition.
      *
-     * @param  Character  $character  The character requesting the preview.
-     * @param  array  $progress  The requested Craft Set progress data.
-     * @param  string  $disposition  The requested crafting disposition value.
+     * @param Character $character The character requesting the preview.
+     * @param array $progress The requested Craft Set progress data.
+     * @param string $disposition The requested crafting disposition value.
      * @return array The factual Craft Set preview payload.
      */
     public function build(Character $character, array $progress, string $disposition): array
@@ -72,9 +72,9 @@ class CraftSetPreviewService
     /**
      * Resolve the current retained-output destination capacity for the requested output destination.
      *
-     * @param  Character  $character  The character requesting the preview.
-     * @param  array  $progress  The requested Craft Set progress data.
-     * @param  int  $positionCount  The number of actually resolved planned output entries.
+     * @param Character $character The character requesting the preview.
+     * @param array $progress The requested Craft Set progress data.
+     * @param int $positionCount The number of actually resolved planned output entries.
      * @return array{capacity: array{current: int, max: int, remaining: int}|null, can_fit: bool, error: string|null} The resolved capacity facts.
      */
     private function resolveDestinationCapacity(Character $character, array $progress, int $positionCount): array
@@ -102,9 +102,9 @@ class CraftSetPreviewService
     /**
      * Resolve the selected normal Inventory Set's destination capacity, validating it is a legal target.
      *
-     * @param  Character  $character  The character requesting the preview.
-     * @param  array  $progress  The requested Craft Set progress data.
-     * @param  int  $positionCount  The number of planned positions that will be retained.
+     * @param Character $character The character requesting the preview.
+     * @param array $progress The requested Craft Set progress data.
+     * @param int $positionCount The number of planned positions that will be retained.
      * @return array{capacity: array{current: int, max: int, remaining: int}|null, can_fit: bool, error: string|null} The resolved capacity facts.
      */
     private function resolveInventorySetCapacity(Character $character, array $progress, int $positionCount): array

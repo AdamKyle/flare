@@ -18,9 +18,9 @@ class ExplorationOutputUpdated implements ShouldBroadcastNow
     public ?array $output;
 
     /**
-     * @param  User  $user  The user to broadcast Exploration output to.
-     * @param  string|null  $type  The output panel type.
-     * @param  array|null  $output  The output panel payload.
+     * @param User $user The user to broadcast Exploration output to.
+     * @param string|null $type The output panel type.
+     * @param array|null $output The output panel payload.
      */
     public function __construct(private readonly User $user, ?string $type, ?array $output)
     {

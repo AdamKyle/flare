@@ -37,7 +37,7 @@ class RaidMapConflictService
     /**
      * Every raid id that owns a location on any of the given maps.
      *
-     * @param  int[]  $gameMapIds
+     * @param int[] $gameMapIds
      * @return int[]
      */
     public function raidIdsOnMaps(array $gameMapIds): array
@@ -89,7 +89,7 @@ class RaidMapConflictService
      * Every unordered pair index within the requested raid list whose map sets
      * intersect, keyed by "indexA:indexB".
      *
-     * @param  Raid[]  $raids
+     * @param Raid[] $raids
      * @return array<string, array{0: int, 1: int}>
      */
     public function requestedSetConflicts(array $raids): array
@@ -129,7 +129,7 @@ class RaidMapConflictService
     }
 
     /**
-     * @param  int[]  $raidIds
+     * @param int[] $raidIds
      */
     private function reservingScheduledEventsQuery(array $raidIds, ?int $excludeScheduledEventId = null): Collection
     {

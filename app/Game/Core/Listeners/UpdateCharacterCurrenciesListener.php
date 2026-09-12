@@ -17,8 +17,8 @@ class UpdateCharacterCurrenciesListener
     private CharacterCurrenciesTransformer $characterCurrenciesTransformer;
 
     /**
-     * @param  CharacterBaseDetailsTransformer  $characterTopBarTransformer
-     * @param  CharacterSheetBaseInfoTransformer  $characterSheetBaseInfoTransformer
+     * @param CharacterBaseDetailsTransformer $characterTopBarTransformer
+     * @param CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer
      */
     public function __construct(Manager $manager, CharacterCurrenciesTransformer $characterCurrenciesTransformer)
     {

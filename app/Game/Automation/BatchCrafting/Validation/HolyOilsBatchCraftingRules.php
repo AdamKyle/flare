@@ -17,7 +17,7 @@ class HolyOilsBatchCraftingRules
      * The client sends only selected target/oil slot ids; costs, stack counts, and target
      * eligibility remain entirely backend-authoritative.
      *
-     * @param  array  $requestData  The raw Batch Crafting request data.
+     * @param array $requestData The raw Batch Crafting request data.
      * @return array The Holy Oils validation rules.
      */
     public function rules(array $requestData): array
@@ -37,7 +37,7 @@ class HolyOilsBatchCraftingRules
     /**
      * Return the client-owned progress keys allowed for the requested mode.
      *
-     * @param  string|null  $mode  The requested mode value.
+     * @param string|null $mode The requested mode value.
      * @return array<int, string> The allowed client-owned progress keys.
      */
     private function allowedProgressKeys(?string $mode): array
@@ -52,7 +52,7 @@ class HolyOilsBatchCraftingRules
     /**
      * Return the mode-specific validation rules for the requested mode.
      *
-     * @param  string|null  $mode  The requested mode value.
+     * @param string|null $mode The requested mode value.
      * @return array The mode-specific validation rules.
      */
     private function modeSpecificRules(?string $mode): array

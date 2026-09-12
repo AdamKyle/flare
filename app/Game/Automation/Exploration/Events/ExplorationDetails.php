@@ -25,8 +25,8 @@ class ExplorationDetails implements ShouldBroadcast
     public $details;
 
     /**
-     * @param  User  $user  The user to broadcast attack details to.
-     * @param  array  $details  The attack detail payload.
+     * @param User $user The user to broadcast attack details to.
+     * @param array $details The attack detail payload.
      */
     public function __construct(User $user, array $details)
     {

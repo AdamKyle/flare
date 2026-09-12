@@ -51,7 +51,7 @@ class CraftExperienceTargetService
     /**
      * Resolve the character's four Crafting skills used by the Experience cycle, in one operation.
      *
-     * @param  Character  $character  The character running the batch.
+     * @param Character $character The character running the batch.
      * @return SupportCollection<string, Skill|null> The resolved skills keyed by Crafting skill group value.
      */
     public function resolveCraftingSkills(Character $character): SupportCollection
@@ -62,7 +62,7 @@ class CraftExperienceTargetService
     /**
      * Determine whether at least one meaningful Experience cycle target currently exists.
      *
-     * @param  SupportCollection<string, Skill|null>  $skills  The character's already-resolved Crafting skills.
+     * @param SupportCollection<string, Skill|null> $skills The character's already-resolved Crafting skills.
      * @return bool True when at least one actionable target with a real craftable XP item exists.
      */
     public function hasMeaningfulTarget(SupportCollection $skills): bool
@@ -73,7 +73,7 @@ class CraftExperienceTargetService
     /**
      * Determine whether all four real Crafting skills have reached their maximum level.
      *
-     * @param  SupportCollection<string, Skill|null>  $skills  The character's already-resolved Crafting skills.
+     * @param SupportCollection<string, Skill|null> $skills The character's already-resolved Crafting skills.
      * @return bool True when every required Crafting skill group has a maxed skill.
      */
     public function allSkillsMaxed(SupportCollection $skills): bool
@@ -92,8 +92,8 @@ class CraftExperienceTargetService
     /**
      * Resolve the next actionable cycle target starting from the persisted cycle position.
      *
-     * @param  SupportCollection<string, Skill|null>  $skills  The character's already-resolved Crafting skills.
-     * @param  int  $startPosition  The persisted cycle position to search from.
+     * @param SupportCollection<string, Skill|null> $skills The character's already-resolved Crafting skills.
+     * @param int $startPosition The persisted cycle position to search from.
      * @return ResolvedCraftExperienceTarget|null The resolved target, or null when none is actionable.
      */
     public function resolveNextTarget(SupportCollection $skills, int $startPosition): ?ResolvedCraftExperienceTarget
@@ -127,7 +127,7 @@ class CraftExperienceTargetService
      * Executes at most four queries total, regardless of how many of the 23 cycle targets are
      * later evaluated against these candidates.
      *
-     * @param  SupportCollection<string, Skill|null>  $skills  The character's already-resolved Crafting skills.
+     * @param SupportCollection<string, Skill|null> $skills The character's already-resolved Crafting skills.
      * @return array<string, Collection> The candidate items keyed by Crafting skill group value.
      */
     private function preloadCandidatesByGroup(SupportCollection $skills): array
@@ -148,8 +148,8 @@ class CraftExperienceTargetService
     /**
      * Resolve the candidate items for one Crafting skill group, when the skill is present and not maxed.
      *
-     * @param  Skill|null  $skill  The character's resolved Crafting skill for the group, when present.
-     * @param  CraftingSkillGroup  $group  The Crafting skill group being resolved.
+     * @param Skill|null $skill The character's resolved Crafting skill for the group, when present.
+     * @param CraftingSkillGroup $group The Crafting skill group being resolved.
      * @return Collection The candidate items for the group, or an empty collection when unavailable.
      */
     private function resolveGroupCandidates(?Skill $skill, CraftingSkillGroup $group): Collection

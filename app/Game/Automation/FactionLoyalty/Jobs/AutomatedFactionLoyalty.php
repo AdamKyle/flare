@@ -70,10 +70,10 @@ class AutomatedFactionLoyalty implements ShouldQueue
     private string $currentPhase = 'initializing';
 
     /**
-     * @param  int  $characterId  The character id being assisted.
-     * @param  int  $automationId  The character automation id.
-     * @param  int  $factionLoyaltyAutomationId  The Faction Loyalty automation record id.
-     * @param  int  $timeDelay  The delay, in minutes, before this round runs.
+     * @param int $characterId The character id being assisted.
+     * @param int $automationId The character automation id.
+     * @param int $factionLoyaltyAutomationId The Faction Loyalty automation record id.
+     * @param int $timeDelay The delay, in minutes, before this round runs.
      */
     public function __construct(int $characterId, int $automationId, int $factionLoyaltyAutomationId, int $timeDelay)
     {
@@ -86,13 +86,13 @@ class AutomatedFactionLoyalty implements ShouldQueue
     /**
      * Handle the automated faction loyalty job.
      *
-     * @param  CharacterCacheData  $characterCacheData  The character cache data service.
-     * @param  FactionLoyaltyNpcTaskCoordinator  $factionLoyaltyNpcTaskCoordinator  The NPC task coordinator.
-     * @param  FactionLoyaltyAutomationActionCoordinator  $factionLoyaltyAutomationActionCoordinator  The action coordinator.
-     * @param  AutomatedCraftingHandler  $automatedCraftingHandler  The crafting handler.
-     * @param  FactionLoyaltyAutomationCraftingLogger  $factionLoyaltyAutomationCraftingLogger  The crafting logger.
-     * @param  AutomatedBountyFightHandler  $automatedBountyFightHandler  The bounty fight handler.
-     * @param  FactionLoyaltyAutomationFightLogger  $factionLoyaltyAutomationFightLogger  The fight logger.
+     * @param CharacterCacheData $characterCacheData The character cache data service.
+     * @param FactionLoyaltyNpcTaskCoordinator $factionLoyaltyNpcTaskCoordinator The NPC task coordinator.
+     * @param FactionLoyaltyAutomationActionCoordinator $factionLoyaltyAutomationActionCoordinator The action coordinator.
+     * @param AutomatedCraftingHandler $automatedCraftingHandler The crafting handler.
+     * @param FactionLoyaltyAutomationCraftingLogger $factionLoyaltyAutomationCraftingLogger The crafting logger.
+     * @param AutomatedBountyFightHandler $automatedBountyFightHandler The bounty fight handler.
+     * @param FactionLoyaltyAutomationFightLogger $factionLoyaltyAutomationFightLogger The fight logger.
      * @return void This method does not return a value.
      */
     public function handle(
@@ -271,7 +271,7 @@ class AutomatedFactionLoyalty implements ShouldQueue
     /**
      * Resolve the faction loyalty NPC.
      *
-     * @param  FactionLoyaltyNpcTaskCoordinator  $factionLoyaltyNpcTaskCoordinator  The NPC task coordinator.
+     * @param FactionLoyaltyNpcTaskCoordinator $factionLoyaltyNpcTaskCoordinator The NPC task coordinator.
      * @return FactionLoyaltyNpc|null The resolved NPC, or null when automation should end.
      *
      * @throws Throwable
@@ -286,7 +286,7 @@ class AutomatedFactionLoyalty implements ShouldQueue
     /**
      * Resolve the faction loyalty automation action.
      *
-     * @param  FactionLoyaltyAutomationActionCoordinator  $factionLoyaltyAutomationActionCoordinator  The action coordinator.
+     * @param FactionLoyaltyAutomationActionCoordinator $factionLoyaltyAutomationActionCoordinator The action coordinator.
      * @return array|null The resolved action, or null when no task is available.
      */
     private function resolveFactionLoyaltyAutomationAction(FactionLoyaltyAutomationActionCoordinator $factionLoyaltyAutomationActionCoordinator): ?array
@@ -299,12 +299,12 @@ class AutomatedFactionLoyalty implements ShouldQueue
     /**
      * Handle the resolved automation action.
      *
-     * @param  array  $factionLoyaltyAutomationAction  The resolved automation action.
-     * @param  AutomatedCraftingHandler  $automatedCraftingHandler  The crafting handler.
-     * @param  FactionLoyaltyAutomationCraftingLogger  $factionLoyaltyAutomationCraftingLogger  The crafting logger.
-     * @param  AutomatedBountyFightHandler  $automatedBountyFightHandler  The bounty fight handler.
-     * @param  FactionLoyaltyAutomationFightLogger  $factionLoyaltyAutomationFightLogger  The fight logger.
-     * @param  CharacterCacheData  $characterCacheData  The character cache data service.
+     * @param array $factionLoyaltyAutomationAction The resolved automation action.
+     * @param AutomatedCraftingHandler $automatedCraftingHandler The crafting handler.
+     * @param FactionLoyaltyAutomationCraftingLogger $factionLoyaltyAutomationCraftingLogger The crafting logger.
+     * @param AutomatedBountyFightHandler $automatedBountyFightHandler The bounty fight handler.
+     * @param FactionLoyaltyAutomationFightLogger $factionLoyaltyAutomationFightLogger The fight logger.
+     * @param CharacterCacheData $characterCacheData The character cache data service.
      * @return void This method does not return a value.
      */
     private function handleFactionLoyaltyAutomationAction(
@@ -347,12 +347,12 @@ class AutomatedFactionLoyalty implements ShouldQueue
     /**
      * Handle the crafting action.
      *
-     * @param  array  $factionLoyaltyAutomationAction  The resolved crafting action.
-     * @param  AutomatedCraftingHandler  $automatedCraftingHandler  The crafting handler.
-     * @param  FactionLoyaltyAutomationCraftingLogger  $factionLoyaltyAutomationCraftingLogger  The crafting logger.
-     * @param  AutomatedBountyFightHandler  $automatedBountyFightHandler  The bounty fight handler.
-     * @param  FactionLoyaltyAutomationFightLogger  $factionLoyaltyAutomationFightLogger  The fight logger.
-     * @param  CharacterCacheData  $characterCacheData  The character cache data service.
+     * @param array $factionLoyaltyAutomationAction The resolved crafting action.
+     * @param AutomatedCraftingHandler $automatedCraftingHandler The crafting handler.
+     * @param FactionLoyaltyAutomationCraftingLogger $factionLoyaltyAutomationCraftingLogger The crafting logger.
+     * @param AutomatedBountyFightHandler $automatedBountyFightHandler The bounty fight handler.
+     * @param FactionLoyaltyAutomationFightLogger $factionLoyaltyAutomationFightLogger The fight logger.
+     * @param CharacterCacheData $characterCacheData The character cache data service.
      * @return void This method does not return a value.
      */
     private function handleCraftingAction(
@@ -417,10 +417,10 @@ class AutomatedFactionLoyalty implements ShouldQueue
     /**
      * Handle the automated crafting result.
      *
-     * @param  AutomatedCraftingResult  $automatedCraftingResult  The crafting result.
-     * @param  AutomatedBountyFightHandler  $automatedBountyFightHandler  The bounty fight handler.
-     * @param  FactionLoyaltyAutomationFightLogger  $factionLoyaltyAutomationFightLogger  The fight logger.
-     * @param  CharacterCacheData  $characterCacheData  The character cache data service.
+     * @param AutomatedCraftingResult $automatedCraftingResult The crafting result.
+     * @param AutomatedBountyFightHandler $automatedBountyFightHandler The bounty fight handler.
+     * @param FactionLoyaltyAutomationFightLogger $factionLoyaltyAutomationFightLogger The fight logger.
+     * @param CharacterCacheData $characterCacheData The character cache data service.
      * @return void This method does not return a value.
      */
     private function handleCraftingResult(
@@ -554,7 +554,7 @@ class AutomatedFactionLoyalty implements ShouldQueue
     /**
      * Set the failed crafting item.
      *
-     * @param  int  $itemId  The failed crafting item id.
+     * @param int $itemId The failed crafting item id.
      * @return void This method does not return a value.
      */
     private function setFailedCraftingItem(int $itemId): void
@@ -569,10 +569,10 @@ class AutomatedFactionLoyalty implements ShouldQueue
     /**
      * Handle the fight action.
      *
-     * @param  array  $factionLoyaltyAutomationAction  The resolved fight action.
-     * @param  AutomatedBountyFightHandler  $automatedBountyFightHandler  The bounty fight handler.
-     * @param  FactionLoyaltyAutomationFightLogger  $factionLoyaltyAutomationFightLogger  The fight logger.
-     * @param  CharacterCacheData  $characterCacheData  The character cache data service.
+     * @param array $factionLoyaltyAutomationAction The resolved fight action.
+     * @param AutomatedBountyFightHandler $automatedBountyFightHandler The bounty fight handler.
+     * @param FactionLoyaltyAutomationFightLogger $factionLoyaltyAutomationFightLogger The fight logger.
+     * @param CharacterCacheData $characterCacheData The character cache data service.
      * @return void This method does not return a value.
      */
     private function handleFightAction(
@@ -634,8 +634,8 @@ class AutomatedFactionLoyalty implements ShouldQueue
     /**
      * Handle the automated fight result.
      *
-     * @param  AutomatedFightResult  $automatedFightResult  The fight result.
-     * @param  CharacterCacheData  $characterCacheData  The character cache data service.
+     * @param AutomatedFightResult $automatedFightResult The fight result.
+     * @param CharacterCacheData $characterCacheData The character cache data service.
      * @return void This method does not return a value.
      */
     private function handleFightResult(AutomatedFightResult $automatedFightResult, CharacterCacheData $characterCacheData): void
@@ -748,7 +748,7 @@ class AutomatedFactionLoyalty implements ShouldQueue
     /**
      * Should the failed bounty monster be cleared?
      *
-     * @param  AutomatedFightResult  $automatedFightResult  The fight result.
+     * @param AutomatedFightResult $automatedFightResult The fight result.
      * @return bool True when the failed bounty monster state should be cleared.
      */
     private function shouldClearFailedBountyMonster(AutomatedFightResult $automatedFightResult): bool
@@ -796,7 +796,7 @@ class AutomatedFactionLoyalty implements ShouldQueue
     /**
      * Recall the job.
      *
-     * @param  CharacterCacheData  $characterCacheData  The character cache data service.
+     * @param CharacterCacheData $characterCacheData The character cache data service.
      * @return void This method does not return a value.
      */
     private function recallJob(CharacterCacheData $characterCacheData): void
@@ -936,8 +936,8 @@ class AutomatedFactionLoyalty implements ShouldQueue
     /**
      * Handle an automation exception.
      *
-     * @param  Throwable  $throwable  The unexpected exception.
-     * @param  CharacterCacheData  $characterCacheData  The character cache data service.
+     * @param Throwable $throwable The unexpected exception.
+     * @param CharacterCacheData $characterCacheData The character cache data service.
      * @return void This method does not return a value.
      */
     private function handleAutomationException(Throwable $throwable, CharacterCacheData $characterCacheData): void
@@ -994,9 +994,9 @@ class AutomatedFactionLoyalty implements ShouldQueue
     /**
      * Send the automation log update.
      *
-     * @param  string  $message  The log message text.
-     * @param  bool  $makeItalic  Whether the message should render italicized.
-     * @param  bool  $isReward  Whether the message represents a reward.
+     * @param string $message The log message text.
+     * @param bool $makeItalic Whether the message should render italicized.
+     * @param bool $isReward Whether the message represents a reward.
      * @return void This method does not return a value.
      */
     private function sendOutEventLogUpdate(string $message, bool $makeItalic = false, bool $isReward = false): void
@@ -1012,8 +1012,8 @@ class AutomatedFactionLoyalty implements ShouldQueue
     /**
      * End automation.
      *
-     * @param  CharacterCacheData  $characterCacheData  The character cache data service.
-     * @param  bool  $sendCompletionMessages  Whether to send completion log messages.
+     * @param CharacterCacheData $characterCacheData The character cache data service.
+     * @param bool $sendCompletionMessages Whether to send completion log messages.
      * @return void This method does not return a value.
      */
     private function endAutomation(CharacterCacheData $characterCacheData, bool $sendCompletionMessages = true): void
@@ -1074,7 +1074,7 @@ class AutomatedFactionLoyalty implements ShouldQueue
     /**
      * Handle the job's terminal queue failure by reporting and finalizing the Faction Loyalty automation.
      *
-     * @param  Throwable  $throwable  The exception that failed the job.
+     * @param Throwable $throwable The exception that failed the job.
      * @return void This method does not return a value.
      */
     public function failed(Throwable $throwable): void
@@ -1164,7 +1164,7 @@ class AutomatedFactionLoyalty implements ShouldQueue
     /**
      * Create a Faction Loyalty failure warning for the character and broadcast the updated warning state.
      *
-     * @param  string  $type  The failure warning type.
+     * @param string $type The failure warning type.
      * @return void This method does not return a value.
      */
     private function createFailureWarning(string $type): void
@@ -1188,7 +1188,7 @@ class AutomatedFactionLoyalty implements ShouldQueue
     /**
      * Determine whether a newer active Faction Loyalty automation exists for the character.
      *
-     * @param  int|null  $newerActiveAutomationId  The resolved newer active automation id, if found.
+     * @param int|null $newerActiveAutomationId The resolved newer active automation id, if found.
      * @return bool True when a newer active automation exists.
      */
     private function hasNewerActiveFactionLoyaltyAutomation(?int &$newerActiveAutomationId = null): bool
@@ -1211,8 +1211,8 @@ class AutomatedFactionLoyalty implements ShouldQueue
     /**
      * Set whether the character can craft.
      *
-     * @param  Character  $character  The character to update.
-     * @param  bool  $canCraft  Whether the character can craft.
+     * @param Character $character The character to update.
+     * @param bool $canCraft Whether the character can craft.
      * @return Character The refreshed character.
      */
     private function setCharacterCanCraft(Character $character, bool $canCraft): Character

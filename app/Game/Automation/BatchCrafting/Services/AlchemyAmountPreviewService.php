@@ -14,8 +14,8 @@ class AlchemyAmountPreviewService
     /**
      * Build the Alchemy Amount preview payload for the validated Batch Crafting request.
      *
-     * @param  Character  $character  The character requesting the preview.
-     * @param  array  $validated  The validated Batch Crafting request data.
+     * @param Character $character The character requesting the preview.
+     * @param array $validated The validated Batch Crafting request data.
      * @return array The lean Alchemy Amount preview payload.
      */
     public function build(Character $character, array $validated): array
@@ -58,7 +58,7 @@ class AlchemyAmountPreviewService
     /**
      * Resolve the requested Alchemy item, when it is still a valid craftable Alchemy item.
      *
-     * @param  int  $itemId  The requested Alchemy item id.
+     * @param int $itemId The requested Alchemy item id.
      * @return Item|null The resolved item, or null when it is no longer valid.
      */
     private function findAlchemyItem(int $itemId): ?Item
@@ -72,8 +72,8 @@ class AlchemyAmountPreviewService
     /**
      * Resolve the character's current Alchemy Bag capacity, only relevant when the disposition retains the item.
      *
-     * @param  Character  $character  The character requesting the preview.
-     * @param  BatchCraftingDisposition  $disposition  The requested Alchemy disposition.
+     * @param Character $character The character requesting the preview.
+     * @param BatchCraftingDisposition $disposition The requested Alchemy disposition.
      * @return array{current: int, max: int, remaining: int}|null The Alchemy Bag capacity, or null when not retaining the item.
      */
     private function resolveBagCapacity(Character $character, BatchCraftingDisposition $disposition): ?array
@@ -91,9 +91,9 @@ class AlchemyAmountPreviewService
     /**
      * Build the blocking messages for the Alchemy Amount preview.
      *
-     * @param  bool  $canAffordGoldDust  Whether the character can afford the requested Gold Dust cost.
-     * @param  bool  $canAffordShards  Whether the character can afford the requested Shards cost.
-     * @param  array{current: int, max: int, remaining: int}|null  $bagCapacity  The resolved Alchemy Bag capacity, if relevant.
+     * @param bool $canAffordGoldDust Whether the character can afford the requested Gold Dust cost.
+     * @param bool $canAffordShards Whether the character can afford the requested Shards cost.
+     * @param array{current: int, max: int, remaining: int}|null $bagCapacity The resolved Alchemy Bag capacity, if relevant.
      * @return array<int, string> The blocking messages, empty when nothing blocks the request.
      */
     private function buildBlockers(bool $canAffordGoldDust, bool $canAffordShards, ?array $bagCapacity): array
@@ -118,8 +118,8 @@ class AlchemyAmountPreviewService
     /**
      * Build the lean preview payload for a requested Alchemy item that is no longer valid.
      *
-     * @param  Character  $character  The character requesting the preview.
-     * @param  array  $progress  The requested Alchemy Amount progress data.
+     * @param Character $character The character requesting the preview.
+     * @param array $progress The requested Alchemy Amount progress data.
      * @return array The lean unavailable-item preview payload.
      */
     private function buildUnavailableItemPreview(Character $character, array $progress): array

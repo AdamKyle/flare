@@ -15,7 +15,7 @@ class GlobalTimeOut implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * @param  User  $user
+     * @param User $user
      */
     private User $user;
 

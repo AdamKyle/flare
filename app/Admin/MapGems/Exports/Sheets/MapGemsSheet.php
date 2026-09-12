@@ -25,7 +25,7 @@ class MapGemsSheet implements FromCollection, ShouldAutoSize, WithHeadings, With
     /**
      * Map a Map Gem profile into its workbook row, using human-readable Map/Skill/atonement names.
      *
-     * @param  mixed  $gameMapGemParamter
+     * @param mixed $gameMapGemParamter
      */
     public function map($gameMapGemParamter): array
     {

@@ -18,9 +18,9 @@ class BatchCraftingDestinationResolver
     /**
      * Resolve the retained-item destination facts for a batch's disposition and configured output destination.
      *
-     * @param  Character  $character  The character the batch belongs to.
-     * @param  BatchCraftingDisposition  $disposition  The batch's configured disposition.
-     * @param  array  $progress  The persisted Batch Crafting progress data.
+     * @param Character $character The character the batch belongs to.
+     * @param BatchCraftingDisposition $disposition The batch's configured disposition.
+     * @param array $progress The persisted Batch Crafting progress data.
      * @return array{capacity: array{current: int, max: int, remaining: int}|null, destination_set_id: int|null, destination_set_name: string|null} The resolved destination facts.
      */
     public function resolve(Character $character, BatchCraftingDisposition $disposition, array $progress): array
@@ -43,7 +43,7 @@ class BatchCraftingDestinationResolver
     /**
      * Resolve the Backpack destination capacity facts for a retained Inventory batch.
      *
-     * @param  Character  $character  The character the batch belongs to.
+     * @param Character $character The character the batch belongs to.
      * @return array{capacity: array{current: int, max: int, remaining: int}|null, destination_set_id: int|null, destination_set_name: string|null} The resolved Inventory destination facts.
      */
     private function resolveInventoryDestination(Character $character): array
@@ -61,7 +61,7 @@ class BatchCraftingDestinationResolver
     /**
      * Resolve the existing Crafted Items Set destination facts without creating a set.
      *
-     * @param  Character  $character  The character the batch belongs to.
+     * @param Character $character The character the batch belongs to.
      * @return array{capacity: array{current: int, max: int, remaining: int}|null, destination_set_id: int|null, destination_set_name: string|null} The resolved Crafted Items Set facts.
      */
     private function resolveCraftedItemsSetDestination(Character $character): array
@@ -86,8 +86,8 @@ class BatchCraftingDestinationResolver
     /**
      * Resolve the selected normal Inventory Set destination facts.
      *
-     * @param  Character  $character  The character the batch belongs to.
-     * @param  array  $progress  The persisted Batch Crafting progress data.
+     * @param Character $character The character the batch belongs to.
+     * @param array $progress The persisted Batch Crafting progress data.
      * @return array{capacity: array{current: int, max: int, remaining: int}|null, destination_set_id: int|null, destination_set_name: string|null} The resolved Inventory Set facts.
      */
     private function resolveInventorySetDestination(Character $character, array $progress): array

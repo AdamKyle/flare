@@ -28,9 +28,9 @@ class CraftAndEnchantSetPreviewService
     /**
      * Build the factual Craft and Enchant Set preview payload for the requested plan and disposition.
      *
-     * @param  Character  $character  The character requesting the preview.
-     * @param  array  $progress  The requested Craft and Enchant Set progress data.
-     * @param  string  $disposition  The requested crafting disposition value.
+     * @param Character $character The character requesting the preview.
+     * @param array $progress The requested Craft and Enchant Set progress data.
+     * @param string $disposition The requested crafting disposition value.
      * @return array The factual Craft and Enchant Set preview payload.
      */
     public function build(Character $character, array $progress, string $disposition): array
@@ -98,8 +98,8 @@ class CraftAndEnchantSetPreviewService
      * so its destination facts are immediately real for the caller, without ever creating a Set
      * as a side effect of read-only status display.
      *
-     * @param  Character  $character  The character requesting the preview.
-     * @param  array  $progress  The requested Craft and Enchant Set progress data.
+     * @param Character $character The character requesting the preview.
+     * @param array $progress The requested Craft and Enchant Set progress data.
      * @return string|null The destination blocker, or null when the destination is ready.
      */
     private function prepareDestination(Character $character, array $progress): ?string
@@ -127,7 +127,7 @@ class CraftAndEnchantSetPreviewService
     /**
      * Preload every affix referenced by the resolved plan queue, in one bounded query.
      *
-     * @param  array<int, array>  $queue  The resolved plan queue entries.
+     * @param array<int, array> $queue The resolved plan queue entries.
      * @return Collection<int, ItemAffix> The preloaded affixes, keyed by id.
      */
     private function preloadAffixes(array $queue): Collection
@@ -145,7 +145,7 @@ class CraftAndEnchantSetPreviewService
     /**
      * Preload every item referenced by the resolved plan queue, in one bounded query.
      *
-     * @param  array<int, array>  $queue  The resolved plan queue entries.
+     * @param array<int, array> $queue The resolved plan queue entries.
      * @return Collection<int, Item> The preloaded items, keyed by id.
      */
     private function preloadItems(array $queue): Collection
@@ -158,10 +158,10 @@ class CraftAndEnchantSetPreviewService
     /**
      * Build the per-position preview facts for the resolved plan queue.
      *
-     * @param  Character  $character  The character requesting the preview.
-     * @param  array<int, array>  $queue  The resolved plan queue entries.
-     * @param  Collection<int, ItemAffix>  $affixesById  The preloaded affixes, keyed by id.
-     * @param  Collection<int, Item>  $itemsById  The preloaded items, keyed by id.
+     * @param Character $character The character requesting the preview.
+     * @param array<int, array> $queue The resolved plan queue entries.
+     * @param Collection<int, ItemAffix> $affixesById The preloaded affixes, keyed by id.
+     * @param Collection<int, Item> $itemsById The preloaded items, keyed by id.
      * @return array<int, array> The per-position preview facts.
      */
     private function buildPositionFacts(Character $character, array $queue, Collection $affixesById, Collection $itemsById): array
@@ -189,7 +189,7 @@ class CraftAndEnchantSetPreviewService
     /**
      * Build the factual preview facts for one resolved affix.
      *
-     * @param  ItemAffix|null  $affix  The resolved affix, when one was selected.
+     * @param ItemAffix|null $affix The resolved affix, when one was selected.
      * @return array{id: int, name: string, cost: int, int_required: int}|null The affix preview facts, or null when unselected.
      */
     private function affixFacts(?ItemAffix $affix): ?array

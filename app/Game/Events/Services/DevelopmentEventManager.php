@@ -433,7 +433,7 @@ class DevelopmentEventManager
      * confirmed, or if a confirmed conflict no longer exists / is no longer
      * active, since either means the confirmed set no longer matches reality.
      *
-     * @param  int[]  $confirmedScheduleIds
+     * @param int[] $confirmedScheduleIds
      * @return int[] deduplicated schedule ids to cancel before creating replacements
      */
     private function reconcileExistingConflicts(array $reloadedRequest, array $confirmedScheduleIds): array

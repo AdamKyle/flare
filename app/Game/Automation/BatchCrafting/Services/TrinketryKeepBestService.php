@@ -23,9 +23,9 @@ class TrinketryKeepBestService
      * Items Set, destroying whichever result (the new one, or the previously retained one)
      * is no longer the strongest.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record, whose progress is updated and persisted.
-     * @param  Character  $character  The character running the batch.
-     * @param  Item  $craftedItem  The Trinket just successfully crafted.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record, whose progress is updated and persisted.
+     * @param Character $character The character running the batch.
+     * @param Item $craftedItem The Trinket just successfully crafted.
      * @return BatchCraftingOperationResult The outcome of applying the Keep Best comparison.
      */
     public function apply(BatchCrafting $batchCrafting, Character $character, Item $craftedItem): BatchCraftingOperationResult
@@ -69,11 +69,11 @@ class TrinketryKeepBestService
     /**
      * Persist the retained best Trinket entry.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record, whose progress is updated and persisted.
-     * @param  array  $progress  The batch's current progress payload.
-     * @param  Item  $craftedItem  The Trinket now retained as best.
-     * @param  int  $quality  The retained item's quality.
-     * @param  int  $setSlotId  The Crafted Items Set slot id holding the retained item.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record, whose progress is updated and persisted.
+     * @param array $progress The batch's current progress payload.
+     * @param Item $craftedItem The Trinket now retained as best.
+     * @param int $quality The retained item's quality.
+     * @param int $setSlotId The Crafted Items Set slot id holding the retained item.
      * @return void This method does not return a value.
      */
     private function recordBest(BatchCrafting $batchCrafting, array $progress, Item $craftedItem, int $quality, int $setSlotId): void

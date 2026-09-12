@@ -39,8 +39,8 @@ class AutomatedCraftingResult
     /**
      * Set up the result.
      *
-     * @param  AutomatedCraftingResultType  $resultType  The crafting result type.
-     * @param  int  $targetItemId  The target item id.
+     * @param AutomatedCraftingResultType $resultType The crafting result type.
+     * @param int $targetItemId The target item id.
      * @return AutomatedCraftingResult The reset result instance.
      */
     public function setUp(AutomatedCraftingResultType $resultType, int $targetItemId): AutomatedCraftingResult
@@ -67,7 +67,7 @@ class AutomatedCraftingResult
     /**
      * Set the crafted item id.
      *
-     * @param  int|null  $craftedItemId  The crafted item id.
+     * @param int|null $craftedItemId The crafted item id.
      * @return AutomatedCraftingResult The result instance.
      */
     public function setCraftedItemId(?int $craftedItemId): AutomatedCraftingResult
@@ -80,7 +80,7 @@ class AutomatedCraftingResult
     /**
      * Set the crafted item name.
      *
-     * @param  string|null  $craftedItemName  The crafted item name.
+     * @param string|null $craftedItemName The crafted item name.
      * @return AutomatedCraftingResult The result instance.
      */
     public function setCraftedItemName(?string $craftedItemName): AutomatedCraftingResult
@@ -93,7 +93,7 @@ class AutomatedCraftingResult
     /**
      * Set the crafting type.
      *
-     * @param  string  $craftingType  The crafting type.
+     * @param string $craftingType The crafting type.
      * @return AutomatedCraftingResult The result instance.
      */
     public function setCraftingType(string $craftingType): AutomatedCraftingResult
@@ -106,7 +106,7 @@ class AutomatedCraftingResult
     /**
      * Set the target item level.
      *
-     * @param  int  $targetItemLevel  The target item level.
+     * @param int $targetItemLevel The target item level.
      * @return AutomatedCraftingResult The result instance.
      */
     public function setTargetItemLevel(int $targetItemLevel): AutomatedCraftingResult
@@ -119,7 +119,7 @@ class AutomatedCraftingResult
     /**
      * Set the current skill level.
      *
-     * @param  int  $currentSkillLevel  The character's current skill level.
+     * @param int $currentSkillLevel The character's current skill level.
      * @return AutomatedCraftingResult The result instance.
      */
     public function setCurrentSkillLevel(int $currentSkillLevel): AutomatedCraftingResult
@@ -132,7 +132,7 @@ class AutomatedCraftingResult
     /**
      * Set whether the character started below the target item level.
      *
-     * @param  bool  $startedBelowTargetLevel  Whether the character started below the target level.
+     * @param bool $startedBelowTargetLevel Whether the character started below the target level.
      * @return AutomatedCraftingResult The result instance.
      */
     public function setStartedBelowTargetLevel(bool $startedBelowTargetLevel): AutomatedCraftingResult
@@ -145,7 +145,7 @@ class AutomatedCraftingResult
     /**
      * Set whether the target item was crafted.
      *
-     * @param  bool  $craftedTargetItem  Whether the target item was crafted.
+     * @param bool $craftedTargetItem Whether the target item was crafted.
      * @return AutomatedCraftingResult The result instance.
      */
     public function setCraftedTargetItem(bool $craftedTargetItem): AutomatedCraftingResult
@@ -158,7 +158,7 @@ class AutomatedCraftingResult
     /**
      * Set the number of attempts.
      *
-     * @param  int  $attempts  The number of crafting attempts.
+     * @param int $attempts The number of crafting attempts.
      * @return AutomatedCraftingResult The result instance.
      */
     public function setAttempts(int $attempts): AutomatedCraftingResult
@@ -171,7 +171,7 @@ class AutomatedCraftingResult
     /**
      * Set the number of failed rolls.
      *
-     * @param  int  $failedRolls  The number of failed crafting rolls.
+     * @param int $failedRolls The number of failed crafting rolls.
      * @return AutomatedCraftingResult The result instance.
      */
     public function setFailedRolls(int $failedRolls): AutomatedCraftingResult
@@ -184,7 +184,7 @@ class AutomatedCraftingResult
     /**
      * Set the amount of gold spent.
      *
-     * @param  int  $goldSpent  The amount of gold spent.
+     * @param int $goldSpent The amount of gold spent.
      * @return AutomatedCraftingResult The result instance.
      */
     public function setGoldSpent(int $goldSpent): AutomatedCraftingResult
@@ -197,7 +197,7 @@ class AutomatedCraftingResult
     /**
      * Set successful target crafts.
      *
-     * @param  int  $successfulTargetCrafts  The successful target craft count.
+     * @param int $successfulTargetCrafts The successful target craft count.
      * @return AutomatedCraftingResult The result instance.
      */
     public function setSuccessfulTargetCrafts(int $successfulTargetCrafts): AutomatedCraftingResult
@@ -210,7 +210,7 @@ class AutomatedCraftingResult
     /**
      * Set successful training crafts.
      *
-     * @param  int  $successfulTrainingCrafts  The successful training craft count.
+     * @param int $successfulTrainingCrafts The successful training craft count.
      * @return AutomatedCraftingResult The result instance.
      */
     public function setSuccessfulTrainingCrafts(int $successfulTrainingCrafts): AutomatedCraftingResult
@@ -223,7 +223,7 @@ class AutomatedCraftingResult
     /**
      * Set the automation log entry id.
      *
-     * @param  string  $logEntryId  The log entry id.
+     * @param string $logEntryId The log entry id.
      * @return AutomatedCraftingResult The result instance.
      */
     public function setLogEntryId(string $logEntryId): AutomatedCraftingResult

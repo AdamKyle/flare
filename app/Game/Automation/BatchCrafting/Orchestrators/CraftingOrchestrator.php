@@ -19,8 +19,8 @@ class CraftingOrchestrator implements BatchCraftingOrchestrator
     /**
      * Resolve and run the Craft batch type's handler for the current craft mode.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  Character  $character  The character running the batch.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param Character $character The character running the batch.
      * @return BatchCraftingOperationResult The outcome of the handled operation.
      */
     public function orchestrate(BatchCrafting $batchCrafting, Character $character): BatchCraftingOperationResult

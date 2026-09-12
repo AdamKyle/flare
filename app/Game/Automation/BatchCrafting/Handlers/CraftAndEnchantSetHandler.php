@@ -37,8 +37,8 @@ class CraftAndEnchantSetHandler implements BatchCraftingHandler
      * the exact base item, and an enchanting phase that applies the exact requested affixes
      * and, only once both succeed, applies the final disposition and advances the queue.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  Character  $character  The character running the batch.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param Character $character The character running the batch.
      * @return BatchCraftingOperationResult The outcome of the phase step.
      */
     public function handle(BatchCrafting $batchCrafting, Character $character): BatchCraftingOperationResult
@@ -63,9 +63,9 @@ class CraftAndEnchantSetHandler implements BatchCraftingHandler
     /**
      * Craft the current queue entry's exact base item and advance to the enchanting phase.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  Character  $character  The character running the batch.
-     * @param  CraftAndEnchantSetPlanEntry  $entry  The current queue entry.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param Character $character The character running the batch.
+     * @param CraftAndEnchantSetPlanEntry $entry The current queue entry.
      * @return BatchCraftingOperationResult The outcome of the crafting phase step.
      */
     private function handleCraftingPhase(BatchCrafting $batchCrafting, Character $character, CraftAndEnchantSetPlanEntry $entry): BatchCraftingOperationResult
@@ -98,11 +98,11 @@ class CraftAndEnchantSetHandler implements BatchCraftingHandler
     /**
      * Apply the current queue entry's exact requested affixes and, when complete, the final disposition.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  Character  $character  The character running the batch.
-     * @param  CraftAndEnchantSetPlanEntry  $entry  The current queue entry.
-     * @param  int  $index  The current queue index.
-     * @param  int  $queueLength  The total number of queued positions.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param Character $character The character running the batch.
+     * @param CraftAndEnchantSetPlanEntry $entry The current queue entry.
+     * @param int $index The current queue index.
+     * @param int $queueLength The total number of queued positions.
      * @return BatchCraftingOperationResult The outcome of the enchanting phase step.
      */
     private function handleEnchantingPhase(BatchCrafting $batchCrafting, Character $character, CraftAndEnchantSetPlanEntry $entry, int $index, int $queueLength): BatchCraftingOperationResult
@@ -146,12 +146,12 @@ class CraftAndEnchantSetHandler implements BatchCraftingHandler
     /**
      * Apply the final disposition to the fully enchanted item and advance the queue.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  Character  $character  The character running the batch.
-     * @param  Item  $enchantedItem  The finished enchanted item.
-     * @param  int  $goldCost  The combined crafting and enchanting Gold cost for this position.
-     * @param  int  $index  The current queue index.
-     * @param  int  $queueLength  The total number of queued positions.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param Character $character The character running the batch.
+     * @param Item $enchantedItem The finished enchanted item.
+     * @param int $goldCost The combined crafting and enchanting Gold cost for this position.
+     * @param int $index The current queue index.
+     * @param int $queueLength The total number of queued positions.
      * @return BatchCraftingOperationResult The outcome of the completed position.
      */
     private function completePosition(BatchCrafting $batchCrafting, Character $character, Item $enchantedItem, int $goldCost, int $index, int $queueLength): BatchCraftingOperationResult
@@ -188,8 +188,8 @@ class CraftAndEnchantSetHandler implements BatchCraftingHandler
     /**
      * Reset the current queue position back to its crafting phase, clearing all transient state.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  array  $progress  The batch's current progress payload.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param array $progress The batch's current progress payload.
      * @return void This method does not return a value.
      */
     private function resetToCraftingPhase(BatchCrafting $batchCrafting, array $progress): void
@@ -202,7 +202,7 @@ class CraftAndEnchantSetHandler implements BatchCraftingHandler
     /**
      * Clear the transient current-item/affix progress fields, in place.
      *
-     * @param  array  $progress  The batch's current progress payload, modified in place.
+     * @param array $progress The batch's current progress payload, modified in place.
      * @return void This method does not return a value.
      */
     private function clearTransientState(array &$progress): void

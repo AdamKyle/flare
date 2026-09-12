@@ -11,8 +11,8 @@ use Illuminate\Http\Request;
 class ExplorationWarningController
 {
     /**
-     * @param  ExplorationWarningService  $explorationWarningService  The Exploration warning service.
-     * @param  ExplorationLogService  $explorationLogService  The Exploration log service.
+     * @param ExplorationWarningService $explorationWarningService The Exploration warning service.
+     * @param ExplorationLogService $explorationLogService The Exploration log service.
      */
     public function __construct(
         private readonly ExplorationWarningService $explorationWarningService,
@@ -22,8 +22,8 @@ class ExplorationWarningController
     /**
      * Dismiss an active Exploration warning for the character.
      *
-     * @param  Request  $request  The dismiss request, optionally naming a warning id.
-     * @param  Character  $character  The character dismissing the warning.
+     * @param Request $request The dismiss request, optionally naming a warning id.
+     * @param Character $character The character dismissing the warning.
      * @return JsonResponse The updated Exploration output panel.
      */
     public function dismiss(Request $request, Character $character): JsonResponse
@@ -38,7 +38,7 @@ class ExplorationWarningController
     /**
      * Dismiss the character's ended Exploration log.
      *
-     * @param  Character  $character  The character dismissing the ended log.
+     * @param Character $character The character dismissing the ended log.
      * @return JsonResponse The updated Exploration output panel.
      */
     public function dismissEnded(Character $character): JsonResponse

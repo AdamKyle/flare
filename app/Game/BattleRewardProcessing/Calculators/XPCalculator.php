@@ -13,7 +13,7 @@ class XPCalculator
      *
      * If the character is over the max level, we return 3.333 xp minus any reductions for skill training.
      *
-     * @param  float  $xpReduction  | 0.0
+     * @param float $xpReduction | 0.0
      */
     public function fetchXPFromMonster(Monster $monster, int $characterLevel, float $xpReduction = 0.0): int
     {

@@ -19,8 +19,8 @@ class BatchCraftingHandlerFactory
     /**
      * Resolve the registered Batch Crafting handler for the given type and mode.
      *
-     * @param  BatchCraftingType  $type  The Batch Crafting type to resolve.
-     * @param  BackedEnum  $mode  The craft mode to resolve.
+     * @param BatchCraftingType $type The Batch Crafting type to resolve.
+     * @param BackedEnum $mode The craft mode to resolve.
      * @return BatchCraftingHandler The resolved handler instance.
      */
     public function make(BatchCraftingType $type, BackedEnum $mode): BatchCraftingHandler

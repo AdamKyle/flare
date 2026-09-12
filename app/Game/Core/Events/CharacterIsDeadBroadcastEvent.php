@@ -24,7 +24,7 @@ class CharacterIsDeadBroadcastEvent implements ShouldBroadcastNow
     /**
      * Create a new event instance.
      *
-     * @param  bool  $isDead  | false
+     * @param bool $isDead | false
      * @return void
      */
     public function __construct(User $user, bool $isDead = false)

@@ -62,7 +62,7 @@ class MapBuilder
     /**
      * Sets the land color
      *
-     * @param  StructColor  $land  | null
+     * @param StructColor $land | null
      */
     public function setLandColor(?StructColor $land = null): MapBuilder
     {
@@ -74,7 +74,7 @@ class MapBuilder
     /**
      * Sets the water color
      *
-     * @param  StructColor  $water  | null
+     * @param StructColor $water | null
      */
     public function setWaterColor(?StructColor $water = null): MapBuilder
     {
@@ -86,7 +86,7 @@ class MapBuilder
     /**
      * Sets the height of the map.
      *
-     * @param  int  $height  | 500
+     * @param int $height | 500
      */
     public function setMapHeight(int $height = 500): MapBuilder
     {
@@ -98,7 +98,7 @@ class MapBuilder
     /**
      * Sets the width of the map.
      *
-     * @param  int  $width  | 500
+     * @param int $width | 500
      */
     public function setMapWidth(int $width = 500): MapBuilder
     {
@@ -110,7 +110,7 @@ class MapBuilder
     /**
      * Sets the map seed
      *
-     * @param  string  $seed  | '123'
+     * @param string $seed | '123'
      */
     public function setMapSeed(string $seed = '123'): MapBuilder
     {

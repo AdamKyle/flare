@@ -13,9 +13,9 @@ class MapColorScheme extends DefaultColorScheme
     /**
      * Constructor
      *
-     * @param  ShaderInterface  $shader  | null
-     * @param  mixed  $land  | null
-     * @param  mixed  $water  | null
+     * @param ShaderInterface $shader | null
+     * @param mixed $land | null
+     * @param mixed $water | null
      * @return void
      */
     public function __construct(?ShaderInterface $shader = null, $land = null, $water = null)

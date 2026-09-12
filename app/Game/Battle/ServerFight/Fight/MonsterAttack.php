@@ -267,8 +267,8 @@ class MonsterAttack extends BattleBase
     /**
      * Apply the monster's enchantment damage when its affixes can deal damage.
      *
-     * @param  ServerMonster  $monster  Attacking monster.
-     * @param  Character  $character  Defending character.
+     * @param ServerMonster $monster Attacking monster.
+     * @param Character $character Defending character.
      * @return void Enchantment damage and messages are applied when relevant.
      */
     private function fireEnchantments(ServerMonster $monster, Character $character): void

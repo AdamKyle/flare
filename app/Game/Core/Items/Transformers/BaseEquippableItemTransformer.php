@@ -32,7 +32,7 @@ class BaseEquippableItemTransformer extends TransformerAbstract
     /**
      * Transforms an enriched Item model into an API-ready array.
      *
-     * @param  Item  $item  ->item
+     * @param Item $item ->item
      * @return array<string, mixed>
      */
     public function transform(Item $item): array

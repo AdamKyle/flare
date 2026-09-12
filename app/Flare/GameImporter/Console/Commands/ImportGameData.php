@@ -36,7 +36,7 @@ class ImportGameData extends Command
     /**
      * Execute the console command.
      *
-     * @param  ExcelMapper  $excelMapper  Mapper used to resolve spreadsheet import definitions.
+     * @param ExcelMapper $excelMapper Mapper used to resolve spreadsheet import definitions.
      * @return void Re-imports a single named directory when one is given, otherwise runs the full ordered import.
      */
     public function handle(ExcelMapper $excelMapper)
@@ -178,8 +178,8 @@ class ImportGameData extends Command
     /**
      * Sort files by an explicit import order.
      *
-     * @param  array<int, string>  $files  Source file list to sort.
-     * @param  array<int, string>  $order  Ordering keys naming the required file sequence.
+     * @param array<int, string> $files Source file list to sort.
+     * @param array<int, string> $order Ordering keys naming the required file sequence.
      * @return array<int, string> Files sorted to match the given order, with unmatched files placed last.
      */
     protected function sortFilesByCustomOrder(array $files, array $order): array
@@ -205,9 +205,9 @@ class ImportGameData extends Command
     /**
      * Import th excel files.
      *
-     * @param  ExcelMapper  $excelMapper  Mapper used to resolve spreadsheet import definitions.
-     * @param  array<int, string>  $files  Workbook file paths to import, in import order.
-     * @param  string  $directoryName  Import directory name the files belong to.
+     * @param ExcelMapper $excelMapper Mapper used to resolve spreadsheet import definitions.
+     * @param array<int, string> $files Workbook file paths to import, in import order.
+     * @param string $directoryName Import directory name the files belong to.
      * @return void Imports each file in the given directory through the supplied mapper.
      */
     protected function import(ExcelMapper $excelMapper, array $files, string $directoryName): void

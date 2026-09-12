@@ -19,10 +19,10 @@ class AlchemyExperienceKeepBestService
      * Alchemy Bag, destroying whichever result (the new one, or the previously retained one)
      * is no longer the strongest.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record, whose progress is updated and persisted.
-     * @param  Character  $character  The character running the batch.
-     * @param  Item  $item  The item just successfully transmuted.
-     * @param  int  $alchemyBagSlotId  The Alchemy Bag slot holding the newly produced item.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record, whose progress is updated and persisted.
+     * @param Character $character The character running the batch.
+     * @param Item $item The item just successfully transmuted.
+     * @param int $alchemyBagSlotId The Alchemy Bag slot holding the newly produced item.
      * @return BatchCraftingOperationResult The outcome of applying the Keep Best comparison.
      */
     public function apply(BatchCrafting $batchCrafting, Character $character, Item $item, int $alchemyBagSlotId): BatchCraftingOperationResult
@@ -54,8 +54,8 @@ class AlchemyExperienceKeepBestService
     /**
      * Destroy a displaced Alchemy Bag slot.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  int  $alchemyBagSlotId  The Alchemy Bag slot being destroyed.
+     * @param Character $character The character running the batch.
+     * @param int $alchemyBagSlotId The Alchemy Bag slot being destroyed.
      * @return void This method does not return a value.
      */
     private function destroy(Character $character, int $alchemyBagSlotId): void

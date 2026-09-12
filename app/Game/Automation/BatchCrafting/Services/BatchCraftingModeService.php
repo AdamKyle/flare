@@ -18,8 +18,8 @@ class BatchCraftingModeService
     /**
      * Resolve the typed mode enum for the given Batch Crafting type and persisted mode value.
      *
-     * @param  BatchCraftingType  $type  The Batch Crafting type.
-     * @param  string  $mode  The persisted mode value.
+     * @param BatchCraftingType $type The Batch Crafting type.
+     * @param string $mode The persisted mode value.
      * @return BatchCraftingMode The resolved typed mode contract.
      */
     public function resolve(BatchCraftingType $type, string $mode): BatchCraftingMode
@@ -37,8 +37,8 @@ class BatchCraftingModeService
     /**
      * Return the recurring execution window size for the given Batch Crafting type and mode.
      *
-     * @param  BatchCraftingType  $type  The Batch Crafting type.
-     * @param  string  $mode  The persisted mode value.
+     * @param BatchCraftingType $type The Batch Crafting type.
+     * @param string $mode The persisted mode value.
      * @return int|null The recurring window size, or null for a continuous mode.
      */
     public function executionWindowSize(BatchCraftingType $type, string $mode): ?int
@@ -49,8 +49,8 @@ class BatchCraftingModeService
     /**
      * Return the legal dispositions for the given Batch Crafting type and mode.
      *
-     * @param  BatchCraftingType  $type  The Batch Crafting type.
-     * @param  string  $mode  The persisted mode value.
+     * @param BatchCraftingType $type The Batch Crafting type.
+     * @param string $mode The persisted mode value.
      * @return array<int, BatchCraftingDisposition> The legal dispositions.
      */
     public function allowedDispositions(BatchCraftingType $type, string $mode): array
@@ -61,8 +61,8 @@ class BatchCraftingModeService
     /**
      * Return the legal output destinations for the given Batch Crafting type and mode.
      *
-     * @param  BatchCraftingType  $type  The Batch Crafting type.
-     * @param  string  $mode  The persisted mode value.
+     * @param BatchCraftingType $type The Batch Crafting type.
+     * @param string $mode The persisted mode value.
      * @return array<int, BatchCraftingOutputDestination> The legal output destinations.
      */
     public function allowedOutputDestinations(BatchCraftingType $type, string $mode): array

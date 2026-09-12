@@ -11,8 +11,8 @@ interface BatchCraftingOrchestrator
     /**
      * Coordinate the active Batch Crafting run for the character to its next operation.
      *
-     * @param  BatchCrafting  $batchCrafting  The active Batch Crafting record.
-     * @param  Character  $character  The character crafting.
+     * @param BatchCrafting $batchCrafting The active Batch Crafting record.
+     * @param Character $character The character crafting.
      * @return BatchCraftingOperationResult The operation outcome.
      */
     public function orchestrate(BatchCrafting $batchCrafting, Character $character): BatchCraftingOperationResult;

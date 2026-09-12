@@ -27,7 +27,7 @@ class ShowTimeOutEvent implements ShouldBroadcastNow
     /**
      * Create a new event instance.
      *
-     * @param  int|float  $forLength  | 0
+     * @param int|float $forLength | 0
      * @return void
      */
     public function __construct(User $user, int|float $forLength = 0)

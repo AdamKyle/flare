@@ -11,8 +11,8 @@ interface BatchCraftingHandler
     /**
      * Execute one Batch Crafting operation for the active batch and character.
      *
-     * @param  BatchCrafting  $batchCrafting  The active Batch Crafting record.
-     * @param  Character  $character  The character crafting.
+     * @param BatchCrafting $batchCrafting The active Batch Crafting record.
+     * @param Character $character The character crafting.
      * @return BatchCraftingOperationResult The operation outcome.
      */
     public function handle(BatchCrafting $batchCrafting, Character $character): BatchCraftingOperationResult;

@@ -24,7 +24,7 @@ class UpdateRaidMonsters implements ShouldBroadcastNow
     /**
      * Create a new event instance.
      *
-     * @param  Map  $map
+     * @param Map $map
      */
     public function __construct(array $raidMonsters, User $user)
     {

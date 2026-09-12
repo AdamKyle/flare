@@ -164,7 +164,7 @@ class CharacterQuestAvailabilityService
     /**
      * Resolve every Game Map id occupied by a currently active runtime Raid.
      *
-     * @param  int[]  $activeRaidIds
+     * @param int[] $activeRaidIds
      * @return int[]
      */
     private function activeRaidMapIds(array $activeRaidIds): array

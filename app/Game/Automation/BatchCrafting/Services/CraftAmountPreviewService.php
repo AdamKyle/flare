@@ -22,8 +22,8 @@ class CraftAmountPreviewService
     /**
      * Build the Craft Amount preview payload for the validated Batch Crafting request.
      *
-     * @param  Character  $character  The character requesting the preview.
-     * @param  array  $validated  The validated Batch Crafting request data.
+     * @param Character $character The character requesting the preview.
+     * @param array $validated The validated Batch Crafting request data.
      * @return array The lean Craft Amount preview payload.
      */
     public function build(Character $character, array $validated): array
@@ -68,8 +68,8 @@ class CraftAmountPreviewService
     /**
      * Find the character's craftable item matching the requested Batch Crafting progress.
      *
-     * @param  Character  $character  The character requesting the preview.
-     * @param  array  $progress  The requested Craft Amount progress data.
+     * @param Character $character The character requesting the preview.
+     * @param array $progress The requested Craft Amount progress data.
      * @return Item|null The matching craftable item, or null when unavailable.
      */
     private function findCraftableItem(Character $character, array $progress): ?Item
@@ -80,8 +80,8 @@ class CraftAmountPreviewService
     /**
      * Build the lean preview payload for a requested item that is no longer craftable.
      *
-     * @param  Character  $character  The character requesting the preview.
-     * @param  array  $progress  The requested Craft Amount progress data.
+     * @param Character $character The character requesting the preview.
+     * @param array $progress The requested Craft Amount progress data.
      * @return array The lean unavailable-item preview payload.
      */
     private function buildUnavailableItemPreview(Character $character, array $progress): array
@@ -111,9 +111,9 @@ class CraftAmountPreviewService
      * destination contract so a normal Set's capacity is never silently substituted with the
      * Crafted Items Set's capacity.
      *
-     * @param  Character  $character  The character requesting the preview.
-     * @param  string  $destinationValue  The requested output destination value.
-     * @param  int|null  $outputSetId  The requested destination Inventory Set id, when applicable.
+     * @param Character $character The character requesting the preview.
+     * @param string $destinationValue The requested output destination value.
+     * @param int|null $outputSetId The requested destination Inventory Set id, when applicable.
      * @return array{capacity: array{current: int, max: int, remaining: int}|null, error: string|null} The resolved capacity facts.
      */
     private function resolveDestinationCapacity(Character $character, string $destinationValue, ?int $outputSetId): array
@@ -140,8 +140,8 @@ class CraftAmountPreviewService
     /**
      * Resolve the requested normal Inventory Set destination's real capacity, validating it is empty at start.
      *
-     * @param  Character  $character  The character requesting the preview.
-     * @param  int|null  $outputSetId  The requested destination Inventory Set id.
+     * @param Character $character The character requesting the preview.
+     * @param int|null $outputSetId The requested destination Inventory Set id.
      * @return array{capacity: array{current: int, max: int, remaining: int}|null, error: string|null} The resolved capacity facts.
      */
     private function resolveInventorySetCapacity(Character $character, ?int $outputSetId): array
@@ -165,9 +165,9 @@ class CraftAmountPreviewService
     /**
      * Resolve the destination capacity relevant to the preview when the disposition retains the item.
      *
-     * @param  Character  $character  The character requesting the preview.
-     * @param  BatchCraftingDisposition  $disposition  The requested crafting disposition.
-     * @param  array  $progress  The requested Craft Amount progress data.
+     * @param Character $character The character requesting the preview.
+     * @param BatchCraftingDisposition $disposition The requested crafting disposition.
+     * @param array $progress The requested Craft Amount progress data.
      * @return array{capacity: array{current: int, max: int, remaining: int}|null, error: string|null} The resolved destination facts.
      */
     private function resolvePreviewDestinationCapacity(Character $character, BatchCraftingDisposition $disposition, array $progress): array
@@ -182,9 +182,9 @@ class CraftAmountPreviewService
     /**
      * Determine whether the requested amount fits within the resolved destination capacity.
      *
-     * @param  int  $requestedAmount  The requested Craft Amount.
-     * @param  array{current: int, max: int, remaining: int}|null  $destinationCapacity  The resolved destination capacity, if any.
-     * @param  string|null  $destinationError  The resolved destination blocker, if any.
+     * @param int $requestedAmount The requested Craft Amount.
+     * @param array{current: int, max: int, remaining: int}|null $destinationCapacity The resolved destination capacity, if any.
+     * @param string|null $destinationError The resolved destination blocker, if any.
      * @return bool True when the requested amount fits.
      */
     private function canFitRequestedAmount(int $requestedAmount, ?array $destinationCapacity, ?string $destinationError): bool
@@ -203,9 +203,9 @@ class CraftAmountPreviewService
     /**
      * Calculate the maximum amount the character can request given Gold and destination capacity.
      *
-     * @param  int  $availableGold  The character's available Gold.
-     * @param  int  $unitCost  The Gold cost per crafted item.
-     * @param  array{current: int, max: int, remaining: int}|null  $destinationCapacity  The resolved destination capacity, if any.
+     * @param int $availableGold The character's available Gold.
+     * @param int $unitCost The Gold cost per crafted item.
+     * @param array{current: int, max: int, remaining: int}|null $destinationCapacity The resolved destination capacity, if any.
      * @return int The maximum amount the character can request.
      */
     private function maximumRequestAmount(int $availableGold, int $unitCost, ?array $destinationCapacity): int
@@ -232,9 +232,9 @@ class CraftAmountPreviewService
     /**
      * Build the blocking messages for the Craft Amount preview.
      *
-     * @param  bool  $canAfford  Whether the character can afford the requested amount.
-     * @param  bool  $canFit  Whether the requested amount fits the destination capacity.
-     * @param  string|null  $destinationError  The resolved destination blocker, if any.
+     * @param bool $canAfford Whether the character can afford the requested amount.
+     * @param bool $canFit Whether the requested amount fits the destination capacity.
+     * @param string|null $destinationError The resolved destination blocker, if any.
      * @return array<int, string> The blocking messages, empty when nothing blocks the request.
      */
     private function buildPreviewBlockers(bool $canAfford, bool $canFit, ?string $destinationError): array

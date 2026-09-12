@@ -17,7 +17,7 @@ class MoveCharacterAfterEventService
     ) {}
 
     /**
-     * @param  callable  $callback  function(Collection $characters): void
+     * @param callable $callback function(Collection $characters): void
      */
     public function forCharactersOnMap(int $mapId, callable $callback): void
     {
@@ -30,7 +30,7 @@ class MoveCharacterAfterEventService
     }
 
     /**
-     * @param  Collection<int, Character>  $characters
+     * @param Collection<int, Character> $characters
      */
     public function stopExplorationFor(Collection $characters): void
     {
@@ -44,7 +44,7 @@ class MoveCharacterAfterEventService
     }
 
     /**
-     * @param  Collection<int, Character>  $characters
+     * @param Collection<int, Character> $characters
      */
     public function resetFactionProgressForMap(Collection $characters, int $mapId): void
     {
@@ -66,7 +66,7 @@ class MoveCharacterAfterEventService
     }
 
     /**
-     * @param  Collection<int, Character>  $characters
+     * @param Collection<int, Character> $characters
      */
     public function moveAllToSurface(Collection $characters, GameMap $surface): void
     {

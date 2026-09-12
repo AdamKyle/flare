@@ -29,7 +29,7 @@ class HolyOilApplicationPlanEntry
     /**
      * Rebuild a plan entry from its persisted array representation.
      *
-     * @param  array  $data  The persisted plan entry data.
+     * @param array $data The persisted plan entry data.
      * @return self The rebuilt plan entry.
      */
     public static function fromArray(array $data): self

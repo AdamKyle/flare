@@ -13,8 +13,8 @@ class HolyOilOilPoolResolver
      * Preserves the order the character selected the oil slots in, exhausting one slot's
      * amount before the next is ever considered.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  array<int, int>  $oilSlotIds  The character-selected Holy Oil Alchemy Bag slot ids.
+     * @param Character $character The character running the batch.
+     * @param array<int, int> $oilSlotIds The character-selected Holy Oil Alchemy Bag slot ids.
      * @return AlchemyBagSlot|null The next available Holy Oil slot, or null when the pool is exhausted.
      */
     public function nextAvailableOil(Character $character, array $oilSlotIds): ?AlchemyBagSlot

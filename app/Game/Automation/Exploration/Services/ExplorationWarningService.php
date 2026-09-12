@@ -14,7 +14,7 @@ class ExplorationWarningService
     /**
      * Return and broadcast the character's current Exploration warning state.
      *
-     * @param  Character  $character  The character to resolve warning state for.
+     * @param Character $character The character to resolve warning state for.
      * @return array The current Exploration warning state.
      */
     public function getState(Character $character): array
@@ -47,10 +47,10 @@ class ExplorationWarningService
     /**
      * Record a new Exploration warning for the character, retrying past transient database locks.
      *
-     * @param  Character  $character  The character receiving the warning.
-     * @param  ExplorationLog  $log  The Exploration log the warning relates to.
-     * @param  string  $type  The warning type.
-     * @param  string  $message  The warning message.
+     * @param Character $character The character receiving the warning.
+     * @param ExplorationLog $log The Exploration log the warning relates to.
+     * @param string $type The warning type.
+     * @param string $message The warning message.
      * @return array The updated Exploration warning state.
      */
     public function createWarning(Character $character, ExplorationLog $log, string $type, string $message): array
@@ -91,8 +91,8 @@ class ExplorationWarningService
     /**
      * Dismiss the character's latest undismissed Exploration warning, or a specific one by id.
      *
-     * @param  Character  $character  The character dismissing the warning.
-     * @param  int|null  $warningId  The specific warning id to dismiss, or null for the latest.
+     * @param Character $character The character dismissing the warning.
+     * @param int|null $warningId The specific warning id to dismiss, or null for the latest.
      * @return void This method does not return a value.
      */
     public function dismiss(Character $character, ?int $warningId = null): void
@@ -109,7 +109,7 @@ class ExplorationWarningService
     /**
      * Dismiss the character's latest undismissed Exploration warning.
      *
-     * @param  Character  $character  The character dismissing the warning.
+     * @param Character $character The character dismissing the warning.
      * @return array The updated Exploration warning state.
      */
     public function dismissLatest(Character $character): array
@@ -125,8 +125,8 @@ class ExplorationWarningService
     /**
      * Dismiss a specific Exploration warning for the character.
      *
-     * @param  Character  $character  The character dismissing the warning.
-     * @param  ExplorationWarning  $warning  The specific warning to dismiss.
+     * @param Character $character The character dismissing the warning.
+     * @param ExplorationWarning $warning The specific warning to dismiss.
      * @return array The updated Exploration warning state.
      */
     public function dismissSelected(Character $character, ExplorationWarning $warning): array
@@ -137,8 +137,8 @@ class ExplorationWarningService
     /**
      * Mark the character's undismissed Exploration warnings as dismissed and return the updated state.
      *
-     * @param  Character  $character  The character whose warnings are being dismissed.
-     * @param  ExplorationWarning|null  $warning  Unused; dismissal always clears all undismissed warnings.
+     * @param Character $character The character whose warnings are being dismissed.
+     * @param ExplorationWarning|null $warning Unused; dismissal always clears all undismissed warnings.
      * @return array The updated Exploration warning state.
      */
     private function dismissWarning(Character $character, ?ExplorationWarning $warning): array

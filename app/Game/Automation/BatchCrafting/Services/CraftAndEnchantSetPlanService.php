@@ -25,9 +25,9 @@ class CraftAndEnchantSetPlanService
     /**
      * Resolve the authoritative Craft and Enchant Set plan for the character's selected positions and enchantments.
      *
-     * @param  Character  $character  The character building the plan.
-     * @param  array<string, int>  $setPositions  The requested position-to-item-id map.
-     * @param  array<string, array{prefix_id: int|null, suffix_id: int|null}>  $enchantments  The requested position-to-enchantment map.
+     * @param Character $character The character building the plan.
+     * @param array<string, int> $setPositions The requested position-to-item-id map.
+     * @param array<string, array{prefix_id: int|null, suffix_id: int|null}> $enchantments The requested position-to-enchantment map.
      * @return array{queue: array<int, array>, blockers: array<int, string>, total_crafting_cost: int} The resolved plan, any blockers, and the authoritative total crafting Gold cost.
      */
     public function resolvePlan(Character $character, array $setPositions, array $enchantments): array
@@ -81,8 +81,8 @@ class CraftAndEnchantSetPlanService
     /**
      * Calculate the authoritative total crafting Gold cost for every resolved item in the plan.
      *
-     * @param  Character  $character  The character building the plan.
-     * @param  array<string, Item>  $resolvedItems  The resolved items keyed by position value.
+     * @param Character $character The character building the plan.
+     * @param array<string, Item> $resolvedItems The resolved items keyed by position value.
      * @return int The authoritative total crafting Gold cost.
      */
     private function totalCraftingCost(Character $character, array $resolvedItems): int
@@ -96,8 +96,8 @@ class CraftAndEnchantSetPlanService
     /**
      * Resolve the optional hand positions into resolved items, validating the hand combination.
      *
-     * @param  Collection<int, Item>  $craftableItemsById  The character's bulk-resolved craftable items, keyed by item id.
-     * @param  array<string, int>  $setPositions  The requested position-to-item-id map.
+     * @param Collection<int, Item> $craftableItemsById The character's bulk-resolved craftable items, keyed by item id.
+     * @param array<string, int> $setPositions The requested position-to-item-id map.
      * @return array{items: array<string, Item>, blockers: array<int, string>} The resolved hand items and any blockers.
      */
     private function resolveHandPositions(Collection $craftableItemsById, array $setPositions): array
@@ -139,9 +139,9 @@ class CraftAndEnchantSetPlanService
      * bounded query before any per-position validation happens, so the loop below performs
      * no database query of its own.
      *
-     * @param  Character  $character  The character building the plan.
-     * @param  array<string, Item>  $resolvedItems  The resolved items keyed by position value.
-     * @param  array<string, array{prefix_id: int|null, suffix_id: int|null}>  $enchantments  The requested position-to-enchantment map.
+     * @param Character $character The character building the plan.
+     * @param array<string, Item> $resolvedItems The resolved items keyed by position value.
+     * @param array<string, array{prefix_id: int|null, suffix_id: int|null}> $enchantments The requested position-to-enchantment map.
      * @return array{entries: array<string, array{prefix_id: int|null, suffix_id: int|null}>, blockers: array<int, string>} The resolved enchantments and any blockers.
      */
     private function resolveEnchantments(Character $character, array $resolvedItems, array $enchantments): array
@@ -185,8 +185,8 @@ class CraftAndEnchantSetPlanService
     /**
      * Collect every distinct requested Prefix/Suffix affix id across every included position.
      *
-     * @param  array<string, Item>  $resolvedItems  The resolved items keyed by position value.
-     * @param  array<string, array{prefix_id: int|null, suffix_id: int|null}>  $enchantments  The requested position-to-enchantment map.
+     * @param array<string, Item> $resolvedItems The resolved items keyed by position value.
+     * @param array<string, array{prefix_id: int|null, suffix_id: int|null}> $enchantments The requested position-to-enchantment map.
      * @return array<int, int> The distinct requested affix ids.
      */
     private function requestedAffixIds(array $resolvedItems, array $enchantments): array
@@ -205,12 +205,12 @@ class CraftAndEnchantSetPlanService
     /**
      * Validate one position's requested enchantment against the preloaded affix map, in memory.
      *
-     * @param  Collection<int, ItemAffix>  $affixesById  The preloaded requested affixes, keyed by id.
-     * @param  Skill|null  $enchantingSkill  The character's already-resolved Enchanting skill, when present.
-     * @param  int  $characterInt  The character's already-resolved Intelligence stat.
-     * @param  int|null  $prefixId  The requested Prefix affix id, when selected.
-     * @param  int|null  $suffixId  The requested Suffix affix id, when selected.
-     * @param  string  $positionValue  The plan position value being validated, used only for blocker text.
+     * @param Collection<int, ItemAffix> $affixesById The preloaded requested affixes, keyed by id.
+     * @param Skill|null $enchantingSkill The character's already-resolved Enchanting skill, when present.
+     * @param int $characterInt The character's already-resolved Intelligence stat.
+     * @param int|null $prefixId The requested Prefix affix id, when selected.
+     * @param int|null $suffixId The requested Suffix affix id, when selected.
+     * @param string $positionValue The plan position value being validated, used only for blocker text.
      * @return array{prefix_id: int|null, suffix_id: int|null}|null The resolved enchantment, or null when invalid.
      */
     private function resolvePositionEnchantment(Collection $affixesById, ?Skill $enchantingSkill, int $characterInt, ?int $prefixId, ?int $suffixId, string $positionValue): ?array
@@ -237,10 +237,10 @@ class CraftAndEnchantSetPlanService
     /**
      * Validate a preloaded candidate affix against its required type and the character's Enchanting skill level.
      *
-     * @param  Collection<int, ItemAffix>  $affixesById  The preloaded requested affixes, keyed by id.
-     * @param  int  $affixId  The requested affix id.
-     * @param  string  $type  The required affix type (prefix or suffix).
-     * @param  Skill|null  $enchantingSkill  The character's already-resolved Enchanting skill, when present.
+     * @param Collection<int, ItemAffix> $affixesById The preloaded requested affixes, keyed by id.
+     * @param int $affixId The requested affix id.
+     * @param string $type The required affix type (prefix or suffix).
+     * @param Skill|null $enchantingSkill The character's already-resolved Enchanting skill, when present.
      * @return ItemAffix|null The validated affix, or null when invalid or currently ineligible.
      */
     private function validateAffix(Collection $affixesById, int $affixId, string $type, ?Skill $enchantingSkill): ?ItemAffix
@@ -261,9 +261,9 @@ class CraftAndEnchantSetPlanService
     /**
      * Resolve the currently craftable item for a required plan position and requested item id.
      *
-     * @param  Collection<int, Item>  $craftableItemsById  The character's bulk-resolved craftable items, keyed by item id.
-     * @param  CraftSetPosition  $position  The plan position being resolved.
-     * @param  int  $itemId  The requested item id for the position.
+     * @param Collection<int, Item> $craftableItemsById The character's bulk-resolved craftable items, keyed by item id.
+     * @param CraftSetPosition $position The plan position being resolved.
+     * @param int $itemId The requested item id for the position.
      * @return Item|null The matching craftable item, or null when unavailable.
      */
     private function resolvePositionItem(Collection $craftableItemsById, CraftSetPosition $position, int $itemId): ?Item
@@ -280,8 +280,8 @@ class CraftAndEnchantSetPlanService
     /**
      * Resolve the currently craftable hand item (weapon or shield) for a requested item id.
      *
-     * @param  Collection<int, Item>  $craftableItemsById  The character's bulk-resolved craftable items, keyed by item id.
-     * @param  int  $itemId  The requested item id for the hand position.
+     * @param Collection<int, Item> $craftableItemsById The character's bulk-resolved craftable items, keyed by item id.
+     * @param int $itemId The requested item id for the hand position.
      * @return Item|null The matching craftable hand item, or null when unavailable.
      */
     private function resolveHandItem(Collection $craftableItemsById, int $itemId): ?Item
@@ -298,8 +298,8 @@ class CraftAndEnchantSetPlanService
     /**
      * Build the final plan queue in the single authoritative Craft Set position order.
      *
-     * @param  array<string, Item>  $resolvedItems  The resolved items keyed by position value.
-     * @param  array<string, array{prefix_id: int|null, suffix_id: int|null}>  $enchantEntries  The resolved enchantments keyed by position value.
+     * @param array<string, Item> $resolvedItems The resolved items keyed by position value.
+     * @param array<string, array{prefix_id: int|null, suffix_id: int|null}> $enchantEntries The resolved enchantments keyed by position value.
      * @return array<int, CraftAndEnchantSetPlanEntry> The ordered queue entries.
      */
     private function buildQueue(array $resolvedItems, array $enchantEntries): array
@@ -330,7 +330,7 @@ class CraftAndEnchantSetPlanService
     /**
      * Resolve the crafting type used to craft a resolved hand item (weapon or shield).
      *
-     * @param  Item  $item  The resolved hand item.
+     * @param Item $item The resolved hand item.
      * @return string The crafting type used to craft the hand item.
      */
     private function resolveHandCraftingType(Item $item): string

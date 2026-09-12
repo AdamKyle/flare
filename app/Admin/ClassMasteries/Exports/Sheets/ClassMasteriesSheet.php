@@ -23,7 +23,7 @@ class ClassMasteriesSheet implements FromCollection, ShouldAutoSize, WithHeading
     /**
      * Map a Class Mastery into its workbook row.
      *
-     * @param  mixed  $gameClassSpecial
+     * @param mixed $gameClassSpecial
      */
     public function map($gameClassSpecial): array
     {

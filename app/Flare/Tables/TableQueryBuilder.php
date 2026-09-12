@@ -9,7 +9,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 class TableQueryBuilder
 {
     /**
-     * @param  TableColumn[]  $columns
+     * @param TableColumn[] $columns
      */
     public static function paginate(Builder $query, array $columns, Request $request, int $perPage = 15): LengthAwarePaginator
     {

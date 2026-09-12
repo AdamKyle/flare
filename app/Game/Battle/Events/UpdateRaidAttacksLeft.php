@@ -23,8 +23,8 @@ class UpdateRaidAttacksLeft implements ShouldBroadcastNow
     private int $userId;
 
     /**
-     * @param  int  $raidBossHealth
-     * @param  User  $user
+     * @param int $raidBossHealth
+     * @param User $user
      */
     public function __construct(int $userId, int $attacksLeft, int $damageDealt, ?int $raidBossId = null)
     {

@@ -23,10 +23,10 @@ class HolyOilBatchDispositionService
     /**
      * Apply the selected disposition to a target once its planned Holy Oil work is complete.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  BatchCraftingDisposition  $disposition  The selected Holy Oils disposition.
-     * @param  InventorySlot|SetSlot  $slot  The completed target slot.
-     * @param  int|null  $listingPrice  The requested listing price, when listing.
+     * @param Character $character The character running the batch.
+     * @param BatchCraftingDisposition $disposition The selected Holy Oils disposition.
+     * @param InventorySlot|SetSlot $slot The completed target slot.
+     * @param int|null $listingPrice The requested listing price, when listing.
      * @return BatchCraftingOperationResult The outcome of applying the disposition.
      */
     public function apply(Character $character, BatchCraftingDisposition $disposition, InventorySlot|SetSlot $slot, ?int $listingPrice): BatchCraftingOperationResult
@@ -43,8 +43,8 @@ class HolyOilBatchDispositionService
     /**
      * Sell the completed target through the real sale domain path.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  InventorySlot|SetSlot  $slot  The completed target slot.
+     * @param Character $character The character running the batch.
+     * @param InventorySlot|SetSlot $slot The completed target slot.
      * @return BatchCraftingOperationResult The sold operation result.
      */
     private function sell(Character $character, InventorySlot|SetSlot $slot): BatchCraftingOperationResult
@@ -67,8 +67,8 @@ class HolyOilBatchDispositionService
     /**
      * Destroy the completed target.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  InventorySlot|SetSlot  $slot  The completed target slot.
+     * @param Character $character The character running the batch.
+     * @param InventorySlot|SetSlot $slot The completed target slot.
      * @return BatchCraftingOperationResult The destroyed operation result.
      */
     private function destroy(Character $character, InventorySlot|SetSlot $slot): BatchCraftingOperationResult
@@ -82,9 +82,9 @@ class HolyOilBatchDispositionService
     /**
      * List the completed target on the Market and remove it from its slot.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  InventorySlot|SetSlot  $slot  The completed target slot.
-     * @param  int|null  $listingPrice  The requested listing price.
+     * @param Character $character The character running the batch.
+     * @param InventorySlot|SetSlot $slot The completed target slot.
+     * @param int|null $listingPrice The requested listing price.
      * @return BatchCraftingOperationResult The listed operation result.
      */
     private function list(Character $character, InventorySlot|SetSlot $slot, ?int $listingPrice): BatchCraftingOperationResult
@@ -99,8 +99,8 @@ class HolyOilBatchDispositionService
     /**
      * Disenchant the completed target through the real Disenchant domain path.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  InventorySlot|SetSlot  $slot  The completed target slot.
+     * @param Character $character The character running the batch.
+     * @param InventorySlot|SetSlot $slot The completed target slot.
      * @return BatchCraftingOperationResult The disenchanted operation result.
      */
     private function disenchant(Character $character, InventorySlot|SetSlot $slot): BatchCraftingOperationResult

@@ -35,8 +35,8 @@ class CraftExperienceHandler implements BatchCraftingHandler
     /**
      * Execute one Craft For Experience Batch Crafting operation for the running batch.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  Character  $character  The character running the batch.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param Character $character The character running the batch.
      * @return BatchCraftingOperationResult The outcome of the operation.
      */
     public function handle(BatchCrafting $batchCrafting, Character $character): BatchCraftingOperationResult
@@ -67,12 +67,12 @@ class CraftExperienceHandler implements BatchCraftingHandler
     /**
      * Perform the craft attempt for the resolved target, routing through Keep Best when selected.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  Character  $character  The character running the batch.
-     * @param  BatchCraftingDisposition  $disposition  The configured crafting disposition.
-     * @param  Item  $item  The resolved item to craft.
-     * @param  CraftExperienceCycleTarget  $target  The resolved cycle target.
-     * @param  int  $goldCost  The Gold cost of this attempt.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param Character $character The character running the batch.
+     * @param BatchCraftingDisposition $disposition The configured crafting disposition.
+     * @param Item $item The resolved item to craft.
+     * @param CraftExperienceCycleTarget $target The resolved cycle target.
+     * @param int $goldCost The Gold cost of this attempt.
      * @return BatchCraftingOperationResult The outcome of the craft attempt.
      */
     private function performAttempt(BatchCrafting $batchCrafting, Character $character, BatchCraftingDisposition $disposition, Item $item, CraftExperienceCycleTarget $target, int $goldCost): BatchCraftingOperationResult
@@ -103,12 +103,12 @@ class CraftExperienceHandler implements BatchCraftingHandler
     /**
      * Perform the craft attempt and apply the Keep Best comparison for the resolved target.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  Character  $character  The character running the batch.
-     * @param  BatchCraftingDisposition  $disposition  The selected Keep Best disposition.
-     * @param  Item  $item  The resolved item to craft.
-     * @param  CraftingSkillGroup  $skillGroup  The resolved target's skill group.
-     * @param  int  $goldCost  The Gold cost of this attempt.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param Character $character The character running the batch.
+     * @param BatchCraftingDisposition $disposition The selected Keep Best disposition.
+     * @param Item $item The resolved item to craft.
+     * @param CraftingSkillGroup $skillGroup The resolved target's skill group.
+     * @param int $goldCost The Gold cost of this attempt.
      * @return BatchCraftingOperationResult The outcome of the craft attempt.
      */
     private function performKeepBestAttempt(BatchCrafting $batchCrafting, Character $character, BatchCraftingDisposition $disposition, Item $item, CraftingSkillGroup $skillGroup, int $goldCost): BatchCraftingOperationResult
@@ -127,8 +127,8 @@ class CraftExperienceHandler implements BatchCraftingHandler
     /**
      * Persist the batch's cumulative Crafting XP using the factual XP reported by this attempt.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  int  $xpGained  The factual XP gained by this attempt.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param int $xpGained The factual XP gained by this attempt.
      * @return void This method does not return a value.
      */
     private function persistXpGained(BatchCrafting $batchCrafting, int $xpGained): void
@@ -141,7 +141,7 @@ class CraftExperienceHandler implements BatchCraftingHandler
     /**
      * Resolve the factual reason no Experience cycle target is currently actionable.
      *
-     * @param  SupportCollection<string, Skill|null>  $skills  The character's already-resolved Crafting skills.
+     * @param SupportCollection<string, Skill|null> $skills The character's already-resolved Crafting skills.
      * @return BatchCraftingEndReason SKILL_MAXED when all four Crafting skills are maxed, otherwise MAXED_OR_NOTHING_LEFT.
      */
     private function resolveNoTargetReason(SupportCollection $skills): BatchCraftingEndReason

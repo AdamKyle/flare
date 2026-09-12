@@ -18,8 +18,8 @@ class ExplorationLogService
     /**
      * Create the Exploration log for a newly started automation run.
      *
-     * @param  Character  $character  The character starting Exploration.
-     * @param  CharacterAutomation  $automation  The character's Exploration automation record.
+     * @param Character $character The character starting Exploration.
+     * @param CharacterAutomation $automation The character's Exploration automation record.
      * @return ExplorationLog The newly created Exploration log.
      */
     public function start(Character $character, CharacterAutomation $automation): ExplorationLog
@@ -43,9 +43,9 @@ class ExplorationLogService
     /**
      * Accumulate fight/kill/damage/currency totals onto the active Exploration log.
      *
-     * @param  ExplorationLog  $log  The Exploration log to update.
-     * @param  array  $totals  The round's fight/kill/damage/currency totals.
-     * @param  bool  $broadcast  Whether to broadcast the updated output.
+     * @param ExplorationLog $log The Exploration log to update.
+     * @param array $totals The round's fight/kill/damage/currency totals.
+     * @param bool $broadcast Whether to broadcast the updated output.
      * @return void This method does not return a value.
      */
     public function recordFightTotals(ExplorationLog $log, array $totals, bool $broadcast = true): void
@@ -93,9 +93,9 @@ class ExplorationLogService
     /**
      * Store the current monster's stat snapshot on the Exploration log summary.
      *
-     * @param  ExplorationLog  $log  The Exploration log to update.
-     * @param  array  $monster  The monster snapshot to record.
-     * @param  bool  $broadcast  Whether to broadcast the updated output.
+     * @param ExplorationLog $log The Exploration log to update.
+     * @param array $monster The monster snapshot to record.
+     * @param bool $broadcast Whether to broadcast the updated output.
      * @return void This method does not return a value.
      */
     public function recordMonsterSnapshot(ExplorationLog $log, array $monster, bool $broadcast = true): void
@@ -117,9 +117,9 @@ class ExplorationLogService
     /**
      * Store the current round's creature count on the Exploration log summary.
      *
-     * @param  ExplorationLog  $log  The Exploration log to update.
-     * @param  int  $currentRoundCreatures  The number of creatures in the current round.
-     * @param  bool  $broadcast  Whether to broadcast the updated output.
+     * @param ExplorationLog $log The Exploration log to update.
+     * @param int $currentRoundCreatures The number of creatures in the current round.
+     * @param bool $broadcast Whether to broadcast the updated output.
      * @return void This method does not return a value.
      */
     public function recordCurrentRoundCreatures(ExplorationLog $log, int $currentRoundCreatures, bool $broadcast = true): void
@@ -141,9 +141,9 @@ class ExplorationLogService
     /**
      * End the Exploration log with its final summary and stop reason.
      *
-     * @param  ExplorationLog  $log  The Exploration log to finalize.
-     * @param  string|null  $stoppedReason  The reason Exploration ended.
-     * @param  bool  $stoppedByPlayer  Whether the player manually stopped Exploration.
+     * @param ExplorationLog $log The Exploration log to finalize.
+     * @param string|null $stoppedReason The reason Exploration ended.
+     * @param bool $stoppedByPlayer Whether the player manually stopped Exploration.
      * @return void This method does not return a value.
      */
     public function finalize(ExplorationLog $log, ?string $stoppedReason = null, bool $stoppedByPlayer = false): void
@@ -176,7 +176,7 @@ class ExplorationLogService
     /**
      * Return the character's most recent Exploration log.
      *
-     * @param  Character  $character  The character to look up.
+     * @param Character $character The character to look up.
      * @return ExplorationLog|null The character's most recent Exploration log, if any.
      */
     public function latestForCharacter(Character $character): ?ExplorationLog
@@ -189,7 +189,7 @@ class ExplorationLogService
     /**
      * Return the character's currently active (unended) Exploration log.
      *
-     * @param  Character  $character  The character to look up.
+     * @param Character $character The character to look up.
      * @return ExplorationLog|null The character's active Exploration log, if any.
      */
     public function activeForCharacter(Character $character): ?ExplorationLog
@@ -203,10 +203,10 @@ class ExplorationLogService
     /**
      * Apply post-reward currency/xp deltas to the Exploration log and broadcast the updated output.
      *
-     * @param  ExplorationLog  $log  The Exploration log to update.
-     * @param  Character  $character  The character receiving rewards.
-     * @param  array  $beforeSnapshot  The character's currency/level values before rewards were applied.
-     * @param  array  $context  The xp/skill xp/faction point totals awarded.
+     * @param ExplorationLog $log The Exploration log to update.
+     * @param Character $character The character receiving rewards.
+     * @param array $beforeSnapshot The character's currency/level values before rewards were applied.
+     * @param array $context The xp/skill xp/faction point totals awarded.
      * @return void This method does not return a value.
      */
     public static function applyRewardContext(
@@ -256,10 +256,10 @@ class ExplorationLogService
     /**
      * Add the positive difference between the current and previous currency values to the totals.
      *
-     * @param  array  $currenciesGained  The currency totals to update.
-     * @param  string  $currency  The currency key being updated.
-     * @param  int  $currentValue  The character's current currency value.
-     * @param  int  $previousValue  The character's currency value before the reward.
+     * @param array $currenciesGained The currency totals to update.
+     * @param string $currency The currency key being updated.
+     * @param int $currentValue The character's current currency value.
+     * @param int $previousValue The character's currency value before the reward.
      * @return array The updated currency totals.
      */
     private static function addCurrencyDelta(array $currenciesGained, string $currency, int $currentValue, int $previousValue): array
@@ -278,7 +278,7 @@ class ExplorationLogService
     /**
      * Return and broadcast the character's current Exploration output panel.
      *
-     * @param  Character  $character  The character to resolve output for.
+     * @param Character $character The character to resolve output for.
      * @return array The current Exploration output panel.
      */
     public function outputForCharacter(Character $character): array
@@ -293,8 +293,8 @@ class ExplorationLogService
     /**
      * Clear the character's active Exploration log or dismiss a specific warning.
      *
-     * @param  Character  $character  The character to clear output for.
-     * @param  ExplorationWarning|null  $warning  The specific warning to dismiss, or null to clear the active log.
+     * @param Character $character The character to clear output for.
+     * @param ExplorationWarning|null $warning The specific warning to dismiss, or null to clear the active log.
      * @return void This method does not return a value.
      */
     public function clear(Character $character, ?ExplorationWarning $warning = null): void
@@ -325,7 +325,7 @@ class ExplorationLogService
     /**
      * Broadcast the character's current Exploration output panel.
      *
-     * @param  Character  $character  The character to broadcast output for.
+     * @param Character $character The character to broadcast output for.
      * @return void This method does not return a value.
      */
     private function broadcastOutputForCharacter(Character $character): void
@@ -338,7 +338,7 @@ class ExplorationLogService
     /**
      * Dismiss the character's ended Exploration log panel.
      *
-     * @param  Character  $character  The character dismissing the ended log.
+     * @param Character $character The character dismissing the ended log.
      * @return void This method does not return a value.
      */
     public function dismissEndedLog(Character $character): void
@@ -354,7 +354,7 @@ class ExplorationLogService
     /**
      * Resolve the character's current Exploration output panel: active log, warning, or ended log.
      *
-     * @param  Character  $character  The character to resolve output for.
+     * @param Character $character The character to resolve output for.
      * @return array The resolved Exploration output panel.
      */
     private function resolveOutputForCharacter(Character $character): array
@@ -439,7 +439,7 @@ class ExplorationLogService
     /**
      * Format an Exploration warning into its output panel shape.
      *
-     * @param  ExplorationWarning  $warning  The warning to format.
+     * @param ExplorationWarning $warning The warning to format.
      * @return array The formatted warning output panel.
      */
     private function formatWarningOutput(ExplorationWarning $warning): array
@@ -463,7 +463,7 @@ class ExplorationLogService
     /**
      * Format an Exploration log into its output panel shape.
      *
-     * @param  ExplorationLog  $log  The log to format.
+     * @param ExplorationLog $log The log to format.
      * @return array The formatted log output panel.
      */
     private function formatLogOutput(ExplorationLog $log): array
@@ -551,9 +551,9 @@ class ExplorationLogService
     /**
      * Format the current monster's display stats, preferring the log snapshot over live model data.
      *
-     * @param  Monster|null  $monster  The base monster model, if it still exists.
-     * @param  int  $monsterId  The monster id recorded on the log.
-     * @param  array|null  $snapshot  The recorded monster snapshot, if any.
+     * @param Monster|null $monster The base monster model, if it still exists.
+     * @param int $monsterId The monster id recorded on the log.
+     * @param array|null $snapshot The recorded monster snapshot, if any.
      * @return array The formatted monster display data.
      */
     private function formatMonster(?Monster $monster, int $monsterId, ?array $snapshot = null): array
@@ -595,10 +595,10 @@ class ExplorationLogService
     /**
      * Resolve a single monster stat, preferring the log snapshot over live model data.
      *
-     * @param  array|null  $snapshot  The recorded monster snapshot, if any.
-     * @param  Monster|null  $monster  The base monster model, if it still exists.
-     * @param  string  $baseAttribute  The monster model attribute name.
-     * @param  string  $runtimeAttribute  The snapshot's runtime attribute key.
+     * @param array|null $snapshot The recorded monster snapshot, if any.
+     * @param Monster|null $monster The base monster model, if it still exists.
+     * @param string $baseAttribute The monster model attribute name.
+     * @param string $runtimeAttribute The snapshot's runtime attribute key.
      * @return mixed The resolved stat value.
      */
     private function formatMonsterStat(?array $snapshot, ?Monster $monster, string $baseAttribute, string $runtimeAttribute): mixed
@@ -613,7 +613,7 @@ class ExplorationLogService
     /**
      * Calculate the Exploration log's elapsed duration in seconds.
      *
-     * @param  ExplorationLog  $log  The log to measure.
+     * @param ExplorationLog $log The log to measure.
      * @return int The elapsed duration in seconds.
      */
     private function duration(ExplorationLog $log): int

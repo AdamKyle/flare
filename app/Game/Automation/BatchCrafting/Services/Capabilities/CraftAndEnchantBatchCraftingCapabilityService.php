@@ -21,7 +21,7 @@ class CraftAndEnchantBatchCraftingCapabilityService
     /**
      * Build the complete Craft and Enchant capability facts for the character.
      *
-     * @param  Character  $character  The character requesting capability facts.
+     * @param Character $character The character requesting capability facts.
      * @return array The Craft and Enchant capability facts payload.
      */
     public function build(Character $character): array
@@ -39,7 +39,7 @@ class CraftAndEnchantBatchCraftingCapabilityService
     /**
      * Build the factual current Enchanting skill progress for the character, used by the Experience/Event runtime UI.
      *
-     * @param  Character  $character  The character being checked.
+     * @param Character $character The character being checked.
      * @return array|null The Enchanting skill progress facts, or null when the skill does not exist.
      */
     public function enchantingSkillFactsFor(Character $character): ?array
@@ -50,8 +50,8 @@ class CraftAndEnchantBatchCraftingCapabilityService
     /**
      * Determine whether the character has the real Crafting and Enchanting prerequisites to use this workflow at all.
      *
-     * @param  Character  $character  The character being checked.
-     * @param  Skill|null  $enchantingSkill  The character's already-resolved Enchanting skill, when present.
+     * @param Character $character The character being checked.
+     * @param Skill|null $enchantingSkill The character's already-resolved Enchanting skill, when present.
      * @return bool True when the character has at least one Crafting skill and an Enchanting skill.
      */
     private function canCraftAndEnchant(Character $character, ?Skill $enchantingSkill): bool
@@ -68,7 +68,7 @@ class CraftAndEnchantBatchCraftingCapabilityService
     /**
      * Build the factual current Enchanting skill progress used by the setup/runtime UI.
      *
-     * @param  Skill|null  $skill  The character's already-resolved Enchanting skill, when present.
+     * @param Skill|null $skill The character's already-resolved Enchanting skill, when present.
      * @return array|null The Enchanting skill progress facts, or null when the skill does not exist.
      */
     private function enchantingSkillFacts(?Skill $skill): ?array

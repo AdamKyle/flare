@@ -345,9 +345,9 @@ class CapitalCityUnitManagementRequestHandler
     /**
      * Prepare the unit requests data.
      *
-     * @param  Kingdom|null  $toKingdom
-     * @param  array  $activeManualUnitIdSet
-     * @param  array  $activeCapitalUnitNameSet
+     * @param Kingdom|null $toKingdom
+     * @param array $activeManualUnitIdSet
+     * @param array $activeCapitalUnitNameSet
      */
     private function prepareUnitRequests(array $unitRequestsData, Kingdom $toKingdom, Collection $gameUnitsByName): array
     {

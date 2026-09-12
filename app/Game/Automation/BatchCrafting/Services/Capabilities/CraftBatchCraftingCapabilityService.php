@@ -20,7 +20,7 @@ class CraftBatchCraftingCapabilityService
     /**
      * Build the complete Craft capability facts for the character.
      *
-     * @param  Character  $character  The character requesting capability facts.
+     * @param Character $character The character requesting capability facts.
      * @return array The Craft capability facts payload.
      */
     public function build(Character $character): array
@@ -38,7 +38,7 @@ class CraftBatchCraftingCapabilityService
     /**
      * Determine whether Craft For Experience is currently available to the character.
      *
-     * @param  Character  $character  The character being checked.
+     * @param Character $character The character being checked.
      * @return bool True when at least one meaningful Experience cycle target currently exists.
      */
     public function canCraftForExperience(Character $character): bool
@@ -51,7 +51,7 @@ class CraftBatchCraftingCapabilityService
     /**
      * Determine whether Craft For Event is currently available to the character.
      *
-     * @param  Character  $character  The character being checked.
+     * @param Character $character The character being checked.
      * @return bool True when a real eligible Craft Event goal currently exists.
      */
     public function canCraftForEvent(Character $character): bool
@@ -62,7 +62,7 @@ class CraftBatchCraftingCapabilityService
     /**
      * Build the factual current Crafting skill progress used by the Experience runtime UI.
      *
-     * @param  Character  $character  The character being checked.
+     * @param Character $character The character being checked.
      * @return array<int, array> The four Crafting skill progress facts.
      */
     public function craftingSkillFacts(Character $character): array
@@ -75,7 +75,7 @@ class CraftBatchCraftingCapabilityService
     /**
      * Transform already-resolved Crafting skills into the Experience runtime UI's skill progress facts.
      *
-     * @param  SupportCollection  $skills  The character's already-resolved Crafting skills.
+     * @param SupportCollection $skills The character's already-resolved Crafting skills.
      * @return array<int, array> The four Crafting skill progress facts.
      */
     private function buildCraftingSkillFacts(SupportCollection $skills): array
@@ -104,7 +104,7 @@ class CraftBatchCraftingCapabilityService
     /**
      * Build the factual current Craft Event goal facts, when a real eligible goal exists.
      *
-     * @param  Character  $character  The character being checked.
+     * @param Character $character The character being checked.
      * @return array|null The current Craft Event goal facts, or null when none is eligible.
      */
     public function eventGoalFacts(Character $character): ?array
@@ -124,8 +124,8 @@ class CraftBatchCraftingCapabilityService
      * Used to preserve the final goal/contribution facts after the goal is no longer
      * currently eligible (completed, or the Event stepped away from Crafting).
      *
-     * @param  Character  $character  The character being checked.
-     * @param  int  $goalId  The authoritative persisted Craft Event goal id.
+     * @param Character $character The character being checked.
+     * @param int $goalId The authoritative persisted Craft Event goal id.
      * @return array|null The goal/contribution facts payload, or null when the goal no longer exists.
      */
     public function eventGoalFactsById(Character $character, int $goalId): ?array
@@ -142,8 +142,8 @@ class CraftBatchCraftingCapabilityService
     /**
      * Build the factual goal/contribution payload for a resolved Craft Event goal.
      *
-     * @param  Character  $character  The character being checked.
-     * @param  GlobalEventGoal  $goal  The resolved Craft Event goal.
+     * @param Character $character The character being checked.
+     * @param GlobalEventGoal $goal The resolved Craft Event goal.
      * @return array The goal/contribution facts payload.
      */
     private function buildGoalFacts(Character $character, GlobalEventGoal $goal): array

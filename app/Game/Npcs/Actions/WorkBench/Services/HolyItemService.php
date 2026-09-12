@@ -39,10 +39,10 @@ class HolyItemService
     /**
      * Fetches a paginated, searchable list of inventory items eligible for Holy Oil application.
      *
-     * @param  Character  $character  The character requesting target items.
-     * @param  int  $perPage  The number of items to return per page.
-     * @param  int  $page  The page number to return.
-     * @param  string  $search  The optional search text to filter items by name.
+     * @param Character $character The character requesting target items.
+     * @param int $perPage The number of items to return per page.
+     * @param int $page The page number to return.
+     * @param string $search The optional search text to filter items by name.
      * @return array The paginated target item payload.
      */
     public function fetchPaginatedTargetItems(Character $character, int $perPage, int $page, string $search = ''): array
@@ -70,10 +70,10 @@ class HolyItemService
     /**
      * Fetches a paginated, searchable list of Holy Oils from the character's Alchemy Bag.
      *
-     * @param  Character  $character  The character requesting Holy Oils.
-     * @param  int  $perPage  The number of items to return per page.
-     * @param  int  $page  The page number to return.
-     * @param  string  $search  The optional search text to filter items by name.
+     * @param Character $character The character requesting Holy Oils.
+     * @param int $perPage The number of items to return per page.
+     * @param int $page The page number to return.
+     * @param string $search The optional search text to filter items by name.
      * @return array The paginated Holy Oil payload.
      */
     public function fetchPaginatedHolyOils(Character $character, int $perPage, int $page, string $search = ''): array
@@ -104,7 +104,7 @@ class HolyItemService
     /**
      * Fetch the character's Holy Oil target items and available Holy Oils, with cost facts.
      *
-     * @param  Character  $character  The character requesting smithing items.
+     * @param Character $character The character requesting smithing items.
      * @return array The target items, available Holy Oils, and their cost lookup.
      */
     public function fetchSmithingItems(Character $character): array
@@ -125,8 +125,8 @@ class HolyItemService
     /**
      * Build the Holy Oil cost lookup, keyed by target inventory slot id and alchemy bag slot id.
      *
-     * @param  Collection  $items  The candidate target item slots.
-     * @param  Collection  $alchemyItems  The candidate Holy Oil Alchemy Bag slots.
+     * @param Collection $items The candidate target item slots.
+     * @param Collection $alchemyItems The candidate Holy Oil Alchemy Bag slots.
      * @return array The cost lookup, keyed by target slot id then Alchemy Bag slot id.
      */
     private function buildCostLookup(Collection $items, Collection $alchemyItems): array
@@ -145,8 +145,8 @@ class HolyItemService
     /**
      * Apply a Holy Oil from the request params to the requested target item.
      *
-     * @param  Character  $character  The character applying the oil.
-     * @param  array  $params  The request params, including the target slot and Alchemy slot ids.
+     * @param Character $character The character applying the oil.
+     * @param array $params The request params, including the target slot and Alchemy slot ids.
      * @return array The application result payload.
      */
     public function applyOil(Character $character, array $params): array
@@ -220,8 +220,8 @@ class HolyItemService
     /**
      * Calculate the Gold Dust cost to apply the given Holy Oil to the given target item.
      *
-     * @param  Item  $item  The target item.
-     * @param  Item  $alchemyItem  The Holy Oil item being applied.
+     * @param Item $item The target item.
+     * @param Item $alchemyItem The Holy Oil item being applied.
      * @return int The Gold Dust cost.
      */
     public function getCost(Item $item, Item $alchemyItem): int
@@ -235,7 +235,7 @@ class HolyItemService
     /**
      * Determine whether an item is a currently eligible Holy Oil target.
      *
-     * @param  Item  $item  The item being checked.
+     * @param Item $item The item being checked.
      * @return bool True when the item can still receive an applied Holy stack.
      */
     public function isEligibleHolyOilTarget(Item $item): bool
@@ -249,7 +249,7 @@ class HolyItemService
      * Uses the same eligibility semantics as actual Holy Oil application: the item must be
      * unequipped, must not be a Trinket or Artifact, and must have remaining Holy stack capacity.
      *
-     * @param  Character  $character  The character being checked.
+     * @param Character $character The character being checked.
      * @return bool True when at least one eligible loose Inventory target item exists.
      */
     public function hasEligibleInventoryTarget(Character $character): bool
@@ -276,7 +276,7 @@ class HolyItemService
      * unequipped, and not the special Crafted Items Set, and it must contain at least one item
      * that is not a Trinket or Artifact with remaining Holy stack capacity.
      *
-     * @param  Character  $character  The character being checked.
+     * @param Character $character The character being checked.
      * @return bool True when at least one eligible Set target item exists.
      */
     public function hasEligibleInventorySetTarget(Character $character): bool
@@ -297,7 +297,7 @@ class HolyItemService
     /**
      * Determine whether the character owns at least one usable Holy Oil.
      *
-     * @param  Character  $character  The character being checked.
+     * @param Character $character The character being checked.
      * @return bool True when at least one usable Holy Oil exists in the Alchemy Bag.
      */
     public function hasEligibleHolyOil(Character $character): bool
@@ -317,9 +317,9 @@ class HolyItemService
     /**
      * Apply one Holy Oil stack to an Inventory target for Batch Crafting.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  int  $inventorySlotId  The target Inventory slot id.
-     * @param  int  $alchemySlotId  The Holy Oil Alchemy Bag slot id.
+     * @param Character $character The character running the batch.
+     * @param int $inventorySlotId The target Inventory slot id.
+     * @param int $alchemySlotId The Holy Oil Alchemy Bag slot id.
      * @return HolyOilBatchApplicationResult The factual outcome of the application attempt.
      */
     public function applyOilForBatch(Character $character, int $inventorySlotId, int $alchemySlotId): HolyOilBatchApplicationResult
@@ -361,10 +361,10 @@ class HolyItemService
     /**
      * Apply one Holy Oil stack to an Inventory Set target for Batch Crafting.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  InventorySet  $set  The Inventory Set owning the target slot.
-     * @param  int  $setSlotId  The target Set slot id.
-     * @param  int  $alchemySlotId  The Holy Oil Alchemy Bag slot id.
+     * @param Character $character The character running the batch.
+     * @param InventorySet $set The Inventory Set owning the target slot.
+     * @param int $setSlotId The target Set slot id.
+     * @param int $alchemySlotId The Holy Oil Alchemy Bag slot id.
      * @return HolyOilBatchApplicationResult The factual outcome of the application attempt.
      */
     public function applyOilToSetSlotForBatch(Character $character, InventorySet $set, int $setSlotId, int $alchemySlotId): HolyOilBatchApplicationResult
@@ -405,8 +405,8 @@ class HolyItemService
     /**
      * Resolve an owned, usable Holy Oil Alchemy Bag slot by id.
      *
-     * @param  Character  $character  The character being checked.
-     * @param  int  $alchemySlotId  The requested Alchemy Bag slot id.
+     * @param Character $character The character being checked.
+     * @param int $alchemySlotId The requested Alchemy Bag slot id.
      * @return AlchemyBagSlot|null The resolved slot, or null when it is not a legal Holy Oil.
      */
     private function resolveAlchemySlot(Character $character, int $alchemySlotId): ?AlchemyBagSlot
@@ -427,7 +427,7 @@ class HolyItemService
     /**
      * Determine whether the item has reached its maximum applied Holy stacks.
      *
-     * @param  Item  $item  The item being checked.
+     * @param Item $item The item being checked.
      * @return bool True when no further Holy stacks can be applied.
      */
     private function isSaturated(Item $item): bool
@@ -438,7 +438,7 @@ class HolyItemService
     /**
      * Determine whether the item has any remaining Holy stack capacity.
      *
-     * @param  Item  $item  The target item.
+     * @param Item $item The target item.
      * @return bool True when at least one more Holy stack can be applied.
      */
     private function canApplyAdditionalStacks(Item $item): bool
@@ -451,8 +451,8 @@ class HolyItemService
     /**
      * Apply one Holy stack from the Alchemy Bag slot's oil to the target loose Inventory item.
      *
-     * @param  InventorySlot  $itemSlot  The target Inventory slot.
-     * @param  AlchemyBagSlot  $alchemyItemSlot  The Holy Oil Alchemy Bag slot.
+     * @param InventorySlot $itemSlot The target Inventory slot.
+     * @param AlchemyBagSlot $alchemyItemSlot The Holy Oil Alchemy Bag slot.
      * @return InventorySlot The resulting Inventory slot.
      */
     private function applyStack(InventorySlot $itemSlot, AlchemyBagSlot $alchemyItemSlot): InventorySlot
@@ -482,8 +482,8 @@ class HolyItemService
     /**
      * Apply one Holy Oil stack to a Set slot's item, in place.
      *
-     * @param  SetSlot  $setSlot  The target Set slot.
-     * @param  AlchemyBagSlot  $alchemyItemSlot  The Holy Oil Alchemy Bag slot being consumed.
+     * @param SetSlot $setSlot The target Set slot.
+     * @param AlchemyBagSlot $alchemyItemSlot The Holy Oil Alchemy Bag slot being consumed.
      * @return SetSlot The updated Set slot.
      */
     private function applyStackToSetSlot(SetSlot $setSlot, AlchemyBagSlot $alchemyItemSlot): SetSlot
@@ -509,8 +509,8 @@ class HolyItemService
     /**
      * Duplicate an item as the sellable, market-flagged base for its first applied Holy stack.
      *
-     * @param  Item  $item  The item being duplicated.
-     * @param  HolyItemLevel  $holyItemLevel  The applied Holy Oil's level.
+     * @param Item $item The item being duplicated.
+     * @param HolyItemLevel $holyItemLevel The applied Holy Oil's level.
      * @return Item The newly duplicated item, already carrying its first applied Holy stack.
      */
     private function duplicateItemForNewHolyStack(Item $item, HolyItemLevel $holyItemLevel): Item
@@ -531,8 +531,8 @@ class HolyItemService
     /**
      * Create one applied Holy stack record for the item.
      *
-     * @param  Item  $item  The item receiving the applied Holy stack.
-     * @param  HolyItemLevel  $holyItemLevel  The applied Holy Oil's level.
+     * @param Item $item The item receiving the applied Holy stack.
+     * @param HolyItemLevel $holyItemLevel The applied Holy Oil's level.
      * @return void This method does not return a value.
      */
     private function createAppliedHolyStack(Item $item, HolyItemLevel $holyItemLevel): void
@@ -547,7 +547,7 @@ class HolyItemService
     /**
      * Fetch the character's Alchemy Bag slots holding usable Holy Oils.
      *
-     * @param  Character  $character  The character requesting Holy Oils.
+     * @param Character $character The character requesting Holy Oils.
      * @return Collection The Holy Oil Alchemy Bag slots.
      */
     private function fetchAlchemyItems(Character $character): Collection
@@ -569,7 +569,7 @@ class HolyItemService
     /**
      * Filter the given slots down to those whose item still has remaining Holy stack capacity.
      *
-     * @param  DBCollection  $slots  The candidate slots.
+     * @param DBCollection $slots The candidate slots.
      * @return Collection The slots with remaining Holy stack capacity.
      */
     private function fetchValidItems(DBCollection $slots): Collection
@@ -582,7 +582,7 @@ class HolyItemService
     /**
      * Fetch the character's unequipped loose Inventory slots.
      *
-     * @param  Character  $character  The character requesting slots.
+     * @param Character $character The character requesting slots.
      * @return DBCollection The unequipped Inventory slots.
      */
     private function getSlots(Character $character): DBCollection
@@ -595,7 +595,7 @@ class HolyItemService
     /**
      * Consume one unit of the given Alchemy Bag slot's Holy Oil, deleting the slot when exhausted.
      *
-     * @param  AlchemyBagSlot  $alchemySlot  The Holy Oil Alchemy Bag slot.
+     * @param AlchemyBagSlot $alchemySlot The Holy Oil Alchemy Bag slot.
      * @return void This method does not return a value.
      */
     private function decrementAlchemySlot(AlchemyBagSlot $alchemySlot): void

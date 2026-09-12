@@ -21,7 +21,7 @@ class CraftAndEnchantExperienceTargetService
     /**
      * Determine whether meaningful Craft and Enchant For Experience work currently exists.
      *
-     * @param  Character  $character  The character being checked.
+     * @param Character $character The character being checked.
      * @return bool True when at least one side of the workflow still offers meaningful progression.
      */
     public function hasMeaningfulWork(Character $character): bool
@@ -37,8 +37,8 @@ class CraftAndEnchantExperienceTargetService
      * any real currently craftable item so Enchanting progression can continue on its own,
      * but only while the Enchanting skill itself is not maxed and a meaningful affix exists.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  int  $cyclePosition  The persisted Crafting Experience cycle position to search from.
+     * @param Character $character The character running the batch.
+     * @param int $cyclePosition The persisted Crafting Experience cycle position to search from.
      * @return ResolvedCraftAndEnchantExperienceTarget|null The resolved target, or null when no meaningful work exists.
      */
     public function resolveNext(Character $character, int $cyclePosition): ?ResolvedCraftAndEnchantExperienceTarget
@@ -62,9 +62,9 @@ class CraftAndEnchantExperienceTargetService
      * Resolves every Crafting discipline's cheapest currently craftable item in a single bounded
      * query, before selecting between them, so no query runs from inside the group loop.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  SupportCollection<string, Skill|null>  $skills  The character's already-resolved Crafting skills.
-     * @param  int  $cyclePosition  The persisted Crafting Experience cycle position to resume at.
+     * @param Character $character The character running the batch.
+     * @param SupportCollection<string, Skill|null> $skills The character's already-resolved Crafting skills.
+     * @param int $cyclePosition The persisted Crafting Experience cycle position to resume at.
      * @return ResolvedCraftAndEnchantExperienceTarget|null The resolved fallback target, or null when unavailable.
      */
     private function resolveEnchantingOnlyFallbackTarget(Character $character, SupportCollection $skills, int $cyclePosition): ?ResolvedCraftAndEnchantExperienceTarget

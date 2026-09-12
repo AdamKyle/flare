@@ -24,7 +24,7 @@ class CraftSetRecommendationService
      * reports any required position with no currently craftable candidate. Hand
      * positions are never recommended; the player always chooses them.
      *
-     * @param  Character  $character  The character requesting the recommendation.
+     * @param Character $character The character requesting the recommendation.
      * @return array{positions: array<int, array{position: string, item_id: int, crafting_type: string, item_name: string}>, missing_positions: array<int, string>} The recommended positions and any required positions with no craftable candidate.
      */
     public function build(Character $character): array
@@ -72,7 +72,7 @@ class CraftSetRecommendationService
     /**
      * Fetch the required-position candidate items for every Crafting group, in at most three queries.
      *
-     * @param  Collection<string, Skill|null>  $skillsByGroup  The resolved Crafting skills keyed by Crafting skill group value.
+     * @param Collection<string, Skill|null> $skillsByGroup The resolved Crafting skills keyed by Crafting skill group value.
      * @return array<string, Collection<string, Item>> The candidate items keyed by Crafting group value, then item type.
      */
     private function fetchCandidatesByGroup(Collection $skillsByGroup): array
@@ -99,9 +99,9 @@ class CraftSetRecommendationService
     /**
      * Fetch the highest craftable candidate items for one Crafting group, when the skill exists.
      *
-     * @param  Skill|null  $skill  The character's resolved Crafting skill for the group, when it exists.
-     * @param  string  $craftingType  The Crafting group used to query craftable items.
-     * @param  array<int, string>  $itemTypes  The required item types for the group.
+     * @param Skill|null $skill The character's resolved Crafting skill for the group, when it exists.
+     * @param string $craftingType The Crafting group used to query craftable items.
+     * @param array<int, string> $itemTypes The required item types for the group.
      * @return Collection<string, Item> The highest craftable item for each item type, keyed by item type.
      */
     private function fetchCandidates(?Skill $skill, string $craftingType, array $itemTypes): Collection
@@ -119,8 +119,8 @@ class CraftSetRecommendationService
      * Every caller has already filtered to required positions, which always resolve a
      * Crafting group, so the group here is never null.
      *
-     * @param  array<string, Collection<string, Item>>  $candidatesByGroup  The candidate items keyed by Crafting group value, then item type.
-     * @param  CraftSetPosition  $position  The required position being resolved.
+     * @param array<string, Collection<string, Item>> $candidatesByGroup The candidate items keyed by Crafting group value, then item type.
+     * @param CraftSetPosition $position The required position being resolved.
      * @return Item|null The recommended item, or null when no candidate exists for the position.
      */
     private function resolveCandidate(array $candidatesByGroup, CraftSetPosition $position): ?Item

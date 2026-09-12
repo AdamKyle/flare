@@ -28,7 +28,7 @@ class UpdateGlobalCharacterCountBroadcast implements ShouldBroadcastNow
     /**
      * Create a new event instance.
      *
-     * @param  int  $mapId
+     * @param int $mapId
      */
     public function __construct(GameMap $gameMap)
     {

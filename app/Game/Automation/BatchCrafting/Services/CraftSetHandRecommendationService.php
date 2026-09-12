@@ -19,8 +19,8 @@ class CraftSetHandRecommendationService
      * Backend Craft Set hand pair validation remains authoritative elsewhere; this
      * service only resolves a single hand's default recommendation.
      *
-     * @param  Character  $character  The character requesting the recommendation.
-     * @param  string  $handType  The selected hand type: a valid weapon type, or "shield".
+     * @param Character $character The character requesting the recommendation.
+     * @param string $handType The selected hand type: a valid weapon type, or "shield".
      * @return Item|null The recommended item, or null when the hand type is unsupported or nothing is craftable.
      */
     public function recommend(Character $character, string $handType): ?Item

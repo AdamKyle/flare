@@ -26,7 +26,7 @@ class ClassesSheet implements FromCollection, ShouldAutoSize, WithHeadings, With
     /**
      * Map a Class into its workbook row, using the prerequisite Classes' names rather than ids.
      *
-     * @param  mixed  $gameClass
+     * @param mixed $gameClass
      */
     public function map($gameClass): array
     {

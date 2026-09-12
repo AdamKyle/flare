@@ -49,7 +49,7 @@ class AutomatedFightResult
     /**
      * Set up the result.
      *
-     * @param  AutomatedFightResultType  $resultType  The fight result type.
+     * @param AutomatedFightResultType $resultType The fight result type.
      * @return AutomatedFightResult The reset result instance.
      */
     public function setUp(AutomatedFightResultType $resultType): AutomatedFightResult
@@ -81,7 +81,7 @@ class AutomatedFightResult
     /**
      * Set the monster id.
      *
-     * @param  int|null  $monsterId  The monster id.
+     * @param int|null $monsterId The monster id.
      * @return AutomatedFightResult The result instance.
      */
     public function setMonsterId(?int $monsterId): AutomatedFightResult
@@ -94,7 +94,7 @@ class AutomatedFightResult
     /**
      * Set the monster name.
      *
-     * @param  string|null  $monsterName  The monster name.
+     * @param string|null $monsterName The monster name.
      * @return AutomatedFightResult The result instance.
      */
     public function setMonsterName(?string $monsterName): AutomatedFightResult
@@ -107,7 +107,7 @@ class AutomatedFightResult
     /**
      * Set whether this is the bounty target.
      *
-     * @param  bool  $bountyTarget  Whether the monster is the bounty target.
+     * @param bool $bountyTarget Whether the monster is the bounty target.
      * @return AutomatedFightResult The result instance.
      */
     public function setBountyTarget(bool $bountyTarget): AutomatedFightResult
@@ -120,7 +120,7 @@ class AutomatedFightResult
     /**
      * Set whether this is training.
      *
-     * @param  bool  $training  Whether the fight is recovery training.
+     * @param bool $training Whether the fight is recovery training.
      * @return AutomatedFightResult The result instance.
      */
     public function setTraining(bool $training): AutomatedFightResult
@@ -133,7 +133,7 @@ class AutomatedFightResult
     /**
      * Set the failed bounty monster id.
      *
-     * @param  int|null  $failedBountyMonsterId  The failed bounty monster id.
+     * @param int|null $failedBountyMonsterId The failed bounty monster id.
      * @return AutomatedFightResult The result instance.
      */
     public function setFailedBountyMonsterId(?int $failedBountyMonsterId): AutomatedFightResult
@@ -146,7 +146,7 @@ class AutomatedFightResult
     /**
      * Set whether training has completed for the failed bounty.
      *
-     * @param  bool  $trainedForFailedBounty  Whether recovery training has completed.
+     * @param bool $trainedForFailedBounty Whether recovery training has completed.
      * @return AutomatedFightResult The result instance.
      */
     public function setTrainedForFailedBounty(bool $trainedForFailedBounty): AutomatedFightResult
@@ -159,7 +159,7 @@ class AutomatedFightResult
     /**
      * Set the total kills.
      *
-     * @param  int  $kills  The total kill count.
+     * @param int $kills The total kill count.
      * @return AutomatedFightResult The result instance.
      */
     public function setKills(int $kills): AutomatedFightResult
@@ -172,7 +172,7 @@ class AutomatedFightResult
     /**
      * Set the training kills.
      *
-     * @param  int  $trainingKills  The training kill count.
+     * @param int $trainingKills The training kill count.
      * @return AutomatedFightResult The result instance.
      */
     public function setTrainingKills(int $trainingKills): AutomatedFightResult
@@ -185,7 +185,7 @@ class AutomatedFightResult
     /**
      * Set the bounty kills.
      *
-     * @param  int  $bountyKills  The bounty kill count.
+     * @param int $bountyKills The bounty kill count.
      * @return AutomatedFightResult The result instance.
      */
     public function setBountyKills(int $bountyKills): AutomatedFightResult
@@ -198,7 +198,7 @@ class AutomatedFightResult
     /**
      * Set the total creatures.
      *
-     * @param  int  $totalCreatures  The total creature count.
+     * @param int $totalCreatures The total creature count.
      * @return AutomatedFightResult The result instance.
      */
     public function setTotalCreatures(int $totalCreatures): AutomatedFightResult
@@ -211,7 +211,7 @@ class AutomatedFightResult
     /**
      * Set the total XP.
      *
-     * @param  int  $totalXp  The total xp awarded.
+     * @param int $totalXp The total xp awarded.
      * @return AutomatedFightResult The result instance.
      */
     public function setTotalXp(int $totalXp): AutomatedFightResult
@@ -224,7 +224,7 @@ class AutomatedFightResult
     /**
      * Set the total skill XP.
      *
-     * @param  int  $totalSkillXp  The total skill xp awarded.
+     * @param int $totalSkillXp The total skill xp awarded.
      * @return AutomatedFightResult The result instance.
      */
     public function setTotalSkillXp(int $totalSkillXp): AutomatedFightResult
@@ -237,7 +237,7 @@ class AutomatedFightResult
     /**
      * Set the total faction points.
      *
-     * @param  int  $totalFactionPoints  The total faction points awarded.
+     * @param int $totalFactionPoints The total faction points awarded.
      * @return AutomatedFightResult The result instance.
      */
     public function setTotalFactionPoints(int $totalFactionPoints): AutomatedFightResult
@@ -250,7 +250,7 @@ class AutomatedFightResult
     /**
      * Set whether the character died.
      *
-     * @param  bool  $characterDied  Whether the character died.
+     * @param bool $characterDied Whether the character died.
      * @return AutomatedFightResult The result instance.
      */
     public function setCharacterDied(bool $characterDied): AutomatedFightResult
@@ -263,7 +263,7 @@ class AutomatedFightResult
     /**
      * Set whether automation ended.
      *
-     * @param  bool  $endedAutomation  Whether the automation ended.
+     * @param bool $endedAutomation Whether the automation ended.
      * @return AutomatedFightResult The result instance.
      */
     public function setEndedAutomation(bool $endedAutomation): AutomatedFightResult
@@ -276,7 +276,7 @@ class AutomatedFightResult
     /**
      * Set the fight data.
      *
-     * @param  array  $fightData  The fight result payload.
+     * @param array $fightData The fight result payload.
      * @return AutomatedFightResult The result instance.
      */
     public function setFightData(array $fightData): AutomatedFightResult
@@ -289,7 +289,7 @@ class AutomatedFightResult
     /**
      * Set the stalled attempt.
      *
-     * @param  int  $stalledAttempt  The stalled attempt count.
+     * @param int $stalledAttempt The stalled attempt count.
      * @return AutomatedFightResult The result instance.
      */
     public function setStalledAttempt(int $stalledAttempt): AutomatedFightResult
@@ -302,7 +302,7 @@ class AutomatedFightResult
     /**
      * Set the warning notice.
      *
-     * @param  array|null  $warningNotice  The warning notice payload.
+     * @param array|null $warningNotice The warning notice payload.
      * @return AutomatedFightResult The result instance.
      */
     public function setWarningNotice(?array $warningNotice): AutomatedFightResult
@@ -315,7 +315,7 @@ class AutomatedFightResult
     /**
      * Set the automation log entry id.
      *
-     * @param  string  $logEntryId  The log entry id.
+     * @param string $logEntryId The log entry id.
      * @return AutomatedFightResult The result instance.
      */
     public function setLogEntryId(string $logEntryId): AutomatedFightResult

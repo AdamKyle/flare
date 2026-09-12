@@ -25,8 +25,8 @@ class ExplorationAttackMessage implements ShouldBroadcast
     public $messages;
 
     /**
-     * @param  User  $user  The user to broadcast attack messages to.
-     * @param  array  $messages  The attack messages.
+     * @param User $user The user to broadcast attack messages to.
+     * @param array $messages The attack messages.
      */
     public function __construct(User $user, array $messages)
     {

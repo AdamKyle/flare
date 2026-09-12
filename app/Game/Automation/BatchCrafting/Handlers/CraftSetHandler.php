@@ -28,8 +28,8 @@ class CraftSetHandler implements BatchCraftingHandler
     /**
      * Execute one Craft Set Batch Crafting operation for the running batch.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  Character  $character  The character running the batch.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param Character $character The character running the batch.
      * @return BatchCraftingOperationResult The outcome of the operation.
      */
     public function handle(BatchCrafting $batchCrafting, Character $character): BatchCraftingOperationResult
@@ -88,8 +88,8 @@ class CraftSetHandler implements BatchCraftingHandler
     /**
      * Re-resolve the currently planned queue entry's item, confirming it is still genuinely craftable.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  CraftSetPlanEntry  $entry  The current queue entry.
+     * @param Character $character The character running the batch.
+     * @param CraftSetPlanEntry $entry The current queue entry.
      * @return Item|null The still-craftable item, or null when it is no longer available.
      */
     private function resolveEntryItem(Character $character, CraftSetPlanEntry $entry): ?Item
@@ -100,8 +100,8 @@ class CraftSetHandler implements BatchCraftingHandler
     /**
      * Resolve the retained item's output destination placement callback, or a capacity end reason.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  array  $progress  The persisted Craft Set progress data.
+     * @param Character $character The character running the batch.
+     * @param array $progress The persisted Craft Set progress data.
      * @return BatchCraftingEndReason|Closure The capacity end reason, or the placement callback.
      */
     private function resolveDestination(Character $character, array $progress): BatchCraftingEndReason|Closure

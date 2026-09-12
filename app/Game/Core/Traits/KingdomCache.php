@@ -170,7 +170,7 @@ trait KingdomCache
      * If the cache is empty we will set a kingdom to it by pushing
      * the kingdom to the array.
      *
-     * @param  array  $cache  | []
+     * @param array $cache | []
      */
     protected function addKingdom(Kingdom $kingdom, array $cache = []): array
     {

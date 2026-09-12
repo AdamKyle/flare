@@ -16,7 +16,7 @@ class FactionLoyaltyAutomationController
     use ChecksAutomationRestrictions, FactionLoyalty;
 
     /**
-     * @param  FactionLoyaltyAutomationService  $factionLoyaltyAutomationService  The Faction Loyalty automation service.
+     * @param FactionLoyaltyAutomationService $factionLoyaltyAutomationService The Faction Loyalty automation service.
      */
     public function __construct(
         private readonly FactionLoyaltyAutomationService $factionLoyaltyAutomationService,
@@ -25,8 +25,8 @@ class FactionLoyaltyAutomationController
     /**
      * Start Faction Loyalty automation for the character with the validated request options.
      *
-     * @param  FactionLoyaltyAutomationRequest  $request  The validated Faction Loyalty start request.
-     * @param  Character  $character  The character starting Faction Loyalty automation.
+     * @param FactionLoyaltyAutomationRequest $request The validated Faction Loyalty start request.
+     * @param Character $character The character starting Faction Loyalty automation.
      * @return JsonResponse The start confirmation or validation error response.
      */
     public function begin(FactionLoyaltyAutomationRequest $request, Character $character): JsonResponse
@@ -81,7 +81,7 @@ class FactionLoyaltyAutomationController
     /**
      * Stop the character's active Faction Loyalty automation.
      *
-     * @param  Character  $character  The character stopping Faction Loyalty automation.
+     * @param Character $character The character stopping Faction Loyalty automation.
      * @return JsonResponse The stop confirmation response.
      */
     public function stop(Character $character): JsonResponse

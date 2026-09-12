@@ -11,8 +11,8 @@ class ImageBuilder
     /**
      * Turn the image into a file and store the image in a specified location.
      *
-     * @param  mixed  $image
-     * @param  string  $storageDisk  | public
+     * @param mixed $image
+     * @param string $storageDisk | public
      */
     public function buildAndStoreImage($image, string $fileName, string $storageDisk = 'public'): void
     {

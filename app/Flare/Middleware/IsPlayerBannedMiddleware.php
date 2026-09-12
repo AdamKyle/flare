@@ -11,8 +11,8 @@ class IsPlayerBannedMiddleware
     /**
      * Handle an incoming request.
      *
-     * @param  Request  $request
-     * @param  string|null  $guard
+     * @param Request $request
+     * @param string|null $guard
      * @return mixed
      */
     public function handle($request, Closure $next, $guard = null)

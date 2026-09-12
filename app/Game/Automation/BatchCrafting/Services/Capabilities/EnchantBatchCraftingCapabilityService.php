@@ -15,7 +15,7 @@ class EnchantBatchCraftingCapabilityService
     /**
      * Build the complete Enchant For Event capability facts for the character.
      *
-     * @param  Character  $character  The character requesting capability facts.
+     * @param Character $character The character requesting capability facts.
      * @return array The Enchant For Event capability facts payload.
      */
     public function build(Character $character): array
@@ -29,7 +29,7 @@ class EnchantBatchCraftingCapabilityService
     /**
      * Determine whether Enchant For Event is currently available to the character.
      *
-     * @param  Character  $character  The character being checked.
+     * @param Character $character The character being checked.
      * @return bool True when a real eligible Enchant Event goal currently exists.
      */
     public function canEnchantForEvent(Character $character): bool
@@ -40,7 +40,7 @@ class EnchantBatchCraftingCapabilityService
     /**
      * Build the factual current Enchant Event goal facts, when a real eligible goal exists.
      *
-     * @param  Character  $character  The character being checked.
+     * @param Character $character The character being checked.
      * @return array|null The current Enchant Event goal facts, or null when none is eligible.
      */
     public function eventGoalFacts(Character $character): ?array
@@ -60,8 +60,8 @@ class EnchantBatchCraftingCapabilityService
      * Used to preserve the final goal/contribution facts after the goal is no longer
      * currently eligible (completed, or the Event stepped away from Enchanting).
      *
-     * @param  Character  $character  The character being checked.
-     * @param  int  $goalId  The authoritative persisted Enchant Event goal id.
+     * @param Character $character The character being checked.
+     * @param int $goalId The authoritative persisted Enchant Event goal id.
      * @return array|null The goal/contribution facts payload, or null when the goal no longer exists.
      */
     public function eventGoalFactsById(Character $character, int $goalId): ?array
@@ -78,8 +78,8 @@ class EnchantBatchCraftingCapabilityService
     /**
      * Build the factual goal/contribution payload for a resolved Enchant Event goal.
      *
-     * @param  Character  $character  The character being checked.
-     * @param  GlobalEventGoal  $goal  The resolved Enchant Event goal.
+     * @param Character $character The character being checked.
+     * @param GlobalEventGoal $goal The resolved Enchant Event goal.
      * @return array The goal/contribution facts payload.
      */
     private function buildGoalFacts(Character $character, GlobalEventGoal $goal): array

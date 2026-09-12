@@ -21,8 +21,8 @@ class HolyOilSetPreviewService
      * The client never sends target item ids for this mode; every eligible target is resolved
      * server-side from the Set's real contents.
      *
-     * @param  Character  $character  The character requesting the preview.
-     * @param  array  $validated  The validated Batch Crafting request data.
+     * @param Character $character The character requesting the preview.
+     * @param array $validated The validated Batch Crafting request data.
      * @return array The lean Holy Oils Inventory Set preview payload.
      */
     public function build(Character $character, array $validated): array
@@ -57,8 +57,8 @@ class HolyOilSetPreviewService
     /**
      * Resolve the requested Holy Oil Alchemy Bag slots the character actually owns.
      *
-     * @param  Character  $character  The character requesting the preview.
-     * @param  array<int, int>  $oilSlotIds  The requested Holy Oil Alchemy Bag slot ids.
+     * @param Character $character The character requesting the preview.
+     * @param array<int, int> $oilSlotIds The requested Holy Oil Alchemy Bag slot ids.
      * @return Collection<int, AlchemyBagSlot> The resolved oil slots.
      */
     private function resolveOilSlots(Character $character, array $oilSlotIds): Collection
@@ -80,9 +80,9 @@ class HolyOilSetPreviewService
     /**
      * Build the blocking messages for the Holy Oils Inventory Set preview.
      *
-     * @param  Collection  $oilSlots  The resolved oil slots.
-     * @param  array  $plan  The simulated application plan.
-     * @param  int  $goldDustAvailable  The character's available Gold Dust.
+     * @param Collection $oilSlots The resolved oil slots.
+     * @param array $plan The simulated application plan.
+     * @param int $goldDustAvailable The character's available Gold Dust.
      * @return array<int, string> The blocking messages, empty when nothing blocks the request.
      */
     private function buildBlockers(Collection $oilSlots, array $plan, int $goldDustAvailable): array
@@ -103,8 +103,8 @@ class HolyOilSetPreviewService
     /**
      * Build the lean preview payload for a requested Inventory Set that is no longer valid.
      *
-     * @param  Character  $character  The character requesting the preview.
-     * @param  array  $progress  The requested Holy Oils Inventory Set progress data.
+     * @param Character $character The character requesting the preview.
+     * @param array $progress The requested Holy Oils Inventory Set progress data.
      * @return array The lean unavailable-set preview payload.
      */
     private function buildUnavailableSetPreview(Character $character, array $progress): array

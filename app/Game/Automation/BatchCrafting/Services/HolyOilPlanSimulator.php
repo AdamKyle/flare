@@ -14,9 +14,9 @@ class HolyOilPlanSimulator
      * Oils are drawn from the given slots in order, exhausting one slot's amount before moving
      * to the next. Preview-only: the actual batch run resolves oil availability live per operation.
      *
-     * @param  HolyItemService  $holyItemService  The Holy Oil domain service providing the real cost formula.
-     * @param  Collection  $targets  The resolved target slots, each exposing an `item` relation.
-     * @param  Collection  $oilSlots  The resolved Holy Oil Alchemy Bag slots, each exposing an `item` relation and `amount`.
+     * @param HolyItemService $holyItemService The Holy Oil domain service providing the real cost formula.
+     * @param Collection $targets The resolved target slots, each exposing an `item` relation.
+     * @param Collection $oilSlots The resolved Holy Oil Alchemy Bag slots, each exposing an `item` relation and `amount`.
      * @return array{total_applications: int, total_gold_dust_cost: int, targets: array<int, array>} The simulated plan.
      */
     public static function simulate(HolyItemService $holyItemService, Collection $targets, Collection $oilSlots): array
@@ -73,7 +73,7 @@ class HolyOilPlanSimulator
     /**
      * Resolve the index of the next oil queue entry with a remaining unit available.
      *
-     * @param  array<int, array{item: Item, remaining: int}>  $oilQueue  The oil queue.
+     * @param array<int, array{item: Item, remaining: int}> $oilQueue The oil queue.
      * @return int|null The resolved index, or null when no oil units remain.
      */
     private static function nextAvailableOilIndex(array $oilQueue): ?int

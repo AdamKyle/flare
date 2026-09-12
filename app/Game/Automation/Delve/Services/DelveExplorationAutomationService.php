@@ -26,7 +26,7 @@ class DelveExplorationAutomationService
     private int $timeDelay = 5;
 
     /**
-     * @param  CharacterCacheData  $characterCacheData  The character cache data service.
+     * @param CharacterCacheData $characterCacheData The character cache data service.
      */
     public function __construct(
         private readonly CharacterCacheData $characterCacheData,
@@ -35,9 +35,9 @@ class DelveExplorationAutomationService
     /**
      * Start Delve automation for the character at the given location with the given options.
      *
-     * @param  Character  $character  The character starting Delve.
-     * @param  Location  $location  The Delve location.
-     * @param  array  $params  The Delve start options.
+     * @param Character $character The character starting Delve.
+     * @param Location $location The Delve location.
+     * @param array $params The Delve start options.
      * @return void
      */
     public function beginAutomation(Character $character, Location $location, array $params)
@@ -87,7 +87,7 @@ class DelveExplorationAutomationService
     /**
      * Stop the character's active Delve automation.
      *
-     * @param  Character  $character  The character stopping Delve.
+     * @param Character $character The character stopping Delve.
      * @return array|void
      */
     public function stopExploration(Character $character)
@@ -122,7 +122,7 @@ class DelveExplorationAutomationService
     /**
      * Set the delay, in minutes, between Delve fight rounds for the location.
      *
-     * @param  Location  $location  The Delve location.
+     * @param Location $location The Delve location.
      * @return void This method does not return a value.
      */
     public function setTimeDelay(Location $location): void
@@ -133,11 +133,11 @@ class DelveExplorationAutomationService
     /**
      * Dispatch the delayed Delve exploration job for the character's automation.
      *
-     * @param  Character  $character  The character delving.
-     * @param  Location  $location  The Delve location.
-     * @param  int  $automationId  The character automation id.
-     * @param  int  $delveAutomationId  The Delve exploration record id.
-     * @param  array  $params  The Delve fight parameters.
+     * @param Character $character The character delving.
+     * @param Location $location The Delve location.
+     * @param int $automationId The character automation id.
+     * @param int $delveAutomationId The Delve exploration record id.
+     * @param array $params The Delve fight parameters.
      * @return void
      */
     protected function startAutomation(Character $character, Location $location, int $automationId, int $delveAutomationId, array $params)

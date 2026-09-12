@@ -40,8 +40,8 @@ class CharacterInventoryController extends Controller
     /**
      * Return the character's paginated normal inventory.
      *
-     * @param  PaginationRequest  $request  The validated pagination/search request.
-     * @param  Character  $character  The character requesting their inventory.
+     * @param PaginationRequest $request The validated pagination/search request.
+     * @param Character $character The character requesting their inventory.
      * @return JsonResponse The paginated inventory payload.
      */
     public function inventory(PaginationRequest $request, Character $character): JsonResponse
@@ -54,8 +54,8 @@ class CharacterInventoryController extends Controller
     /**
      * Return the character's paginated quest items.
      *
-     * @param  PaginationRequest  $request  The validated pagination/search request.
-     * @param  Character  $character  The character requesting their quest items.
+     * @param PaginationRequest $request The validated pagination/search request.
+     * @param Character $character The character requesting their quest items.
      * @return JsonResponse The paginated quest item payload.
      */
     public function questItems(PaginationRequest $request, Character $character): JsonResponse
@@ -68,8 +68,8 @@ class CharacterInventoryController extends Controller
     /**
      * Return the character's paginated usable items.
      *
-     * @param  PaginationRequest  $request  The validated pagination/search/filter request.
-     * @param  Character  $character  The character requesting their usable items.
+     * @param PaginationRequest $request The validated pagination/search/filter request.
+     * @param Character $character The character requesting their usable items.
      * @return JsonResponse The paginated usable item payload.
      */
     public function usableItems(PaginationRequest $request, Character $character): JsonResponse
@@ -82,7 +82,7 @@ class CharacterInventoryController extends Controller
     /**
      * Return the character's currently equipped items and derived combat totals.
      *
-     * @param  Character  $character  The character requesting their equipped items.
+     * @param Character $character The character requesting their equipped items.
      * @return JsonResponse The equipped items and derived combat totals.
      */
     public function equippedItems(Character $character): JsonResponse
@@ -104,8 +104,8 @@ class CharacterInventoryController extends Controller
     /**
      * Return the character's paginated Inventory Sets.
      *
-     * @param  PaginationRequest  $request  The validated pagination request.
-     * @param  Character  $character  The character requesting their Inventory Sets.
+     * @param PaginationRequest $request The validated pagination request.
+     * @param Character $character The character requesting their Inventory Sets.
      * @return JsonResponse The paginated Inventory Set payload.
      */
     public function currentSets(PaginationRequest $request, Character $character): JsonResponse
@@ -118,8 +118,8 @@ class CharacterInventoryController extends Controller
     /**
      * Return the paginated items belonging to one of the character's Inventory Sets.
      *
-     * @param  PaginationRequest  $request  The validated pagination/search/filter request.
-     * @param  Character  $character  The character requesting the set items.
+     * @param PaginationRequest $request The validated pagination/search/filter request.
+     * @param Character $character The character requesting the set items.
      * @return JsonResponse The paginated set item payload.
      */
     public function getSetItems(PaginationRequest $request, Character $character): JsonResponse
@@ -132,8 +132,8 @@ class CharacterInventoryController extends Controller
     /**
      * Return the character's paginated selectable Inventory Set options.
      *
-     * @param  PaginationRequest  $request  The validated pagination/search request.
-     * @param  Character  $character  The character requesting the set options.
+     * @param PaginationRequest $request The validated pagination/search request.
+     * @param Character $character The character requesting the set options.
      * @return JsonResponse The paginated set option payload.
      */
     public function setOptions(PaginationRequest $request, Character $character): JsonResponse
@@ -146,8 +146,8 @@ class CharacterInventoryController extends Controller
     /**
      * Return the character's paginated selectable Inventory Set Holy Oil targets.
      *
-     * @param  PaginationRequest  $request  The validated pagination/search request.
-     * @param  Character  $character  The character requesting the set options.
+     * @param PaginationRequest $request The validated pagination/search request.
+     * @param Character $character The character requesting the set options.
      * @return JsonResponse The paginated Holy Oil target set option payload.
      */
     public function holyOilTargetSetOptions(PaginationRequest $request, Character $character): JsonResponse
@@ -160,9 +160,9 @@ class CharacterInventoryController extends Controller
     /**
      * Return the enriched item data for one inventory slot.
      *
-     * @param  ViewInventoryItemRequest  $request  The validated item detail request.
-     * @param  Character  $character  The character requesting the item details.
-     * @param  ItemEnricherFactory  $itemEnricherFactory  The factory used to build the enriched item payload.
+     * @param ViewInventoryItemRequest $request The validated item detail request.
+     * @param Character $character The character requesting the item details.
+     * @param ItemEnricherFactory $itemEnricherFactory The factory used to build the enriched item payload.
      * @return JsonResponse The enriched item payload, or an error when the slot cannot be resolved.
      */
     public function itemDetails(ViewInventoryItemRequest $request, Character $character, ItemEnricherFactory $itemEnricherFactory): JsonResponse
@@ -183,8 +183,8 @@ class CharacterInventoryController extends Controller
     /**
      * Destroy one item from the character's inventory.
      *
-     * @param  Request  $request  The incoming request containing the item id to destroy.
-     * @param  Character  $character  The character destroying the item.
+     * @param Request $request The incoming request containing the item id to destroy.
+     * @param Character $character The character destroying the item.
      * @return JsonResponse The service's destroy result, or the automation restriction response when blocked.
      */
     public function destroy(Request $request, Character $character): JsonResponse
@@ -206,7 +206,7 @@ class CharacterInventoryController extends Controller
     /**
      * Destroy every item in the character's normal inventory.
      *
-     * @param  Character  $character  The character destroying their inventory.
+     * @param Character $character The character destroying their inventory.
      * @return JsonResponse The service's destroy-all result, or the automation restriction response when blocked.
      */
     public function destroyAll(Character $character): JsonResponse
@@ -228,7 +228,7 @@ class CharacterInventoryController extends Controller
     /**
      * Disenchant every disenchantable item in the character's normal inventory.
      *
-     * @param  Character  $character  The character disenchanting their inventory.
+     * @param Character $character The character disenchanting their inventory.
      * @return JsonResponse The service's disenchant-all result, or the automation restriction response when blocked.
      */
     public function disenchantAll(Character $character): JsonResponse
@@ -250,8 +250,8 @@ class CharacterInventoryController extends Controller
     /**
      * Move one inventory item into an Inventory Set.
      *
-     * @param  MoveItemRequest  $request  The validated move-item request.
-     * @param  Character  $character  The character moving the item.
+     * @param MoveItemRequest $request The validated move-item request.
+     * @param Character $character The character moving the item.
      * @return JsonResponse The set service's move result.
      */
     public function moveToSet(MoveItemRequest $request, Character $character): JsonResponse
@@ -267,8 +267,8 @@ class CharacterInventoryController extends Controller
     /**
      * Rename one of the character's Inventory Sets.
      *
-     * @param  RenameSetRequest  $request  The validated rename-set request.
-     * @param  Character  $character  The character renaming the set.
+     * @param RenameSetRequest $request The validated rename-set request.
+     * @param Character $character The character renaming the set.
      * @return JsonResponse The set service's rename result.
      */
     public function renameSet(RenameSetRequest $request, Character $character): JsonResponse
@@ -284,8 +284,8 @@ class CharacterInventoryController extends Controller
     /**
      * Save the character's currently equipped items into an Inventory Set.
      *
-     * @param  SaveEquipmentAsSet  $request  The validated save-equipped-as-set request.
-     * @param  Character  $character  The character saving their equipped items.
+     * @param SaveEquipmentAsSet $request The validated save-equipped-as-set request.
+     * @param Character $character The character saving their equipped items.
      * @return JsonResponse The set service's save result.
      */
     public function saveEquippedAsSet(SaveEquipmentAsSet $request, Character $character): JsonResponse
@@ -301,8 +301,8 @@ class CharacterInventoryController extends Controller
     /**
      * Remove one item from an Inventory Set back into the normal inventory.
      *
-     * @param  RemoveItemRequest  $request  The validated remove-from-set request.
-     * @param  Character  $character  The character removing the item.
+     * @param RemoveItemRequest $request The validated remove-from-set request.
+     * @param Character $character The character removing the item.
      * @return JsonResponse The set service's remove result.
      */
     public function removeFromSet(RemoveItemRequest $request, Character $character): JsonResponse
@@ -318,8 +318,8 @@ class CharacterInventoryController extends Controller
     /**
      * Empty every item out of an Inventory Set back into the normal inventory.
      *
-     * @param  Character  $character  The character emptying the set.
-     * @param  InventorySet  $inventorySet  The Inventory Set being emptied.
+     * @param Character $character The character emptying the set.
+     * @param InventorySet $inventorySet The Inventory Set being emptied.
      * @return JsonResponse The set service's empty-set result.
      */
     public function emptySet(Character $character, InventorySet $inventorySet): JsonResponse
@@ -335,9 +335,9 @@ class CharacterInventoryController extends Controller
     /**
      * Equip one item for the character.
      *
-     * @param  EquipItemValidation  $request  The validated equip-item request.
-     * @param  Character  $character  The character equipping the item.
-     * @param  EquipItemService  $equipItemService  The service performing the equip operation.
+     * @param EquipItemValidation $request The validated equip-item request.
+     * @param Character $character The character equipping the item.
+     * @param EquipItemService $equipItemService The service performing the equip operation.
      * @return JsonResponse The equip service's result.
      */
     public function equipItem(EquipItemValidation $request, Character $character, EquipItemService $equipItemService): JsonResponse
@@ -353,8 +353,8 @@ class CharacterInventoryController extends Controller
     /**
      * Unequip one item, or the character's equipped Inventory Set, for the character.
      *
-     * @param  Request  $request  The incoming request indicating whether a set or single item is being unequipped.
-     * @param  Character  $character  The character unequipping the item or set.
+     * @param Request $request The incoming request indicating whether a set or single item is being unequipped.
+     * @param Character $character The character unequipping the item or set.
      * @return JsonResponse The set service's or inventory service's unequip result.
      */
     public function unequipItem(Request $request, Character $character): JsonResponse
@@ -379,8 +379,8 @@ class CharacterInventoryController extends Controller
     /**
      * Unequip every equipped item, or the character's equipped Inventory Set, for the character.
      *
-     * @param  Request  $request  The incoming request indicating whether a set or all items are being unequipped.
-     * @param  Character  $character  The character unequipping everything.
+     * @param Request $request The incoming request indicating whether a set or all items are being unequipped.
+     * @param Character $character The character unequipping everything.
      * @return JsonResponse The set service's or inventory service's unequip-all result.
      */
     public function unequipAll(Request $request, Character $character): JsonResponse
@@ -405,8 +405,8 @@ class CharacterInventoryController extends Controller
     /**
      * Equip every item in an Inventory Set for the character.
      *
-     * @param  Character  $character  The character equipping the set.
-     * @param  InventorySet  $inventorySet  The Inventory Set being equipped.
+     * @param Character $character The character equipping the set.
+     * @param InventorySet $inventorySet The Inventory Set being equipped.
      * @return JsonResponse The set service's equip-set result.
      */
     public function equipItemSet(Character $character, InventorySet $inventorySet): JsonResponse
@@ -422,8 +422,8 @@ class CharacterInventoryController extends Controller
     /**
      * Use several inventory items at once for the character.
      *
-     * @param  UseManyItemsValidation  $request  The validated use-many-items request.
-     * @param  Character  $character  The character using the items.
+     * @param UseManyItemsValidation $request The validated use-many-items request.
+     * @param Character $character The character using the items.
      * @return JsonResponse The use-item service's result.
      */
     public function useManyItems(UseManyItemsValidation $request, Character $character): JsonResponse
@@ -439,8 +439,8 @@ class CharacterInventoryController extends Controller
     /**
      * Use one inventory item for the character.
      *
-     * @param  Character  $character  The character using the item.
-     * @param  Item  $item  The item being used.
+     * @param Character $character The character using the item.
+     * @param Item $item The item being used.
      * @return JsonResponse The use-item service's result.
      */
     public function useItem(Character $character, Item $item): JsonResponse
@@ -456,9 +456,9 @@ class CharacterInventoryController extends Controller
     /**
      * Use one or all of an Alchemy Bag slot's items for the character.
      *
-     * @param  Request  $request  The incoming request indicating whether every item in the slot is being used.
-     * @param  Character  $character  The character using the Alchemy item.
-     * @param  AlchemyBagSlot  $alchemyBagSlot  The Alchemy Bag slot being used.
+     * @param Request $request The incoming request indicating whether every item in the slot is being used.
+     * @param Character $character The character using the Alchemy item.
+     * @param AlchemyBagSlot $alchemyBagSlot The Alchemy Bag slot being used.
      * @return JsonResponse The use-item service's result.
      */
     public function useAlchemyItem(Request $request, Character $character, AlchemyBagSlot $alchemyBagSlot): JsonResponse
@@ -476,8 +476,8 @@ class CharacterInventoryController extends Controller
     /**
      * Destroy one Alchemy Bag slot for the character.
      *
-     * @param  Request  $request  The incoming request containing the Alchemy Bag slot id to destroy.
-     * @param  Character  $character  The character destroying the Alchemy item.
+     * @param Request $request The incoming request containing the Alchemy Bag slot id to destroy.
+     * @param Character $character The character destroying the Alchemy item.
      * @return JsonResponse The inventory service's destroy result.
      */
     public function destroyAlchemyItem(Request $request, Character $character): JsonResponse
@@ -493,7 +493,7 @@ class CharacterInventoryController extends Controller
     /**
      * Destroy every item in the character's Alchemy Bag.
      *
-     * @param  Character  $character  The character destroying their Alchemy Bag.
+     * @param Character $character The character destroying their Alchemy Bag.
      * @return JsonResponse The inventory service's destroy-all-alchemy-items result.
      */
     public function destroyAllAlchemyItems(Character $character): JsonResponse
@@ -509,8 +509,8 @@ class CharacterInventoryController extends Controller
     /**
      * Sell one inventory item for the character.
      *
-     * @param  InventoryActionRequest  $request  The validated sell-item request.
-     * @param  Character  $character  The character selling the item.
+     * @param InventoryActionRequest $request The validated sell-item request.
+     * @param Character $character The character selling the item.
      * @return JsonResponse The inventory service's sell result.
      */
     public function sellItem(InventoryActionRequest $request, Character $character): JsonResponse
@@ -526,8 +526,8 @@ class CharacterInventoryController extends Controller
     /**
      * Disenchant one inventory item for the character.
      *
-     * @param  InventoryActionRequest  $request  The validated disenchant-item request.
-     * @param  Character  $character  The character disenchanting the item.
+     * @param InventoryActionRequest $request The validated disenchant-item request.
+     * @param Character $character The character disenchanting the item.
      * @return JsonResponse The inventory service's disenchant result.
      */
     public function disenchantItem(InventoryActionRequest $request, Character $character): JsonResponse
@@ -543,8 +543,8 @@ class CharacterInventoryController extends Controller
     /**
      * Return the equippability details for every item in an Inventory Set.
      *
-     * @param  Character  $character  The character requesting the equippability details.
-     * @param  InventorySet  $inventorySet  The Inventory Set being checked.
+     * @param Character $character The character requesting the equippability details.
+     * @param InventorySet $inventorySet The Inventory Set being checked.
      * @return JsonResponse The set service's equippability details result.
      */
     public function inventorySetEquippabilityDetails(Character $character, InventorySet $inventorySet): JsonResponse
@@ -560,8 +560,8 @@ class CharacterInventoryController extends Controller
     /**
      * Move one item between Inventory Sets.
      *
-     * @param  MoveItemRequest  $request  The validated move-item request.
-     * @param  Character  $character  The character moving the item.
+     * @param MoveItemRequest $request The validated move-item request.
+     * @param Character $character The character moving the item.
      * @return JsonResponse The set service's move result.
      */
     public function moveItemToSet(MoveItemRequest $request, Character $character): JsonResponse

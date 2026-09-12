@@ -17,8 +17,8 @@ class CraftAndEnchantAmountStatusSection implements BatchCraftingStatusSection
     /**
      * Determine whether this section builds the mode-specific status facts for the given type and mode.
      *
-     * @param  BatchCraftingType  $type  The batch's Batch Crafting type.
-     * @param  string  $mode  The batch's persisted mode value.
+     * @param BatchCraftingType $type The batch's Batch Crafting type.
+     * @param string $mode The batch's persisted mode value.
      * @return bool True when this section owns the given type and mode.
      */
     public function supports(BatchCraftingType $type, string $mode): bool
@@ -29,9 +29,9 @@ class CraftAndEnchantAmountStatusSection implements BatchCraftingStatusSection
     /**
      * Build the Craft and Enchant Amount mode-specific status facts for the batch.
      *
-     * @param  Character  $character  The character the batch belongs to.
-     * @param  BatchCrafting  $batchCrafting  The visible Batch Crafting record.
-     * @param  array  $progress  The persisted Batch Crafting progress data.
+     * @param Character $character The character the batch belongs to.
+     * @param BatchCrafting $batchCrafting The visible Batch Crafting record.
+     * @param array $progress The persisted Batch Crafting progress data.
      * @return array The Craft and Enchant Amount mode-specific status facts.
      */
     public function build(Character $character, BatchCrafting $batchCrafting, array $progress): array

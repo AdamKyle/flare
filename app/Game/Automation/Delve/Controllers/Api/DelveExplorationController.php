@@ -21,8 +21,8 @@ class DelveExplorationController extends Controller
     use ChecksAutomationRestrictions;
 
     /**
-     * @param  DelveExplorationAutomationService  $delveExplorationAutomationService  The Delve automation service.
-     * @param  DelveStatusService  $delveStatusService  The Delve status service.
+     * @param DelveExplorationAutomationService $delveExplorationAutomationService The Delve automation service.
+     * @param DelveStatusService $delveStatusService The Delve status service.
      */
     public function __construct(
         private readonly DelveExplorationAutomationService $delveExplorationAutomationService,
@@ -32,8 +32,8 @@ class DelveExplorationController extends Controller
     /**
      * Start Delve automation for the character with the validated request options.
      *
-     * @param  DelveExplorationRequest  $request  The validated Delve start request.
-     * @param  Character  $character  The character starting Delve.
+     * @param DelveExplorationRequest $request The validated Delve start request.
+     * @param Character $character The character starting Delve.
      * @return JsonResponse The start confirmation or validation error response.
      */
     public function begin(DelveExplorationRequest $request, Character $character): JsonResponse
@@ -73,7 +73,7 @@ class DelveExplorationController extends Controller
     /**
      * Return the character's current Delve automation status.
      *
-     * @param  Character  $character  The character to return status for.
+     * @param Character $character The character to return status for.
      * @return JsonResponse The current Delve status panel.
      */
     public function status(Character $character): JsonResponse
@@ -84,8 +84,8 @@ class DelveExplorationController extends Controller
     /**
      * Return quest item detail for a Delve quest item.
      *
-     * @param  Character  $character  The character viewing the item.
-     * @param  Item  $item  The quest item to detail.
+     * @param Character $character The character viewing the item.
+     * @param Item $item The quest item to detail.
      * @return JsonResponse The item detail or validation error response.
      */
     public function questItemDetail(Character $character, Item $item): JsonResponse
@@ -102,7 +102,7 @@ class DelveExplorationController extends Controller
     /**
      * Dismiss the character's ended Delve status panel.
      *
-     * @param  Character  $character  The character dismissing the panel.
+     * @param Character $character The character dismissing the panel.
      * @return JsonResponse The updated Delve status panel.
      */
     public function dismiss(Character $character): JsonResponse
@@ -117,7 +117,7 @@ class DelveExplorationController extends Controller
     /**
      * Stop the character's active Delve automation.
      *
-     * @param  Character  $character  The character stopping Delve.
+     * @param Character $character The character stopping Delve.
      * @return JsonResponse Empty confirmation response.
      */
     public function stop(Character $character): JsonResponse

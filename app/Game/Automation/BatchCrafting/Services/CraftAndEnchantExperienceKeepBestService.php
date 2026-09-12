@@ -23,11 +23,11 @@ class CraftAndEnchantExperienceKeepBestService
      * Mirrors CraftExperienceKeepBestService's retained-best comparison, extended with a
      * Disenchant Rest disposal path for the enchanted Craft and Enchant For Experience workflow.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record, whose progress is updated and persisted.
-     * @param  Character  $character  The character running the batch.
-     * @param  Item  $enchantedItem  The item just successfully crafted and enchanted.
-     * @param  BatchCraftingDisposition  $disposition  The selected Keep Best disposition.
-     * @param  int  $goldCost  The combined Gold cost of this crafting and enchanting attempt.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record, whose progress is updated and persisted.
+     * @param Character $character The character running the batch.
+     * @param Item $enchantedItem The item just successfully crafted and enchanted.
+     * @param BatchCraftingDisposition $disposition The selected Keep Best disposition.
+     * @param int $goldCost The combined Gold cost of this crafting and enchanting attempt.
      * @return BatchCraftingOperationResult The outcome of applying the Keep Best comparison.
      */
     public function apply(BatchCrafting $batchCrafting, Character $character, Item $enchantedItem, BatchCraftingDisposition $disposition, int $goldCost): BatchCraftingOperationResult
@@ -70,13 +70,13 @@ class CraftAndEnchantExperienceKeepBestService
     /**
      * Persist the retained best entry for an item type.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record, whose progress is updated and persisted.
-     * @param  array  $progress  The batch's current progress payload.
-     * @param  array  $bestMap  The current retained-best map, keyed by item type.
-     * @param  string  $itemType  The item type being recorded.
-     * @param  Item  $enchantedItem  The item now retained as best for this item type.
-     * @param  int  $quality  The retained item's quality.
-     * @param  int  $setSlotId  The Crafted Items Set slot id holding the retained item.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record, whose progress is updated and persisted.
+     * @param array $progress The batch's current progress payload.
+     * @param array $bestMap The current retained-best map, keyed by item type.
+     * @param string $itemType The item type being recorded.
+     * @param Item $enchantedItem The item now retained as best for this item type.
+     * @param int $quality The retained item's quality.
+     * @param int $setSlotId The Crafted Items Set slot id holding the retained item.
      * @return void This method does not return a value.
      */
     private function recordBest(BatchCrafting $batchCrafting, array $progress, array $bestMap, string $itemType, Item $enchantedItem, int $quality, int $setSlotId): void
@@ -89,8 +89,8 @@ class CraftAndEnchantExperienceKeepBestService
     /**
      * Determine whether the newly crafted item is the exact same item already retained as best.
      *
-     * @param  array{item_id: int, set_slot_id: int, quality: int}|null  $currentBest  The currently retained best entry, if any.
-     * @param  Item  $enchantedItem  The item just successfully crafted and enchanted.
+     * @param array{item_id: int, set_slot_id: int, quality: int}|null $currentBest The currently retained best entry, if any.
+     * @param Item $enchantedItem The item just successfully crafted and enchanted.
      * @return bool True when the retained best already holds this same item.
      */
     private function isSameRetainedItem(?array $currentBest, Item $enchantedItem): bool
@@ -101,10 +101,10 @@ class CraftAndEnchantExperienceKeepBestService
     /**
      * Dispose of a newly crafted item that is not stronger than the currently retained best.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  Item  $enchantedItem  The inferior newly crafted and enchanted item.
-     * @param  BatchCraftingDisposition  $disposition  The selected Keep Best disposition.
-     * @param  int  $goldCost  The combined Gold cost of this crafting and enchanting attempt.
+     * @param Character $character The character running the batch.
+     * @param Item $enchantedItem The inferior newly crafted and enchanted item.
+     * @param BatchCraftingDisposition $disposition The selected Keep Best disposition.
+     * @param int $goldCost The combined Gold cost of this crafting and enchanting attempt.
      * @return BatchCraftingOperationResult The outcome recording the disposed item.
      */
     private function disposeInferiorItem(Character $character, Item $enchantedItem, BatchCraftingDisposition $disposition, int $goldCost): BatchCraftingOperationResult
@@ -129,10 +129,10 @@ class CraftAndEnchantExperienceKeepBestService
     /**
      * Dispose of the item displaced by an in-place Crafted Items Set slot replacement.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  Item  $displacedItem  The item that was displaced from the retained slot.
-     * @param  BatchCraftingDisposition  $disposition  The selected Keep Best disposition.
-     * @param  int  $goldCost  The combined Gold cost of the new best item's crafting and enchanting attempt.
+     * @param Character $character The character running the batch.
+     * @param Item $displacedItem The item that was displaced from the retained slot.
+     * @param BatchCraftingDisposition $disposition The selected Keep Best disposition.
+     * @param int $goldCost The combined Gold cost of the new best item's crafting and enchanting attempt.
      * @return BatchCraftingOperationResult The outcome recording the displacement.
      */
     private function disposeDisplacedItem(Character $character, Item $displacedItem, BatchCraftingDisposition $disposition, int $goldCost): BatchCraftingOperationResult

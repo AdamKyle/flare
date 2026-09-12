@@ -18,7 +18,7 @@ class BatchCraftingOrchestratorFactory
     /**
      * Resolve the registered Batch Crafting orchestrator for the given type.
      *
-     * @param  BatchCraftingType  $type  The Batch Crafting type to resolve.
+     * @param BatchCraftingType $type The Batch Crafting type to resolve.
      * @return BatchCraftingOrchestrator The resolved orchestrator instance.
      */
     public function make(BatchCraftingType $type): BatchCraftingOrchestrator

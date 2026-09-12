@@ -26,8 +26,8 @@ class CraftAmountHandler implements BatchCraftingHandler
     /**
      * Execute one Craft Amount Batch Crafting operation for the running batch.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  Character  $character  The character running the batch.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param Character $character The character running the batch.
      * @return BatchCraftingOperationResult The outcome of the operation.
      */
     public function handle(BatchCrafting $batchCrafting, Character $character): BatchCraftingOperationResult
@@ -79,7 +79,7 @@ class CraftAmountHandler implements BatchCraftingHandler
     /**
      * Determine whether the Craft Amount run has already reached its requested amount.
      *
-     * @param  array  $progress  The persisted Craft Amount progress data.
+     * @param array $progress The persisted Craft Amount progress data.
      * @return bool True when the requested amount has been reached.
      */
     private function hasReachedRequestedAmount(array $progress): bool
@@ -90,8 +90,8 @@ class CraftAmountHandler implements BatchCraftingHandler
     /**
      * Find the character's craftable item matching the persisted Craft Amount progress.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  array  $progress  The persisted Craft Amount progress data.
+     * @param Character $character The character running the batch.
+     * @param array $progress The persisted Craft Amount progress data.
      * @return Item|null The matching craftable item, or null when unavailable.
      */
     private function findCraftableItem(Character $character, array $progress): ?Item

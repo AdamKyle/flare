@@ -15,7 +15,7 @@ class EnchantBatchCraftingRules
      * Enchant For Event is the only Enchant workflow: no item selection, no affix selection,
      * no manual Event inventory selector, no listing, and no output destination.
      *
-     * @param  array  $requestData  The raw Batch Crafting request data.
+     * @param array $requestData The raw Batch Crafting request data.
      * @return array The Enchant validation rules.
      */
     public function rules(array $requestData): array

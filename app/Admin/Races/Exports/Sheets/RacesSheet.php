@@ -23,7 +23,7 @@ class RacesSheet implements FromCollection, ShouldAutoSize, WithHeadings, WithMa
     /**
      * Map a Race into its workbook row.
      *
-     * @param  mixed  $gameRace
+     * @param mixed $gameRace
      */
     public function map($gameRace): array
     {

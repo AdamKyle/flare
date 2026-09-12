@@ -106,7 +106,7 @@ class MultiInventoryActionService
     /**
      * Sell many items by include/exclude rules.
      *
-     * @param  array{ids?:array<int|string>,exclude?:array<int|string>}  $params
+     * @param array{ids?:array<int|string>,exclude?:array<int|string>} $params
      * @return array{status:int,message:string}
      *
      * @throws Exception
@@ -251,7 +251,7 @@ class MultiInventoryActionService
     /**
      * Disenchant many items via the DisenchantManyService.
      *
-     * @param  array{ids?:array<int|string>,exclude?:array<int|string>}  $params
+     * @param array{ids?:array<int|string>,exclude?:array<int|string>} $params
      * @return array{status:int,message:string,disenchanted_item:array<int,array{name:string,status:string,gold_dust:int}>}
      */
     public function disenchantManyItems(Character $character, array $params): array
@@ -267,7 +267,7 @@ class MultiInventoryActionService
     /**
      * Destroy items by include/exclude rules (artifacts excluded).
      *
-     * @param  array{ids?:array<int|string>,exclude?:array<int|string>}  $params
+     * @param array{ids?:array<int|string>,exclude?:array<int|string>} $params
      * @return array{status:int,message:string}
      */
     public function destroyManySetSlots(Character $character, InventorySet $set, array $setSlotIds): array
@@ -346,7 +346,7 @@ class MultiInventoryActionService
     /**
      * Destroy items by include/exclude rules (artifacts excluded).
      *
-     * @param  array{ids?:array<int|string>,exclude?:array<int|string>}  $params
+     * @param array{ids?:array<int|string>,exclude?:array<int|string>} $params
      * @return array{status:int,message:string}
      */
     public function destroyManyItems(Character $character, array $params): array

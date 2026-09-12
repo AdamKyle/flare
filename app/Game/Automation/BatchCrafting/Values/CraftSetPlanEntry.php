@@ -16,7 +16,7 @@ class CraftSetPlanEntry
     /**
      * Build a plan entry from its persisted array shape.
      *
-     * @param  array{position: string, item_id: int, crafting_type: string, item_name: string}  $entry  The persisted queue entry.
+     * @param array{position: string, item_id: int, crafting_type: string, item_name: string} $entry The persisted queue entry.
      * @return self The typed plan entry.
      */
     public static function fromArray(array $entry): self

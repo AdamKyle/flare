@@ -210,9 +210,9 @@ class Comparator
     /**
      * Build adjustments for scalar fields.
      *
-     * @param  array<string, array{type:?string, compare:?string}>  $fieldMeta
-     * @param  array<string, mixed>  $leftData
-     * @param  array<string, mixed>  $rightData
+     * @param array<string, array{type:?string, compare:?string}> $fieldMeta
+     * @param array<string, mixed> $leftData
+     * @param array<string, mixed> $rightData
      * @return array<string, mixed>
      */
     private function buildFieldAdjustments(array $fieldMeta, array $leftData, array $rightData): array
@@ -237,9 +237,9 @@ class Comparator
     /**
      * Build adjustments for collection rows (e.g., skill_summary).
      *
-     * @param  array<string, array{key:string, fields:array<string,string>}>  $collectionsMeta
-     * @param  array<string, mixed>  $leftData
-     * @param  array<string, mixed>  $rightData
+     * @param array<string, array{key:string, fields:array<string,string>}> $collectionsMeta
+     * @param array<string, mixed> $leftData
+     * @param array<string, mixed> $rightData
      * @return array<int, array<string, mixed>>
      */
     private function buildCollectionAdjustments(array $collectionsMeta, array $leftData, array $rightData): array
@@ -280,9 +280,9 @@ class Comparator
     /**
      * Build a single collection row with key + per-field "*_adjustment".
      *
-     * @param  array<string, mixed>  $leftRow
-     * @param  array<string, mixed>  $rightRow
-     * @param  array<string, string>  $fieldStrategies
+     * @param array<string, mixed> $leftRow
+     * @param array<string, mixed> $rightRow
+     * @param array<string, string> $fieldStrategies
      * @return array<string, mixed>
      */
     private function buildCollectionRow(
@@ -400,7 +400,7 @@ class Comparator
     /**
      * Does the given value match any of the PCRE patterns?
      *
-     * @param  array<int, string>  $patterns
+     * @param array<int, string> $patterns
      */
     private function matchesAny(string $value, array $patterns): bool
     {
@@ -419,7 +419,7 @@ class Comparator
     /**
      * Set a value at a dot-path inside an array (creating arrays as needed).
      *
-     * @param  array<string, mixed>  $target
+     * @param array<string, mixed> $target
      */
     private function setDot(array &$target, string $path, mixed $value): void
     {

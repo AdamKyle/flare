@@ -52,7 +52,7 @@ class BatchCraftingRequest extends FormRequest
     /**
      * Return the allowed backend disposition values for the requested batch type and mode.
      *
-     * @param  BatchCraftingType|null  $type  The requested Batch Crafting type.
+     * @param BatchCraftingType|null $type The requested Batch Crafting type.
      * @return array<int, string> The allowed disposition values.
      */
     private function allowedDispositionValues(?BatchCraftingType $type): array

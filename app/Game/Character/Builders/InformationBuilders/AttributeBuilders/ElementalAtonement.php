@@ -74,7 +74,7 @@ class ElementalAtonement extends BaseAttribute
      *
      * - Caps at 75%.
      *
-     * @param  array  $atonements  The atonement data.
+     * @param array $atonements The atonement data.
      * @return array The array of average values.
      */
     private function calculateAverages(array $atonements): array
@@ -93,7 +93,7 @@ class ElementalAtonement extends BaseAttribute
     /**
      * Calculates the highest element based on the given atonement data.
      *
-     * @param  array  $atonements  The atonement data.
+     * @param array $atonements The atonement data.
      * @return array The highest element information.
      */
     private function calculateHighestElement(array $atonements): array

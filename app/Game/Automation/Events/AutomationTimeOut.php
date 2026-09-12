@@ -27,7 +27,7 @@ class AutomationTimeOut implements ShouldBroadcast
     /**
      * Create a new event instance.
      *
-     * @param  int  $forLength  | 0
+     * @param int $forLength | 0
      * @return void
      */
     public function __construct(User $user, int $forLength = 0)

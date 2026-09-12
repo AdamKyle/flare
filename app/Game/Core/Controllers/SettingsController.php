@@ -28,7 +28,7 @@ class SettingsController extends Controller
     /**
      * Display the Settings page for the authenticated User.
      *
-     * @param  User  $user  Authenticated User whose Settings page is being displayed.
+     * @param User $user Authenticated User whose Settings page is being displayed.
      * @return View
      */
     public function index(User $user)
@@ -54,8 +54,8 @@ class SettingsController extends Controller
     /**
      * Update the authenticated User's chat message display preferences.
      *
-     * @param  Request  $request  Request containing chat-setting changes.
-     * @param  User  $user  Authenticated User being updated.
+     * @param Request $request Request containing chat-setting changes.
+     * @param User $user Authenticated User being updated.
      * @return RedirectResponse
      */
     public function chatSettings(Request $request, User $user)
@@ -88,8 +88,8 @@ class SettingsController extends Controller
     /**
      * Update the authenticated User's auto-disenchant preferences.
      *
-     * @param  Request  $request  Request containing auto-disenchant setting changes.
-     * @param  User  $user  Authenticated User being updated.
+     * @param Request $request Request containing auto-disenchant setting changes.
+     * @param User $user Authenticated User being updated.
      * @return RedirectResponse
      */
     public function autoDisenchantSettings(Request $request, User $user)
@@ -116,8 +116,8 @@ class SettingsController extends Controller
     /**
      * Update the authenticated User's attack type pop-over preference.
      *
-     * @param  Request  $request  Request containing the attack type pop-over setting change.
-     * @param  User  $user  Authenticated User being updated.
+     * @param Request $request Request containing the attack type pop-over setting change.
+     * @param User $user Authenticated User being updated.
      * @return RedirectResponse
      */
     public function disableAttackTypePopOvers(Request $request, User $user)
@@ -135,8 +135,8 @@ class SettingsController extends Controller
     /**
      * Update the authenticated User's Character name.
      *
-     * @param  Request  $request  Request containing the new Character name.
-     * @param  User  $user  Authenticated User being updated.
+     * @param Request $request Request containing the new Character name.
+     * @param User $user Authenticated User being updated.
      * @return RedirectResponse
      */
     public function characterSettings(Request $request, User $user)
@@ -155,8 +155,8 @@ class SettingsController extends Controller
     /**
      * Update the authenticated User's guide enabled preference.
      *
-     * @param  Request  $request  Request containing the guide-enabled setting change.
-     * @param  User  $user  Authenticated User being updated.
+     * @param Request $request Request containing the guide-enabled setting change.
+     * @param User $user Authenticated User being updated.
      * @return RedirectResponse
      */
     public function guideSettings(Request $request, User $user)
@@ -176,8 +176,8 @@ class SettingsController extends Controller
     /**
      * Update the authenticated User's cosmetic chat text options.
      *
-     * @param  CosmeticTextRequest  $request  Request containing cosmetic text options.
-     * @param  User  $user  Authenticated User being updated.
+     * @param CosmeticTextRequest $request Request containing cosmetic text options.
+     * @param User $user Authenticated User being updated.
      * @return RedirectResponse
      */
     public function cosmeticText(CosmeticTextRequest $request, User $user)
@@ -199,8 +199,8 @@ class SettingsController extends Controller
     /**
      * Update the authenticated User's cosmetic name tag option.
      *
-     * @param  NameTagRequest  $request  Request containing the nametag setting.
-     * @param  User  $user  Authenticated User being updated.
+     * @param NameTagRequest $request Request containing the nametag setting.
+     * @param User $user Authenticated User being updated.
      * @return RedirectResponse
      */
     public function cosmeticNametag(NameTagRequest $request, User $user)
@@ -228,8 +228,8 @@ class SettingsController extends Controller
     /**
      * Update the authenticated User's Character Race via the cosmetic Race changer.
      *
-     * @param  RaceChangerRequest  $request  Request containing the Race selection.
-     * @param  User  $user  Authenticated User whose Character Race is changed.
+     * @param RaceChangerRequest $request Request containing the Race selection.
+     * @param User $user Authenticated User whose Character Race is changed.
      * @return RedirectResponse
      */
     public function cosmeticRaceChanger(RaceChangerRequest $request, User $user)

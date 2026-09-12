@@ -25,7 +25,7 @@ class LoginMessage implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param  Collection  $characters
+     * @param Collection $characters
      */
     public function __construct(Character $character)
     {

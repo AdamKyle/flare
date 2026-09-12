@@ -22,7 +22,7 @@ class EquippableItemTransformer extends TransformerAbstract
     /**
      * Transforms an enriched Item model into an API-ready array.
      *
-     * @param  InventorySlot|SetSlot  $slot  ->item
+     * @param InventorySlot|SetSlot $slot ->item
      * @return array<string, mixed>
      */
     public function transform(InventorySlot|SetSlot $slot): array

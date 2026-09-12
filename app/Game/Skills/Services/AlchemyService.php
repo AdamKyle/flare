@@ -74,8 +74,8 @@ class AlchemyService
     /**
      * Fetch every alchemy item currently craftable by the character.
      *
-     * @param  Character  $character  The character requesting alchemy items.
-     * @param  bool  $showMerchantMessage  Whether to send the Merchant cost-reduction server message.
+     * @param Character $character The character requesting alchemy items.
+     * @param bool $showMerchantMessage Whether to send the Merchant cost-reduction server message.
      * @return SupportCollection The craftable alchemy items.
      */
     public function fetchAlchemistItems(Character $character, bool $showMerchantMessage = true)
@@ -94,7 +94,7 @@ class AlchemyService
     /**
      * Resolve the character's Alchemy skill, assuming it exists.
      *
-     * @param  Character  $character  The character being checked.
+     * @param Character $character The character being checked.
      * @return Skill The character's Alchemy skill.
      */
     private function fetchAlchemySkill(Character $character): Skill
@@ -105,7 +105,7 @@ class AlchemyService
     /**
      * Resolve the character's Alchemy skill, tolerating its absence.
      *
-     * @param  Character  $character  The character being checked.
+     * @param Character $character The character being checked.
      * @return Skill|null The character's Alchemy skill, or null when it does not exist.
      */
     public function findAlchemySkill(Character $character): ?Skill
@@ -122,7 +122,7 @@ class AlchemyService
     /**
      * Find the character's highest-requirement Alchemy item that still meaningfully grants XP.
      *
-     * @param  Character  $character  The character requesting the target.
+     * @param Character $character The character requesting the target.
      * @return Item|null The resolved meaningful item, or null when none currently applies.
      */
     public function findMeaningfulBatchItem(Character $character): ?Item
@@ -143,8 +143,8 @@ class AlchemyService
     /**
      * Resolve the character's class-adjusted Gold Dust/Shards cost to transmute the item.
      *
-     * @param  Character  $character  The character transmuting the item.
-     * @param  Item  $item  The Alchemy item being transmuted.
+     * @param Character $character The character transmuting the item.
+     * @param Item $item The Alchemy item being transmuted.
      * @return array{gold_dust: int, shards: int} The class-adjusted currency cost.
      */
     public function resolveCost(Character $character, Item $item): array
@@ -168,7 +168,7 @@ class AlchemyService
     /**
      * Build the base eligible-alchemy-items query for the character's Alchemy skill.
      *
-     * @param  Skill  $skill  The character's Alchemy skill.
+     * @param Skill $skill The character's Alchemy skill.
      * @return Builder The base eligible-alchemy-items query.
      */
     private function buildAlchemyItemsQuery(Skill $skill): Builder
@@ -183,8 +183,8 @@ class AlchemyService
     /**
      * Attach the character's currently owned Alchemy Bag amount to each candidate item.
      *
-     * @param  Character  $character  The character requesting owned amounts.
-     * @param  SupportCollection  $items  The candidate alchemy items.
+     * @param Character $character The character requesting owned amounts.
+     * @param SupportCollection $items The candidate alchemy items.
      * @return SupportCollection The items with owned amounts attached.
      */
     private function attachOwnedAmounts(Character $character, SupportCollection $items): SupportCollection
@@ -208,7 +208,7 @@ class AlchemyService
     /**
      * Return the character's current Alchemy skill XP progress.
      *
-     * @param  Character  $character  The character requesting Alchemy XP.
+     * @param Character $character The character requesting Alchemy XP.
      * @return array The Alchemy XP progress.
      */
     public function fetchSkillXP(Character $character): array
@@ -280,10 +280,10 @@ class AlchemyService
     /**
      * Attempt the transmute skill check and roll for the requested item.
      *
-     * @param  Character  $character  The character transmuting the item.
-     * @param  Skill  $skill  The character's Alchemy skill.
-     * @param  Item  $item  The item being transmuted.
-     * @param  bool  $bypassBagCapacity  Whether to bypass the Alchemy Bag capacity check.
+     * @param Character $character The character transmuting the item.
+     * @param Skill $skill The character's Alchemy skill.
+     * @param Item $item The item being transmuted.
+     * @param bool $bypassBagCapacity Whether to bypass the Alchemy Bag capacity check.
      * @return array|null The transmute outcome, or null when the attempt could not proceed.
      */
     private function attemptTransmute(Character $character, Skill $skill, Item $item, bool $bypassBagCapacity = false): ?array
@@ -345,11 +345,11 @@ class AlchemyService
     /**
      * Place the successfully transmuted item into the character's Alchemy Bag and award XP.
      *
-     * @param  Character  $character  The character transmuting the item.
-     * @param  Item  $item  The item being placed.
-     * @param  Skill  $skill  The character's Alchemy skill.
-     * @param  bool  $tooEasy  Whether the transmute was trivial and should not award XP.
-     * @param  bool  $bypassBagCapacity  Whether to bypass the Alchemy Bag capacity check.
+     * @param Character $character The character transmuting the item.
+     * @param Item $item The item being placed.
+     * @param Skill $skill The character's Alchemy skill.
+     * @param bool $tooEasy Whether the transmute was trivial and should not award XP.
+     * @param bool $bypassBagCapacity Whether to bypass the Alchemy Bag capacity check.
      * @return array|null The resulting Alchemy Bag slot facts, or null when placement failed.
      */
     private function pickUpItem(Character $character, Item $item, Skill $skill, bool $tooEasy = false, bool $bypassBagCapacity = false): ?array
@@ -385,9 +385,9 @@ class AlchemyService
     /**
      * Add the transmuted item to an existing or new Alchemy Bag slot, respecting bag capacity.
      *
-     * @param  Character  $character  The character transmuting the item.
-     * @param  Item  $item  The item being added.
-     * @param  bool  $bypassBagCapacity  Whether to bypass the Alchemy Bag capacity check.
+     * @param Character $character The character transmuting the item.
+     * @param Item $item The item being added.
+     * @param bool $bypassBagCapacity Whether to bypass the Alchemy Bag capacity check.
      * @return AlchemyBagSlot|null The resulting Alchemy Bag slot, or null when the bag is full.
      */
     private function attemptToPickUpItem(Character $character, Item $item, bool $bypassBagCapacity = false): ?AlchemyBagSlot

@@ -40,7 +40,7 @@ class DisenchantService
     /**
      * Set up the service for the given character, resolving their Disenchanting skill and Gold Dust Rush quest slot.
      *
-     * @param  Character  $character  The character disenchanting an item.
+     * @param Character $character The character disenchanting an item.
      * @return DisenchantService The configured service instance.
      */
     public function setUp(Character $character): DisenchantService
@@ -61,8 +61,8 @@ class DisenchantService
     /**
      * Disenchant the item held in an Inventory or Set slot and return the response payload.
      *
-     * @param  InventorySlot|SetSlot  $slot  The slot holding the item being disenchanted.
-     * @param  bool  $doNotSendResponse  Whether to suppress the player-facing response message.
+     * @param InventorySlot|SetSlot $slot The slot holding the item being disenchanted.
+     * @param bool $doNotSendResponse Whether to suppress the player-facing response message.
      * @return array The disenchant response payload.
      */
     public function disenchantItem(InventorySlot|SetSlot $slot, bool $doNotSendResponse = false): array
@@ -87,7 +87,7 @@ class DisenchantService
     /**
      * Roll the Disenchanting skill check, award or deny Gold Dust, and delete the disenchanted slot.
      *
-     * @param  InventorySlot|SetSlot  $slot  The slot holding the item being disenchanted.
+     * @param InventorySlot|SetSlot $slot The slot holding the item being disenchanted.
      * @return void This method does not return a value.
      */
     public function disenchantWithSkill(InventorySlot|SetSlot $slot): void
@@ -224,9 +224,9 @@ class DisenchantService
     /**
      * Roll and award the character's Gold Dust for a disenchant outcome, applying the Disenchanting skill bonus.
      *
-     * @param  Character  $character  The character being awarded Gold Dust.
-     * @param  bool  $failedCheck  Whether the disenchant skill check failed.
-     * @param  bool  $canRollGoldDustRush  Whether this award may also roll the Gold Dust Rush bonus.
+     * @param Character $character The character being awarded Gold Dust.
+     * @param bool $failedCheck Whether the disenchant skill check failed.
+     * @param bool $canRollGoldDustRush Whether this award may also roll the Gold Dust Rush bonus.
      * @return int The Gold Dust amount awarded before the Gold Dust Rush bonus.
      */
     public function updateGoldDust(Character $character, bool $failedCheck = false, bool $canRollGoldDustRush = true): int
@@ -270,8 +270,8 @@ class DisenchantService
     /**
      * Award the Gold Dust Rush quest-effect bonus on top of a successful disenchant, when eligible.
      *
-     * @param  Character  $character  The character being awarded the bonus.
-     * @param  int  $goldDustGain  The base Gold Dust gained from the disenchant.
+     * @param Character $character The character being awarded the bonus.
+     * @param int $goldDustGain The base Gold Dust gained from the disenchant.
      * @return void This method does not return a value.
      */
     public function applyGoldDustRushBonus(Character $character, int $goldDustGain): void

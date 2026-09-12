@@ -15,7 +15,7 @@ class AlchemyBatchCraftingRules
     /**
      * Build the Alchemy batch type's validation rules for the requested mode.
      *
-     * @param  array  $requestData  The raw Batch Crafting request data.
+     * @param array $requestData The raw Batch Crafting request data.
      * @return array The Alchemy validation rules.
      */
     public function rules(array $requestData): array
@@ -32,7 +32,7 @@ class AlchemyBatchCraftingRules
     /**
      * Return the client-owned progress keys allowed for the requested mode.
      *
-     * @param  string|null  $mode  The requested mode value.
+     * @param string|null $mode The requested mode value.
      * @return array<int, string> The allowed client-owned progress keys.
      */
     private function allowedProgressKeys(?string $mode): array
@@ -47,7 +47,7 @@ class AlchemyBatchCraftingRules
     /**
      * Return the mode-specific validation rules for the requested mode.
      *
-     * @param  string|null  $mode  The requested mode value.
+     * @param string|null $mode The requested mode value.
      * @return array The mode-specific validation rules.
      */
     private function modeSpecificRules(?string $mode): array

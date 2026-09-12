@@ -12,7 +12,7 @@ trait QuestDetails
     /**
      * Validate the Quest parent requirement for the character.
      *
-     * @param  mixed  $quest
+     * @param mixed $quest
      */
     protected function validateParentQuest($quest, array $completedQuestIds): bool
     {

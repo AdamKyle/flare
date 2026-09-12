@@ -33,8 +33,8 @@ class EventEnchantHandler implements BatchCraftingHandler
     /**
      * Execute one Enchant For Event Batch Crafting action slot for the running batch.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  Character  $character  The character running the batch.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param Character $character The character running the batch.
      * @return BatchCraftingOperationResult The outcome of the action slot.
      */
     public function handle(BatchCrafting $batchCrafting, Character $character): BatchCraftingOperationResult
@@ -56,9 +56,9 @@ class EventEnchantHandler implements BatchCraftingHandler
     /**
      * Enchant the next available Event Crafting Inventory item, real or fallback-crafted.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  Character  $character  The character running the batch.
-     * @param  GlobalEventGoal  $goal  The current Enchant Event goal.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param Character $character The character running the batch.
+     * @param GlobalEventGoal $goal The current Enchant Event goal.
      * @return BatchCraftingOperationResult The outcome of this action slot.
      */
     private function handleEnchantPhase(BatchCrafting $batchCrafting, Character $character, GlobalEventGoal $goal): BatchCraftingOperationResult
@@ -75,8 +75,8 @@ class EventEnchantHandler implements BatchCraftingHandler
     /**
      * Handle an empty Event Crafting Inventory by ending or moving into the fallback craft phase.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  GlobalEventGoal  $goal  The current Enchant Event goal.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param GlobalEventGoal $goal The current Enchant Event goal.
      * @return BatchCraftingOperationResult The outcome of this action slot.
      */
     private function handleEmptyInventory(BatchCrafting $batchCrafting, GlobalEventGoal $goal): BatchCraftingOperationResult
@@ -95,9 +95,9 @@ class EventEnchantHandler implements BatchCraftingHandler
     /**
      * Resolve the cheapest eligible Event affixes and attempt to enchant the resolved target.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  Character  $character  The character running the batch.
-     * @param  ResolvedEventEnchantTarget  $target  The resolved inventory slot and item.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param Character $character The character running the batch.
+     * @param ResolvedEventEnchantTarget $target The resolved inventory slot and item.
      * @return BatchCraftingOperationResult The outcome of this action slot.
      */
     private function attemptEnchant(BatchCrafting $batchCrafting, Character $character, ResolvedEventEnchantTarget $target): BatchCraftingOperationResult
@@ -139,9 +139,9 @@ class EventEnchantHandler implements BatchCraftingHandler
     /**
      * Craft one fallback item and add it to the character's Event Crafting Inventory.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  Character  $character  The character running the batch.
-     * @param  GlobalEventGoal  $goal  The current Enchant Event goal.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param Character $character The character running the batch.
+     * @param GlobalEventGoal $goal The current Enchant Event goal.
      * @return BatchCraftingOperationResult The outcome of this action slot.
      */
     private function handleCraftFallbackPhase(BatchCrafting $batchCrafting, Character $character, GlobalEventGoal $goal): BatchCraftingOperationResult
@@ -178,9 +178,9 @@ class EventEnchantHandler implements BatchCraftingHandler
     /**
      * Persist the batch's cumulative Crafting and Enchanting XP using this action's factual XP gained.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  int  $craftingXpGained  The factual Crafting XP gained by this action.
-     * @param  int  $enchantingXpGained  The factual Enchanting XP gained by this action.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param int $craftingXpGained The factual Crafting XP gained by this action.
+     * @param int $enchantingXpGained The factual Enchanting XP gained by this action.
      * @return void This method does not return a value.
      */
     private function persistXpGained(BatchCrafting $batchCrafting, int $craftingXpGained, int $enchantingXpGained): void
@@ -194,8 +194,8 @@ class EventEnchantHandler implements BatchCraftingHandler
     /**
      * Persist the run's current Enchant For Event phase.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  EnchantEventPhase  $phase  The phase to persist.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param EnchantEventPhase $phase The phase to persist.
      * @return void This method does not return a value.
      */
     private function setPhase(BatchCrafting $batchCrafting, EnchantEventPhase $phase): void

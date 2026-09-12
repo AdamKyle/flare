@@ -71,12 +71,12 @@ class AutomatedBountyFightHandler
     private bool $lastFightYielded = false;
 
     /**
-     * @param  MonsterFightService  $monsterFightService  The monster fight service.
-     * @param  BattleEventHandler  $battleEventHandler  The battle event handler.
-     * @param  CharacterRewardService  $characterRewardService  The character reward service.
-     * @param  SkillService  $skillService  The skill service.
-     * @param  AutomatedFightResult  $automatedFightResult  The fight result builder.
-     * @param  Closure|null  $clock  An optional clock override used by tests.
+     * @param MonsterFightService $monsterFightService The monster fight service.
+     * @param BattleEventHandler $battleEventHandler The battle event handler.
+     * @param CharacterRewardService $characterRewardService The character reward service.
+     * @param SkillService $skillService The skill service.
+     * @param AutomatedFightResult $automatedFightResult The fight result builder.
+     * @param Closure|null $clock An optional clock override used by tests.
      */
     public function __construct(
         private readonly MonsterFightService $monsterFightService,
@@ -90,12 +90,12 @@ class AutomatedBountyFightHandler
     /**
      * Set up the handler.
      *
-     * @param  Character  $character  The character fighting.
-     * @param  FactionLoyaltyAutomation  $factionLoyaltyAutomation  The Faction Loyalty automation record.
-     * @param  FactionLoyaltyNpc  $factionLoyaltyNpc  The NPC being assisted.
-     * @param  array  $task  The bounty task.
-     * @param  string  $attackType  The selected attack type.
-     * @param  FactionLoyaltyAutomationFightLogger  $factionLoyaltyAutomationFightLogger  The fight logger.
+     * @param Character $character The character fighting.
+     * @param FactionLoyaltyAutomation $factionLoyaltyAutomation The Faction Loyalty automation record.
+     * @param FactionLoyaltyNpc $factionLoyaltyNpc The NPC being assisted.
+     * @param array $task The bounty task.
+     * @param string $attackType The selected attack type.
+     * @param FactionLoyaltyAutomationFightLogger $factionLoyaltyAutomationFightLogger The fight logger.
      * @return AutomatedBountyFightHandler The configured handler instance.
      */
     public function setUp(
@@ -212,8 +212,8 @@ class AutomatedBountyFightHandler
     /**
      * Fight the bounty batch.
      *
-     * @param  Monster  $bountyMonster  The bounty target monster.
-     * @param  int  $remainingKills  The remaining required kill count.
+     * @param Monster $bountyMonster The bounty target monster.
+     * @param int $remainingKills The remaining required kill count.
      * @return AutomatedFightResultType The batch outcome.
      */
     private function fightBountyBatch(Monster $bountyMonster, int $remainingKills): AutomatedFightResultType
@@ -263,9 +263,9 @@ class AutomatedBountyFightHandler
     /**
      * Attempt recovery training.
      *
-     * @param  Monster  $failedBountyMonster  The monster the character failed to defeat.
-     * @param  bool  $reviveCharacter  Whether the character should be revived first.
-     * @param  bool  $retryCachedFight  Whether to retry a stalled cached fight.
+     * @param Monster $failedBountyMonster The monster the character failed to defeat.
+     * @param bool $reviveCharacter Whether the character should be revived first.
+     * @param bool $retryCachedFight Whether to retry a stalled cached fight.
      * @return AutomatedFightResult The recovery training result.
      */
     private function attemptRecoveryTraining(Monster $failedBountyMonster, bool $reviveCharacter = true, bool $retryCachedFight = false): AutomatedFightResult
@@ -346,8 +346,8 @@ class AutomatedBountyFightHandler
     /**
      * Fight one monster until the monster dies, the character dies, or the attack limit is reached.
      *
-     * @param  Monster  $monster  The monster to fight.
-     * @param  bool  $retryCachedFight  Whether to retry a stalled cached fight.
+     * @param Monster $monster The monster to fight.
+     * @param bool $retryCachedFight Whether to retry a stalled cached fight.
      * @return array The final fight result data.
      */
     private function fightMonsterUntilResolved(Monster $monster, bool $retryCachedFight = false): array
@@ -412,7 +412,7 @@ class AutomatedBountyFightHandler
     /**
      * Should the monster be attacked again?
      *
-     * @param  array  $fightData  The fight result data.
+     * @param array $fightData The fight result data.
      * @return bool True when the monster is still alive.
      */
     private function shouldAttackAgain(array $fightData): bool
@@ -427,7 +427,7 @@ class AutomatedBountyFightHandler
     /**
      * Has the character died?
      *
-     * @param  array  $fightData  The fight result data.
+     * @param array $fightData The fight result data.
      * @return bool True when the character died.
      */
     private function hasCharacterDied(array $fightData): bool
@@ -442,7 +442,7 @@ class AutomatedBountyFightHandler
     /**
      * Has the monster died?
      *
-     * @param  array  $fightData  The fight result data.
+     * @param array $fightData The fight result data.
      * @return bool True when the monster died.
      */
     private function hasMonsterDied(array $fightData): bool
@@ -457,7 +457,7 @@ class AutomatedBountyFightHandler
     /**
      * Get a recovery training monster.
      *
-     * @param  Monster  $failedBountyMonster  The monster the character failed to defeat.
+     * @param Monster $failedBountyMonster The monster the character failed to defeat.
      * @return Monster|null The selected recovery training monster, if any.
      */
     private function getTrainingMonster(Monster $failedBountyMonster): ?Monster
@@ -477,7 +477,7 @@ class AutomatedBountyFightHandler
     /**
      * Has training completed for this failed bounty monster?
      *
-     * @param  Monster  $bountyMonster  The bounty target monster.
+     * @param Monster $bountyMonster The bounty target monster.
      * @return bool True when recovery training has completed for this monster.
      */
     private function hasCompletedTrainingForFailedBounty(Monster $bountyMonster): bool
@@ -504,9 +504,9 @@ class AutomatedBountyFightHandler
     /**
      * Should a stalled cached fight be retried?
      *
-     * @param  Monster  $monster  The monster being fought.
-     * @param  bool  $bountyTarget  Whether this monster is the bounty target.
-     * @param  bool  $training  Whether this is recovery training.
+     * @param Monster $monster The monster being fought.
+     * @param bool $bountyTarget Whether this monster is the bounty target.
+     * @param bool $training Whether this is recovery training.
      * @return bool True when the stalled fight should be retried.
      */
     private function shouldRetryStalledFight(Monster $monster, bool $bountyTarget, bool $training): bool
@@ -525,9 +525,9 @@ class AutomatedBountyFightHandler
     /**
      * Prepare the stalled fight result.
      *
-     * @param  Monster  $monster  The monster being fought.
-     * @param  bool  $bountyTarget  Whether this monster is the bounty target.
-     * @param  bool  $training  Whether this is recovery training.
+     * @param Monster $monster The monster being fought.
+     * @param bool $bountyTarget Whether this monster is the bounty target.
+     * @param bool $training Whether this is recovery training.
      * @return AutomatedFightResultType The stalled fight outcome.
      */
     private function prepareStalledResult(Monster $monster, bool $bountyTarget, bool $training): AutomatedFightResultType
@@ -556,9 +556,9 @@ class AutomatedBountyFightHandler
     /**
      * Get the stalled attempt count for the same monster and phase.
      *
-     * @param  Monster  $monster  The monster being fought.
-     * @param  bool  $bountyTarget  Whether this monster is the bounty target.
-     * @param  bool  $training  Whether this is recovery training.
+     * @param Monster $monster The monster being fought.
+     * @param bool $bountyTarget Whether this monster is the bounty target.
+     * @param bool $training Whether this is recovery training.
      * @return int The recorded stalled attempt count.
      */
     private function getStalledAttemptCount(Monster $monster, bool $bountyTarget, bool $training): int
@@ -573,9 +573,9 @@ class AutomatedBountyFightHandler
     /**
      * Does the last fight state match this monster and phase?
      *
-     * @param  Monster  $monster  The monster being fought.
-     * @param  bool  $bountyTarget  Whether this monster is the bounty target.
-     * @param  bool  $training  Whether this is recovery training.
+     * @param Monster $monster The monster being fought.
+     * @param bool $bountyTarget Whether this monster is the bounty target.
+     * @param bool $training Whether this is recovery training.
      * @return bool True when the last recorded fight matches this monster and phase.
      */
     private function lastFightMatches(Monster $monster, bool $bountyTarget, bool $training): bool
@@ -588,7 +588,7 @@ class AutomatedBountyFightHandler
     /**
      * Build the stalled warning message.
      *
-     * @param  Monster  $monster  The monster that stalled the fight.
+     * @param Monster $monster The monster that stalled the fight.
      * @return string The stalled warning message.
      */
     private function buildStalledWarningMessage(Monster $monster): string
@@ -599,7 +599,7 @@ class AutomatedBountyFightHandler
     /**
      * Set the failed bounty monster.
      *
-     * @param  Monster  $bountyMonster  The bounty monster the character failed to defeat.
+     * @param Monster $bountyMonster The bounty monster the character failed to defeat.
      * @return void This method does not return a value.
      */
     private function setFailedBountyMonster(Monster $bountyMonster): void
@@ -614,7 +614,7 @@ class AutomatedBountyFightHandler
     /**
      * Aggregate rewards for one killed monster.
      *
-     * @param  Monster  $monster  The killed monster.
+     * @param Monster $monster The killed monster.
      * @return void This method does not return a value.
      */
     private function aggregateRewards(Monster $monster): void
@@ -629,7 +629,7 @@ class AutomatedBountyFightHandler
     /**
      * Process batch rewards once for the batch.
      *
-     * @param  Monster  $monster  The monster whose death triggers the batch reward.
+     * @param Monster $monster The monster whose death triggers the batch reward.
      * @return void This method does not return a value.
      */
     private function processBatchRewards(Monster $monster): void
@@ -650,7 +650,7 @@ class AutomatedBountyFightHandler
     /**
      * Determine whether the current fight run should yield back to the caller.
      *
-     * @param  int  $killsThisPhase  The number of kills recorded so far this phase.
+     * @param int $killsThisPhase The number of kills recorded so far this phase.
      * @return bool True when the run should yield.
      */
     private function shouldYieldRun(int $killsThisPhase): bool
@@ -673,7 +673,7 @@ class AutomatedBountyFightHandler
     /**
      * Sum the recovery training kills already logged for the failed bounty monster.
      *
-     * @param  Monster  $failedBountyMonster  The monster the character failed to defeat.
+     * @param Monster $failedBountyMonster The monster the character failed to defeat.
      * @return int The recorded recovery training kill count.
      */
     private function completedRecoveryTrainingKills(Monster $failedBountyMonster): int
@@ -691,13 +691,13 @@ class AutomatedBountyFightHandler
     /**
      * Log and return a fight result.
      *
-     * @param  AutomatedFightResultType  $automatedFightResultType  The fight result type.
-     * @param  Monster|null  $monster  The monster fought, if any.
-     * @param  bool  $bountyTarget  Whether the monster is the bounty target.
-     * @param  bool  $training  Whether the fight was recovery training.
-     * @param  bool  $endedAutomation  Whether the automation ended.
-     * @param  bool  $characterDied  Whether the character died.
-     * @param  bool  $trainedForFailedBounty  Whether recovery training completed for a failed bounty.
+     * @param AutomatedFightResultType $automatedFightResultType The fight result type.
+     * @param Monster|null $monster The monster fought, if any.
+     * @param bool $bountyTarget Whether the monster is the bounty target.
+     * @param bool $training Whether the fight was recovery training.
+     * @param bool $endedAutomation Whether the automation ended.
+     * @param bool $characterDied Whether the character died.
+     * @param bool $trainedForFailedBounty Whether recovery training completed for a failed bounty.
      * @return AutomatedFightResult The finished fight result.
      */
     private function finish(
@@ -785,9 +785,9 @@ class AutomatedBountyFightHandler
     /**
      * Send the automation log update.
      *
-     * @param  string  $message  The log message text.
-     * @param  bool  $makeItalic  Whether the message should render italicized.
-     * @param  bool  $isReward  Whether the message represents a reward.
+     * @param string $message The log message text.
+     * @param bool $makeItalic Whether the message should render italicized.
+     * @param bool $isReward Whether the message represents a reward.
      * @return void This method does not return a value.
      */
     private function sendOutEventLogUpdate(string $message, bool $makeItalic = false, bool $isReward = false): void

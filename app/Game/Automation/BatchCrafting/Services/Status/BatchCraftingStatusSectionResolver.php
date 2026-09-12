@@ -8,15 +8,15 @@ use InvalidArgumentException;
 class BatchCraftingStatusSectionResolver
 {
     /**
-     * @param  array<int, BatchCraftingStatusSection>  $sections  The registered status sections.
+     * @param array<int, BatchCraftingStatusSection> $sections The registered status sections.
      */
     public function __construct(private readonly array $sections) {}
 
     /**
      * Resolve the registered status section for the given Batch Crafting type and mode.
      *
-     * @param  BatchCraftingType  $type  The batch's Batch Crafting type.
-     * @param  string  $mode  The batch's persisted mode value.
+     * @param BatchCraftingType $type The batch's Batch Crafting type.
+     * @param string $mode The batch's persisted mode value.
      * @return BatchCraftingStatusSection The resolved status section.
      */
     public function resolve(BatchCraftingType $type, string $mode): BatchCraftingStatusSection

@@ -87,7 +87,7 @@ class StarterWeaponAndInventory
     /**
      * Find a starter item id limited to specific weapon types.
      *
-     * @param  array<int, string>  $types
+     * @param array<int, string> $types
      */
     private function findStarterItemIdByTypes(array $types): ?int
     {

@@ -17,7 +17,7 @@ class FactionLoyaltyAutomationCraftingLogger implements AutomatedCraftingLogger
     /**
      * Set up the logger.
      *
-     * @param  FactionLoyaltyAutomation  $factionLoyaltyAutomation  The Faction Loyalty automation record.
+     * @param FactionLoyaltyAutomation $factionLoyaltyAutomation The Faction Loyalty automation record.
      * @return FactionLoyaltyAutomationCraftingLogger The configured logger instance.
      */
     public function setUp(FactionLoyaltyAutomation $factionLoyaltyAutomation): FactionLoyaltyAutomationCraftingLogger
@@ -30,7 +30,7 @@ class FactionLoyaltyAutomationCraftingLogger implements AutomatedCraftingLogger
     /**
      * Log the automated crafting result.
      *
-     * @param  AutomatedCraftingResult  $automatedCraftingResult  The crafting result to log.
+     * @param AutomatedCraftingResult $automatedCraftingResult The crafting result to log.
      * @return void This method does not return a value.
      */
     public function log(AutomatedCraftingResult $automatedCraftingResult): void
@@ -79,8 +79,8 @@ class FactionLoyaltyAutomationCraftingLogger implements AutomatedCraftingLogger
     /**
      * Append a crafting log entry without hydrating the full JSON log.
      *
-     * @param  int  $factionLoyaltyAutomationLogId  The Faction Loyalty automation log id.
-     * @param  array  $craftingLog  The crafting log entry to append.
+     * @param int $factionLoyaltyAutomationLogId The Faction Loyalty automation log id.
+     * @param array $craftingLog The crafting log entry to append.
      * @return void This method does not return a value.
      */
     private function appendCraftingLog(int $factionLoyaltyAutomationLogId, array $craftingLog): void

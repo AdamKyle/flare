@@ -48,10 +48,10 @@ class TrinketCraftingService
     /**
      * Fetches a paginated, searchable list of Trinkets eligible for crafting.
      *
-     * @param  Character  $character  The character requesting the list.
-     * @param  int  $perPage  The number of items per page.
-     * @param  int  $page  The requested page number.
-     * @param  string  $search  The optional item name search text.
+     * @param Character $character The character requesting the list.
+     * @param int $perPage The number of items per page.
+     * @param int $page The requested page number.
+     * @param string $search The optional item name search text.
      * @return array The paginated craftable Trinket payload.
      */
     public function fetchPaginatedItemsToCraft(Character $character, int $perPage, int $page, string $search = ''): array
@@ -78,8 +78,8 @@ class TrinketCraftingService
     /**
      * Fetch trinkets the player can craft.
      *
-     * @param  Character  $character  The character requesting the list.
-     * @param  bool  $showMerchantMessage  Whether to attach the merchant discount message.
+     * @param Character $character The character requesting the list.
+     * @param bool $showMerchantMessage Whether to attach the merchant discount message.
      * @return array The craftable Trinket payload.
      */
     public function fetchItemsToCraft(Character $character, bool $showMerchantMessage = true): array
@@ -98,7 +98,7 @@ class TrinketCraftingService
     /**
      * Build the base eligible-Trinket query for the given Trinketry skill level.
      *
-     * @param  Skill  $trinketrySkill  The character's Trinketry skill.
+     * @param Skill $trinketrySkill The character's Trinketry skill.
      * @return Builder The base eligible-Trinket query.
      */
     private function buildTrinketItemsQuery(Skill $trinketrySkill): Builder
@@ -111,7 +111,7 @@ class TrinketCraftingService
     /**
      * Return the character's current Trinketry skill XP facts.
      *
-     * @param  Character  $character  The character requesting the XP facts.
+     * @param Character $character The character requesting the XP facts.
      * @return array The Trinketry XP facts.
      */
     public function fetchSkillXP(Character $character): array
@@ -129,8 +129,8 @@ class TrinketCraftingService
     /**
      * Attempt to craft the item, removing currency, rolling the craft, and giving the item to the player.
      *
-     * @param  Character  $character  The character crafting the item.
-     * @param  Item  $item  The item being crafted.
+     * @param Character $character The character crafting the item.
+     * @param Item $item The item being crafted.
      * @return array The updated craftable items and the resulting item preview, when kept.
      */
     public function craft(Character $character, Item $item): array
@@ -206,10 +206,10 @@ class TrinketCraftingService
      * Preserves the same affordability, skill requirement, success/failure roll, and
      * currency spending rules as craft(), but never picks the item up into inventory.
      *
-     * @param  Character  $character  The character crafting the item.
-     * @param  Item  $item  The item being crafted.
-     * @param  bool  $suppressSuccessServerMessage  Whether to suppress the success server message.
-     * @param  callable|null  $destinationCreator  The optional retained-destination callback.
+     * @param Character $character The character crafting the item.
+     * @param Item $item The item being crafted.
+     * @param bool $suppressSuccessServerMessage Whether to suppress the success server message.
+     * @param callable|null $destinationCreator The optional retained-destination callback.
      * @return array The batch craft outcome.
      */
     public function craftForBatch(
@@ -282,7 +282,7 @@ class TrinketCraftingService
     /**
      * Fetch the crafting skill for the player.
      *
-     * @param  Character  $character  The character requesting the skill.
+     * @param Character $character The character requesting the skill.
      * @return Skill The character's Trinketry skill.
      */
     private function fetchCharacterSkill(Character $character): Skill
@@ -293,7 +293,7 @@ class TrinketCraftingService
     /**
      * Resolve the character's Trinketry skill, tolerating its absence.
      *
-     * @param  Character  $character  The character being checked.
+     * @param Character $character The character being checked.
      * @return Skill|null The character's Trinketry skill, or null when it does not exist.
      */
     public function findTrinketrySkill(Character $character): ?Skill
@@ -310,7 +310,7 @@ class TrinketCraftingService
     /**
      * Find the character's highest-requirement Trinket that still meaningfully grants XP.
      *
-     * @param  Character  $character  The character requesting the target.
+     * @param Character $character The character requesting the target.
      * @return Item|null The resolved meaningful item, or null when none currently applies.
      */
     public function findMeaningfulBatchItem(Character $character): ?Item
@@ -331,8 +331,8 @@ class TrinketCraftingService
     /**
      * Resolve the Gold Dust and Copper Coin cost facts for crafting the given item.
      *
-     * @param  Character  $character  The character being charged.
-     * @param  Item  $item  The item being priced.
+     * @param Character $character The character being charged.
+     * @param Item $item The item being priced.
      * @return array The Gold Dust and Copper Coin cost facts.
      */
     public function craftingCost(Character $character, Item $item): array
@@ -364,8 +364,8 @@ class TrinketCraftingService
     /**
      * Determine whether the character can afford the item's Gold Dust and Copper Coin cost.
      *
-     * @param  Character  $character  The character being checked.
-     * @param  Item  $item  The item being priced.
+     * @param Character $character The character being checked.
+     * @param Item $item The item being priced.
      * @return bool True when the character can afford the item.
      */
     private function canAfford(Character $character, Item $item): bool
@@ -379,8 +379,8 @@ class TrinketCraftingService
     /**
      * Deduct the item's crafting cost from the character's currencies.
      *
-     * @param  Character  $character  The character being charged.
-     * @param  Item  $item  The item being crafted.
+     * @param Character $character The character being charged.
+     * @param Item $item The item being crafted.
      * @return void This method does not return a value.
      */
     private function deductCraftingCost(Character $character, Item $item): void
@@ -401,7 +401,7 @@ class TrinketCraftingService
      * Kept protected as an existing test seam: TrinketCraftingServiceTest mocks this method to
      * force a deterministic craft roll outcome.
      *
-     * @param  Skill  $trinketSkill  The character's Trinketry skill.
+     * @param Skill $trinketSkill The character's Trinketry skill.
      * @return bool True when the craft roll succeeds.
      */
     protected function canCraft(Skill $trinketSkill): bool

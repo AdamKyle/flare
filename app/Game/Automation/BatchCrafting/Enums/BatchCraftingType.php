@@ -31,7 +31,7 @@ enum BatchCraftingType: string
     /**
      * Return this batch type's persisted mode value from the given progress data.
      *
-     * @param  array  $progress  The persisted Batch Crafting progress data.
+     * @param array $progress The persisted Batch Crafting progress data.
      * @return string The persisted mode value.
      */
     public function modeFromProgress(array $progress): string

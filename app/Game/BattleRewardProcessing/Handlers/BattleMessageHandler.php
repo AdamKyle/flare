@@ -53,7 +53,7 @@ class BattleMessageHandler
     /**
      * Handle message for gaining xp for faction loyalty
      *
-     * @param  User  $user  .
+     * @param User $user .
      */
     public function handleFactionLoyaltyXp(User $user, int $totalXp, int $newFameLevel, string $npcName): void
     {

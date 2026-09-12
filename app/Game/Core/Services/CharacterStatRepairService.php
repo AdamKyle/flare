@@ -9,15 +9,15 @@ use App\Game\Reincarnate\Values\MaxReincarnationStats;
 class CharacterStatRepairService
 {
     /**
-     * @param  BaseStatCalculator  $baseStatValue  Class-based Character base stat calculator.
+     * @param BaseStatCalculator $baseStatValue Class-based Character base stat calculator.
      */
     public function __construct(private readonly BaseStatCalculator $baseStatValue) {}
 
     /**
      * Calculate the minimum reincarnation stat bonus a Character must have for their times reincarnated and max level.
      *
-     * @param  Character  $character  Character whose minimum reincarnation bonus is being calculated.
-     * @param  int  $maxLevel  Max level used by the calculation.
+     * @param Character $character Character whose minimum reincarnation bonus is being calculated.
+     * @param int $maxLevel Max level used by the calculation.
      * @return int Minimum reincarnation stat bonus required for the Character's times reincarnated and max level.
      */
     public function getMinimumReincarnationBonus(Character $character, int $maxLevel): int
@@ -36,8 +36,8 @@ class CharacterStatRepairService
     /**
      * Repair the Character's reincarnated stat increase when it is below the minimum required bonus.
      *
-     * @param  Character  $character  Character being repaired.
-     * @param  int  $maxLevel  Max level used by the repair calculation.
+     * @param Character $character Character being repaired.
+     * @param int $maxLevel Max level used by the repair calculation.
      * @return void Updates the Character's reincarnated stat increase in place when it is below the minimum; no direct return value.
      */
     public function repairReincarnationBonus(Character $character, int $maxLevel): void
@@ -56,7 +56,7 @@ class CharacterStatRepairService
     /**
      * Repair any of the Character's core stats that have fallen below their expected floor.
      *
-     * @param  Character  $character  Character whose stats are being repaired.
+     * @param Character $character Character whose stats are being repaired.
      * @return void Updates any below-floor core stats on the Character in place; no direct return value.
      */
     public function repair(Character $character): void

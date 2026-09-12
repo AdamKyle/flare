@@ -96,10 +96,10 @@ class Exploration implements ShouldQueue
     ];
 
     /**
-     * @param  Character  $character  The character exploring.
-     * @param  int  $automationId  The character automation id.
-     * @param  string  $attackType  The selected attack type.
-     * @param  int  $timeDelay  The delay, in minutes, before this round runs.
+     * @param Character $character The character exploring.
+     * @param int $automationId The character automation id.
+     * @param string $attackType The selected attack type.
+     * @param int $timeDelay The delay, in minutes, before this round runs.
      */
     public function __construct(Character $character, int $automationId, string $attackType, int $timeDelay)
     {
@@ -112,16 +112,16 @@ class Exploration implements ShouldQueue
     /**
      * Run one Exploration automation round: fight the encounter, apply rewards, and re-dispatch or end the run.
      *
-     * @param  MonsterFightService  $monsterFightService  The monster fight service.
-     * @param  BattleEventHandler  $battleEventHandler  The battle event handler.
-     * @param  CharacterCacheData  $characterCacheData  The character cache data service.
-     * @param  CharacterRewardService  $characterRewardService  The character reward service.
-     * @param  SkillService  $skillService  The skill service.
-     * @param  ExplorationCreatureCountCalculator  $explorationCreatureCountCalculator  The creature count calculator.
-     * @param  FactionHandler  $factionHandler  The faction points handler.
-     * @param  ExplorationLogService  $explorationLogService  The Exploration log service.
-     * @param  ExplorationWarningService  $explorationWarningService  The Exploration warning service.
-     * @param  RandomNumberGenerator  $randomNumberGenerator  The random number generator.
+     * @param MonsterFightService $monsterFightService The monster fight service.
+     * @param BattleEventHandler $battleEventHandler The battle event handler.
+     * @param CharacterCacheData $characterCacheData The character cache data service.
+     * @param CharacterRewardService $characterRewardService The character reward service.
+     * @param SkillService $skillService The skill service.
+     * @param ExplorationCreatureCountCalculator $explorationCreatureCountCalculator The creature count calculator.
+     * @param FactionHandler $factionHandler The faction points handler.
+     * @param ExplorationLogService $explorationLogService The Exploration log service.
+     * @param ExplorationWarningService $explorationWarningService The Exploration warning service.
+     * @param RandomNumberGenerator $randomNumberGenerator The random number generator.
      * @return void This method does not return a value.
      */
     public function handle(
@@ -306,10 +306,10 @@ class Exploration implements ShouldQueue
     /**
      * Handle an encounter.
      *
-     * @param  CharacterAutomation  $automation  The character's Exploration automation record.
-     * @param  array  $params  The encounter parameters.
-     * @param  int  $timeDelay  The delay, in minutes, before the next round.
-     * @param  RandomNumberGenerator  $randomNumberGenerator  The random number generator.
+     * @param CharacterAutomation $automation The character's Exploration automation record.
+     * @param array $params The encounter parameters.
+     * @param int $timeDelay The delay, in minutes, before the next round.
+     * @param RandomNumberGenerator $randomNumberGenerator The random number generator.
      * @return bool True when the encounter was survived.
      *
      * @throws InvalidArgumentException
@@ -387,8 +387,8 @@ class Exploration implements ShouldQueue
     /**
      * Build the monster snapshot recorded on the Exploration log for the current fight.
      *
-     * @param  array  $fightData  The fight setup/result payload.
-     * @param  RandomNumberGenerator  $randomNumberGenerator  The random number generator.
+     * @param array $fightData The fight setup/result payload.
+     * @param RandomNumberGenerator $randomNumberGenerator The random number generator.
      * @return array|null The built monster snapshot, or null when it cannot be built.
      */
     private function builtMonsterSnapshot(array $fightData, RandomNumberGenerator $randomNumberGenerator): ?array
@@ -459,11 +459,11 @@ class Exploration implements ShouldQueue
     /**
      * Resolve a single monster snapshot stat, preferring the fight value over base monster data.
      *
-     * @param  array  $builtMonster  The fight's built monster payload.
-     * @param  Monster|null  $baseMonster  The base monster model, if it still exists.
-     * @param  string  $baseAttribute  The monster model attribute name.
-     * @param  string|null  $runtimeAttribute  The fight payload's runtime attribute key.
-     * @param  mixed  $fightValue  The value rolled during the fight, if any.
+     * @param array $builtMonster The fight's built monster payload.
+     * @param Monster|null $baseMonster The base monster model, if it still exists.
+     * @param string $baseAttribute The monster model attribute name.
+     * @param string|null $runtimeAttribute The fight payload's runtime attribute key.
+     * @param mixed $fightValue The value rolled during the fight, if any.
      * @return mixed The resolved stat value.
      */
     private function builtMonsterStat(array $builtMonster, ?Monster $baseMonster, string $baseAttribute, ?string $runtimeAttribute = null, mixed $fightValue = null): mixed
@@ -486,7 +486,7 @@ class Exploration implements ShouldQueue
     /**
      * Sum weapon, spell, healing, and blocked totals from the fight's battle messages.
      *
-     * @param  array  $fightData  The fight result payload.
+     * @param array $fightData The fight result payload.
      * @return array The summed message totals.
      */
     private function extractBattleMessageTotals(array $fightData): array
@@ -521,7 +521,7 @@ class Exploration implements ShouldQueue
     /**
      * Extract weapon damage from a battle message, if present.
      *
-     * @param  string  $message  The battle message text.
+     * @param string $message The battle message text.
      * @return int The extracted weapon damage, or zero.
      */
     private function extractWeaponDamageFromMessage(string $message): int
@@ -541,7 +541,7 @@ class Exploration implements ShouldQueue
     /**
      * Extract spell damage from a battle message, if present.
      *
-     * @param  string  $message  The battle message text.
+     * @param string $message The battle message text.
      * @return int The extracted spell damage, or zero.
      */
     private function extractSpellDamageFromMessage(string $message): int
@@ -558,7 +558,7 @@ class Exploration implements ShouldQueue
     /**
      * Extract healing done from a battle message, if present.
      *
-     * @param  string  $message  The battle message text.
+     * @param string $message The battle message text.
      * @return int The extracted healing amount, or zero.
      */
     private function extractHealingFromMessage(string $message): int
@@ -575,7 +575,7 @@ class Exploration implements ShouldQueue
     /**
      * Extract damage blocked from a battle message, if present.
      *
-     * @param  string  $message  The battle message text.
+     * @param string $message The battle message text.
      * @return int The extracted blocked damage, or zero.
      */
     private function extractBlockedFromMessage(string $message): int
@@ -591,8 +591,8 @@ class Exploration implements ShouldQueue
     /**
      * Return the first numeric match found in the message for the given regex patterns.
      *
-     * @param  string  $message  The battle message text.
-     * @param  array  $patterns  The regex patterns to test.
+     * @param string $message The battle message text.
+     * @param array $patterns The regex patterns to test.
      * @return int The first numeric match, or zero.
      */
     private function extractMessageTotal(string $message, array $patterns): int
@@ -609,9 +609,9 @@ class Exploration implements ShouldQueue
     /**
      * Fight monster through automation.
      *
-     * @param  CharacterAutomation  $automation  The character's Exploration automation record.
-     * @param  array  $params  The fight parameters.
-     * @param  RandomNumberGenerator  $randomNumberGenerator  The random number generator.
+     * @param CharacterAutomation $automation The character's Exploration automation record.
+     * @param array $params The fight parameters.
+     * @param RandomNumberGenerator $randomNumberGenerator The random number generator.
      * @return bool True when the fight was survived.
      *
      * @throws InvalidArgumentException
@@ -679,8 +679,8 @@ class Exploration implements ShouldQueue
     /**
      * Handle when a character dies in automation.
      *
-     * @param  CharacterAutomation  $automation  The character's Exploration automation record.
-     * @param  array  $data  The fight result data.
+     * @param CharacterAutomation $automation The character's Exploration automation record.
+     * @param array $data The fight result data.
      * @return bool True when the character died and the automation was cancelled.
      */
     private function handleWhenCharacterDies(CharacterAutomation $automation, array $data): bool
@@ -697,7 +697,7 @@ class Exploration implements ShouldQueue
     /**
      * Determine whether the fight should continue based on the character's and monster's health.
      *
-     * @param  array  $data  The fight result data.
+     * @param array $data The fight result data.
      * @return bool True when another attack should be attempted.
      */
     private function shouldAttackAgain(array $data): bool
@@ -721,7 +721,7 @@ class Exploration implements ShouldQueue
     /**
      * Determine whether the fight payload contains the required health data.
      *
-     * @param  array  $data  The fight result data.
+     * @param array $data The fight result data.
      * @return bool True when the required health data is present.
      */
     private function hasRequiredHealthData(array $data): bool
@@ -732,7 +732,7 @@ class Exploration implements ShouldQueue
     /**
      * Return the required health data keys missing from the fight payload.
      *
-     * @param  array  $data  The fight result data.
+     * @param array $data The fight result data.
      * @return array The missing health data keys.
      */
     private function missingRequiredHealthData(array $data): array
@@ -750,9 +750,9 @@ class Exploration implements ShouldQueue
     /**
      * Log that Exploration automation received malformed battle data.
      *
-     * @param  CharacterAutomation  $automation  The character's Exploration automation record.
-     * @param  string  $source  The originating fight step.
-     * @param  array  $data  The malformed fight payload.
+     * @param CharacterAutomation $automation The character's Exploration automation record.
+     * @param string $source The originating fight step.
+     * @param array $data The malformed fight payload.
      * @return void This method does not return a value.
      */
     private function logMalformedBattleData(CharacterAutomation $automation, string $source, array $data): void
@@ -779,7 +779,7 @@ class Exploration implements ShouldQueue
     /**
      * Should we bail?
      *
-     * @param  CharacterAutomation  $automation  The character's Exploration automation record.
+     * @param CharacterAutomation $automation The character's Exploration automation record.
      * @return bool True when the automation has expired and should end.
      */
     private function shouldBail(CharacterAutomation $automation): bool
@@ -794,7 +794,7 @@ class Exploration implements ShouldQueue
     /**
      * Update automation to select the next monster if that option is available.
      *
-     * @param  CharacterAutomation  $automation  The character's Exploration automation record.
+     * @param CharacterAutomation $automation The character's Exploration automation record.
      * @return CharacterAutomation The refreshed automation record.
      */
     private function updateAutomation(CharacterAutomation $automation): CharacterAutomation
@@ -828,8 +828,8 @@ class Exploration implements ShouldQueue
     /**
      * End automation.
      *
-     * @param  CharacterAutomation  $automation  The character's Exploration automation record.
-     * @param  CharacterCacheData  $characterCacheData  The character cache data service.
+     * @param CharacterAutomation $automation The character's Exploration automation record.
+     * @param CharacterCacheData $characterCacheData The character cache data service.
      * @return void This method does not return a value.
      */
     private function endAutomation(CharacterAutomation $automation, CharacterCacheData $characterCacheData): void
@@ -866,9 +866,9 @@ class Exploration implements ShouldQueue
     /**
      * Cancel automation without rewarding the player.
      *
-     * @param  CharacterAutomation  $automation  The character's Exploration automation record.
-     * @param  string|null  $message  The warning message shown to the character.
-     * @param  string  $reason  The cancellation reason.
+     * @param CharacterAutomation $automation The character's Exploration automation record.
+     * @param string|null $message The warning message shown to the character.
+     * @param string $reason The cancellation reason.
      * @return void This method does not return a value.
      */
     private function cancelAutomation(CharacterAutomation $automation, ?string $message = null, string $reason = 'failed'): void
@@ -907,7 +907,7 @@ class Exploration implements ShouldQueue
     /**
      * Set up the fight its self.
      *
-     * @param  array  $params  The fight setup parameters.
+     * @param array $params The fight setup parameters.
      * @return array The fight setup data.
      *
      * @throws InvalidArgumentException
@@ -949,7 +949,7 @@ class Exploration implements ShouldQueue
     /**
      * Handle the job's terminal queue failure by reporting and finalizing the automation.
      *
-     * @param  Throwable  $throwable  The exception that failed the job.
+     * @param Throwable $throwable The exception that failed the job.
      * @return void This method does not return a value.
      */
     public function failed(Throwable $throwable): void
@@ -975,8 +975,8 @@ class Exploration implements ShouldQueue
     /**
      * Finalize the Exploration automation after an unexpected failure and notify the character.
      *
-     * @param  Throwable  $throwable  The unexpected failure.
-     * @param  string  $reason  The failure reason recorded on the log.
+     * @param Throwable $throwable The unexpected failure.
+     * @param string $reason The failure reason recorded on the log.
      * @return void This method does not return a value.
      */
     private function handleFailure(Throwable $throwable, string $reason): void
@@ -1031,9 +1031,9 @@ class Exploration implements ShouldQueue
     /**
      * Build the diagnostic context logged for an Exploration automation failure.
      *
-     * @param  Throwable  $throwable  The unexpected failure.
-     * @param  string  $reason  The failure reason recorded on the log.
-     * @param  CharacterAutomation|null  $automation  The character's Exploration automation record, if found.
+     * @param Throwable $throwable The unexpected failure.
+     * @param string $reason The failure reason recorded on the log.
+     * @param CharacterAutomation|null $automation The character's Exploration automation record, if found.
      * @return array The diagnostic log context.
      */
     private function failureContext(
@@ -1063,8 +1063,8 @@ class Exploration implements ShouldQueue
     /**
      * Log that Exploration automation was cancelled.
      *
-     * @param  CharacterAutomation  $automation  The character's Exploration automation record.
-     * @param  string  $reason  The cancellation reason.
+     * @param CharacterAutomation $automation The character's Exploration automation record.
+     * @param string $reason The cancellation reason.
      * @return void This method does not return a value.
      */
     private function logCancellation(CharacterAutomation $automation, string $reason): void
@@ -1088,9 +1088,9 @@ class Exploration implements ShouldQueue
     /**
      * Send out event log updates
      *
-     * @param  string  $message  The log message text.
-     * @param  bool  $makeItalic  Whether the message should render italicized.
-     * @param  bool  $isReward  Whether the message represents a reward.
+     * @param string $message The log message text.
+     * @param bool $makeItalic Whether the message should render italicized.
+     * @param bool $isReward Whether the message represents a reward.
      * @return void This method does not return a value.
      */
     private function sendOutEventLogUpdate(string $message, bool $makeItalic = false, bool $isReward = false): void
@@ -1106,7 +1106,7 @@ class Exploration implements ShouldQueue
     /**
      * Reward the player for automation completion.
      *
-     * @param  Character  $character  The character to reward.
+     * @param Character $character The character to reward.
      * @return void This method does not return a value.
      */
     private function rewardPlayer(Character $character): void

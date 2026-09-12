@@ -39,8 +39,8 @@ class BatchCraftingAutomationService
     /**
      * Build the preview result for the validated Batch Crafting request, for modes that support a preview.
      *
-     * @param  Character  $character  The character requesting the preview.
-     * @param  array  $validated  The validated Batch Crafting request data.
+     * @param Character $character The character requesting the preview.
+     * @param array $validated The validated Batch Crafting request data.
      * @return array The ResponseBuilder success or error result carrying the preview payload.
      */
     public function preview(Character $character, array $validated): array
@@ -58,8 +58,8 @@ class BatchCraftingAutomationService
     /**
      * Start a new Batch Crafting run for the character using the validated request.
      *
-     * @param  Character  $character  The character starting the run.
-     * @param  array  $validated  The validated Batch Crafting request data.
+     * @param Character $character The character starting the run.
+     * @param array $validated The validated Batch Crafting request data.
      * @return array The ResponseBuilder success or error result.
      */
     public function start(Character $character, array $validated): array
@@ -126,7 +126,7 @@ class BatchCraftingAutomationService
     /**
      * Cancel the character's currently running Batch Crafting run.
      *
-     * @param  Character  $character  The character cancelling the run.
+     * @param Character $character The character cancelling the run.
      * @return array The ResponseBuilder success or error result.
      */
     public function cancel(Character $character): array
@@ -145,7 +145,7 @@ class BatchCraftingAutomationService
     /**
      * Dismiss the character's finished Batch Crafting panel.
      *
-     * @param  Character  $character  The character dismissing the panel.
+     * @param Character $character The character dismissing the panel.
      * @return array The ResponseBuilder success or error result.
      */
     public function dismiss(Character $character): array
@@ -167,7 +167,7 @@ class BatchCraftingAutomationService
     /**
      * Record that the character has acknowledged the Batch Crafting introduction.
      *
-     * @param  Character  $character  The character acknowledging the introduction.
+     * @param Character $character The character acknowledging the introduction.
      * @return array The ResponseBuilder success result.
      */
     public function acknowledgeInfo(Character $character): array
@@ -193,7 +193,7 @@ class BatchCraftingAutomationService
     /**
      * Return the character's current visible Batch Crafting panel status.
      *
-     * @param  Character  $character  The character requesting status.
+     * @param Character $character The character requesting status.
      * @return array The ResponseBuilder success result carrying the panel status.
      */
     public function status(Character $character): array
@@ -204,7 +204,7 @@ class BatchCraftingAutomationService
     /**
      * Complete the character's running Batch Crafting run because the character died.
      *
-     * @param  Character  $character  The character who died.
+     * @param Character $character The character who died.
      * @return void This method does not return a value.
      */
     public function completeForDeath(Character $character): void
@@ -225,7 +225,7 @@ class BatchCraftingAutomationService
      * process up to their fixed window size and, when still running, return the next
      * execution time for the caller to schedule.
      *
-     * @param  BatchCrafting  $batchCrafting  The Batch Crafting record to process.
+     * @param BatchCrafting $batchCrafting The Batch Crafting record to process.
      * @return Carbon|null The next execution time when a recurring window remains, otherwise null.
      */
     public function process(BatchCrafting $batchCrafting): ?Carbon
@@ -259,7 +259,7 @@ class BatchCraftingAutomationService
     /**
      * Persist and broadcast the processing state at the start of an execution window.
      *
-     * @param  BatchCrafting  $batchCrafting  The Batch Crafting record beginning its execution window.
+     * @param BatchCrafting $batchCrafting The Batch Crafting record beginning its execution window.
      * @return void This method does not return a value.
      */
     private function beginProcessingWindow(BatchCrafting $batchCrafting): void
@@ -287,7 +287,7 @@ class BatchCraftingAutomationService
     /**
      * Persist the recurring waiting state and broadcast it, returning the next execution time.
      *
-     * @param  BatchCrafting  $batchCrafting  The Batch Crafting record whose execution window just finished.
+     * @param BatchCrafting $batchCrafting The Batch Crafting record whose execution window just finished.
      * @return Carbon|null The next execution time, or null when the batch is no longer running.
      */
     private function scheduleNextWindow(BatchCrafting $batchCrafting): ?Carbon
@@ -313,7 +313,7 @@ class BatchCraftingAutomationService
     /**
      * Run one Batch Crafting attempt against the freshly reloaded run, observing external cancellation.
      *
-     * @param  BatchCrafting  $batchCrafting  The Batch Crafting record being processed.
+     * @param BatchCrafting $batchCrafting The Batch Crafting record being processed.
      * @return bool True when another attempt should run immediately, false when processing has stopped.
      */
     private function processNextAttempt(BatchCrafting $batchCrafting): bool
@@ -355,8 +355,8 @@ class BatchCraftingAutomationService
     /**
      * Log and report an unexpected Batch Crafting operation failure.
      *
-     * @param  BatchCrafting  $batchCrafting  The Batch Crafting record that failed.
-     * @param  Throwable  $throwable  The unexpected failure.
+     * @param BatchCrafting $batchCrafting The Batch Crafting record that failed.
+     * @param Throwable $throwable The unexpected failure.
      * @return void This method does not return a value.
      */
     private function reportOperationFailure(BatchCrafting $batchCrafting, Throwable $throwable): void
@@ -387,8 +387,8 @@ class BatchCraftingAutomationService
     /**
      * Apply the result of one Batch Crafting attempt to the running batch.
      *
-     * @param  BatchCrafting  $batchCrafting  The Batch Crafting record being processed.
-     * @param  BatchCraftingOperationResult  $result  The outcome of the handled attempt.
+     * @param BatchCrafting $batchCrafting The Batch Crafting record being processed.
+     * @param BatchCraftingOperationResult $result The outcome of the handled attempt.
      * @return bool True when another attempt should run immediately, false when processing has stopped.
      */
     private function applyOperationResult(BatchCrafting $batchCrafting, BatchCraftingOperationResult $result): bool
@@ -420,8 +420,8 @@ class BatchCraftingAutomationService
     /**
      * Increment the running batch's action counters for the given operation outcome.
      *
-     * @param  BatchCrafting  $batchCrafting  The Batch Crafting record being updated.
-     * @param  BatchCraftingActionStatus  $actionStatus  The operation's recorded action status.
+     * @param BatchCrafting $batchCrafting The Batch Crafting record being updated.
+     * @param BatchCraftingActionStatus $actionStatus The operation's recorded action status.
      * @return void This method does not return a value.
      */
     private function incrementActionCounters(BatchCrafting $batchCrafting, BatchCraftingActionStatus $actionStatus): void
@@ -476,8 +476,8 @@ class BatchCraftingAutomationService
     /**
      * Increment a counter persisted within the batch's progress data.
      *
-     * @param  BatchCrafting  $batchCrafting  The Batch Crafting record being updated.
-     * @param  string  $key  The progress counter key to increment.
+     * @param BatchCrafting $batchCrafting The Batch Crafting record being updated.
+     * @param string $key The progress counter key to increment.
      * @return void This method does not return a value.
      */
     private function incrementProgressCounter(BatchCrafting $batchCrafting, string $key): void
@@ -490,8 +490,8 @@ class BatchCraftingAutomationService
     /**
      * Apply the operation's additional disposal counters, independently of the primary action counter.
      *
-     * @param  BatchCrafting  $batchCrafting  The Batch Crafting record being updated.
-     * @param  BatchCraftingOperationResult  $result  The outcome of the handled attempt.
+     * @param BatchCrafting $batchCrafting The Batch Crafting record being updated.
+     * @param BatchCraftingOperationResult $result The outcome of the handled attempt.
      * @return void This method does not return a value.
      */
     private function incrementDisposalCounters(BatchCrafting $batchCrafting, BatchCraftingOperationResult $result): void
@@ -514,9 +514,9 @@ class BatchCraftingAutomationService
      *
      * A skipped Event action slot never reaches this method, so no fake craft attempt is ever charted.
      *
-     * @param  BatchCrafting  $batchCrafting  The Batch Crafting record being updated.
-     * @param  BatchCraftingOperationResult  $result  The outcome of the attempted operation.
-     * @param  BatchCraftingActionStatus  $actionStatus  The operation's recorded action status.
+     * @param BatchCrafting $batchCrafting The Batch Crafting record being updated.
+     * @param BatchCraftingOperationResult $result The outcome of the attempted operation.
+     * @param BatchCraftingActionStatus $actionStatus The operation's recorded action status.
      * @return array|null The newly recorded chart point, or null for a skipped action slot.
      */
     private function recordChartPoint(BatchCrafting $batchCrafting, BatchCraftingOperationResult $result, BatchCraftingActionStatus $actionStatus): ?array
@@ -552,9 +552,9 @@ class BatchCraftingAutomationService
     /**
      * Complete the Batch Crafting run with the supplied end reason.
      *
-     * @param  BatchCrafting  $batchCrafting  The Batch Crafting record being completed.
-     * @param  BatchCraftingEndReason  $reason  The reason the run ended.
-     * @param  array|null  $chartPoint  The latest chart point produced by the final attempt, when applicable.
+     * @param BatchCrafting $batchCrafting The Batch Crafting record being completed.
+     * @param BatchCraftingEndReason $reason The reason the run ended.
+     * @param array|null $chartPoint The latest chart point produced by the final attempt, when applicable.
      * @return void This method does not return a value.
      */
     private function completeBatch(BatchCrafting $batchCrafting, BatchCraftingEndReason $reason, ?array $chartPoint = null): void
@@ -579,8 +579,8 @@ class BatchCraftingAutomationService
     /**
      * Build the authoritative broadcast status snapshot and dispatch it for the character's user.
      *
-     * @param  Character  $character  The character whose status is being broadcast.
-     * @param  array|null  $chartPoint  The latest chart point produced by this update, when one occurred.
+     * @param Character $character The character whose status is being broadcast.
+     * @param array|null $chartPoint The latest chart point produced by this update, when one occurred.
      * @return void This method does not return a value.
      */
     private function broadcastStatus(Character $character, ?array $chartPoint = null): void
@@ -593,7 +593,7 @@ class BatchCraftingAutomationService
     /**
      * Return the character's currently running Batch Crafting record, if any.
      *
-     * @param  Character  $character  The character being checked.
+     * @param Character $character The character being checked.
      * @return BatchCrafting|null The running record, or null when nothing is running.
      */
     private function currentRunningBatchCrafting(Character $character): ?BatchCrafting
@@ -608,7 +608,7 @@ class BatchCraftingAutomationService
     /**
      * Return the character's currently visible Batch Crafting record, if any.
      *
-     * @param  Character  $character  The character being checked.
+     * @param Character $character The character being checked.
      * @return BatchCrafting|null The visible record, or null when nothing is visible.
      */
     private function currentVisibleBatchCrafting(Character $character): ?BatchCrafting

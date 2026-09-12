@@ -22,10 +22,10 @@ class ExplorationAutomationService
     private int $timeDelay = 0;
 
     /**
-     * @param  CharacterCacheData  $characterCacheData  The character cache data service.
-     * @param  ExplorationCreatureCountCalculator  $explorationCreatureCountCalculator  The creature count calculator.
-     * @param  ExplorationLogService  $explorationLogService  The Exploration log service.
-     * @param  ExplorationWarningService  $explorationWarningService  The Exploration warning service.
+     * @param CharacterCacheData $characterCacheData The character cache data service.
+     * @param ExplorationCreatureCountCalculator $explorationCreatureCountCalculator The creature count calculator.
+     * @param ExplorationLogService $explorationLogService The Exploration log service.
+     * @param ExplorationWarningService $explorationWarningService The Exploration warning service.
      */
     public function __construct(
         private readonly CharacterCacheData $characterCacheData,
@@ -37,8 +37,8 @@ class ExplorationAutomationService
     /**
      * Start Exploration automation for the character with the given options.
      *
-     * @param  Character  $character  The character starting Exploration.
-     * @param  array  $params  The Exploration start options.
+     * @param Character $character The character starting Exploration.
+     * @param array $params The Exploration start options.
      * @return void
      */
     public function beginAutomation(Character $character, array $params)
@@ -90,7 +90,7 @@ class ExplorationAutomationService
     /**
      * Stop the character's active Exploration automation.
      *
-     * @param  Character  $character  The character stopping Exploration.
+     * @param Character $character The character stopping Exploration.
      * @return JsonResponse|void
      */
     public function stopExploration(Character $character)
@@ -148,9 +148,9 @@ class ExplorationAutomationService
     /**
      * Dispatch the delayed Exploration job for the character's automation.
      *
-     * @param  Character  $character  The character exploring.
-     * @param  int  $automationId  The character automation id.
-     * @param  string  $attackType  The selected attack type.
+     * @param Character $character The character exploring.
+     * @param int $automationId The character automation id.
+     * @param string $attackType The selected attack type.
      * @return void This method does not return a value.
      */
     protected function startAutomation(Character $character, int $automationId, string $attackType): void
@@ -161,7 +161,7 @@ class ExplorationAutomationService
     /**
      * Determine whether the character began Exploration while standing in a special location.
      *
-     * @param  Character  $character  The character starting Exploration.
+     * @param Character $character The character starting Exploration.
      * @return bool True when the character is standing in a special location.
      */
     private function startedInSpecialLocation(Character $character): bool

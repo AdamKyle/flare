@@ -18,7 +18,7 @@ class CraftAndEnchantBatchCraftingRules
     /**
      * Build the Craft and Enchant batch type's validation rules for the requested mode.
      *
-     * @param  array  $requestData  The raw Batch Crafting request data.
+     * @param array $requestData The raw Batch Crafting request data.
      * @return array The Craft and Enchant validation rules.
      */
     public function rules(array $requestData): array
@@ -35,7 +35,7 @@ class CraftAndEnchantBatchCraftingRules
     /**
      * Return the client-owned progress keys allowed for the requested mode.
      *
-     * @param  string|null  $mode  The requested mode value.
+     * @param string|null $mode The requested mode value.
      * @return array<int, string> The allowed client-owned progress keys.
      */
     private function allowedProgressKeys(?string $mode): array
@@ -51,8 +51,8 @@ class CraftAndEnchantBatchCraftingRules
     /**
      * Return the mode-specific validation rules for the requested mode.
      *
-     * @param  string|null  $mode  The requested mode value.
-     * @param  array  $requestData  The raw Batch Crafting request data.
+     * @param string|null $mode The requested mode value.
+     * @param array $requestData The raw Batch Crafting request data.
      * @return array The mode-specific validation rules.
      */
     private function modeSpecificRules(?string $mode, array $requestData): array
@@ -68,7 +68,7 @@ class CraftAndEnchantBatchCraftingRules
     /**
      * Return the Craft and Enchant Amount specific validation rules.
      *
-     * @param  array  $requestData  The raw Batch Crafting request data.
+     * @param array $requestData The raw Batch Crafting request data.
      * @return array The Craft and Enchant Amount validation rules.
      */
     private function amountRules(array $requestData): array
@@ -87,7 +87,7 @@ class CraftAndEnchantBatchCraftingRules
     /**
      * Return a closure rule requiring that at least one affix id is present in the request.
      *
-     * @param  array  $requestData  The raw Batch Crafting request data.
+     * @param array $requestData The raw Batch Crafting request data.
      * @return \Closure The at-least-one-affix validation closure.
      */
     private function atLeastOneAffixRule(array $requestData): \Closure
@@ -104,7 +104,7 @@ class CraftAndEnchantBatchCraftingRules
     /**
      * Return the Craft and Enchant Set specific validation rules.
      *
-     * @param  array  $requestData  The raw Batch Crafting request data.
+     * @param array $requestData The raw Batch Crafting request data.
      * @return array The Craft and Enchant Set validation rules.
      */
     private function setRules(array $requestData): array
@@ -130,7 +130,7 @@ class CraftAndEnchantBatchCraftingRules
     /**
      * Return a closure rule requiring every included Set position to carry at least one affix.
      *
-     * @param  array  $requestData  The raw Batch Crafting request data.
+     * @param array $requestData The raw Batch Crafting request data.
      * @return \Closure The per-position affix requirement validation closure.
      */
     private function setEnchantmentsRule(array $requestData): \Closure
@@ -172,7 +172,7 @@ class CraftAndEnchantBatchCraftingRules
     /**
      * Return the shared output destination validation rules for a mode that supports retained output.
      *
-     * @param  CraftAndEnchantBatchMode  $mode  The requested mode.
+     * @param CraftAndEnchantBatchMode $mode The requested mode.
      * @return array The output destination validation rules.
      */
     private function outputDestinationRules(CraftAndEnchantBatchMode $mode): array

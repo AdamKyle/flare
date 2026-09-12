@@ -19,8 +19,8 @@ class EquippableEnricher
      * - Affix-based categorized damage (stackable, non-stacking, irresistible)
      * - Item-skill progression bonuses applied to stats and base_*_mod values
      *
-     * @param  Item  $item  The item to enrich
-     * @param  string|null  $damageStat  Optional stat key (e.g., 'str') used to compute total_base_damage_stat
+     * @param Item $item The item to enrich
+     * @param string|null $damageStat Optional stat key (e.g., 'str') used to compute total_base_damage_stat
      * @return Item The enriched item instance (mutated in place)
      */
     #[AutoManifest(ManifestSchemaId::EQUIPPABLE)]
@@ -111,7 +111,7 @@ class EquippableEnricher
     /**
      * Calculate a single stat modifier from base, affix, holy stacks, and item-skill progression.
      *
-     * @param  string  $stat  One of: str, dex, dur, chr, int, agi, focus
+     * @param string $stat One of: str, dex, dur, chr, int, agi, focus
      */
     private function calculateSingleStatMod(Item $item, string $stat): float
     {
@@ -146,7 +146,7 @@ class EquippableEnricher
      * Calculates the total base mod for damage, healing, or AC.
      * Aggregates item base value, affix contribution, and item-skill progression contribution.
      *
-     * @param  string  $attribute  One of: base_damage_mod, base_healing_mod, base_ac_mod
+     * @param string $attribute One of: base_damage_mod, base_healing_mod, base_ac_mod
      */
     private function calculateBaseMod(Item $item, string $attribute): float
     {
@@ -250,7 +250,7 @@ class EquippableEnricher
     /**
      * Sum item-skill progression bonuses for a given core stat.
      *
-     * @param  string  $stat  One of: str, dex, dur, chr, int, agi, focus
+     * @param string $stat One of: str, dex, dur, chr, int, agi, focus
      */
     private function calculateSkillStatBonus(Item $item, string $stat): float
     {
@@ -267,7 +267,7 @@ class EquippableEnricher
     /**
      * Sum item-skill progression bonuses for a given base_*_mod attribute.
      *
-     * @param  string  $attribute  One of: base_damage_mod, base_healing_mod, base_ac_mod
+     * @param string $attribute One of: base_damage_mod, base_healing_mod, base_ac_mod
      */
     private function calculateSkillBaseMod(Item $item, string $attribute): float
     {

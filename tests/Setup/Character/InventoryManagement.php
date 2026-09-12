@@ -45,7 +45,7 @@ class InventoryManagement
     /**
      * Equip an artifact.
      *
-     * @param  string  $position  | artifact-one, artifact-two
+     * @param string $position | artifact-one, artifact-two
      *
      * @throws Exception|InvalidArgumentException
      */

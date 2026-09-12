@@ -10,7 +10,7 @@ class SelectedKingdom extends TransformerAbstract
     /**
      * Gets the response data for the character sheet
      *
-     * @param  Character  $character
+     * @param Character $character
      * @return mixed
      */
     public function transform(Kingdom $kingdom)

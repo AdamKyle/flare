@@ -13,7 +13,7 @@ trait CalculateSkillBonus
      *
      * Takes into account the items and their associated prefixes.
      *
-     * @param  string  $skillName
+     * @param string $skillName
      * @return float|mixed
      */
     public function calculateBonus(Item $item, GameSkill $skill, string $skillAttribute = 'skill_bonus')
@@ -47,7 +47,7 @@ trait CalculateSkillBonus
     /**
      * The percentage of XP bonus given when the skill is being awarded XP.
      *
-     * @param  string  $skillName
+     * @param string $skillName
      * @return float
      */
     public function calculateTrainingBonus(Item $item, GameSkill $gameSkill)

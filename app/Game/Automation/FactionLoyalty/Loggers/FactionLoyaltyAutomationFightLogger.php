@@ -16,7 +16,7 @@ class FactionLoyaltyAutomationFightLogger
     /**
      * Set up the logger.
      *
-     * @param  FactionLoyaltyAutomation  $factionLoyaltyAutomation  The Faction Loyalty automation record.
+     * @param FactionLoyaltyAutomation $factionLoyaltyAutomation The Faction Loyalty automation record.
      * @return FactionLoyaltyAutomationFightLogger The configured logger instance.
      */
     public function setUp(FactionLoyaltyAutomation $factionLoyaltyAutomation): FactionLoyaltyAutomationFightLogger
@@ -29,7 +29,7 @@ class FactionLoyaltyAutomationFightLogger
     /**
      * Log the automated fight result.
      *
-     * @param  AutomatedFightResult  $automatedFightResult  The fight result to log.
+     * @param AutomatedFightResult $automatedFightResult The fight result to log.
      * @return void This method does not return a value.
      */
     public function log(AutomatedFightResult $automatedFightResult): void
@@ -93,8 +93,8 @@ class FactionLoyaltyAutomationFightLogger
     /**
      * Append a fight log entry without hydrating the full JSON log.
      *
-     * @param  int  $factionLoyaltyAutomationLogId  The Faction Loyalty automation log id.
-     * @param  array  $fightLog  The fight log entry to append.
+     * @param int $factionLoyaltyAutomationLogId The Faction Loyalty automation log id.
+     * @param array $fightLog The fight log entry to append.
      * @return void This method does not return a value.
      */
     private function appendFightLog(int $factionLoyaltyAutomationLogId, array $fightLog): void

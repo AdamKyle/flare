@@ -34,8 +34,8 @@ class CraftSetPlanService
     /**
      * Resolve the authoritative Craft Set plan for the character's selected positions.
      *
-     * @param  Character  $character  The character building the plan.
-     * @param  array<string, int>  $setPositions  The requested position-to-item-id map.
+     * @param Character $character The character building the plan.
+     * @param array<string, int> $setPositions The requested position-to-item-id map.
      * @return array{queue: array<int, array{position: string, item_id: int, crafting_type: string, item_name: string}>, blockers: array<int, string>, total_cost: int} The resolved plan, any blockers, and the authoritative total Gold cost.
      */
     public function resolvePlan(Character $character, array $setPositions): array
@@ -86,8 +86,8 @@ class CraftSetPlanService
     /**
      * Calculate the authoritative total Gold cost to craft every resolved item in the plan.
      *
-     * @param  Character  $character  The character building the plan.
-     * @param  array<string, Item>  $resolvedItems  The resolved items keyed by position value.
+     * @param Character $character The character building the plan.
+     * @param array<string, Item> $resolvedItems The resolved items keyed by position value.
      * @return int The authoritative total Gold cost.
      */
     private function totalCost(Character $character, array $resolvedItems): int
@@ -101,7 +101,7 @@ class CraftSetPlanService
     /**
      * Build the final plan queue in the single authoritative Craft Set position order.
      *
-     * @param  array<string, Item>  $resolvedItems  The resolved items keyed by position value.
+     * @param array<string, Item> $resolvedItems The resolved items keyed by position value.
      * @return array<int, CraftSetPlanEntry> The ordered queue entries.
      */
     private function buildQueue(array $resolvedItems): array
@@ -122,8 +122,8 @@ class CraftSetPlanService
     /**
      * Resolve the optional hand positions into resolved items, validating the hand combination.
      *
-     * @param  Collection<int, Item>  $craftableItemsById  The character's bulk-resolved craftable items, keyed by item id.
-     * @param  array<string, int>  $setPositions  The requested position-to-item-id map.
+     * @param Collection<int, Item> $craftableItemsById The character's bulk-resolved craftable items, keyed by item id.
+     * @param array<string, int> $setPositions The requested position-to-item-id map.
      * @return array{items: array<string, Item>, blockers: array<int, string>} The resolved hand items and any blockers.
      */
     private function resolveHandPositions(Collection $craftableItemsById, array $setPositions): array
@@ -161,9 +161,9 @@ class CraftSetPlanService
     /**
      * Resolve the currently craftable item for a required plan position and requested item id.
      *
-     * @param  Collection<int, Item>  $craftableItemsById  The character's bulk-resolved craftable items, keyed by item id.
-     * @param  CraftSetPosition  $position  The plan position being resolved.
-     * @param  int  $itemId  The requested item id for the position.
+     * @param Collection<int, Item> $craftableItemsById The character's bulk-resolved craftable items, keyed by item id.
+     * @param CraftSetPosition $position The plan position being resolved.
+     * @param int $itemId The requested item id for the position.
      * @return Item|null The matching craftable item, or null when unavailable.
      */
     private function resolvePositionItem(Collection $craftableItemsById, CraftSetPosition $position, int $itemId): ?Item
@@ -180,8 +180,8 @@ class CraftSetPlanService
     /**
      * Resolve the currently craftable hand item (weapon or shield) for a requested item id.
      *
-     * @param  Collection<int, Item>  $craftableItemsById  The character's bulk-resolved craftable items, keyed by item id.
-     * @param  int  $itemId  The requested item id for the hand position.
+     * @param Collection<int, Item> $craftableItemsById The character's bulk-resolved craftable items, keyed by item id.
+     * @param int $itemId The requested item id for the hand position.
      * @return Item|null The matching craftable hand item, or null when unavailable.
      */
     private function resolveHandItem(Collection $craftableItemsById, int $itemId): ?Item
@@ -198,8 +198,8 @@ class CraftSetPlanService
     /**
      * Build one deterministic queue entry for a resolved plan position and item.
      *
-     * @param  CraftSetPosition  $position  The plan position.
-     * @param  Item  $item  The resolved item for the position.
+     * @param CraftSetPosition $position The plan position.
+     * @param Item $item The resolved item for the position.
      * @return CraftSetPlanEntry The queue entry.
      */
     private function buildQueueEntry(CraftSetPosition $position, Item $item): CraftSetPlanEntry
@@ -215,7 +215,7 @@ class CraftSetPlanService
     /**
      * Resolve the crafting type used to craft a resolved hand item (weapon or shield).
      *
-     * @param  Item  $item  The resolved hand item.
+     * @param Item $item The resolved hand item.
      * @return string The crafting type used to craft the hand item.
      */
     private function resolveHandCraftingType(Item $item): string

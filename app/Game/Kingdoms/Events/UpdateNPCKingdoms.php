@@ -31,7 +31,7 @@ class UpdateNPCKingdoms implements ShouldBroadcastNow
     /**
      * Create a new event instance.
      *
-     * @param  Character  $character
+     * @param Character $character
      */
     public function __construct(GameMap $map)
     {

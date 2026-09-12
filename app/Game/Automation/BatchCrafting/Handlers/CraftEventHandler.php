@@ -35,8 +35,8 @@ class CraftEventHandler implements BatchCraftingHandler
     /**
      * Execute one Craft For Event Batch Crafting action slot for the running batch.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  Character  $character  The character running the batch.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param Character $character The character running the batch.
      * @return BatchCraftingOperationResult The outcome of the action slot.
      */
     public function handle(BatchCrafting $batchCrafting, Character $character): BatchCraftingOperationResult
@@ -74,11 +74,11 @@ class CraftEventHandler implements BatchCraftingHandler
     /**
      * Craft the resolved item and contribute it to the current Craft Event goal.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  Character  $character  The character running the batch.
-     * @param  Item  $item  The resolved item to craft.
-     * @param  CraftEventTargetType  $target  The resolved cycle target.
-     * @param  GlobalEventGoal  $goal  The current Craft Event goal, before this attempt.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param Character $character The character running the batch.
+     * @param Item $item The resolved item to craft.
+     * @param CraftEventTargetType $target The resolved cycle target.
+     * @param GlobalEventGoal $goal The current Craft Event goal, before this attempt.
      * @return BatchCraftingOperationResult The outcome of the craft attempt.
      */
     private function craftForEvent(BatchCrafting $batchCrafting, Character $character, Item $item, CraftEventTargetType $target, GlobalEventGoal $goal): BatchCraftingOperationResult
@@ -109,8 +109,8 @@ class CraftEventHandler implements BatchCraftingHandler
     /**
      * Determine whether the Event goal completed or moved away from Crafting as a result of this contribution.
      *
-     * @param  Character  $character  The character running the batch.
-     * @param  GlobalEventGoal  $goal  The Craft Event goal contributed to.
+     * @param Character $character The character running the batch.
+     * @param GlobalEventGoal $goal The Craft Event goal contributed to.
      * @return BatchCraftingEndReason|null The terminal end reason, or null when the batch should continue.
      */
     private function resolveEndReasonAfterContribution(Character $character, GlobalEventGoal $goal): ?BatchCraftingEndReason
@@ -131,7 +131,7 @@ class CraftEventHandler implements BatchCraftingHandler
     /**
      * Resolve the specific factual reason Craft For Event is not currently available.
      *
-     * @param  Character  $character  The character running the batch.
+     * @param Character $character The character running the batch.
      * @return BatchCraftingEndReason The factual terminal Event reason.
      */
     private function resolveUnavailableReason(Character $character): BatchCraftingEndReason
@@ -162,8 +162,8 @@ class CraftEventHandler implements BatchCraftingHandler
     /**
      * Persist the batch's cumulative Crafting XP using the factual XP reported by this attempt.
      *
-     * @param  BatchCrafting  $batchCrafting  The running Batch Crafting record.
-     * @param  int  $xpGained  The factual XP gained by this attempt.
+     * @param BatchCrafting $batchCrafting The running Batch Crafting record.
+     * @param int $xpGained The factual XP gained by this attempt.
      * @return void This method does not return a value.
      */
     private function persistXpGained(BatchCrafting $batchCrafting, int $xpGained): void

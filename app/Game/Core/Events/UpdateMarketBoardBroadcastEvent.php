@@ -15,17 +15,17 @@ class UpdateMarketBoardBroadcastEvent implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * @param  array  $marketListings
+     * @param array $marketListings
      */
     public $marketListings;
 
     /**
-     * @param  int  $characterGold
+     * @param int $characterGold
      */
     public $characterGold;
 
     /**
-     * @param  User  $user
+     * @param User $user
      */
     private $user;
 

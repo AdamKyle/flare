@@ -156,7 +156,7 @@ class KingdomSettleService
     /**
      * Purchase a kingdom from the NPC.
      *
-     * @param  string  $name
+     * @param string $name
      */
     public function purchaseKingdom(Character $character, int $kingdomId): ?Kingdom
     {

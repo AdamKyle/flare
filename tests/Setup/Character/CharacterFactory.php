@@ -414,7 +414,7 @@ class CharacterFactory
     /**
      * Lets you update the character
      *
-     * @param  array  $changes  | []
+     * @param array $changes | []
      */
     public function updateCharacter(array $changes = []): CharacterFactory
     {
@@ -446,9 +446,9 @@ class CharacterFactory
      *
      * Length should be a carbon date object.
      *
-     * @param  string  $reason  | null
-     * @param  string  $request  | null
-     * @param  $forLength  | null
+     * @param string $reason | null
+     * @param string $request | null
+     * @param $forLength | null
      */
     public function banCharacter(?string $reason = null, ?string $request = null, $forLength = null): CharacterFactory
     {
@@ -523,8 +523,8 @@ class CharacterFactory
     /**
      * Creates a location for the player.
      *
-     * @param  int  $x  | 16
-     * @param  int  $y  | 16
+     * @param int $x | 16
+     * @param int $y | 16
      */
     public function givePlayerLocation(int $x = 16, int $y = 16, ?GameMap $gameMap = null): CharacterFactory
     {
@@ -553,8 +553,8 @@ class CharacterFactory
     /**
      * Allows one to update a characters location.
      *
-     * @param  int  $x  | 16
-     * @param  int  $y  | 16
+     * @param int $x | 16
+     * @param int $y | 16
      */
     public function updateLocation(int $x = 16, int $y = 16): CharacterFactory
     {
@@ -575,7 +575,7 @@ class CharacterFactory
      *
      * Handles leveling the character up.
      *
-     * @param  int  $levels  | 1
+     * @param int $levels | 1
      */
     public function levelCharacterUp(int $levels = 1): CharacterFactory
     {
@@ -595,7 +595,7 @@ class CharacterFactory
     /**
      * Update a specific skill associated with a character.
      *
-     * @param  array  $changes  | []
+     * @param array $changes | []
      */
     public function updateSkill(string $name, array $changes = []): CharacterFactory
     {
@@ -617,7 +617,7 @@ class CharacterFactory
     /**
      * Assign a new skill to a character.
      *
-     * @param  int  $level  | 1
+     * @param int $level | 1
      */
     public function assignSkill(GameSkill $skill, int $level = 1, bool $locked = false, array $options = []): CharacterFactory
     {
@@ -770,7 +770,7 @@ class CharacterFactory
     /**
      * Cache character sheet data.
      *
-     * @param  array  $data  | []
+     * @param array $data | []
      */
     public function cacheCharacterSheet(array $data = []): CharacterFactory
     {

@@ -23,7 +23,7 @@ class MoveTimeOutJob implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param  Character  $character
+     * @param Character $character
      * @return void
      */
     public function __construct(int $characterId)
