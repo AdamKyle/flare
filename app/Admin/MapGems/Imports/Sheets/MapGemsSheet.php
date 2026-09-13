@@ -2,10 +2,12 @@
 
 namespace App\Admin\MapGems\Imports\Sheets;
 
+use App\Flare\Models\GameLocationGemParamter;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameMapGemParamter;
 use App\Flare\Models\GameSkill;
 use App\Game\Gems\Values\GemTypeValue;
+use App\Game\Gems\Values\GemWorldNameValidator;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use RuntimeException;
@@ -33,6 +35,7 @@ class MapGemsSheet implements ToCollection
     {
         $headers = $rows[0]->toArray();
         $validatedRows = [];
+        $gemWorldNamesByRow = [];
 
         foreach ($rows as $index => $row) {
             if ($index === 0) {
@@ -47,8 +50,12 @@ class MapGemsSheet implements ToCollection
                 break;
             }
 
-            $validatedRows[] = $this->normalizeRow($rawRow, $name, $rowNumber);
+            $profileData = $this->normalizeRow($rawRow, $name, $rowNumber);
+            $gemWorldNamesByRow[$rowNumber] = $profileData['gem_world_name'];
+            $validatedRows[] = $profileData;
         }
+
+        GemWorldNameValidator::assertUniqueAcrossWorkbookAndOtherProfileType($gemWorldNamesByRow, GameLocationGemParamter::class);
 
         return $validatedRows;
     }
@@ -70,6 +77,7 @@ class MapGemsSheet implements ToCollection
         return [
             'game_map_id' => $gameMap->id,
             'name' => $name,
+            'gem_world_name' => $this->resolveGemWorldName($rawRow['gem_world_name'] ?? null, $rowNumber),
             'description' => $this->resolveNullableString($rawRow['description'] ?? null, $rowNumber, 'description'),
             'crafting_skill_ids' => $this->resolveCraftingSkillIds($rawRow['crafting_skill_names'] ?? null, $rowNumber),
             'character_xp_bonus_range' => $this->resolveRange($rawRow['character_xp_bonus_range'] ?? null, $rowNumber, 'character_xp_bonus_range'),
@@ -103,6 +111,17 @@ class MapGemsSheet implements ToCollection
             'monster_atonement' => $this->resolveAtonement($rawRow['monster_atonement'] ?? null, $rowNumber),
             'monster_atonement_range' => $this->resolveRange($rawRow['monster_atonement_range'] ?? null, $rowNumber, 'monster_atonement_range'),
         ];
+    }
+
+    /**
+     * Resolve and validate the required, non-technical Gem World Name cell.
+     */
+    private function resolveGemWorldName(mixed $value, int $rowNumber): string
+    {
+        $gemWorldName = $this->resolveRequiredString($value, $rowNumber, 'gem_world_name');
+        GemWorldNameValidator::assertNotTechnical($gemWorldName, $rowNumber);
+
+        return $gemWorldName;
     }
 
     /**

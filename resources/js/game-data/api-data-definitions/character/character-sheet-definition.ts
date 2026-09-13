@@ -59,6 +59,7 @@ export default interface CharacterSheetDefinition {
   reincarnation_info: ReincarnationInfoDefinition;
   active_boons: ActiveBoonDefinition[];
   gem_world_introduction_acknowledged_at: string | null;
+  is_dead: boolean;
 
   is_admin?: boolean;
   gem_progression?: GemProgressionSummaryDefinition | null;

@@ -52,6 +52,7 @@ class GemWorldGenerationService
             return $this->syncExistingGeneratedMap(
                 $gemParamter->generatedMap,
                 $gemParamter->name,
+                $gemParamter->gem_world_name,
                 $this->mapGemProfileLabel($gemParamter),
                 GeneratedGemMapType::MAP_GEM,
                 $generateWhenMissing,
@@ -62,6 +63,7 @@ class GemWorldGenerationService
         return $this->generate(
             $gemParamter->gameMap,
             $gemParamter->name,
+            $gemParamter->gem_world_name,
             $this->mapGemProfileLabel($gemParamter),
             GeneratedGemMapType::MAP_GEM,
             $gemParamter,
@@ -86,6 +88,7 @@ class GemWorldGenerationService
             return $this->syncExistingGeneratedMap(
                 $gemParamter->generatedMap,
                 $gemParamter->name,
+                $gemParamter->gem_world_name,
                 $this->locationGemProfileLabel($gemParamter),
                 GeneratedGemMapType::LOCATION_GEM,
                 $generateWhenMissing,
@@ -98,6 +101,7 @@ class GemWorldGenerationService
         return $this->generate(
             $gemParamter->location->map,
             $gemParamter->name,
+            $gemParamter->gem_world_name,
             $this->locationGemProfileLabel($gemParamter),
             GeneratedGemMapType::LOCATION_GEM,
             null,
@@ -137,6 +141,7 @@ class GemWorldGenerationService
      *
      * @param GameMap $generatedMap
      * @param string $profileName
+     * @param string $displayName
      * @param string $profileLabel
      * @param GeneratedGemMapType $type
      * @param bool $generateWhenMissing
@@ -146,11 +151,13 @@ class GemWorldGenerationService
     private function syncExistingGeneratedMap(
         GameMap $generatedMap,
         string $profileName,
+        string $displayName,
         string $profileLabel,
         GeneratedGemMapType $type,
         bool $generateWhenMissing,
         CarbonInterface $startedAt,
     ): GemWorldGenerationResult {
+        $this->syncGeneratedMapDisplayName($generatedMap, $displayName);
         $repairMessage = $this->repairLegacyJpegPath($generatedMap);
         $assetResult = $this->syncAssets($generatedMap, $generateWhenMissing);
 
@@ -195,6 +202,7 @@ class GemWorldGenerationService
      *
      * @param GameMap $parentMap
      * @param string $profileName
+     * @param string $displayName
      * @param string $profileLabel
      * @param GeneratedGemMapType $type
      * @param GameMapGemParamter|null $mapGemParamter
@@ -206,6 +214,7 @@ class GemWorldGenerationService
     private function generate(
         GameMap $parentMap,
         string $profileName,
+        string $displayName,
         string $profileLabel,
         GeneratedGemMapType $type,
         ?GameMapGemParamter $mapGemParamter,
@@ -213,11 +222,12 @@ class GemWorldGenerationService
         bool $generateWhenMissing,
         CarbonInterface $startedAt,
     ): GemWorldGenerationResult {
-        $mapName = $this->generatedMapName($profileName, $type);
+        $technicalAssetName = $this->technicalAssetName($profileName, $type);
 
         $generatedMap = GameMap::create([
-            'name' => $mapName,
-            'path' => GeneratedGemMapPath::for($mapName),
+            'name' => $displayName,
+            'generated_asset_name' => $technicalAssetName,
+            'path' => GeneratedGemMapPath::for($technicalAssetName),
             'default' => false,
             'kingdom_color' => $parentMap->kingdom_color,
             'xp_bonus' => $parentMap->xp_bonus,
@@ -287,7 +297,7 @@ class GemWorldGenerationService
     private function generateAssets(GameMap $generatedMap): MapBackupAssetResult
     {
         if (! Storage::disk('maps')->exists($generatedMap->path)) {
-            $this->imageGenerator->generate($generatedMap->effectiveGameMap(), $generatedMap->name);
+            $this->imageGenerator->generate($generatedMap->effectiveGameMap(), $generatedMap->generated_asset_name ?? $generatedMap->name);
         }
 
         $this->mapTileGenerationService->tile($generatedMap, generateWhenMissing: true);
@@ -340,15 +350,40 @@ class GemWorldGenerationService
     }
 
     /**
-     * Build the deterministic generated Game Map name for a profile.
+     * Build the stable, deterministic technical asset name for a profile, used only to derive
+     * the generated image path and tile pieces folder. This never changes even when the
+     * player-facing Gem World display name changes, so committed backups remain resolvable.
      *
      * @param string $profileName
      * @param GeneratedGemMapType $type
      * @return string
      */
-    private function generatedMapName(string $profileName, GeneratedGemMapType $type): string
+    private function technicalAssetName(string $profileName, GeneratedGemMapType $type): string
     {
         return $profileName.' '.$type->label().' World';
+    }
+
+    /**
+     * Backfill the stable technical asset name when missing, then update the generated Game
+     * Map's player-facing name to the imported Gem World Name, leaving asset identity untouched.
+     *
+     * @param GameMap $generatedMap
+     * @param string $displayName
+     * @return void
+     */
+    private function syncGeneratedMapDisplayName(GameMap $generatedMap, string $displayName): void
+    {
+        if (is_null($generatedMap->generated_asset_name)) {
+            $generatedMap->generated_asset_name = $generatedMap->name;
+        }
+
+        if ($generatedMap->name !== $displayName) {
+            $generatedMap->name = $displayName;
+        }
+
+        if ($generatedMap->isDirty()) {
+            $generatedMap->save();
+        }
     }
 
     /**

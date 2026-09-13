@@ -16,6 +16,7 @@ class GameMapGemParamter extends Model
     protected $fillable = [
         'game_map_id',
         'name',
+        'gem_world_name',
         'description',
         'character_xp_bonus_range',
         'character_class_rank_xp_bonus_range',

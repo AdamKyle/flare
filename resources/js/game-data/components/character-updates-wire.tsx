@@ -5,6 +5,8 @@ import { CoreWebSocketChannels } from 'game-data/components/event-enums/core-web
 import { CoreWebSocketEventNames } from 'game-data/components/event-enums/core-web-socket-event-names';
 import CharacterUpdateWireProps from 'game-data/components/types/character-update-wire-props';
 import UseCharacterBoonsUpdateStreamResponse from 'game-data/hooks/definitions/use-character-boons-update-stream-response';
+import UseCharacterReviveStreamResponse from 'game-data/hooks/definitions/use-character-revive-stream-response';
+import UseCharacterStatusStreamResponse from 'game-data/hooks/definitions/use-character-status-stream-response';
 import UseCharterUpdateStreamResponse from 'game-data/hooks/definitions/use-character-update-stream-response';
 import UseGemProgressionUpdateStreamResponse from 'game-data/hooks/definitions/use-gem-progression-update-stream-response';
 import UseLocationBasedCraftingOptionsStreamResponse from 'game-data/hooks/definitions/use-location-based-crafting-options-stream-response';
@@ -15,6 +17,8 @@ export const CharacterUpdatesWire = ({
   onCraftingOptionsEvent,
   onBoonsEvent,
   onGemProgressionEvent,
+  onReviveEvent,
+  onStatusEvent,
 }: CharacterUpdateWireProps) => {
   useWebsocket<UseCharterUpdateStreamResponse>({
     url: CoreWebSocketChannels.UPDATE_CHARACTER,
@@ -54,6 +58,22 @@ export const CharacterUpdatesWire = ({
     type: ChannelType.PRIVATE,
     channelName: CoreWebSocketEventNames.UPDATE_GEM_PROGRESSION,
     onEvent: onGemProgressionEvent,
+  });
+
+  useWebsocket<UseCharacterReviveStreamResponse>({
+    url: CoreWebSocketChannels.CHARACTER_REVIVE,
+    params: { userId },
+    type: ChannelType.PRIVATE,
+    channelName: CoreWebSocketEventNames.CHARACTER_REVIVE,
+    onEvent: onReviveEvent,
+  });
+
+  useWebsocket<UseCharacterStatusStreamResponse>({
+    url: CoreWebSocketChannels.CHARACTER_STATUS,
+    params: { userId },
+    type: ChannelType.PRIVATE,
+    channelName: CoreWebSocketEventNames.CHARACTER_STATUS,
+    onEvent: onStatusEvent,
   });
 
   return null;

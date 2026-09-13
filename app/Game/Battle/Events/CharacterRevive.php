@@ -17,6 +17,8 @@ class CharacterRevive implements ShouldBroadcastNow
 
     public int $health;
 
+    public bool $is_dead = false;
+
     /**
      * Create a new event instance.
      */

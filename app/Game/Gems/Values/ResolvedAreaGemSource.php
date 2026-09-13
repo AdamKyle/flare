@@ -12,6 +12,7 @@ class ResolvedAreaGemSource
      * @param GemSourceType $type The Gem profile source type.
      * @param int $profileId The contributing Map/Location Gem profile id.
      * @param string $profileName The contributing Map/Location Gem profile name.
+     * @param string $gemWorldName The player-facing generated Gem World name for this profile.
      * @param int $rolledGemId The id of the currently rolled Gem for this profile.
      * @param string $rolledGemName The name of the currently rolled Gem for this profile.
      * @param float $monsterMultiplier The Monster combat effect multiplier applied for this source.
@@ -26,6 +27,7 @@ class ResolvedAreaGemSource
         private readonly GemSourceType $type,
         private readonly int $profileId,
         private readonly string $profileName,
+        private readonly string $gemWorldName,
         private readonly int $rolledGemId,
         private readonly string $rolledGemName,
         private readonly float $monsterMultiplier,
@@ -59,6 +61,14 @@ class ResolvedAreaGemSource
     public function profileName(): string
     {
         return $this->profileName;
+    }
+
+    /**
+     * The player-facing generated Gem World name for this profile.
+     */
+    public function gemWorldName(): string
+    {
+        return $this->gemWorldName;
     }
 
     /**
@@ -144,6 +154,7 @@ class ResolvedAreaGemSource
             'type' => $this->type->value,
             'profile_id' => $this->profileId,
             'profile_name' => $this->profileName,
+            'gem_world_name' => $this->gemWorldName,
             'rolled_gem_id' => $this->rolledGemId,
             'rolled_gem_name' => $this->rolledGemName,
             'monster_multiplier' => $this->monsterMultiplier,

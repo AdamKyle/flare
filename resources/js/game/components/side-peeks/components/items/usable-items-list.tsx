@@ -25,7 +25,7 @@ const UsableItemsList = ({
   const renderUsableItemSlots = () => {
     if (isEmpty(items)) {
       return (
-        <div className="py-4 text-center">
+        <div className="px-4 py-4 text-center sm:px-5">
           You don't have any usable items. You can craft these through Alchemy.
           Players can craft items that buff their stats and attack, deal damage
           to their opponents kingdoms or apply buffs to their items in the form

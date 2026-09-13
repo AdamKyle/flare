@@ -2,6 +2,7 @@ export default interface AreaGemSourceDefinition {
   type: 'map_gem' | 'location_gem';
   profile_id: number;
   profile_name: string;
+  gem_world_name: string;
   rolled_gem_id: number;
   rolled_gem_name: string;
   monster_multiplier: number;

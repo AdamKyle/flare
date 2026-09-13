@@ -1,5 +1,6 @@
 import React, { Fragment, ReactNode } from 'react';
 
+import GemEffectRow from './gem-effect-row';
 import { gemTypeLabel } from '../enums/gem-type';
 import RolledGemStatsProps from '../types/rolled-gem-stats-props';
 
@@ -80,14 +81,16 @@ const RolledGemStats = ({
             <h4 className="text-glacier-800 dark:text-glacier-200 mb-1 text-xs font-semibold tracking-wide uppercase">
               {group.title}
             </h4>
-            <Dl>
+            <div className="flex flex-col divide-y divide-gray-100 dark:divide-gray-800">
               {group.fields.map(({ field, value }) => (
-                <Fragment key={field.rolled_field}>
-                  <Dt>{field.label}</Dt>
-                  <Dd>{formatPercent(value)}</Dd>
-                </Fragment>
+                <GemEffectRow
+                  key={field.rolled_field}
+                  field={field.rolled_field}
+                  label={field.label}
+                  value={value}
+                />
               ))}
-            </Dl>
+            </div>
           </div>
         </Fragment>
       );

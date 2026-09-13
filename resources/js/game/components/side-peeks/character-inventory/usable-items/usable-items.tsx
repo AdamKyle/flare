@@ -44,6 +44,7 @@ const UsableItems = ({
   character_id,
   initial_item,
   initial_search_text,
+  initial_filter,
 }: UsableItemsProps) => {
   const { gameData } = useGameData();
   const activeBoons = gameData?.character?.active_boons ?? [];
@@ -56,7 +57,9 @@ const UsableItems = ({
   >(null);
   const [detailQuantityMode, setDetailQuantityMode] = useState(false);
   const [detailQuantity, setDetailQuantity] = useState(1);
-  const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [activeFilter, setActiveFilter] = useState<string | null>(
+    initial_filter ?? null
+  );
   const [scrollSubfilter, setScrollSubfilter] = useState<string>('scrolls');
 
   const {
@@ -72,6 +75,15 @@ const UsableItems = ({
     urlParams: { character: character_id },
     initialSearchText: initial_search_text,
   });
+
+  useEffect(() => {
+    if (!initial_filter) {
+      return;
+    }
+
+    setFilters({ [initial_filter]: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleUseSuccess = (): void => {
     setRefresh((previousValue) => !previousValue);

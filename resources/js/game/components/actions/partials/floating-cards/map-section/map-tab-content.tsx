@@ -7,6 +7,8 @@ import { MapMovementTypes } from './map-movement-types/map-movement-types';
 import MapTabContentProps from './types/map-tab-content-props';
 import Map from '../../../../map-section/map';
 
+import { Alert } from 'ui/alerts/alert';
+import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import TimerBar from 'ui/timer-bar/timer-bar';
@@ -27,7 +29,9 @@ const MapTabContent = ({
   on_conjure: onConjure,
   is_view_location_enabled: isViewLocationEnabled,
   on_view_location: onViewLocation,
+  is_kingdoms_enabled: isKingdomsEnabled,
   on_open_kingdoms: onOpenKingdoms,
+  is_character_dead: isCharacterDead,
   gem_world_actions_props: gemWorldActionsProps,
 }: MapTabContentProps): ReactNode => {
   const renderTimerBar = (): ReactNode => {
@@ -59,6 +63,11 @@ const MapTabContent = ({
       </div>
       {renderTimerBar()}
       {renderMapError()}
+      {isCharacterDead && (
+        <Alert variant={AlertVariant.DANGER}>
+          Revive your Character before performing Map actions.
+        </Alert>
+      )}
       <div className="my-2 p-2">
         Map Position (X/Y): {characterMapPosition.x_position}/
         {characterMapPosition.y_position})
@@ -130,6 +139,12 @@ const MapTabContent = ({
           on_click={onOpenKingdoms}
           label={'My Kingdoms'}
           variant={ButtonVariant.PRIMARY}
+          disabled={!isKingdomsEnabled}
+          aria_label={
+            isKingdomsEnabled
+              ? undefined
+              : 'Revive your Character before performing Map actions.'
+          }
         />
       </div>
       <GemWorldActions {...gemWorldActionsProps} />

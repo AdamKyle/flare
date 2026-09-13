@@ -8,27 +8,29 @@ use App\Game\Gems\Values\GemTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use RuntimeException;
 use Tests\TestCase;
+use Tests\Traits\CreateGameLocationGemParamter;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGameMapGemParamter;
 use Tests\Traits\CreateGameSkill;
 
 class MapGemsSheetTest extends TestCase
 {
-    use CreateGameMap, CreateGameMapGemParamter, CreateGameSkill, RefreshDatabase;
+    use CreateGameLocationGemParamter, CreateGameMap, CreateGameMapGemParamter, CreateGameSkill, RefreshDatabase;
 
     public function test_valid_workbook_row_creates_a_new_profile(): void
     {
         $map = $this->createGameMap(['name' => 'Import Map']);
 
         (new MapGemsSheet)->collection(collect([
-            collect(['name', 'game_map_name']),
-            collect(['Imported Profile', $map->name]),
+            collect(['name', 'game_map_name', 'gem_world_name']),
+            collect(['Imported Profile', $map->name, 'The Imported Requiem']),
         ]));
 
         $profile = GameMapGemParamter::where('name', 'Imported Profile')->first();
 
         $this->assertNotNull($profile);
         $this->assertSame($map->id, $profile->game_map_id);
+        $this->assertSame('The Imported Requiem', $profile->gem_world_name);
     }
 
     public function test_valid_workbook_row_updates_existing_profile_by_name(): void
@@ -41,13 +43,14 @@ class MapGemsSheetTest extends TestCase
         ]);
 
         (new MapGemsSheet)->collection(collect([
-            collect(['name', 'game_map_name', 'gold_gain_range']),
-            collect(['Existing Profile', $map->name, '0.10-0.20']),
+            collect(['name', 'game_map_name', 'gem_world_name', 'gold_gain_range']),
+            collect(['Existing Profile', $map->name, 'The Updated Requiem', '0.10-0.20']),
         ]));
 
         $profile->refresh();
 
         $this->assertSame('0.10-0.20', $profile->gold_gain_range);
+        $this->assertSame('The Updated Requiem', $profile->gem_world_name);
     }
 
     public function test_unknown_game_map_name_fails_the_import(): void
@@ -77,8 +80,8 @@ class MapGemsSheetTest extends TestCase
         $skill = $this->createGameSkill(['name' => 'Import Skill', 'can_train' => false]);
 
         (new MapGemsSheet)->collection(collect([
-            collect(['name', 'game_map_name', 'crafting_skill_names']),
-            collect(['Crafting Profile', $map->name, $skill->name]),
+            collect(['name', 'game_map_name', 'gem_world_name', 'crafting_skill_names']),
+            collect(['Crafting Profile', $map->name, 'The Crafting Requiem', $skill->name]),
         ]));
 
         $profile = GameMapGemParamter::where('name', 'Crafting Profile')->first();
@@ -148,8 +151,8 @@ class MapGemsSheetTest extends TestCase
         $label = GemTypeValue::getNames()[GemTypeValue::FIRE];
 
         (new MapGemsSheet)->collection(collect([
-            collect(['name', 'game_map_name', 'monster_atonement']),
-            collect(['Atonement Profile', $map->name, $label]),
+            collect(['name', 'game_map_name', 'gem_world_name', 'monster_atonement']),
+            collect(['Atonement Profile', $map->name, 'The Atonement Requiem', $label]),
         ]));
 
         $profile = GameMapGemParamter::where('name', 'Atonement Profile')->first();
@@ -162,8 +165,8 @@ class MapGemsSheetTest extends TestCase
         $map = $this->createGameMap(['name' => 'Fallback Map']);
 
         (new MapGemsSheet)->collection(collect([
-            collect(['name', 'game_map_name', 'unique_mythic_cosmic_item_drop_chance_increase_range']),
-            collect(['Fallback Profile', $map->name, '0.01-0.02']),
+            collect(['name', 'game_map_name', 'gem_world_name', 'unique_mythic_cosmic_item_drop_chance_increase_range']),
+            collect(['Fallback Profile', $map->name, 'The Fallback Requiem', '0.01-0.02']),
         ]));
 
         $profile = GameMapGemParamter::where('name', 'Fallback Profile')->first();
@@ -178,10 +181,10 @@ class MapGemsSheetTest extends TestCase
         $map = $this->createGameMap(['name' => 'Blank Stop Map']);
 
         (new MapGemsSheet)->collection(collect([
-            collect(['name', 'game_map_name']),
-            collect(['Valid Before Blank Profile', $map->name]),
-            collect([null, null]),
-            collect(['Should Not Be Reached Profile', $map->name]),
+            collect(['name', 'game_map_name', 'gem_world_name']),
+            collect(['Valid Before Blank Profile', $map->name, 'The Valid Before Blank Requiem']),
+            collect([null, null, null]),
+            collect(['Should Not Be Reached Profile', $map->name, 'The Unreached Requiem']),
         ]));
 
         $this->assertNotNull(GameMapGemParamter::where('name', 'Valid Before Blank Profile')->first());
@@ -193,8 +196,8 @@ class MapGemsSheetTest extends TestCase
         $map = $this->createGameMap(['name' => 'Zero Range Map']);
 
         (new MapGemsSheet)->collection(collect([
-            collect(['name', 'game_map_name', 'gold_gain_range', 'crafting_skill_bonus_range', 'item_drop_chance_increase_range', 'unique_item_drop_chance_increase_range']),
-            collect(['Zero Range Profile', $map->name, 0, 0.0, '0', '0-0']),
+            collect(['name', 'game_map_name', 'gem_world_name', 'gold_gain_range', 'crafting_skill_bonus_range', 'item_drop_chance_increase_range', 'unique_item_drop_chance_increase_range']),
+            collect(['Zero Range Profile', $map->name, 'The Zero Range Requiem', 0, 0.0, '0', '0-0']),
         ]));
 
         $profile = GameMapGemParamter::where('name', 'Zero Range Profile')->first();
@@ -213,6 +216,53 @@ class MapGemsSheetTest extends TestCase
         (new MapGemsSheet)->collection(collect([
             collect(['name', 'game_map_name', 'gold_gain_range']),
             collect(['Nonzero Scalar Profile', $map->name, '5']),
+        ]));
+    }
+
+    public function test_missing_gem_world_name_fails_the_import(): void
+    {
+        $map = $this->createGameMap(['name' => 'Missing World Name Map']);
+        $this->expectException(RuntimeException::class);
+
+        (new MapGemsSheet)->collection(collect([
+            collect(['name', 'game_map_name']),
+            collect(['Missing World Name Profile', $map->name]),
+        ]));
+    }
+
+    public function test_gem_world_name_containing_technical_phrase_fails_the_import(): void
+    {
+        $map = $this->createGameMap(['name' => 'Technical Phrase Map']);
+        $this->expectException(RuntimeException::class);
+
+        (new MapGemsSheet)->collection(collect([
+            collect(['name', 'game_map_name', 'gem_world_name']),
+            collect(['Technical Phrase Profile', $map->name, 'Technical Phrase Gem Profile']),
+        ]));
+    }
+
+    public function test_duplicate_gem_world_name_within_workbook_fails_the_import(): void
+    {
+        $mapOne = $this->createGameMap(['name' => 'Duplicate Name Map One']);
+        $mapTwo = $this->createGameMap(['name' => 'Duplicate Name Map Two']);
+        $this->expectException(RuntimeException::class);
+
+        (new MapGemsSheet)->collection(collect([
+            collect(['name', 'game_map_name', 'gem_world_name']),
+            collect(['First Duplicate Profile', $mapOne->name, 'The Duplicated Requiem']),
+            collect(['Second Duplicate Profile', $mapTwo->name, 'the duplicated requiem']),
+        ]));
+    }
+
+    public function test_gem_world_name_matching_a_location_gem_world_name_fails_the_import(): void
+    {
+        $map = $this->createGameMap(['name' => 'Cross Type Map']);
+        $this->createGameLocationGemParamter(['gem_world_name' => 'The Shared Requiem']);
+        $this->expectException(RuntimeException::class);
+
+        (new MapGemsSheet)->collection(collect([
+            collect(['name', 'game_map_name', 'gem_world_name']),
+            collect(['Cross Type Profile', $map->name, 'The Shared Requiem']),
         ]));
     }
 }

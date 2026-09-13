@@ -357,6 +357,7 @@ class AreaGemEffectService
             type: $type,
             profileId: $profile->id,
             profileName: $profile->name,
+            gemWorldName: $profile->generatedMap?->name ?? $profile->gem_world_name ?? $profile->name,
             rolledGemId: $gem->id,
             rolledGemName: $gem->name,
             monsterMultiplier: $monsterMultiplier,

@@ -18,6 +18,8 @@ export default interface MapTabContentProps {
   on_conjure: () => void;
   is_view_location_enabled: boolean;
   on_view_location: () => void;
+  is_kingdoms_enabled: boolean;
   on_open_kingdoms: () => void;
+  is_character_dead: boolean;
   gem_world_actions_props: GemWorldActionsProps;
 }

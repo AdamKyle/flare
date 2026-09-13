@@ -63,9 +63,11 @@ const AllActiveGemScrollsList = ({
 
   if (data.length === 0) {
     return (
-      <p className="text-sm text-gray-600 dark:text-gray-400">
-        No active Gem Scrolls across any Gem World.
-      </p>
+      <div className="flex h-full min-h-0 flex-col px-4 py-4 sm:px-5">
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          No active Gem Scrolls across any Gem World.
+        </p>
+      </div>
     );
   }
 

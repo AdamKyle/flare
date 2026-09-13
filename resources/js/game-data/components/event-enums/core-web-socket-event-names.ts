@@ -5,4 +5,6 @@ export enum CoreWebSocketEventNames {
   UPDATE_LOCATION_BASED_CRAFTING_OPTIONS = 'Game.Maps.Events.UpdateLocationBasedCraftingOptions',
   UPDATE_BOONS = 'Game.Character.CharacterInventory.Events.CharacterBoonsUpdateBroadcastEvent',
   UPDATE_GEM_PROGRESSION = 'Game.Gems.Progression.Events.GemProgressionUpdateBroadcastEvent',
+  CHARACTER_REVIVE = 'Game.Battle.Events.CharacterRevive',
+  CHARACTER_STATUS = 'Game.Battle.Events.UpdateCharacterStatus',
 }

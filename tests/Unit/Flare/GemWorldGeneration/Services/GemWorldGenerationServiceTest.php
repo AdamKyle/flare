@@ -34,7 +34,7 @@ class GemWorldGenerationServiceTest extends TestCase
     public function test_generate_map_gem_creates_missing_generated_map_without_calling_image_generator_when_assets_restore_successfully(): void
     {
         $parentMap = $this->createGameMap(['name' => 'Surface']);
-        $gemParamter = $this->createGameMapGemParamter(['game_map_id' => $parentMap->id, 'name' => 'Fiery']);
+        $gemParamter = $this->createGameMapGemParamter(['game_map_id' => $parentMap->id, 'name' => 'Fiery', 'gem_world_name' => 'The Fiery Requiem']);
         $this->createLocationTemplate(['name' => 'Fiery Outpost', 'type' => LocationTemplateType::REGULAR->value]);
 
         $imageGenerator = Mockery::mock(GemWorldImageGenerator::class);
@@ -42,7 +42,7 @@ class GemWorldGenerationServiceTest extends TestCase
 
         $mapBackupAssetService = Mockery::mock(MapBackupAssetService::class);
         $mapBackupAssetService->shouldReceive('restore')->once()
-            ->with(Mockery::on(fn (GameMap $map): bool => $map->name === 'Fiery Map Gem World'))
+            ->with(Mockery::on(fn (GameMap $map): bool => $map->generated_asset_name === 'Fiery Map Gem World' && $map->name === 'The Fiery Requiem'))
             ->andReturn(new MapBackupAssetResult(MapBackupAssetStatus::RESTORED, 'Restored committed tile pieces for: Fiery Map Gem World'));
 
         $mapTileGenerationService = Mockery::mock(MapTileGenerationService::class);
@@ -61,7 +61,8 @@ class GemWorldGenerationServiceTest extends TestCase
         $this->assertSame(1, $result->locations_created);
         $this->assertSame(1, Location::where('x', 10)->where('y', 20)->count());
         $this->assertDatabaseHas('game_maps', [
-            'name' => 'Fiery Map Gem World',
+            'name' => 'The Fiery Requiem',
+            'generated_asset_name' => 'Fiery Map Gem World',
             'generated_parent_game_map_id' => $parentMap->id,
             'game_map_gem_paramter_id' => $gemParamter->id,
         ]);
@@ -97,7 +98,7 @@ class GemWorldGenerationServiceTest extends TestCase
     public function test_generate_map_gem_generates_image_and_tiles_when_generate_missing_is_explicitly_allowed(): void
     {
         $parentMap = $this->createGameMap(['name' => 'Surface']);
-        $gemParamter = $this->createGameMapGemParamter(['game_map_id' => $parentMap->id, 'name' => 'Fiery']);
+        $gemParamter = $this->createGameMapGemParamter(['game_map_id' => $parentMap->id, 'name' => 'Fiery', 'gem_world_name' => 'The Fiery Requiem']);
         $this->createLocationTemplate(['name' => 'Fiery Outpost', 'type' => LocationTemplateType::REGULAR->value]);
 
         $imageGenerator = Mockery::mock(GemWorldImageGenerator::class);
@@ -113,7 +114,7 @@ class GemWorldGenerationServiceTest extends TestCase
 
         $mapTileGenerationService = Mockery::mock(MapTileGenerationService::class);
         $mapTileGenerationService->shouldReceive('tile')->once()
-            ->with(Mockery::on(fn (GameMap $map): bool => $map->name === 'Fiery Map Gem World'), true);
+            ->with(Mockery::on(fn (GameMap $map): bool => $map->generated_asset_name === 'Fiery Map Gem World'), true);
 
         $placementService = Mockery::mock(GemWorldLocationPlacementService::class);
         $placementService->shouldReceive('placements')->once()->andReturn([
@@ -135,6 +136,7 @@ class GemWorldGenerationServiceTest extends TestCase
         $gemParamter = $this->createGameMapGemParamter([
             'game_map_id' => $parentMap->id,
             'name' => 'Fiery',
+            'gem_world_name' => 'The Fiery Requiem',
         ]);
         $generatedMap->update(['game_map_gem_paramter_id' => $gemParamter->id]);
 
@@ -155,6 +157,8 @@ class GemWorldGenerationServiceTest extends TestCase
         $this->assertSame('skipped', $result->status);
         $this->assertSame(0, $result->locations_created);
         $this->assertSame($gemParamter->id, $generatedMap->fresh()->game_map_gem_paramter_id);
+        $this->assertSame('The Fiery Requiem', $generatedMap->fresh()->name);
+        $this->assertSame('Fiery Map Gem World', $generatedMap->fresh()->generated_asset_name);
     }
 
     public function test_generate_map_gem_recovers_missing_locations_for_an_existing_generated_map_with_valid_assets(): void
@@ -168,6 +172,7 @@ class GemWorldGenerationServiceTest extends TestCase
         $gemParamter = $this->createGameMapGemParamter([
             'game_map_id' => $parentMap->id,
             'name' => 'Fiery',
+            'gem_world_name' => 'The Fiery Requiem',
         ]);
         $generatedMap->update(['game_map_gem_paramter_id' => $gemParamter->id]);
 
@@ -193,6 +198,8 @@ class GemWorldGenerationServiceTest extends TestCase
         $this->assertSame('generated', $result->status);
         $this->assertStringContainsString('Recovered and placed locations for existing map', $result->message);
         $this->assertSame($generatedMap->id, $result->map_id);
+        $this->assertSame('The Fiery Requiem', $generatedMap->fresh()->name);
+        $this->assertSame('Fiery Map Gem World', $generatedMap->fresh()->generated_asset_name);
     }
 
     public function test_generate_map_gem_returns_a_failed_result_when_placement_fails(): void

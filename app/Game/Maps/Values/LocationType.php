@@ -105,6 +105,19 @@ enum LocationType: int
         return in_array($this->value, self::manualQuestDropValues(), true);
     }
 
+    /**
+     * The Location Types with a live, wired manual-fight reward mechanic in
+     * BattleLocationRewardService, independent of any generic quest Item drop row.
+     */
+    public static function liveManualFightRewardLocationTypes(): array
+    {
+        return [
+            self::PURGATORY_SMITH_HOUSE->value,
+            self::GOLD_MINES->value,
+            self::THE_OLD_CHURCH->value,
+        ];
+    }
+
     public function getNamedValue(): string
     {
         return $this->label();

@@ -5,4 +5,6 @@ export enum CoreWebSocketChannels {
   UPDATE_LOCATION_BASED_CRAFTING_OPTIONS = 'update-location-base-crafting-options-{userId}',
   UPDATE_BOONS = 'update-boons-{userId}',
   UPDATE_GEM_PROGRESSION = 'update-gem-progression-{userId}',
+  CHARACTER_REVIVE = 'character-revive-{userId}',
+  CHARACTER_STATUS = 'update-character-status-{userId}',
 }

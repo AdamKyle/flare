@@ -44,10 +44,18 @@ const MapCard = () => {
 
   const { closeMapCard } = useManageMapSectionVisibility();
   const { moveCharacterDirectionally } = useDirectionallyMoveCharacter();
-  const { canMove, showTimerBar, lengthOfTime } = useFetchMovementTimeoutData();
+  const {
+    canMove: canMoveFromTimeout,
+    showTimerBar,
+    lengthOfTime,
+  } = useFetchMovementTimeoutData();
   const { isSetSailEnabled } = useManageSetSailButtonState();
-  const { isConjureEnabled } = useManageConjureButtonState();
+  const { isConjureEnabled: isConjureEnabledFromState } =
+    useManageConjureButtonState();
   const { gameData } = useGameData();
+  const isCharacterDead = gameData?.character?.is_dead ?? false;
+  const canMove = canMoveFromTimeout && !isCharacterDead;
+  const isConjureEnabled = isConjureEnabledFromState && !isCharacterDead;
   const { openTeleport } = UseOpenTeleportSidePeek();
   const { errorMessage, resetErrorMessage } = useManageMapMovementErrorState();
   const { characterPosition } = useEmitCharacterPosition();
@@ -197,9 +205,11 @@ const MapCard = () => {
         openConjure(gameData.character);
       }
     },
-    is_view_location_enabled: isViewLocationEnabled,
+    is_view_location_enabled: isViewLocationEnabled && !isCharacterDead,
     on_view_location: handleViewLocationDetails,
+    is_kingdoms_enabled: !isCharacterDead,
     on_open_kingdoms: openPlayerKingdoms,
+    is_character_dead: isCharacterDead,
     gem_world_actions_props: {
       status: gemWorldStatus,
       loading: gemWorldContextLoading,

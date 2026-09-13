@@ -89,6 +89,7 @@ const GemWorldActions = ({
         label={entry.label}
         variant={ButtonVariant.PRIMARY}
         additional_css={'w-full'}
+        disabled={!canMove}
       />
     </div>
   );

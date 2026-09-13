@@ -23,6 +23,7 @@ class GameMap extends Model
         'name',
         'description',
         'path',
+        'generated_asset_name',
         'tile_map',
         'default',
         'kingdom_color',

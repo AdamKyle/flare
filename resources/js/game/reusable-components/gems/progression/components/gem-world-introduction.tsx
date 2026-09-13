@@ -4,9 +4,9 @@ import GemWorldIntroductionProps from './types/gem-world-introduction-props';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
-import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
-import LoadingButton from 'ui/buttons/loading-button';
+import { useSidePeekOptions } from 'ui/side-peek/options/hooks/use-side-peek-options';
+import SidePeekOptionDefinition from 'ui/side-peek/options/types/side-peek-option-definition';
 
 interface IntroductionPage {
   title: string;
@@ -86,6 +86,41 @@ const GemWorldIntroduction = ({
     setPageIndex((previous) => Math.max(previous - 1, 0));
   };
 
+  const resolveFooterOptions = (): SidePeekOptionDefinition[] => {
+    const options: SidePeekOptionDefinition[] = [];
+
+    if (!isFirstPage) {
+      options.push({
+        id: 'gem-world-introduction-previous',
+        label: 'Previous',
+        variant: ButtonVariant.PRIMARY,
+        on_click: handleBack,
+      });
+    }
+
+    if (isLastPage) {
+      options.push({
+        id: 'gem-world-introduction-understand',
+        label: 'I Understand',
+        loading_label: 'Saving…',
+        variant: ButtonVariant.SUCCESS,
+        loading,
+        on_click: onAcknowledge,
+      });
+    } else {
+      options.push({
+        id: 'gem-world-introduction-next',
+        label: 'Next',
+        variant: ButtonVariant.PRIMARY,
+        on_click: handleNext,
+      });
+    }
+
+    return options;
+  };
+
+  useSidePeekOptions(resolveFooterOptions());
+
   return (
     <div className="flex flex-col gap-3">
       <span className="text-xs font-medium tracking-wide text-gray-500 uppercase dark:text-gray-400">
@@ -101,30 +136,6 @@ const GemWorldIntroduction = ({
       </div>
 
       {error && <Alert variant={AlertVariant.DANGER}>{error}</Alert>}
-
-      <div className="mt-2 flex items-center justify-between gap-2">
-        <Button
-          label="Back"
-          variant={ButtonVariant.PRIMARY}
-          disabled={isFirstPage}
-          on_click={handleBack}
-        />
-        {isLastPage ? (
-          <LoadingButton
-            label="I Understand"
-            loading_label="Saving…"
-            variant={ButtonVariant.SUCCESS}
-            is_loading={loading}
-            on_click={onAcknowledge}
-          />
-        ) : (
-          <Button
-            label="Next"
-            variant={ButtonVariant.PRIMARY}
-            on_click={handleNext}
-          />
-        )}
-      </div>
     </div>
   );
 };

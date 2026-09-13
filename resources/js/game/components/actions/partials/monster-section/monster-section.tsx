@@ -17,6 +17,7 @@ import MonsterSectionProps from './types/monster-section-props';
 import { getImageTierByIndex } from './util/monster-image-tier';
 import AttackButtonsContainer from '../../components/fight-section/attack-buttons-container';
 import AttackMessages from '../../components/fight-section/attack-messages';
+import CharacterDeadAction from '../../components/fight-section/character-dead-action';
 import { HealthBarType } from '../../components/fight-section/enums/health-bar-type';
 import HealthBar from '../../components/fight-section/health-bar';
 import HealthBarContainer from '../../components/fight-section/health-bar-container';
@@ -55,6 +56,8 @@ const MonsterSection = ({
     () => (Array.isArray(gameData?.monsters) ? gameData.monsters : []),
     [gameData?.monsters]
   );
+
+  const isCharacterDead = gameData?.character?.is_dead ?? false;
 
   useEffect(() => {
     if (!monsters || monsters.length === 0) {
@@ -145,6 +148,12 @@ const MonsterSection = ({
   };
 
   const renderMonsterFightSection = () => {
+    if (isCharacterDead) {
+      return (
+        <CharacterDeadAction character_id={gameData?.character?.id || 0} />
+      );
+    }
+
     if (showExplorationConfiguration) {
       return (
         <MonsterExplorationConfiguration

@@ -7,6 +7,8 @@ import CharacterSheetDefinition from '../api-data-definitions/character/characte
 import GameDataDefinition from '../deffinitions/game-data-definition';
 
 import UseCharacterBoonsUpdateStreamResponse from 'game-data/hooks/definitions/use-character-boons-update-stream-response';
+import UseCharacterReviveStreamResponse from 'game-data/hooks/definitions/use-character-revive-stream-response';
+import UseCharacterStatusStreamResponse from 'game-data/hooks/definitions/use-character-status-stream-response';
 import UseCharterUpdateStreamResponse from 'game-data/hooks/definitions/use-character-update-stream-response';
 import UseGemProgressionUpdateStreamResponse from 'game-data/hooks/definitions/use-gem-progression-update-stream-response';
 import UseLocationBasedCraftingOptionsStreamResponse from 'game-data/hooks/definitions/use-location-based-crafting-options-stream-response';
@@ -62,6 +64,16 @@ const GameDataProvider = (props: GameDataProviderProps) => {
         monsters: updatedMonsters,
       };
     });
+  };
+
+  const handleOnCharacterRevive = (data: UseCharacterReviveStreamResponse) => {
+    updateCharacter({ is_dead: data.is_dead, health: data.health });
+  };
+
+  const handleOnCharacterStatusUpdate = (
+    data: UseCharacterStatusStreamResponse
+  ) => {
+    updateCharacter({ is_dead: data.is_dead });
   };
 
   const handleOnCharacterUpdate = (
@@ -195,6 +207,8 @@ const GameDataProvider = (props: GameDataProviderProps) => {
     onCraftingOptionsEvent: handleOnCraftingOptionsUpdate,
     onBoonsEvent: handleOnBoonsUpdate,
     onGemProgressionEvent: handleOnGemProgressionUpdate,
+    onReviveEvent: handleOnCharacterRevive,
+    onStatusEvent: handleOnCharacterStatusUpdate,
   });
 
   const {

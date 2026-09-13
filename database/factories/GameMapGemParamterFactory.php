@@ -16,6 +16,7 @@ class GameMapGemParamterFactory extends Factory
         return [
             'game_map_id' => GameMap::factory(),
             'name' => $this->faker->unique()->words(3, true),
+            'gem_world_name' => $this->faker->unique()->words(3, true),
             'description' => 'A generated gem parameter description.',
             'character_xp_bonus_range' => '0.01-1.0',
             'gold_gain_range' => '0.01-1.0',

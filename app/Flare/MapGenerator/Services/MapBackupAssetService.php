@@ -84,7 +84,7 @@ class MapBackupAssetService
      */
     private function restorePieces(GameMap $gameMap): MapBackupAssetResult
     {
-        $piecesFolder = GameMapPiecesFolderName::for($gameMap->name);
+        $piecesFolder = GameMapPiecesFolderName::for($gameMap->generated_asset_name ?? $gameMap->name);
         $liveDisk = Storage::disk('maps');
         $livePiecesExist = $liveDisk->exists($piecesFolder);
 
