@@ -25,8 +25,10 @@ use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\MovementMessageTypes;
+use App\Game\Monsters\Services\BuildMonsterCacheService;
 use App\Game\Monsters\Services\MonsterListService;
 use App\Game\Monsters\Transformers\MonsterTransformer;
+use App\Game\Monsters\Values\MonsterCacheKey;
 use Facades\App\Game\Maps\Cache\CoordinatesCache;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Support\Facades\Cache;
@@ -51,6 +53,18 @@ class TraverseService
 
     private MonsterListService $monsterListService;
 
+    /**
+     * @param Manager $manager
+     * @param CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer
+     * @param BuildCharacterAttackTypes $buildCharacterAttackTypes
+     * @param MonsterTransformer $monsterTransformer
+     * @param MonsterListService $monsterListService
+     * @param LocationService $locationService
+     * @param MapTileValue $mapTileValue
+     * @param RandomNumberGenerator $randomNumberGenerator
+     * @param CharacterAreaGemEffectService $characterAreaGemEffectService
+     * @param BuildMonsterCacheService $buildMonsterCacheService
+     */
     public function __construct(
         Manager $manager,
         CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer,
@@ -61,6 +75,7 @@ class TraverseService
         MapTileValue $mapTileValue,
         private readonly RandomNumberGenerator $randomNumberGenerator,
         private readonly CharacterAreaGemEffectService $characterAreaGemEffectService,
+        private readonly BuildMonsterCacheService $buildMonsterCacheService,
     ) {
         $this->manager = $manager;
         $this->characterSheetBaseInfoTransformer = $characterSheetBaseInfoTransformer;
@@ -408,11 +423,18 @@ class TraverseService
             || $gameMap->mapType()->isDelusionalMemories();
     }
 
+    /**
+     * Resolve the effective Monster dataset for the destination Game Map after a traversal.
+     *
+     * @param Map $characterMap
+     * @param int $mapId
+     * @return array
+     */
     protected function getMonstersForMap(Map $characterMap, int $mapId): array
     {
         $canAccessPurgatory = $characterMap->character->inventory->slots->where('items.effect', ItemEffectType::PURGATORY->value)->count() > 0;
 
-        $monsters = Cache::get('monsters')[GameMap::find($mapId)->name];
+        $monsters = $this->resolveMapMonsterDataset($mapId);
 
         if ($characterMap->gameMap->only_during_event_type) {
             if ($canAccessPurgatory) {
@@ -423,6 +445,24 @@ class TraverseService
         }
 
         return $monsters;
+    }
+
+    /**
+     * Resolve the destination Game Map's canonical Monster dataset, repairing only
+     * that Map's cache entry on a miss rather than rebuilding every Map.
+     *
+     * @param int $mapId
+     * @return array
+     */
+    private function resolveMapMonsterDataset(int $mapId): array
+    {
+        $dataset = Cache::get(MonsterCacheKey::forGameMap($mapId));
+
+        if (! is_null($dataset)) {
+            return $dataset;
+        }
+
+        return $this->buildMonsterCacheService->rebuildMapCache(GameMap::find($mapId));
     }
 
     /**

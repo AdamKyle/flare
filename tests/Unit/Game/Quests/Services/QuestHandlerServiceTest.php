@@ -12,6 +12,7 @@ use App\Game\Events\Values\EventType;
 use App\Game\Maps\Events\UpdateMap;
 use App\Game\Maps\Validation\CanTravelToMap;
 use App\Game\Maps\Values\MapTileValue;
+use App\Game\Monsters\Services\BuildMonsterCacheService;
 use App\Game\Quests\Handlers\NpcQuestsHandler;
 use App\Game\Quests\Services\BuildQuestCacheService;
 use App\Game\Quests\Services\QuestHandlerService;
@@ -159,6 +160,7 @@ class QuestHandlerServiceTest extends TestCase
             $mapTileValue,
             resolve(BuildQuestCacheService::class),
             resolve(BattleRewardProcessingQueueManager::class),
+            resolve(BuildMonsterCacheService::class),
         );
 
         $result = $service->moveCharacter($character, $npc);
@@ -507,6 +509,7 @@ class QuestHandlerServiceTest extends TestCase
             $mapTileValue,
             resolve(BuildQuestCacheService::class),
             resolve(BattleRewardProcessingQueueManager::class),
+            resolve(BuildMonsterCacheService::class),
         );
 
         $result = $service->moveCharacter($character, $npc);
@@ -540,6 +543,7 @@ class QuestHandlerServiceTest extends TestCase
             $mapTileValue,
             resolve(BuildQuestCacheService::class),
             resolve(BattleRewardProcessingQueueManager::class),
+            resolve(BuildMonsterCacheService::class),
         );
 
         $result = $service->moveCharacter($character, $npc);
@@ -574,6 +578,7 @@ class QuestHandlerServiceTest extends TestCase
             $mapTileValue,
             resolve(BuildQuestCacheService::class),
             resolve(BattleRewardProcessingQueueManager::class),
+            resolve(BuildMonsterCacheService::class),
         );
 
         $result = $service->moveCharacter($character, $npc);
@@ -608,6 +613,7 @@ class QuestHandlerServiceTest extends TestCase
             $mapTileValue,
             resolve(BuildQuestCacheService::class),
             resolve(BattleRewardProcessingQueueManager::class),
+            resolve(BuildMonsterCacheService::class),
         );
 
         $result = $service->moveCharacter($character, $npc);
@@ -643,6 +649,7 @@ class QuestHandlerServiceTest extends TestCase
             $mapTileValue,
             resolve(BuildQuestCacheService::class),
             resolve(BattleRewardProcessingQueueManager::class),
+            resolve(BuildMonsterCacheService::class),
         );
 
         $service->moveCharacter($character, $npc);
@@ -675,6 +682,7 @@ class QuestHandlerServiceTest extends TestCase
             $mapTileValue,
             resolve(BuildQuestCacheService::class),
             resolve(BattleRewardProcessingQueueManager::class),
+            resolve(BuildMonsterCacheService::class),
         );
 
         $service->moveCharacter($character, $npc);

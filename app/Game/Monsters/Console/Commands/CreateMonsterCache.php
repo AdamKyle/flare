@@ -2,6 +2,7 @@
 
 namespace App\Game\Monsters\Console\Commands;
 
+use App\Flare\Models\GameMap;
 use App\Game\Monsters\Services\BuildMonsterCacheService;
 use Illuminate\Console\Command;
 use Psr\SimpleCache\InvalidArgumentException;
@@ -23,12 +24,34 @@ class CreateMonsterCache extends Command
     protected $description = 'Generates monsters to fight';
 
     /**
-     * Execute the console command.
+     * Execute the console command, reporting progress per Game Map for the
+     * canonical per-Map Monster cache before rebuilding the remaining caches.
+     *
+     * @param BuildMonsterCacheService $buildMonsterCacheService
+     * @return void
      *
      * @throws InvalidArgumentException
      */
     public function handle(BuildMonsterCacheService $buildMonsterCacheService): void
     {
-        $buildMonsterCacheService->buildAll();
+        $gameMaps = GameMap::all();
+
+        $this->output->progressStart($gameMaps->count());
+
+        foreach ($gameMaps as $gameMap) {
+            $buildMonsterCacheService->rebuildMapCache($gameMap);
+
+            $this->output->progressAdvance();
+        }
+
+        $this->output->progressFinish();
+
+        $buildMonsterCacheService->buildLocationCache();
+        $buildMonsterCacheService->buildWeeklyFightCache();
+        $buildMonsterCacheService->buildRaidCache();
+        $buildMonsterCacheService->buildCelestialCache();
+        $buildMonsterCacheService->finalizeCanonicalCache();
+
+        $this->info('Monster cache regenerated.');
     }
 }

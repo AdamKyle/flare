@@ -2,6 +2,7 @@
 
 namespace App\Game\Monsters\Services;
 
+use App\Flare\Models\GameMap;
 use App\Flare\Models\Monster;
 use App\Flare\Pagination\Pagination;
 use App\Game\Monsters\Values\MonsterCacheKey;
@@ -82,7 +83,7 @@ class MonsterGemEffectContextService
 
         $contexts = [];
 
-        $this->collectFromCache(Cache::get(MonsterCacheKey::MONSTERS->value) ?? [], $monster, $contexts);
+        $this->collectFromCache($this->allMapMonsterCacheEntries(), $monster, $contexts);
         $this->collectFromCache(Cache::get(MonsterCacheKey::LOCATION_MONSTERS->value) ?? [], $monster, $contexts);
 
         return $this->sortContexts(array_values($contexts));
@@ -161,6 +162,20 @@ class MonsterGemEffectContextService
             && ! $monster->is_raid_monster
             && ! $monster->is_raid_boss
             && is_null($monster->only_for_location_type);
+    }
+
+    /**
+     * Collect every currently cached per-Game-Map Monster dataset entry.
+     *
+     * @return array
+     */
+    private function allMapMonsterCacheEntries(): array
+    {
+        return GameMap::all()
+            ->map(fn (GameMap $gameMap) => Cache::get(MonsterCacheKey::forGameMap($gameMap->id)))
+            ->filter()
+            ->values()
+            ->all();
     }
 
     /**

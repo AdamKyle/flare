@@ -9,6 +9,7 @@ use App\Game\Battle\ServerFight\Monster\BuildMonster;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Exploration\Services\DelveMonsterService;
 use App\Game\Maps\Values\LocationType;
+use App\Game\Monsters\Values\MonsterCacheKey;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Mockery;
@@ -69,11 +70,9 @@ class MonsterPlayerFightTest extends TestCase
         $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $factory = new MonsterPlayerFightFactory();
 
-        Cache::put('monsters', [
-            'Surface' => ['data' => [
-                ['id' => 5, 'name' => 'Fresh', 'fire_atonement' => 0, 'ice_atonement' => 0, 'water_atonement' => 0],
-            ]],
-        ]);
+        Cache::put(MonsterCacheKey::forGameMap($character->map->gameMap->id), ['data' => [
+            ['id' => 5, 'name' => 'Fresh', 'fire_atonement' => 0, 'ice_atonement' => 0, 'water_atonement' => 0],
+        ]]);
 
         $buildMonster = Mockery::mock(BuildMonster::class);
         $buildMonster->shouldReceive('setServerMonster')->once()->andReturnUsing(function ($monster) use ($factory) {
@@ -517,7 +516,7 @@ class MonsterPlayerFightTest extends TestCase
         Cache::put('special-location-monsters', [
             'location-type-999' => ['data' => [['id' => 777, 'name' => 'Ghost Monster']]],
         ]);
-        Cache::put('monsters', [$gameMap->name => ['data' => []]]);
+        Cache::put(MonsterCacheKey::forGameMap($gameMap->id), ['data' => []]);
         Cache::put('weekly-monsters', []);
         Cache::put('location-monsters', []);
         Cache::put('celestials', [$gameMap->name => ['data' => []]]);
@@ -536,7 +535,7 @@ class MonsterPlayerFightTest extends TestCase
         $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $gameMap = $character->map->gameMap;
 
-        Cache::put('monsters', [$gameMap->name => ['data' => []]]);
+        Cache::put(MonsterCacheKey::forGameMap($gameMap->id), ['data' => []]);
         Cache::put('weekly-monsters', []);
         Cache::put('location-monsters', []);
         Cache::put('celestials', [

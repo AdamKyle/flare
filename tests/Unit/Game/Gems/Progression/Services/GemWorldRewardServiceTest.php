@@ -5,8 +5,11 @@ namespace Tests\Unit\Game\Gems\Progression\Services;
 use App\Flare\Models\AlchemyBagSlot;
 use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Currency\Services\CurrencyLimit;
+use App\Game\Gems\Progression\Events\GemProfileProgressionUpdateBroadcastEvent;
+use App\Game\Gems\Progression\Events\GemProgressionUpdateBroadcastEvent;
 use App\Game\Gems\Progression\Values\GemScrollCurrencyType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Mockery;
 use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
@@ -63,6 +66,28 @@ class GemWorldRewardServiceTest extends TestCase
             'level' => 1,
             'xp' => 105,
         ]);
+    }
+
+    public function test_successful_gem_world_reward_processing_persists_progression_and_broadcasts_the_update(): void
+    {
+        Event::fake([GemProgressionUpdateBroadcastEvent::class, GemProfileProgressionUpdateBroadcastEvent::class]);
+
+        $graph = $this->gemWorldRewardTestFactory->buildGeneratedMapGemWorldCharacter();
+        $step = $this->createCharacterBattleRewardRequestStep(['character_id' => $graph->character->id]);
+
+        $result = $this->gemWorldRewardTestFactory->buildService()->applyToLedgerStep($step, $graph->character, ['xp' => 100, 'gold' => 10], 1, []);
+
+        $this->assertTrue($result['applied']);
+
+        $this->assertDatabaseHas('character_game_map_gem_progressions', [
+            'character_id' => $graph->character->id,
+            'game_map_gem_paramter_id' => $graph->mapProfile->id,
+            'level' => 1,
+            'xp' => 105,
+        ]);
+
+        Event::assertDispatched(GemProgressionUpdateBroadcastEvent::class);
+        Event::assertDispatched(GemProfileProgressionUpdateBroadcastEvent::class);
     }
 
     public function test_location_gem_world_awards_its_exact_location_profile_progression(): void

@@ -437,7 +437,7 @@ class GemWorldControllerTest extends TestCase
 
         resolve(BuildMonsterCacheService::class)->buildAll();
 
-        $cachedMonster = collect(Cache::get(MonsterCacheKey::MONSTERS->value)[$generatedMap->name]['data'])
+        $cachedMonster = collect(Cache::get(MonsterCacheKey::forGameMap($generatedMap->id))['data'])
             ->firstWhere('id', $monster->id);
 
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation(16, 16, $parentMap)->getCharacter();
@@ -494,7 +494,7 @@ class GemWorldControllerTest extends TestCase
 
         resolve(BuildMonsterCacheService::class)->buildAll();
 
-        $cachedMonster = collect(Cache::get(MonsterCacheKey::MONSTERS->value)[$generatedLocationMap->name]['data'])
+        $cachedMonster = collect(Cache::get(MonsterCacheKey::forGameMap($generatedLocationMap->id))['data'])
             ->firstWhere('id', $monster->id);
 
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation(50, 50, $parentMap)->getCharacter();

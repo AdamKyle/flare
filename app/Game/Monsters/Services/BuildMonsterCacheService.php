@@ -42,37 +42,68 @@ class BuildMonsterCacheService
         $this->buildRaidCache();
         $this->buildCelestialCache();
 
+        $this->finalizeCanonicalCache();
+    }
+
+    /**
+     * Build the regular per-Game-Map Monster cache, one Game Map at a time, applying the
+     * current rolled Map Gem effects for each Game Map's actual gameplay context (including
+     * generated Gem Worlds). Each Map's dataset is written under its own cache key so a
+     * single fight never has to load every Map's dataset to read one.
+     */
+    public function buildCache(): void
+    {
+        foreach (GameMap::all() as $gameMap) {
+            $this->rebuildMapCache($gameMap);
+        }
+    }
+
+    /**
+     * Rebuild and cache only the given Game Map's Monster dataset.
+     *
+     * @param GameMap $gameMap
+     * @return array
+     */
+    public function rebuildMapCache(GameMap $gameMap): array
+    {
+        $dataset = $this->buildDatasetForGameMap($gameMap);
+
+        Cache::put(MonsterCacheKey::forGameMap($gameMap->id), $dataset);
+
+        return $dataset;
+    }
+
+    /**
+     * Forget the obsolete global Monster cache value and publish a new canonical
+     * cache revision. Must only be called after every canonical cache build succeeds.
+     */
+    public function finalizeCanonicalCache(): void
+    {
+        Cache::forget(MonsterCacheKey::MONSTERS->value);
+
         $this->monsterCacheRevisionService->bump();
     }
 
     /**
-     * Build the regular per-Game-Map Monster cache, applying the current rolled Map Gem
-     * effects for each Game Map's actual gameplay context (including generated Gem Worlds).
+     * Build the transformed Monster dataset for one Game Map's actual gameplay context.
+     *
+     * @param GameMap $gameMap
+     * @return array
      */
-    public function buildCache(): void
+    private function buildDatasetForGameMap(GameMap $gameMap): array
     {
-        Cache::delete(MonsterCacheKey::MONSTERS->value);
+        $monsterSourceMap = $gameMap->monsterSourceGameMap();
 
-        $monstersCache = [];
+        $monsters = new Collection(
+            $this->regularMonsterQuery($monsterSourceMap->id)->get(),
+            $this->transformerForGameMap($gameMap)
+        );
 
-        foreach (GameMap::all() as $gameMap) {
-            $monsterSourceMap = $gameMap->monsterSourceGameMap();
-
-            $monsters = new Collection(
-                $this->regularMonsterQuery($monsterSourceMap->id)->get(),
-                $this->transformerForGameMap($gameMap)
-            );
-
-            if (! is_null($monsterSourceMap->only_during_event_type)) {
-                $monstersCache[$gameMap->name] = $this->createMonstersForEventMaps($gameMap, $monsters);
-
-                continue;
-            }
-
-            $monstersCache[$gameMap->name] = $this->manager->createData($monsters)->toArray();
+        if (! is_null($monsterSourceMap->only_during_event_type)) {
+            return $this->createMonstersForEventMaps($gameMap, $monsters);
         }
 
-        Cache::put(MonsterCacheKey::MONSTERS->value, $monstersCache);
+        return $this->manager->createData($monsters)->toArray();
     }
 
     /**
@@ -186,8 +217,11 @@ class BuildMonsterCacheService
      */
     public function invalidateGemAffectedCaches(): void
     {
-        Cache::delete(MonsterCacheKey::MONSTERS->value);
-        Cache::delete(MonsterCacheKey::LOCATION_MONSTERS->value);
+        foreach (GameMap::all() as $gameMap) {
+            Cache::forget(MonsterCacheKey::forGameMap($gameMap->id));
+        }
+
+        Cache::forget(MonsterCacheKey::LOCATION_MONSTERS->value);
     }
 
     /**

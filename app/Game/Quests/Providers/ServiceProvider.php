@@ -7,6 +7,7 @@ use App\Game\Factions\FactionLoyalty\Services\UpdateFactionLoyaltyService;
 use App\Game\Maps\Validation\CanTravelToMap;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
+use App\Game\Monsters\Services\BuildMonsterCacheService;
 use App\Game\Quests\Console\Commands\CreateQuestCache;
 use App\Game\Quests\Handlers\NpcQuestRewardHandler;
 use App\Game\Quests\Handlers\NpcQuestsHandler;
@@ -51,6 +52,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(MapTileValue::class),
                 $app->make(BuildQuestCacheService::class),
                 $app->make(BattleRewardProcessingQueueManager::class),
+                $app->make(BuildMonsterCacheService::class),
             );
         });
 

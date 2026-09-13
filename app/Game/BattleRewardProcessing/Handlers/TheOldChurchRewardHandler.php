@@ -17,6 +17,7 @@ use App\Game\Core\Items\Values\RandomAffixTier;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Types\CurrenciesMessageTypes;
+use App\Game\Monsters\Values\MonsterCacheKey;
 use Exception;
 use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
@@ -130,7 +131,7 @@ class TheOldChurchRewardHandler
     private function isMonsterAtLeastHalfWayOrMore(Location $location, Monster $monster): bool
     {
 
-        $monsters = Cache::get('monsters')[$location->name];
+        $monsters = Cache::get(MonsterCacheKey::forGameMap($location->game_map_id)) ?? [];
 
         $monsterCount = count($monsters);
         $halfWay = (int) ($monsterCount / 2);

@@ -33,6 +33,22 @@ class MonsterListServiceTest extends TestCase
         $this->assertTrue(collect($list)->contains('id', $monster->id));
     }
 
+    public function test_resolving_monsters_only_touches_the_characters_own_map_cache_key(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $gameMap = $character->map->gameMap;
+        $otherMap = $this->createGameMap(['name' => 'Unrelated Cache Map', 'default' => false]);
+        $monster = $this->createMonster(['game_map_id' => $gameMap->id]);
+        $this->createMonster(['game_map_id' => $otherMap->id]);
+
+        $effectiveMonster = resolve(MonsterListService::class)->getMonsterForFight($character->refresh(), $monster->id);
+
+        $this->assertSame($monster->id, $effectiveMonster['id']);
+        $this->assertTrue(Cache::has(MonsterCacheKey::forGameMap($gameMap->id)));
+        $this->assertFalse(Cache::has(MonsterCacheKey::forGameMap($otherMap->id)));
+        $this->assertFalse(Cache::has('monsters'));
+    }
+
     public function test_gem_bearing_location_resolves_its_own_location_cache(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();

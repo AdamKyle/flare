@@ -3,6 +3,7 @@
 namespace Tests\Feature\Admin\LocationGems;
 
 use App\Admin\LocationGems\Imports\LocationGemsImport;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\Gem;
 use App\Game\Monsters\Services\BuildMonsterCacheService;
 use App\Game\Monsters\Values\MonsterCacheKey;
@@ -362,7 +363,10 @@ class LocationGemsApiControllerTest extends TestCase
 
         $this->actingAs($admin)->call('POST', '/api/admin/location-gems/'.$profile->id.'/roll');
 
-        $this->assertFalse(Cache::has(MonsterCacheKey::MONSTERS->value));
+        foreach (GameMap::all() as $gameMap) {
+            $this->assertFalse(Cache::has(MonsterCacheKey::forGameMap($gameMap->id)));
+        }
+
         $this->assertFalse(Cache::has(MonsterCacheKey::LOCATION_MONSTERS->value));
         $this->assertTrue(Cache::has(MonsterCacheKey::RAID_MONSTERS->value));
     }
@@ -442,7 +446,10 @@ class LocationGemsApiControllerTest extends TestCase
 
         $this->actingAs($admin)->call('POST', '/api/admin/location-gems/roll-all');
 
-        $this->assertFalse(Cache::has(MonsterCacheKey::MONSTERS->value));
+        foreach (GameMap::all() as $gameMap) {
+            $this->assertFalse(Cache::has(MonsterCacheKey::forGameMap($gameMap->id)));
+        }
+
         $this->assertFalse(Cache::has(MonsterCacheKey::LOCATION_MONSTERS->value));
     }
 
@@ -533,7 +540,10 @@ class LocationGemsApiControllerTest extends TestCase
 
         $this->actingAs($admin)->call('PUT', '/api/admin/location-gems/'.$profile->id.'/rolls/'.$firstGem->id.'/activate');
 
-        $this->assertFalse(Cache::has(MonsterCacheKey::MONSTERS->value));
+        foreach (GameMap::all() as $gameMap) {
+            $this->assertFalse(Cache::has(MonsterCacheKey::forGameMap($gameMap->id)));
+        }
+
         $this->assertFalse(Cache::has(MonsterCacheKey::LOCATION_MONSTERS->value));
     }
 

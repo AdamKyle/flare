@@ -18,6 +18,8 @@ use App\Game\Maps\Events\UpdateRaidMonsters;
 use App\Game\Maps\Validation\CanTravelToMap;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Monsters\Services\BuildMonsterCacheService;
+use App\Game\Monsters\Values\MonsterCacheKey;
 use App\Game\Quests\Handlers\NpcQuestsHandler;
 use App\Game\Quests\Traits\QuestDetails;
 use Illuminate\Support\Facades\Cache;
@@ -36,12 +38,21 @@ class QuestHandlerService
 
     private BuildQuestCacheService $buildQuestCacheService;
 
+    /**
+     * @param NpcQuestsHandler $npcQuestsHandler
+     * @param CanTravelToMap $canTravelToMap
+     * @param MapTileValue $mapTileValue
+     * @param BuildQuestCacheService $buildQuestCacheService
+     * @param BattleRewardProcessingQueueManager $battleRewardProcessingQueueManager
+     * @param BuildMonsterCacheService $buildMonsterCacheService
+     */
     public function __construct(
         NpcQuestsHandler $npcQuestsHandler,
         CanTravelToMap $canTravelToMap,
         MapTileValue $mapTileValue,
         BuildQuestCacheService $buildQuestCacheService,
         private readonly BattleRewardProcessingQueueManager $battleRewardProcessingQueueManager,
+        private readonly BuildMonsterCacheService $buildMonsterCacheService,
     ) {
 
         $this->npcQuestsHandler = $npcQuestsHandler;
@@ -208,14 +219,36 @@ class QuestHandlerService
 
     /**
      * Update the character map details after Quest movement.
+     *
+     * @param Character $character
+     * @return void
      */
     protected function updateMapDetails(Character $character): void
     {
-        $monsters = Cache::get('monsters')[$character->map->gameMap->name];
+        $monsters = $this->resolveMapMonsterDataset($character);
 
         event(new UpdateMonsterList($monsters, $character->user));
 
         event(new UpdateRaidMonsters([], $character->user));
+    }
+
+    /**
+     * Resolve the Character's current Game Map's canonical Monster dataset, repairing only
+     * that Map's cache entry on a miss rather than rebuilding every Map.
+     *
+     * @param Character $character
+     * @return array
+     */
+    private function resolveMapMonsterDataset(Character $character): array
+    {
+        $gameMap = $character->map->gameMap;
+        $dataset = Cache::get(MonsterCacheKey::forGameMap($gameMap->id));
+
+        if (! is_null($dataset)) {
+            return $dataset;
+        }
+
+        return $this->buildMonsterCacheService->rebuildMapCache($gameMap);
     }
 
     /**

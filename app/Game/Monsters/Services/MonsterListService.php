@@ -60,7 +60,7 @@ class MonsterListService
         $characterMap = $character->map;
         $gameMap = $characterMap->gameMap;
 
-        $this->ensureMonsterCache();
+        $this->ensureSupportingMonsterCaches();
 
         $currentLocation = $this->findCurrentLocation(
             $characterMap->character_position_x,
@@ -91,12 +91,10 @@ class MonsterListService
             return $locationMonsters;
         }
 
-        $monstersKey = $gameMap->name;
-        $monsters = $this->baseMonsters($monstersKey);
+        $monsters = $this->mapMonsters($gameMap);
 
         return $this->applyMapTierOverrides(
             $monsters,
-            $monstersKey,
             $gameMap->mapType()->isTheIcePlane(),
             $gameMap->mapType()->isDelusionalMemories(),
             $this->characterHasPurgatoryAccess($character)
@@ -104,14 +102,11 @@ class MonsterListService
     }
 
     /**
-     * Ensure the Monster caches required by the current context exist.
+     * Ensure the small supporting Monster caches required by the current context exist.
+     * The canonical per-Game-Map Monster dataset is resolved separately and lazily.
      */
-    private function ensureMonsterCache(): void
+    private function ensureSupportingMonsterCaches(): void
     {
-        if (! Cache::has(MonsterCacheKey::MONSTERS->value)) {
-            $this->buildMonsterCacheService->buildCache();
-        }
-
         if (! Cache::has(MonsterCacheKey::WEEKLY_MONSTERS->value)) {
             $this->buildMonsterCacheService->buildWeeklyFightCache();
         }
@@ -175,13 +170,18 @@ class MonsterListService
     }
 
     /**
-     * Return the base Monster dataset for the Map cache key.
+     * Resolve the current Game Map's canonical Monster dataset, repairing only
+     * that Map's cache entry on a miss rather than rebuilding every Map.
      */
-    private function baseMonsters(string $monstersKey): array
+    private function mapMonsters(GameMap $gameMap): array
     {
-        $monstersCache = Cache::get(MonsterCacheKey::MONSTERS->value);
+        $dataset = Cache::get(MonsterCacheKey::forGameMap($gameMap->id));
 
-        return $monstersCache[$monstersKey] ?? ['data' => []];
+        if (! is_null($dataset)) {
+            return $dataset;
+        }
+
+        return $this->buildMonsterCacheService->rebuildMapCache($gameMap);
     }
 
     /**
@@ -189,7 +189,6 @@ class MonsterListService
      */
     private function applyMapTierOverrides(
         array $current,
-        string $monstersKey,
         bool $isTheIcePlane,
         bool $isDelusionalMemories,
         bool $hasPurgatoryAccess
@@ -198,10 +197,9 @@ class MonsterListService
             return $current;
         }
 
-        $monstersCache = Cache::get(MonsterCacheKey::MONSTERS->value);
         $tier = $hasPurgatoryAccess ? 'regular' : 'easier';
 
-        return $monstersCache[$monstersKey][$tier] ?? $current;
+        return $current[$tier] ?? $current;
     }
 
     /**

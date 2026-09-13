@@ -27,25 +27,23 @@ class MonsterGemEffectContextServiceTest extends TestCase
             'max_affix_damage' => 20,
         ]);
 
-        Cache::put(MonsterCacheKey::MONSTERS->value, [
-            $gameMap->name => [
-                'data' => [[
-                    'id' => $monster->id,
-                    'gem_effect_context' => [
-                        'has_effects' => true,
-                        'context_type' => 'map',
-                        'context_label' => $gameMap->name,
-                        'game_map' => ['id' => $gameMap->id, 'name' => $gameMap->name],
-                        'location' => null,
-                        'sources' => [],
-                        'character_power_reduction' => 0.0,
-                    ],
-                    'to_hit_base' => 15,
-                    'criticality' => 0.2,
-                    'spell_damage' => 75,
-                    'max_affix_damage' => 30,
-                ]],
-            ],
+        Cache::put(MonsterCacheKey::forGameMap($gameMap->id), [
+            'data' => [[
+                'id' => $monster->id,
+                'gem_effect_context' => [
+                    'has_effects' => true,
+                    'context_type' => 'map',
+                    'context_label' => $gameMap->name,
+                    'game_map' => ['id' => $gameMap->id, 'name' => $gameMap->name],
+                    'location' => null,
+                    'sources' => [],
+                    'character_power_reduction' => 0.0,
+                ],
+                'to_hit_base' => 15,
+                'criticality' => 0.2,
+                'spell_damage' => 75,
+                'max_affix_damage' => 30,
+            ]],
         ]);
 
         $contexts = (new MonsterGemEffectContextService(resolve(Pagination::class)))->forMonster($monster);
@@ -63,21 +61,19 @@ class MonsterGemEffectContextServiceTest extends TestCase
         $gameMap = $this->createGameMap(['name' => 'Summary Map']);
         $monster = $this->createMonster(['game_map_id' => $gameMap->id]);
 
-        Cache::put(MonsterCacheKey::MONSTERS->value, [
-            $gameMap->name => [
-                'data' => [[
-                    'id' => $monster->id,
-                    'gem_effect_context' => [
-                        'has_effects' => true,
-                        'context_type' => 'map',
-                        'context_label' => $gameMap->name,
-                        'game_map' => ['id' => $gameMap->id, 'name' => $gameMap->name],
-                        'location' => null,
-                        'sources' => [],
-                        'character_power_reduction' => 0.0,
-                    ],
-                ]],
-            ],
+        Cache::put(MonsterCacheKey::forGameMap($gameMap->id), [
+            'data' => [[
+                'id' => $monster->id,
+                'gem_effect_context' => [
+                    'has_effects' => true,
+                    'context_type' => 'map',
+                    'context_label' => $gameMap->name,
+                    'game_map' => ['id' => $gameMap->id, 'name' => $gameMap->name],
+                    'location' => null,
+                    'sources' => [],
+                    'character_power_reduction' => 0.0,
+                ],
+            ]],
         ]);
 
         Cache::put(MonsterCacheKey::LOCATION_MONSTERS->value, [
@@ -124,7 +120,6 @@ class MonsterGemEffectContextServiceTest extends TestCase
             ];
         }
 
-        Cache::put(MonsterCacheKey::MONSTERS->value, []);
         Cache::put(MonsterCacheKey::LOCATION_MONSTERS->value, [
             'Paginated Locations' => ['data' => $rows],
         ]);
@@ -153,21 +148,19 @@ class MonsterGemEffectContextServiceTest extends TestCase
             'is_raid_monster' => true,
         ]);
 
-        Cache::put(MonsterCacheKey::MONSTERS->value, [
-            $gameMap->name => [
-                'data' => [[
-                    'id' => $monster->id,
-                    'gem_effect_context' => [
-                        'has_effects' => true,
-                        'context_type' => 'map',
-                        'context_label' => $gameMap->name,
-                        'game_map' => ['id' => $gameMap->id, 'name' => $gameMap->name],
-                        'location' => null,
-                        'sources' => [],
-                        'character_power_reduction' => 0.0,
-                    ],
-                ]],
-            ],
+        Cache::put(MonsterCacheKey::forGameMap($gameMap->id), [
+            'data' => [[
+                'id' => $monster->id,
+                'gem_effect_context' => [
+                    'has_effects' => true,
+                    'context_type' => 'map',
+                    'context_label' => $gameMap->name,
+                    'game_map' => ['id' => $gameMap->id, 'name' => $gameMap->name],
+                    'location' => null,
+                    'sources' => [],
+                    'character_power_reduction' => 0.0,
+                ],
+            ]],
         ]);
 
         $summary = (new MonsterGemEffectContextService(resolve(Pagination::class)))->summary($monster);

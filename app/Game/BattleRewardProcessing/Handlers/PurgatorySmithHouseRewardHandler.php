@@ -17,6 +17,7 @@ use App\Game\Core\Items\Values\RandomAffixTier;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Types\CurrenciesMessageTypes;
+use App\Game\Monsters\Values\MonsterCacheKey;
 use Exception;
 use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
@@ -121,9 +122,16 @@ class PurgatorySmithHouseRewardHandler
         ];
     }
 
+    /**
+     * Determine whether the Monster is at least halfway down the current Map's Monster list.
+     *
+     * @param Location $location
+     * @param Monster $monster
+     * @return bool
+     */
     protected function isMonsterAtLeastHalfWayOrMore(Location $location, Monster $monster): bool
     {
-        $monsters = Cache::get('monsters')[$location->name];
+        $monsters = Cache::get(MonsterCacheKey::forGameMap($location->game_map_id)) ?? [];
 
         $monsterCount = count($monsters);
         $halfWay = (int) ($monsterCount / 2);
@@ -133,9 +141,16 @@ class PurgatorySmithHouseRewardHandler
         return $position !== false && $position >= $halfWay;
     }
 
+    /**
+     * Determine whether the Monster is the final Monster in the current Map's Monster list.
+     *
+     * @param Location $location
+     * @param Monster $monster
+     * @return bool
+     */
     protected function isMonsterTheFinalMonster(Location $location, Monster $monster): bool
     {
-        $monsters = Cache::get('monsters')[$location->name];
+        $monsters = Cache::get(MonsterCacheKey::forGameMap($location->game_map_id)) ?? [];
 
         return $monsters[count($monsters) - 1]['id'] === $monster->id;
     }

@@ -21,11 +21,20 @@ class CreateMonsterCacheTest extends TestCase
 
     public function test_command_creates_the_monsters_cache(): void
     {
-        $this->createGameMap(['name' => 'Command Regular Map', 'default' => false]);
+        $gameMap = $this->createGameMap(['name' => 'Command Regular Map', 'default' => false]);
 
         $this->artisan('generate:monster-cache')->assertExitCode(0);
 
-        $this->assertTrue(Cache::has(MonsterCacheKey::MONSTERS->value));
+        $this->assertTrue(Cache::has(MonsterCacheKey::forGameMap($gameMap->id)));
+    }
+
+    public function test_command_never_recreates_the_obsolete_global_monsters_cache(): void
+    {
+        $this->createGameMap(['name' => 'Command No Global Map', 'default' => false]);
+
+        $this->artisan('generate:monster-cache')->assertExitCode(0);
+
+        $this->assertFalse(Cache::has(MonsterCacheKey::MONSTERS->value));
     }
 
     public function test_command_creates_the_location_monsters_cache(): void
@@ -83,7 +92,7 @@ class CreateMonsterCacheTest extends TestCase
 
         $this->artisan('generate:monster-cache')->assertExitCode(0);
 
-        $cached = collect(Cache::get(MonsterCacheKey::MONSTERS->value)[$gameMap->name]['data'])
+        $cached = collect(Cache::get(MonsterCacheKey::forGameMap($gameMap->id))['data'])
             ->firstWhere('id', $monster->id);
 
         $this->assertSame(15, $cached['str']);
@@ -131,7 +140,7 @@ class CreateMonsterCacheTest extends TestCase
 
         $this->artisan('generate:monster-cache')->assertExitCode(0);
 
-        $cached = collect(Cache::get(MonsterCacheKey::MONSTERS->value)[$generatedMap->name]['data'])
+        $cached = collect(Cache::get(MonsterCacheKey::forGameMap($generatedMap->id))['data'])
             ->firstWhere('id', $monster->id);
 
         $this->assertSame(12, $cached['str']);
@@ -162,7 +171,7 @@ class CreateMonsterCacheTest extends TestCase
 
         $this->artisan('generate:monster-cache')->assertExitCode(0);
 
-        $cached = collect(Cache::get(MonsterCacheKey::MONSTERS->value)[$generatedMap->name]['data'])
+        $cached = collect(Cache::get(MonsterCacheKey::forGameMap($generatedMap->id))['data'])
             ->firstWhere('id', $monster->id);
 
         $this->assertSame(14, $cached['str']);

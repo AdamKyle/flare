@@ -138,6 +138,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(MapTileValue::class),
                 $app->make(RandomNumberGenerator::class),
                 $app->make(CharacterAreaGemEffectService::class),
+                $app->make(BuildMonsterCacheService::class),
             );
         });
 
