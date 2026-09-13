@@ -3,10 +3,19 @@
 namespace App\Flare\GemWorldGeneration\Services;
 
 use App\Flare\Models\GameMap;
+use ChristianEssl\LandmapGeneration\Color\Shader\DetailShader;
+use ChristianEssl\LandmapGeneration\Enum\FillType;
 use ChristianEssl\LandmapGeneration\Struct\Color;
+use ChristianEssl\LandmapGeneration\Struct\Map;
 
 class GemWorldPlaneGenerationSettings
 {
+    /**
+     * Resolve the configured land color for a Gem World's parent Map.
+     *
+     * @param GameMap $parentMap
+     * @return Color
+     */
     public function landColor(GameMap $parentMap): Color
     {
         return match ($parentMap->name) {
@@ -22,6 +31,12 @@ class GemWorldPlaneGenerationSettings
         };
     }
 
+    /**
+     * Resolve the configured, unshaded water color for a Gem World's parent Map.
+     *
+     * @param GameMap $parentMap
+     * @return Color
+     */
     public function waterColor(GameMap $parentMap): Color
     {
         return match ($parentMap->name) {
@@ -36,6 +51,12 @@ class GemWorldPlaneGenerationSettings
         };
     }
 
+    /**
+     * Resolve the configured water level for a Gem World's parent Map.
+     *
+     * @param GameMap $parentMap
+     * @return int
+     */
     public function waterLevel(GameMap $parentMap): int
     {
         return match ($parentMap->name) {
@@ -46,5 +67,38 @@ class GemWorldPlaneGenerationSettings
             'Delusional Memories' => 40,
             default => 45,
         };
+    }
+
+    /**
+     * Resolve the water color as it actually appears on a generated Gem World image, once shaded
+     * by the same DetailShader the generator renders with. Generated images are never a flat fill:
+     * DetailShader brightens every water pixel by a fixed factor, so Location placement must
+     * classify terrain against this shaded color rather than the raw configured water color.
+     *
+     * @param GameMap $parentMap
+     * @return Color
+     */
+    public function renderedWaterColor(GameMap $parentMap): Color
+    {
+        return $this->shadedColor($this->waterColor($parentMap), FillType::WATER);
+    }
+
+    /**
+     * Shade a raw terrain color through the exact shader the Gem World image generator uses.
+     *
+     * @param Color $color
+     * @param int $fillType
+     * @return Color
+     */
+    private function shadedColor(Color $color, int $fillType): Color
+    {
+        $map = new Map(1, 1);
+        $map->fillTypes = [[$fillType]];
+        $map->altitudes = [[0]];
+
+        $shader = new DetailShader;
+        $shader->createShades($map);
+
+        return $shader->shadeColor($color, 0, 0);
     }
 }

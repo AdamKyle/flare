@@ -70,4 +70,14 @@ class GemWorldPlaneGenerationSettingsTest extends TestCase
 
         $this->assertSame(45, $settings->waterLevel($this->createGameMap(['name' => 'Surface'])));
     }
+
+    public function test_rendered_water_color_matches_the_shared_shader_output_for_previously_failing_planes(): void
+    {
+        $settings = new GemWorldPlaneGenerationSettings();
+
+        $this->assertEquals(new Color(255, 255, 200), $settings->renderedWaterColor($this->createGameMap(['name' => 'Dungeons'])));
+        $this->assertEquals(new Color(170, 255, 255), $settings->renderedWaterColor($this->createGameMap(['name' => 'Shadow Plane'])));
+        $this->assertEquals(new Color(112, 219, 255), $settings->renderedWaterColor($this->createGameMap(['name' => 'Delusional Memories'])));
+        $this->assertEquals(new Color(74, 146, 170), $settings->renderedWaterColor($this->createGameMap(['name' => 'Labyrinth'])));
+    }
 }

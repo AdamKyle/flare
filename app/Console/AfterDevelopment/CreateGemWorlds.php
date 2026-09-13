@@ -13,9 +13,9 @@ use Illuminate\Support\Collection;
 
 class CreateGemWorlds extends Command
 {
-    protected $signature = 'create:gem-worlds';
+    protected $signature = 'create:gem-worlds {--generate-missing : Generate Gem World images/tiles for profiles missing both live and committed backup assets}';
 
-    protected $description = 'Rolls missing Map and Location Gems and creates their generated Gem Worlds.';
+    protected $description = 'Rolls missing Map and Location Gems and restores/generates their generated Gem Worlds.';
 
     private int $mapRollsCreated = 0;
 
@@ -34,11 +34,13 @@ class CreateGemWorlds extends Command
     }
 
     /**
-     * Roll every missing Map/Location Gem and generate their Gem Worlds.
+     * Roll every missing Map/Location Gem and restore/generate their Gem Worlds.
      */
     public function handle(): int
     {
-        $results = $this->processMapGemProfiles()->merge($this->processLocationGemProfiles());
+        $generateMissing = $this->option('generate-missing');
+
+        $results = $this->processMapGemProfiles($generateMissing)->merge($this->processLocationGemProfiles($generateMissing));
 
         if (($this->mapRollsCreated + $this->locationRollsCreated) > 0) {
             $this->buildMonsterCacheService->invalidateGemAffectedCaches();
@@ -46,7 +48,7 @@ class CreateGemWorlds extends Command
 
         $this->showSummary($results);
 
-        if ($results->contains(fn (GemWorldGenerationResult $result): bool => $result->failed())) {
+        if ($results->contains(fn (GemWorldGenerationResult $result): bool => $result->failed() || $result->missingBackup())) {
             return self::FAILURE;
         }
 
@@ -54,27 +56,27 @@ class CreateGemWorlds extends Command
     }
 
     /**
-     * Roll missing Map Gems and generate their Gem Worlds for every Map Gem profile.
+     * Roll missing Map Gems and restore/generate their Gem Worlds for every Map Gem profile.
      */
-    private function processMapGemProfiles(): Collection
+    private function processMapGemProfiles(bool $generateMissing): Collection
     {
         $profiles = GameMapGemParamter::with(['gameMap', 'generatedMap', 'rolledGem'])
             ->orderBy('name')
             ->orderBy('id')
             ->get();
 
-        return $profiles->map(fn (GameMapGemParamter $profile): GemWorldGenerationResult => $this->processMapGemProfile($profile))->values();
+        return $profiles->map(fn (GameMapGemParamter $profile): GemWorldGenerationResult => $this->processMapGemProfile($profile, $generateMissing))->values();
     }
 
     /**
-     * Roll a Map Gem profile when missing, then generate its Gem World.
+     * Roll a Map Gem profile when missing, then restore/generate its Gem World.
      */
-    private function processMapGemProfile(GameMapGemParamter $profile): GemWorldGenerationResult
+    private function processMapGemProfile(GameMapGemParamter $profile, bool $generateMissing): GemWorldGenerationResult
     {
         $label = $profile->gameMap->name.' - '.$profile->name;
         $profile = $this->rollMapGemIfMissing($profile, $label);
 
-        $result = $this->gemWorldGenerationService->generateMapGem($profile);
+        $result = $this->gemWorldGenerationService->generateMapGem($profile, $generateMissing);
         $this->reportGenerationResult($result);
 
         return $result;
@@ -100,27 +102,27 @@ class CreateGemWorlds extends Command
     }
 
     /**
-     * Roll missing Location Gems and generate their Gem Worlds for every Location Gem profile.
+     * Roll missing Location Gems and restore/generate their Gem Worlds for every Location Gem profile.
      */
-    private function processLocationGemProfiles(): Collection
+    private function processLocationGemProfiles(bool $generateMissing): Collection
     {
         $profiles = GameLocationGemParamter::with(['location.map', 'generatedMap', 'rolledGem'])
             ->orderBy('name')
             ->orderBy('id')
             ->get();
 
-        return $profiles->map(fn (GameLocationGemParamter $profile): GemWorldGenerationResult => $this->processLocationGemProfile($profile))->values();
+        return $profiles->map(fn (GameLocationGemParamter $profile): GemWorldGenerationResult => $this->processLocationGemProfile($profile, $generateMissing))->values();
     }
 
     /**
-     * Roll a Location Gem profile when missing, then generate its Gem World.
+     * Roll a Location Gem profile when missing, then restore/generate its Gem World.
      */
-    private function processLocationGemProfile(GameLocationGemParamter $profile): GemWorldGenerationResult
+    private function processLocationGemProfile(GameLocationGemParamter $profile, bool $generateMissing): GemWorldGenerationResult
     {
         $label = $profile->location->nameWithPlaneForLocationGem.' - '.$profile->name;
         $profile = $this->rollLocationGemIfMissing($profile, $label);
 
-        $result = $this->gemWorldGenerationService->generateLocationGem($profile);
+        $result = $this->gemWorldGenerationService->generateLocationGem($profile, $generateMissing);
         $this->reportGenerationResult($result);
 
         return $result;
@@ -162,6 +164,12 @@ class CreateGemWorlds extends Command
             return;
         }
 
+        if ($result->missingBackup()) {
+            $this->warn($result->message);
+
+            return;
+        }
+
         $this->error($result->message);
     }
 
@@ -177,6 +185,7 @@ class CreateGemWorlds extends Command
 
         $this->info('Gem Worlds generated: '.$results->filter(fn (GemWorldGenerationResult $result): bool => $result->generated())->count());
         $this->info('Gem Worlds skipped: '.$results->filter(fn (GemWorldGenerationResult $result): bool => $result->skipped())->count());
+        $this->info('Gem Worlds missing backup: '.$results->filter(fn (GemWorldGenerationResult $result): bool => $result->missingBackup())->count());
         $this->info('Gem Worlds failed: '.$results->filter(fn (GemWorldGenerationResult $result): bool => $result->failed())->count());
     }
 }

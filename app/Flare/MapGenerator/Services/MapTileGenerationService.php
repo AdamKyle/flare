@@ -2,39 +2,45 @@
 
 namespace App\Flare\MapGenerator\Services;
 
+use App\Flare\MapGenerator\Values\GameMapPiecesFolderName;
 use App\Flare\MapGenerator\Values\PreparedMapTileReplacement;
 use App\Flare\Models\GameMap;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use RuntimeException;
 use Throwable;
 
 class MapTileGenerationService
 {
     /**
-     * @param ImageTilerService $imageTilerService Image tile generator.
+     * @param ImageTilerService $imageTilerService
+     * @param MapBackupAssetService $mapBackupAssetService
      */
-    public function __construct(private readonly ImageTilerService $imageTilerService) {}
+    public function __construct(
+        private readonly ImageTilerService $imageTilerService,
+        private readonly MapBackupAssetService $mapBackupAssetService,
+    ) {}
 
     /**
-     * Generate initial Game Map tiles when committed tiles are unavailable, replacing stale partial output when necessary.
+     * Ensure a Game Map has valid initial tiles, restoring/repairing them from committed backup
+     * or existing live pieces first, and only slicing the source image when explicitly allowed.
      *
-     * @param GameMap $gameMap Game Map requiring initial tiles.
-     * @return void Tiles are generated when absent.
+     * @param GameMap $gameMap
+     * @param bool $generateWhenMissing
+     * @return void
      */
-    public function tile(GameMap $gameMap): void
+    public function tile(GameMap $gameMap, bool $generateWhenMissing = false): void
     {
-        $folderName = $this->piecesFolder($gameMap->name);
-        $directoryExists = Storage::disk('maps')->exists($folderName);
+        $result = $this->mapBackupAssetService->restore($gameMap);
 
-        if ($directoryExists && ! is_null($gameMap->tile_map)) {
+        if ($result->isSuccessful()) {
             return;
         }
 
-        if ($directoryExists) {
-            $this->deleteDirectory($folderName);
+        if (! $generateWhenMissing || ! $result->isMissingBackup()) {
+            return;
         }
 
+        $folderName = $this->piecesFolder($gameMap->name);
         $tileMap = $this->generate($gameMap, $folderName, $folderName);
 
         GameMap::query()->whereKey($gameMap->getKey())->update([
@@ -46,9 +52,9 @@ class MapTileGenerationService
     /**
      * Prepare replacement tiles without changing committed tile output or model state.
      *
-     * @param GameMap $gameMap Game Map carrying replacement source-image state.
-     * @param string $previousName Committed Game Map name before replacement.
-     * @return PreparedMapTileReplacement Prepared replacement state.
+     * @param GameMap $gameMap
+     * @param string $previousName
+     * @return PreparedMapTileReplacement
      */
     public function prepareReplacement(GameMap $gameMap, string $previousName): PreparedMapTileReplacement
     {
@@ -90,8 +96,8 @@ class MapTileGenerationService
     /**
      * Promote prepared replacement tiles while preserving current committed output.
      *
-     * @param PreparedMapTileReplacement $replacement Prepared replacement state.
-     * @return void Replacement tiles become the current committed output.
+     * @param PreparedMapTileReplacement $replacement
+     * @return void
      */
     public function commitReplacement(PreparedMapTileReplacement $replacement): void
     {
@@ -125,8 +131,8 @@ class MapTileGenerationService
      *
      * A finalization failure must not cause the caller to restore the previous database state.
      *
-     * @param PreparedMapTileReplacement $replacement Committed replacement state.
-     * @return void Obsolete and backup directories are removed.
+     * @param PreparedMapTileReplacement $replacement
+     * @return void
      */
     public function finalizeReplacement(PreparedMapTileReplacement $replacement): void
     {
@@ -142,10 +148,10 @@ class MapTileGenerationService
      *
      * This boundary must not be called for finalization or post-commit source cleanup failures.
      *
-     * @param GameMap $gameMap Game Map whose in-memory tile state must be restored.
-     * @param array<int, array<int, string>>|null $previousTileMap Previously committed tile URL map.
-     * @param PreparedMapTileReplacement $replacement Committed replacement state.
-     * @return void Previous tile output and in-memory state are restored.
+     * @param GameMap $gameMap
+     * @param array|null $previousTileMap
+     * @param PreparedMapTileReplacement $replacement
+     * @return void
      */
     public function rollbackReplacement(
         GameMap $gameMap,
@@ -176,8 +182,8 @@ class MapTileGenerationService
     /**
      * Remove tile output belonging to a failed Game Map creation.
      *
-     * @param GameMap $gameMap Failed Game Map creation.
-     * @return void Failed creation tiles are removed.
+     * @param GameMap $gameMap
+     * @return void
      */
     public function remove(GameMap $gameMap): void
     {
@@ -187,10 +193,10 @@ class MapTileGenerationService
     /**
      * Generate and persist the tile map for the supplied pieces folder.
      *
-     * @param GameMap $gameMap Game Map whose source image is tiled.
-     * @param string $folderName Physical output folder.
-     * @param string $publicFolderName Committed public folder represented in tile URLs.
-     * @return array<int, array<int, string>> Generated tile URL map.
+     * @param GameMap $gameMap
+     * @param string $folderName
+     * @param string $publicFolderName
+     * @return array
      */
     private function generate(GameMap $gameMap, string $folderName, string $publicFolderName): array
     {
@@ -202,8 +208,8 @@ class MapTileGenerationService
     /**
      * Delete an existing tile directory and surface a failed required deletion.
      *
-     * @param string $folderName Tile directory to delete when present.
-     * @return void The directory is absent after completion.
+     * @param string $folderName
+     * @return void
      */
     private function deleteDirectoryWhenPresent(string $folderName): void
     {
@@ -217,10 +223,8 @@ class MapTileGenerationService
     /**
      * Delete a required existing tile directory and surface a failed deletion.
      *
-     * @param string $folderName Existing tile directory to delete.
-     * @return void The directory is absent after completion.
-     *
-     * @throws RuntimeException When the existing directory cannot be deleted.
+     * @param string $folderName
+     * @return void
      */
     private function deleteDirectory(string $folderName): void
     {
@@ -232,8 +236,8 @@ class MapTileGenerationService
     /**
      * Restore the preserved current directory after replacement promotion fails.
      *
-     * @param PreparedMapTileReplacement $replacement Replacement state identifying current and backup output.
-     * @return void The preserved directory is restored when required.
+     * @param PreparedMapTileReplacement $replacement
+     * @return void
      */
     private function restoreCurrentDirectory(PreparedMapTileReplacement $replacement): void
     {
@@ -249,9 +253,9 @@ class MapTileGenerationService
     /**
      * Build an exception message containing every compensation failure.
      *
-     * @param string $message Failure context.
-     * @param array<int, Throwable> $failures Compensation failures to include.
-     * @return string Combined failure message.
+     * @param string $message
+     * @param array $failures
+     * @return string
      */
     private function failureMessage(string $message, array $failures): string
     {
@@ -265,11 +269,11 @@ class MapTileGenerationService
     /**
      * Resolve the conventional pieces folder for a Game Map name.
      *
-     * @param string $gameMapName Game Map name.
-     * @return string Conventional tile directory.
+     * @param string $gameMapName
+     * @return string
      */
     private function piecesFolder(string $gameMapName): string
     {
-        return Str::lower($gameMapName).'-pieces';
+        return GameMapPiecesFolderName::for($gameMapName);
     }
 }

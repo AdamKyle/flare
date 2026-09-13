@@ -10,12 +10,20 @@ import GameMapDefinition from '../api/definitions/game-map-definition';
 import { useGameMaps } from '../api/hooks/use-game-maps';
 import { GAME_MAP_LIST_COLUMNS } from '../definitions/game-map-list-columns';
 import { GameMapImportCopy } from '../enums/game-map-import-copy';
+import { GAME_MAP_PLANE_VALUES, isGameMapPlane } from '../enums/game-map-plane';
+import {
+  GAME_MAP_TYPE_LABELS,
+  GAME_MAP_TYPE_VALUES,
+  isGameMapType,
+} from '../enums/game-map-type';
 import { GameMapScreens } from '../screen-manager/game-map-screen-constants';
 import { useGameMapScreenNavigation } from '../screen-manager/game-map-screen-kit';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import DataTable from 'ui/data-table/data-table';
+import Dropdown from 'ui/drop-down/drop-down';
+import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 
 const GameMapListScreen = (): ReactNode => {
   const navigation = useGameMapScreenNavigation();
@@ -30,11 +38,29 @@ const GameMapListScreen = (): ReactNode => {
     set_search_text: setSearchText,
     page,
     set_page: setPage,
+    plane,
+    set_plane: setPlane,
+    map_type: mapType,
+    set_map_type: setMapType,
     sort_key: sortKey,
     sort_direction: sortDirection,
     set_sort: setSort,
     refresh_first_page: refreshFirstPage,
   } = useGameMaps();
+
+  const planeItems: DropdownItem[] = GAME_MAP_PLANE_VALUES.map(
+    (planeValue) => ({
+      label: planeValue,
+      value: planeValue,
+    })
+  );
+
+  const mapTypeItems: DropdownItem[] = GAME_MAP_TYPE_VALUES.map(
+    (typeValue) => ({
+      label: GAME_MAP_TYPE_LABELS[typeValue],
+      value: typeValue,
+    })
+  );
 
   const handleRowActivate = (gameMap: GameMapDefinition): void => {
     navigation.navigateTo(GameMapScreens.SHOW, { game_map_id: gameMap.id });
@@ -98,6 +124,35 @@ const GameMapListScreen = (): ReactNode => {
           label="Export"
           variant={ButtonVariant.PRIMARY}
         />
+        <div className="w-full max-w-xs">
+          <Dropdown
+            id="game-map-plane-filter"
+            aria_label="Filter by Plane"
+            searchable
+            items={planeItems}
+            pre_selected_item={planeItems.find((item) => item.value === plane)}
+            on_select={(item) =>
+              setPlane(isGameMapPlane(item.value) ? item.value : null)
+            }
+            on_clear={() => setPlane(null)}
+            selection_placeholder="All Planes"
+          />
+        </div>
+        <div className="w-full max-w-xs">
+          <Dropdown
+            id="game-map-type-filter"
+            aria_label="Filter by Map Type"
+            items={mapTypeItems}
+            pre_selected_item={mapTypeItems.find(
+              (item) => item.value === mapType
+            )}
+            on_select={(item) =>
+              setMapType(isGameMapType(item.value) ? item.value : null)
+            }
+            on_clear={() => setMapType(null)}
+            selection_placeholder="All Map Types"
+          />
+        </div>
       </div>
       <DataTable<GameMapDefinition>
         id_prefix="game-maps"

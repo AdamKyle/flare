@@ -17,7 +17,9 @@ use Illuminate\Support\Facades\Storage;
 use Mockery;
 use Mockery\MockInterface;
 use Tests\TestCase;
+use Tests\Traits\CreateGameLocationGemParamter;
 use Tests\Traits\CreateGameMap;
+use Tests\Traits\CreateGameMapGemParamter;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateKingdom;
 use Tests\Traits\CreateLocation;
@@ -28,7 +30,7 @@ use Tests\Traits\CreateUser;
 
 class GameMapsApiControllerTest extends TestCase
 {
-    use CreateGameMap, CreateItem, CreateKingdom, CreateLocation, CreateNpc, CreateQuest, CreateRole, CreateUser, RefreshDatabase;
+    use CreateGameLocationGemParamter, CreateGameMap, CreateGameMapGemParamter, CreateItem, CreateKingdom, CreateLocation, CreateNpc, CreateQuest, CreateRole, CreateUser, RefreshDatabase;
 
     public function test_unauthenticated_request_receives_json_401(): void
     {
@@ -161,6 +163,220 @@ class GameMapsApiControllerTest extends TestCase
         ], [], [], ['HTTP_ACCEPT' => 'application/json']);
 
         $this->assertSame(422, $response->getStatusCode());
+    }
+
+    public function test_index_returns_base_map_classification_plane_and_null_source(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $this->createGameMap(['name' => 'Hell']);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/game-maps', ['search_text' => 'Hell']);
+        $data = json_decode($response->getContent(), true)['data'][0];
+
+        $this->assertSame('base', $data['map_type']);
+        $this->assertSame('Base Map', $data['map_type_label']);
+        $this->assertSame('Hell', $data['plane']);
+        $this->assertNull($data['source']);
+    }
+
+    public function test_index_returns_world_gem_classification_plane_and_source(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $parentMap = $this->createGameMap(['name' => 'Hell']);
+        $gemParamter = $this->createGameMapGemParamter(['game_map_id' => $parentMap->id, 'name' => 'Hell Gem Profile']);
+        $this->createGameMap([
+            'name' => 'Hell Gem Profile Map Gem World',
+            'generated_map_type' => 'map_gem',
+            'generated_parent_game_map_id' => $parentMap->id,
+            'game_map_gem_paramter_id' => $gemParamter->id,
+        ]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/game-maps', ['search_text' => 'Hell Gem Profile Map Gem World']);
+        $data = json_decode($response->getContent(), true)['data'][0];
+
+        $this->assertSame('map_gem_world', $data['map_type']);
+        $this->assertSame('World Gem', $data['map_type_label']);
+        $this->assertSame('Hell', $data['plane']);
+        $this->assertSame('Map: Hell — Hell Gem Profile', $data['source']);
+    }
+
+    public function test_index_returns_location_gem_classification_plane_and_source(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $parentMap = $this->createGameMap(['name' => 'Hell']);
+        $location = $this->createLocation(['game_map_id' => $parentMap->id, 'name' => 'Hells Broken Anvil']);
+        $gemParamter = $this->createGameLocationGemParamter(['location_id' => $location->id, 'name' => 'Hells Broken Anvil Gem Profile']);
+        $this->createGameMap([
+            'name' => 'Hells Broken Anvil Gem Profile Location Gem World',
+            'generated_map_type' => 'location_gem',
+            'generated_parent_game_map_id' => $parentMap->id,
+            'game_location_gem_paramter_id' => $gemParamter->id,
+        ]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/game-maps', ['search_text' => 'Location Gem World']);
+        $data = json_decode($response->getContent(), true)['data'][0];
+
+        $this->assertSame('location_gem_world', $data['map_type']);
+        $this->assertSame('Location Gem', $data['map_type_label']);
+        $this->assertSame('Hell', $data['plane']);
+        $this->assertSame('Location: Hells Broken Anvil — Hells Broken Anvil Gem Profile', $data['source']);
+    }
+
+    public function test_index_orders_base_before_world_gem_before_location_gem_then_alphabetically(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $parentMap = $this->createGameMap(['name' => 'Zeta Base']);
+        $this->createGameMap(['name' => 'Alpha Base']);
+
+        $mapGemParamter = $this->createGameMapGemParamter(['game_map_id' => $parentMap->id, 'name' => 'Fire']);
+        $this->createGameMap([
+            'name' => 'Zzz Map Gem World',
+            'generated_map_type' => 'map_gem',
+            'generated_parent_game_map_id' => $parentMap->id,
+            'game_map_gem_paramter_id' => $mapGemParamter->id,
+        ]);
+
+        $location = $this->createLocation(['game_map_id' => $parentMap->id, 'name' => 'Some Location']);
+        $locationGemParamter = $this->createGameLocationGemParamter(['location_id' => $location->id, 'name' => 'Water']);
+        $this->createGameMap([
+            'name' => 'Aaa Location Gem World',
+            'generated_map_type' => 'location_gem',
+            'generated_parent_game_map_id' => $parentMap->id,
+            'game_location_gem_paramter_id' => $locationGemParamter->id,
+        ]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/game-maps', ['per_page' => 100]);
+        $names = collect(json_decode($response->getContent(), true)['data'])->pluck('name')->all();
+
+        $this->assertSame([
+            'Alpha Base',
+            'Zeta Base',
+            'Zzz Map Gem World',
+            'Aaa Location Gem World',
+        ], $names);
+    }
+
+    public function test_index_filters_by_plane(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $this->createGameMap(['name' => 'Hell']);
+        $this->createGameMap(['name' => 'Surface']);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/game-maps', ['plane' => 'Hell']);
+        $data = json_decode($response->getContent(), true)['data'];
+
+        $this->assertCount(1, $data);
+        $this->assertSame('Hell', $data[0]['name']);
+    }
+
+    public function test_index_filters_by_map_type(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $parentMap = $this->createGameMap(['name' => 'Hell']);
+        $gemParamter = $this->createGameMapGemParamter(['game_map_id' => $parentMap->id, 'name' => 'Fire']);
+        $this->createGameMap([
+            'name' => 'Fire Map Gem World',
+            'generated_map_type' => 'map_gem',
+            'generated_parent_game_map_id' => $parentMap->id,
+            'game_map_gem_paramter_id' => $gemParamter->id,
+        ]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/game-maps', ['map_type' => 'map_gem_world']);
+        $data = json_decode($response->getContent(), true)['data'];
+
+        $this->assertCount(1, $data);
+        $this->assertSame('Fire Map Gem World', $data[0]['name']);
+    }
+
+    public function test_index_composes_plane_and_map_type_filters(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $hellMap = $this->createGameMap(['name' => 'Hell']);
+        $surfaceMap = $this->createGameMap(['name' => 'Surface']);
+
+        $hellGemParamter = $this->createGameMapGemParamter(['game_map_id' => $hellMap->id, 'name' => 'Fire']);
+        $this->createGameMap([
+            'name' => 'Hell World Gem World',
+            'generated_map_type' => 'map_gem',
+            'generated_parent_game_map_id' => $hellMap->id,
+            'game_map_gem_paramter_id' => $hellGemParamter->id,
+        ]);
+
+        $surfaceGemParamter = $this->createGameMapGemParamter(['game_map_id' => $surfaceMap->id, 'name' => 'Grass']);
+        $this->createGameMap([
+            'name' => 'Surface World Gem World',
+            'generated_map_type' => 'map_gem',
+            'generated_parent_game_map_id' => $surfaceMap->id,
+            'game_map_gem_paramter_id' => $surfaceGemParamter->id,
+        ]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/game-maps', [
+            'plane' => 'Hell',
+            'map_type' => 'map_gem_world',
+        ]);
+        $data = json_decode($response->getContent(), true)['data'];
+
+        $this->assertCount(1, $data);
+        $this->assertSame('Hell World Gem World', $data[0]['name']);
+    }
+
+    public function test_index_searches_by_map_gem_profile_name(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $parentMap = $this->createGameMap(['name' => 'Hell']);
+        $gemParamter = $this->createGameMapGemParamter(['game_map_id' => $parentMap->id, 'name' => 'Emerald Mining Town']);
+        $this->createGameMap([
+            'name' => 'Emerald Mining Town Map Gem World',
+            'generated_map_type' => 'map_gem',
+            'generated_parent_game_map_id' => $parentMap->id,
+            'game_map_gem_paramter_id' => $gemParamter->id,
+        ]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/game-maps', ['search_text' => 'Emerald Mining Town']);
+        $data = json_decode($response->getContent(), true)['data'];
+
+        $this->assertCount(1, $data);
+        $this->assertSame('Emerald Mining Town Map Gem World', $data[0]['name']);
+    }
+
+    public function test_index_searches_by_location_gem_profile_name(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $parentMap = $this->createGameMap(['name' => 'Hell']);
+        $location = $this->createLocation(['game_map_id' => $parentMap->id, 'name' => 'Broken Anvil']);
+        $gemParamter = $this->createGameLocationGemParamter(['location_id' => $location->id, 'name' => 'Hells Broken Anvil Gem Profile']);
+        $this->createGameMap([
+            'name' => 'Hells Broken Anvil Gem Profile Location Gem World',
+            'generated_map_type' => 'location_gem',
+            'generated_parent_game_map_id' => $parentMap->id,
+            'game_location_gem_paramter_id' => $gemParamter->id,
+        ]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/game-maps', ['search_text' => 'Hells Broken Anvil Gem Profile']);
+        $data = json_decode($response->getContent(), true)['data'];
+
+        $this->assertCount(1, $data);
+        $this->assertSame('Hells Broken Anvil Gem Profile Location Gem World', $data[0]['name']);
+    }
+
+    public function test_index_searches_by_source_location_name(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $parentMap = $this->createGameMap(['name' => 'Hell']);
+        $location = $this->createLocation(['game_map_id' => $parentMap->id, 'name' => 'Broken Anvil']);
+        $gemParamter = $this->createGameLocationGemParamter(['location_id' => $location->id, 'name' => 'Gem Profile']);
+        $this->createGameMap([
+            'name' => 'Gem Profile Location Gem World',
+            'generated_map_type' => 'location_gem',
+            'generated_parent_game_map_id' => $parentMap->id,
+            'game_location_gem_paramter_id' => $gemParamter->id,
+        ]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/game-maps', ['search_text' => 'Broken Anvil']);
+        $data = json_decode($response->getContent(), true)['data'];
+
+        $this->assertCount(1, $data);
+        $this->assertSame('Gem Profile Location Gem World', $data[0]['name']);
     }
 
     public function test_show_returns_exact_detail_shape(): void

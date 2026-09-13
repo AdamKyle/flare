@@ -9,6 +9,7 @@ use App\Flare\GemWorldGeneration\Services\GemWorldPlaneGenerationSettings;
 use App\Flare\GemWorldGeneration\Values\GemWorldGenerationConfig;
 use App\Flare\MapGenerator\Contracts\LandMapImageFactory;
 use App\Flare\MapGenerator\Contracts\MapPixelReaderFactory;
+use App\Flare\MapGenerator\Services\MapBackupAssetService;
 use App\Flare\MapGenerator\Services\MapTileGenerationService;
 use App\Flare\MapGenerator\Support\GdPngImageWriter;
 use App\Game\Maps\Contracts\CoordinatesQuery;
@@ -52,6 +53,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(GemWorldImageGenerator::class),
                 $app->make(GemWorldLocationPlacementService::class),
                 $app->make(MapTileGenerationService::class),
+                $app->make(MapBackupAssetService::class),
             );
         });
     }

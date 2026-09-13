@@ -3,6 +3,7 @@
 namespace App\Flare\GemWorldGeneration\Services;
 
 use App\Flare\GemWorldGeneration\Values\GemWorldGenerationConfig;
+use App\Flare\GemWorldGeneration\Values\GeneratedGemMapPath;
 use App\Flare\MapGenerator\Contracts\LandMapImageFactory;
 use App\Flare\MapGenerator\Schemes\MapColorScheme;
 use App\Flare\MapGenerator\Support\GdPngImageWriter;
@@ -24,7 +25,7 @@ class GemWorldImageGenerator
     {
         ini_set('memory_limit', $this->config->memoryLimit);
 
-        $path = 'generated-gem-worlds/'.Str::slug($mapName).'.png';
+        $path = GeneratedGemMapPath::for($mapName);
 
         try {
             $mapSettings = (new MapSettings())

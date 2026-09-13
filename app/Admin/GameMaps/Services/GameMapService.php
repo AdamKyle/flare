@@ -6,6 +6,8 @@ use App\Admin\GameMaps\Jobs\GenerateGameMapTilesJob;
 use App\Admin\GameMaps\Jobs\ReplaceGameMapTilesJob;
 use App\Admin\GameMaps\Requests\GameMapIndexRequest;
 use App\Admin\GameMaps\Requests\GameMapRelationIndexRequest;
+use App\Admin\GameMaps\Values\AdminGameMapType;
+use App\Flare\GemWorldGeneration\Values\GeneratedGemMapType;
 use App\Flare\MapGenerator\Services\MapTileGenerationService;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
@@ -38,16 +40,20 @@ class GameMapService
      */
     public function paginate(GameMapIndexRequest $request): LengthAwarePaginator
     {
-        $searchText = $request->validated('search_text');
         $sortDirection = $request->validated('sort_direction');
 
-        $query = GameMap::query();
+        $query = GameMap::query()->with([
+            'generatedParentMap',
+            'generatedMapGemParamter.gameMap',
+            'generatedLocationGemParamter.location',
+        ]);
 
-        if (! empty($searchText)) {
-            $query->where('name', 'LIKE', '%'.$searchText.'%');
-        }
+        $this->applyGameMapSearch($query, $request->validated('search_text'));
+        $this->applyPlaneFilter($query, $request->validated('plane'));
+        $this->applyMapTypeFilter($query, $request->validated('map_type'));
 
-        $query->orderBy('name', $sortDirection)
+        $query->orderByRaw($this->gameMapTypeGroupOrderExpression())
+            ->orderBy('name', $sortDirection)
             ->orderBy('id');
 
         return $query->paginate(
@@ -56,6 +62,72 @@ class GameMapService
             'page',
             $request->validated('page')
         );
+    }
+
+    /**
+     * Apply the Game Maps list search across the Game Map name, its generated Gem profile names,
+     * and its source Location name.
+     *
+     * @param mixed $query
+     */
+    private function applyGameMapSearch($query, ?string $searchText): void
+    {
+        if (empty($searchText)) {
+            return;
+        }
+
+        $query->where(function ($nameQuery) use ($searchText) {
+            $nameQuery->where('name', 'LIKE', '%'.$searchText.'%')
+                ->orWhereHas('generatedMapGemParamter', fn ($gemQuery) => $gemQuery->where('name', 'LIKE', '%'.$searchText.'%'))
+                ->orWhereHas('generatedLocationGemParamter', fn ($gemQuery) => $gemQuery->where('name', 'LIKE', '%'.$searchText.'%'))
+                ->orWhereHas('generatedLocationGemParamter.location', fn ($locationQuery) => $locationQuery->where('name', 'LIKE', '%'.$searchText.'%'));
+        });
+    }
+
+    /**
+     * Filter the Game Maps list to those whose effective plane matches the requested plane.
+     *
+     * @param mixed $query
+     */
+    private function applyPlaneFilter($query, ?string $plane): void
+    {
+        if (empty($plane)) {
+            return;
+        }
+
+        $query->where(function ($planeQuery) use ($plane) {
+            $planeQuery->where(function ($baseQuery) use ($plane) {
+                $baseQuery->whereNull('generated_parent_game_map_id')->where('name', $plane);
+            })->orWhereHas('generatedParentMap', fn ($parentQuery) => $parentQuery->where('name', $plane));
+        });
+    }
+
+    /**
+     * Filter the Game Maps list to the requested Admin Game Map classification.
+     *
+     * @param mixed $query
+     */
+    private function applyMapTypeFilter($query, ?string $mapType): void
+    {
+        if (empty($mapType)) {
+            return;
+        }
+
+        match (AdminGameMapType::from($mapType)) {
+            AdminGameMapType::BASE => $query->whereNull('generated_map_type'),
+            AdminGameMapType::MAP_GEM_WORLD => $query->where('generated_map_type', GeneratedGemMapType::MAP_GEM->value),
+            AdminGameMapType::LOCATION_GEM_WORLD => $query->where('generated_map_type', GeneratedGemMapType::LOCATION_GEM->value),
+        };
+    }
+
+    /**
+     * Build the deterministic ordering expression grouping Base Maps before World Gem Maps before
+     * Location Gem Maps.
+     */
+    private function gameMapTypeGroupOrderExpression(): string
+    {
+        return "CASE WHEN generated_map_type IS NULL THEN 0 WHEN generated_map_type = '"
+            .GeneratedGemMapType::MAP_GEM->value."' THEN 1 ELSE 2 END";
     }
 
     /**

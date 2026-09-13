@@ -19,6 +19,12 @@ class GemWorldLocationPlacementService
 
     private const MAX_RANDOM_ATTEMPTS = 500;
 
+    /**
+     * @param CoordinatesQuery $coordinatesQuery
+     * @param GemWorldPlaneGenerationSettings $generationSettings
+     * @param MapPixelReaderFactory $mapPixelReaderFactory
+     * @param GemWorldGenerationConfig $config
+     */
     public function __construct(
         private readonly CoordinatesQuery $coordinatesQuery,
         private readonly GemWorldPlaneGenerationSettings $generationSettings,
@@ -74,22 +80,39 @@ class GemWorldLocationPlacementService
         return $placements;
     }
 
+    /**
+     * Resolve the rendered water color to classify terrain against, matching the same shaded
+     * color the shared generated terrain palette produces on the parent Map's generated image.
+     *
+     * @param GameMap|null $parentMap
+     * @return array
+     */
     private function waterColor(?GameMap $parentMap): array
     {
         if (is_null($parentMap)) {
             return ['red' => 0, 'green' => 0, 'blue' => 0];
         }
 
-        $color = $this->generationSettings->waterColor($parentMap);
+        $color = $this->generationSettings->renderedWaterColor($parentMap);
 
         return ['red' => $color->r, 'green' => $color->g, 'blue' => $color->b];
     }
 
     /**
-     * @param int[] $shuffledX
-     * @param int[] $shuffledY
-     * @param int[] $orderedX
-     * @param int[] $orderedY
+     * Scan for the next valid placement coordinate for a Location type, trying shuffled random
+     * candidates first, then falling back to a deterministic ordered scan.
+     *
+     * @param string $type
+     * @param array $shuffledX
+     * @param array $shuffledY
+     * @param array $orderedX
+     * @param array $orderedY
+     * @param array $usedCoordinates
+     * @param MapPixelReader $imageResource
+     * @param array $waterColor
+     * @param GameMap $generatedMap
+     * @param GameMap|null $parentMap
+     * @return GemWorldLocationPlacement
      */
     private function nextPlacement(
         string $type,
@@ -212,11 +235,29 @@ class GemWorldLocationPlacementService
         );
     }
 
+    /**
+     * Load the generated Gem World image as a pixel-readable resource.
+     *
+     * @param GameMap $gameMap
+     * @return MapPixelReader
+     */
     private function loadMapImage(GameMap $gameMap): MapPixelReader
     {
         return $this->mapPixelReaderFactory->fromBinary(Storage::disk('maps')->get($gameMap->path));
     }
 
+    /**
+     * Determine whether a candidate coordinate is valid terrain for the given Location type.
+     *
+     * @param string $type
+     * @param int $x
+     * @param int $y
+     * @param MapPixelReader $imageResource
+     * @param array $waterColor
+     * @param int $landCandidateCount
+     * @param int $nearWaterCandidateCount
+     * @return bool
+     */
     private function canPlaceLocationType(string $type, int $x, int $y, MapPixelReader $imageResource, array $waterColor, int &$landCandidateCount, int &$nearWaterCandidateCount): bool
     {
         if ($this->isWaterTile($x, $y, $imageResource, $waterColor)) {
@@ -238,6 +279,15 @@ class GemWorldLocationPlacementService
         return true;
     }
 
+    /**
+     * Determine whether any tile adjacent to the coordinate is water.
+     *
+     * @param int $x
+     * @param int $y
+     * @param MapPixelReader $imageResource
+     * @param array $waterColor
+     * @return bool
+     */
     private function isNearWater(int $x, int $y, MapPixelReader $imageResource, array $waterColor): bool
     {
         $adjacentCoordinates = [
@@ -256,6 +306,15 @@ class GemWorldLocationPlacementService
         return false;
     }
 
+    /**
+     * Determine whether the pixel at the coordinate matches the generated water color.
+     *
+     * @param int $x
+     * @param int $y
+     * @param MapPixelReader $imageResource
+     * @param array $waterColor
+     * @return bool
+     */
     private function isWaterTile(int $x, int $y, MapPixelReader $imageResource, array $waterColor): bool
     {
         if ($x < 0 || $y < 0 || $x >= $imageResource->width() || $y >= $imageResource->height()) {
@@ -267,6 +326,14 @@ class GemWorldLocationPlacementService
         return $this->colorDistance($rgbArray, $waterColor) <= $this->config->waterColorTolerance;
     }
 
+    /**
+     * Count how many sampled pixels across the image match the generated water color, for
+     * placement-failure diagnostics.
+     *
+     * @param MapPixelReader $imageResource
+     * @param array $waterColor
+     * @return int
+     */
     private function sampledWaterCount(MapPixelReader $imageResource, array $waterColor): int
     {
         $count = 0;
@@ -283,6 +350,14 @@ class GemWorldLocationPlacementService
         return $count;
     }
 
+    /**
+     * Find the sampled pixel color closest to the generated water color, for placement-failure
+     * diagnostics.
+     *
+     * @param MapPixelReader $imageResource
+     * @param array $waterColor
+     * @return array
+     */
     private function closestColorToWater(MapPixelReader $imageResource, array $waterColor): array
     {
         $closest = ['red' => 0, 'green' => 0, 'blue' => 0];
@@ -308,6 +383,13 @@ class GemWorldLocationPlacementService
         return $closest;
     }
 
+    /**
+     * Compute the Euclidean distance between a sampled color and the generated water color.
+     *
+     * @param array $color
+     * @param array $waterColor
+     * @return float
+     */
     private function colorDistance(array $color, array $waterColor): float
     {
         return sqrt(
@@ -317,6 +399,15 @@ class GemWorldLocationPlacementService
         );
     }
 
+    /**
+     * Determine whether the coordinate falls within the spacing radius of an already-used
+     * coordinate.
+     *
+     * @param int $x
+     * @param int $y
+     * @param array $usedCoordinates
+     * @return bool
+     */
     private function isClustered(int $x, int $y, array $usedCoordinates): bool
     {
         foreach (array_keys($usedCoordinates) as $coordinate) {

@@ -79,7 +79,7 @@ class GemWorldLocationPlacementServiceTest extends TestCase
         $this->assertSame(8, $specialCount);
     }
 
-    public function test_placements_uses_the_parent_maps_water_color_when_present(): void
+    public function test_placements_uses_the_parent_maps_rendered_water_color_when_present(): void
     {
         $parentMap = $this->createGameMap(['name' => 'Surface']);
         $gameMap = $this->createGameMap(['name' => 'Gem World', 'generated_parent_game_map_id' => $parentMap->id]);
@@ -98,13 +98,63 @@ class GemWorldLocationPlacementServiceTest extends TestCase
         $mapPixelReaderFactory->shouldReceive('fromBinary')->once()->andReturn($reader);
 
         $settings = Mockery::mock(GemWorldPlaneGenerationSettings::class);
-        $settings->shouldReceive('waterColor')->once()->with(Mockery::on(fn ($map) => $map->id === $parentMap->id))->andReturn(new Color(10, 20, 30));
+        $settings->shouldReceive('renderedWaterColor')->once()->with(Mockery::on(fn ($map) => $map->id === $parentMap->id))->andReturn(new Color(10, 20, 30));
 
         $service = new GemWorldLocationPlacementService($coordinatesQuery, $settings, $mapPixelReaderFactory, GemWorldGenerationConfig::fromConfig());
 
         $this->expectException(CouldNotPlaceGeneratedGemWorldLocation::class);
 
         $service->placements($gameMap);
+    }
+
+    public function test_placements_classifies_the_generators_shaded_water_pixel_for_a_previously_failing_plane(): void
+    {
+        $parentMap = $this->createGameMap(['name' => 'Delusional Memories']);
+        $gameMap = $this->createGameMap(['name' => 'Gem World', 'generated_parent_game_map_id' => $parentMap->id]);
+
+        $settings = new GemWorldPlaneGenerationSettings();
+        $shadedWaterColor = $settings->renderedWaterColor($parentMap);
+
+        $xValues = [];
+        $yValues = [];
+        for ($i = 0; $i < 40; $i++) {
+            $xValues[] = $i * 64;
+            $yValues[] = $i * 64;
+        }
+
+        $coordinatesQuery = Mockery::mock(CoordinatesQuery::class);
+        $coordinatesQuery->shouldReceive('get')->once()->andReturn(new Coordinates($xValues, $yValues));
+
+        Storage::shouldReceive('disk')->with('maps')->andReturn(Mockery::mock(['get' => 'binary-data']));
+
+        $reader = Mockery::mock(MapPixelReader::class);
+        $reader->shouldReceive('width')->andReturn(3000);
+        $reader->shouldReceive('height')->andReturn(3000);
+        $reader->shouldReceive('colorAt')->andReturnUsing(function (int $x, int $y) use ($shadedWaterColor) {
+            if ($x >= 0 && ($x % 64) === 16) {
+                return ['red' => $shadedWaterColor->r, 'green' => $shadedWaterColor->g, 'blue' => $shadedWaterColor->b];
+            }
+
+            return ['red' => 255, 'green' => 255, 'blue' => 255];
+        });
+
+        $mapPixelReaderFactory = Mockery::mock(MapPixelReaderFactory::class);
+        $mapPixelReaderFactory->shouldReceive('fromBinary')->once()->with('binary-data')->andReturn($reader);
+
+        $service = new GemWorldLocationPlacementService(
+            $coordinatesQuery,
+            $settings,
+            $mapPixelReaderFactory,
+            GemWorldGenerationConfig::fromConfig(),
+        );
+
+        $placements = $service->placements($gameMap);
+
+        $this->assertCount(32, $placements);
+
+        $portCount = count(array_filter($placements, fn ($placement) => $placement->type === LocationTemplateType::PORT->value));
+
+        $this->assertSame(6, $portCount);
     }
 
     public function test_placements_throws_when_no_valid_land_tile_exists(): void

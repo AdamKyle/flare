@@ -44,6 +44,10 @@ class KingdomSettleService
             return $this->errorResult('You can settle another kingdom in: '.now()->diffInMinutes($character->can_settle_again_at).' Minutes.');
         }
 
+        if ($character->map->gameMap->isGeneratedGemMap()) {
+            return $this->errorResult('You cannot settle a Kingdom inside a Gem World.');
+        }
+
         if ($character->map->gameMap->mapType()->isPurgatory()) {
             return $this->errorResult('Child, this is not place to be a King or Queen, The Creator would destroy anything you build down here.');
         }
@@ -74,6 +78,12 @@ class KingdomSettleService
      */
     public function canSettle(Character $character): bool
     {
+        if ($character->map->gameMap->isGeneratedGemMap()) {
+            $this->errorMessage = 'You cannot settle a Kingdom inside a Gem World.';
+
+            return false;
+        }
+
         $x = $character->map->character_position_x;
         $y = $character->map->character_position_y;
 

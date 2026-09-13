@@ -9,7 +9,9 @@ use App\Flare\MapGenerator\Console\Commands\CreateMap;
 use App\Flare\MapGenerator\Contracts\LandMapImageFactory;
 use App\Flare\MapGenerator\Contracts\MapPixelReaderFactory;
 use App\Flare\MapGenerator\Services\ImageTilerService;
+use App\Flare\MapGenerator\Services\MapBackupAssetService;
 use App\Flare\MapGenerator\Services\MapTileGenerationService;
+use App\Flare\MapGenerator\Services\MapTileMapBuilder;
 use App\Flare\MapGenerator\Support\GdLandMapImageFactory;
 use App\Flare\MapGenerator\Support\GdMapPixelReaderFactory;
 use App\Flare\MapGenerator\Support\GdPngImageWriter;
@@ -59,8 +61,22 @@ class ServiceProvider extends ApplicationServiceProvider
             return new ImageTilerService($app->make(ImageManager::class));
         });
 
+        $this->app->bind(MapTileMapBuilder::class, function () {
+            return new MapTileMapBuilder;
+        });
+
+        $this->app->bind(MapBackupAssetService::class, function ($app) {
+            return new MapBackupAssetService(
+                $app->make(MapTileMapBuilder::class),
+                resource_path('backup/maps'),
+            );
+        });
+
         $this->app->bind(MapTileGenerationService::class, function ($app) {
-            return new MapTileGenerationService($app->make(ImageTilerService::class));
+            return new MapTileGenerationService(
+                $app->make(ImageTilerService::class),
+                $app->make(MapBackupAssetService::class),
+            );
         });
     }
 

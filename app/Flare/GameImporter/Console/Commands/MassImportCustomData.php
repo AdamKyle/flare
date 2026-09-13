@@ -30,35 +30,86 @@ class MassImportCustomData extends Command
     /**
      * Execute the console command.
      *
-     * @return void Runs the racial-stat-bonus removal command, then imports Game Maps outside production.
+     * @return void
      *
      * @throws Exception
      */
     public function handle()
     {
-        Artisan::call('import:game-data "World Gems"');
-        Artisan::call('import:game-data "Location Templates"');
-        Artisan::call('import:game-data Quests');
-
-        Artisan::call('remove:racial-stat-bonuses');
-
-        // $this->importInformationSection();
-
-        if (config('app.env') !== 'production') {
-            $this->importGameMaps();
+        if ($this->runStage('Import World Gems', 'import:game-data', ['dirName' => 'World Gems']) !== self::SUCCESS) {
+            return;
         }
 
-        Artisan::call('break:maps-into-pieces');
-        Artisan::call('create:gem-worlds');
-        Artisan::call('create:character-attack-data');
-        Artisan::call('generate:monster-cache');
-        Artisan::call('create:quest-cache');
+        if ($this->runStage('Import Location Templates', 'import:game-data', ['dirName' => 'Location Templates']) !== self::SUCCESS) {
+            return;
+        }
+
+        if ($this->runStage('Import Quests', 'import:game-data', ['dirName' => 'Quests']) !== self::SUCCESS) {
+            return;
+        }
+
+        if ($this->runStage('Remove racial stat bonuses', 'remove:racial-stat-bonuses') !== self::SUCCESS) {
+            return;
+        }
+
+        if (config('app.env') !== 'production' && ! $this->importBaseGameMaps()) {
+            return;
+        }
+
+        if ($this->runStage('Restore base Game Map pieces', 'break:maps-into-pieces') !== self::SUCCESS) {
+            return;
+        }
+
+        if ($this->runStage('Synchronize Gem Worlds', 'create:gem-worlds') !== self::SUCCESS) {
+            return;
+        }
+
+        if ($this->runStage('Create Character attack data', 'create:character-attack-data') !== self::SUCCESS) {
+            return;
+        }
+
+        if ($this->runStage('Generate Monster cache', 'generate:monster-cache') !== self::SUCCESS) {
+            return;
+        }
+
+        $this->runStage('Create Quest cache', 'create:quest-cache');
+    }
+
+    /**
+     * Run a single Artisan bootstrap stage, surfacing its output and reporting its outcome.
+     *
+     * @param string $label
+     * @param string $command
+     * @param array $parameters
+     * @return int
+     */
+    private function runStage(string $label, string $command, array $parameters = []): int
+    {
+        $this->line('START: '.$label);
+
+        $exitCode = Artisan::call($command, $parameters);
+
+        $output = trim(Artisan::output());
+
+        if ($output !== '') {
+            $this->line($output);
+        }
+
+        if ($exitCode === self::SUCCESS) {
+            $this->info('COMPLETE: '.$label);
+
+            return $exitCode;
+        }
+
+        $this->error('FAILED: '.$label.' (exit code '.$exitCode.')');
+
+        return $exitCode;
     }
 
     /**
      * Import the information section
      *
-     * @return void Replaces existing information pages and copies their images into public storage.
+     * @return void
      */
     private function importInformationSection(): void
     {
@@ -96,9 +147,27 @@ class MassImportCustomData extends Command
     }
 
     /**
+     * Import the base Game Maps outside production, reporting the stage outcome like an Artisan stage.
+     *
+     * @return bool
+     *
+     * @throws Exception
+     */
+    private function importBaseGameMaps(): bool
+    {
+        $this->line('START: Import base Game Maps');
+
+        $this->importGameMaps();
+
+        $this->info('COMPLETE: Import base Game Maps');
+
+        return true;
+    }
+
+    /**
      * Import the game maps
      *
-     * @return void Creates or updates each Game Map record with its stored image path.
+     * @return void
      *
      * @throws Exception
      */

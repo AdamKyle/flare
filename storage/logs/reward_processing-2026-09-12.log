@@ -1,0 +1,180 @@
+[2026-09-12 20:20:29] testing.DEBUG: Enqueue entered. {"character_id":312,"priority":"first","source_type":"guide_quest","source_id":"guide_quest:312:3"} 
+[2026-09-12 20:20:29] testing.DEBUG: Enqueue created request. {"character_id":312,"request_id":15,"status":"pending"} 
+[2026-09-12 20:20:30] testing.DEBUG: Enqueue sees queue state. {"character_id":312,"queue_state_id":3,"is_processing":false,"heartbeat_at":null,"pending_count":1,"processing_count":0} 
+[2026-09-12 20:20:30] testing.INFO: Enqueue wakes processor. {"character_id":312} 
+[2026-09-12 20:20:30] testing.DEBUG: Processor job starts. Attempting lock. {"character_id":312,"lock_key":"character-reward-queue:312","job_attempt":1,"memory_usage":328204288} 
+[2026-09-12 20:20:30] testing.INFO: Processor lock acquired. {"character_id":312,"lock_key":"character-reward-queue:312","lock_acquired":true} 
+[2026-09-12 20:20:30] testing.INFO: recoverLedgerBackedProcessingRequests completed. {"character_id":312,"recovered_count":0} 
+[2026-09-12 20:20:30] testing.DEBUG: recoverOrphanedProcessingRequests: skipped — heartbeat is fresh or queue state is missing. {"character_id":312,"heartbeat_at":"2026-09-12T20:20:30-06:00"} 
+[2026-09-12 20:20:30] testing.DEBUG: Processor loop starts. {"character_id":312,"pending_count":1} 
+[2026-09-12 20:20:30] testing.DEBUG: Next request claim attempt. {"character_id":312,"processed_so_far":0,"elapsed_ms":1} 
+[2026-09-12 20:20:30] testing.DEBUG: Next request claim attempt. {"character_id":312,"request_id":15,"priority":"first","source_type":"guide_quest"} 
+[2026-09-12 20:20:30] testing.DEBUG: Request marked processing. {"character_id":312,"request_id":15,"source_type":"guide_quest","priority":"first","started_at":"2026-09-12T20:20:30-06:00"} 
+[2026-09-12 20:20:30] testing.DEBUG: Before reward processing. {"character_id":312,"request_id":15,"source_type":"guide_quest","priority":"first","status":"processing"} 
+[2026-09-12 20:20:30] testing.DEBUG: After reward processing. Starting final player updates. {"character_id":312,"request_id":15,"source_type":"guide_quest","elapsed_ms":375,"memory_usage":328204288} 
+[2026-09-12 20:20:30] testing.DEBUG: Top bar update attempted. {"character_id":312} 
+[2026-09-12 20:20:30] testing.DEBUG: Base character update attempted. {"character_id":312} 
+[2026-09-12 20:20:30] testing.DEBUG: Request marked completed. {"character_id":312,"request_id":15,"completed_at":"2026-09-12T20:20:30-06:00"} 
+[2026-09-12 20:20:30] testing.DEBUG: Final player updates finished. {"character_id":312,"request_id":15} 
+[2026-09-12 20:20:30] testing.DEBUG: Next request claim attempt. {"character_id":312,"processed_so_far":1,"elapsed_ms":644} 
+[2026-09-12 20:20:30] testing.DEBUG: Next request returns null: no pending or resumable rows. {"character_id":312} 
+[2026-09-12 20:20:30] testing.DEBUG: Next request returned null. Ending loop. {"character_id":312,"processed_so_far":1} 
+[2026-09-12 20:20:30] testing.INFO: Processor marked inactive: queue is empty. {"character_id":312,"queue_state_id":3} 
+[2026-09-12 20:20:30] testing.DEBUG: Lock released. {"character_id":312,"lock_key":"character-reward-queue:312","processed":1} 
+[2026-09-12 20:20:31] testing.DEBUG: Enqueue entered. {"character_id":316,"priority":"first","source_type":"guide_quest","source_id":"guide_quest:316:8"} 
+[2026-09-12 20:20:31] testing.DEBUG: Enqueue created request. {"character_id":316,"request_id":16,"status":"pending"} 
+[2026-09-12 20:20:31] testing.DEBUG: Enqueue sees queue state. {"character_id":316,"queue_state_id":4,"is_processing":false,"heartbeat_at":null,"pending_count":1,"processing_count":0} 
+[2026-09-12 20:20:31] testing.INFO: Enqueue wakes processor. {"character_id":316} 
+[2026-09-12 20:20:31] testing.DEBUG: Processor job starts. Attempting lock. {"character_id":316,"lock_key":"character-reward-queue:316","job_attempt":1,"memory_usage":330301440} 
+[2026-09-12 20:20:31] testing.INFO: Processor lock acquired. {"character_id":316,"lock_key":"character-reward-queue:316","lock_acquired":true} 
+[2026-09-12 20:20:31] testing.INFO: recoverLedgerBackedProcessingRequests completed. {"character_id":316,"recovered_count":0} 
+[2026-09-12 20:20:31] testing.DEBUG: recoverOrphanedProcessingRequests: skipped — heartbeat is fresh or queue state is missing. {"character_id":316,"heartbeat_at":"2026-09-12T20:20:31-06:00"} 
+[2026-09-12 20:20:31] testing.DEBUG: Processor loop starts. {"character_id":316,"pending_count":1} 
+[2026-09-12 20:20:31] testing.DEBUG: Next request claim attempt. {"character_id":316,"processed_so_far":0,"elapsed_ms":0} 
+[2026-09-12 20:20:31] testing.DEBUG: Next request claim attempt. {"character_id":316,"request_id":16,"priority":"first","source_type":"guide_quest"} 
+[2026-09-12 20:20:31] testing.DEBUG: Request marked processing. {"character_id":316,"request_id":16,"source_type":"guide_quest","priority":"first","started_at":"2026-09-12T20:20:31-06:00"} 
+[2026-09-12 20:20:31] testing.DEBUG: Before reward processing. {"character_id":316,"request_id":16,"source_type":"guide_quest","priority":"first","status":"processing"} 
+[2026-09-12 20:20:32] testing.DEBUG: After reward processing. Starting final player updates. {"character_id":316,"request_id":16,"source_type":"guide_quest","elapsed_ms":354,"memory_usage":330301440} 
+[2026-09-12 20:20:32] testing.DEBUG: Top bar update attempted. {"character_id":316} 
+[2026-09-12 20:20:32] testing.DEBUG: Base character update attempted. {"character_id":316} 
+[2026-09-12 20:20:32] testing.DEBUG: Request marked completed. {"character_id":316,"request_id":16,"completed_at":"2026-09-12T20:20:32-06:00"} 
+[2026-09-12 20:20:32] testing.DEBUG: Final player updates finished. {"character_id":316,"request_id":16} 
+[2026-09-12 20:20:32] testing.DEBUG: Next request claim attempt. {"character_id":316,"processed_so_far":1,"elapsed_ms":637} 
+[2026-09-12 20:20:32] testing.DEBUG: Next request returns null: no pending or resumable rows. {"character_id":316} 
+[2026-09-12 20:20:32] testing.DEBUG: Next request returned null. Ending loop. {"character_id":316,"processed_so_far":1} 
+[2026-09-12 20:20:32] testing.INFO: Processor marked inactive: queue is empty. {"character_id":316,"queue_state_id":4} 
+[2026-09-12 20:20:32] testing.DEBUG: Lock released. {"character_id":316,"lock_key":"character-reward-queue:316","processed":1} 
+[2026-09-12 20:20:32] testing.DEBUG: Enqueue entered. {"character_id":317,"priority":"first","source_type":"guide_quest","source_id":"guide_quest:317:9"} 
+[2026-09-12 20:20:32] testing.DEBUG: Enqueue created request. {"character_id":317,"request_id":17,"status":"pending"} 
+[2026-09-12 20:20:32] testing.DEBUG: Enqueue sees queue state. {"character_id":317,"queue_state_id":5,"is_processing":false,"heartbeat_at":null,"pending_count":1,"processing_count":0} 
+[2026-09-12 20:20:32] testing.INFO: Enqueue wakes processor. {"character_id":317} 
+[2026-09-12 20:20:32] testing.DEBUG: Processor job starts. Attempting lock. {"character_id":317,"lock_key":"character-reward-queue:317","job_attempt":1,"memory_usage":330301440} 
+[2026-09-12 20:20:32] testing.INFO: Processor lock acquired. {"character_id":317,"lock_key":"character-reward-queue:317","lock_acquired":true} 
+[2026-09-12 20:20:32] testing.INFO: recoverLedgerBackedProcessingRequests completed. {"character_id":317,"recovered_count":0} 
+[2026-09-12 20:20:32] testing.DEBUG: recoverOrphanedProcessingRequests: skipped — heartbeat is fresh or queue state is missing. {"character_id":317,"heartbeat_at":"2026-09-12T20:20:32-06:00"} 
+[2026-09-12 20:20:32] testing.DEBUG: Processor loop starts. {"character_id":317,"pending_count":1} 
+[2026-09-12 20:20:32] testing.DEBUG: Next request claim attempt. {"character_id":317,"processed_so_far":0,"elapsed_ms":0} 
+[2026-09-12 20:20:32] testing.DEBUG: Next request claim attempt. {"character_id":317,"request_id":17,"priority":"first","source_type":"guide_quest"} 
+[2026-09-12 20:20:32] testing.DEBUG: Request marked processing. {"character_id":317,"request_id":17,"source_type":"guide_quest","priority":"first","started_at":"2026-09-12T20:20:32-06:00"} 
+[2026-09-12 20:20:32] testing.DEBUG: Before reward processing. {"character_id":317,"request_id":17,"source_type":"guide_quest","priority":"first","status":"processing"} 
+[2026-09-12 20:20:33] testing.DEBUG: After reward processing. Starting final player updates. {"character_id":317,"request_id":17,"source_type":"guide_quest","elapsed_ms":370,"memory_usage":330301440} 
+[2026-09-12 20:20:33] testing.DEBUG: Top bar update attempted. {"character_id":317} 
+[2026-09-12 20:20:33] testing.DEBUG: Base character update attempted. {"character_id":317} 
+[2026-09-12 20:20:33] testing.DEBUG: Request marked completed. {"character_id":317,"request_id":17,"completed_at":"2026-09-12T20:20:33-06:00"} 
+[2026-09-12 20:20:33] testing.DEBUG: Final player updates finished. {"character_id":317,"request_id":17} 
+[2026-09-12 20:20:33] testing.DEBUG: Next request claim attempt. {"character_id":317,"processed_so_far":1,"elapsed_ms":780} 
+[2026-09-12 20:20:33] testing.DEBUG: Next request returns null: no pending or resumable rows. {"character_id":317} 
+[2026-09-12 20:20:33] testing.DEBUG: Next request returned null. Ending loop. {"character_id":317,"processed_so_far":1} 
+[2026-09-12 20:20:33] testing.INFO: Processor marked inactive: queue is empty. {"character_id":317,"queue_state_id":5} 
+[2026-09-12 20:20:33] testing.DEBUG: Lock released. {"character_id":317,"lock_key":"character-reward-queue:317","processed":1} 
+[2026-09-12 20:20:33] testing.DEBUG: Enqueue entered. {"character_id":318,"priority":"first","source_type":"guide_quest","source_id":"guide_quest:318:10"} 
+[2026-09-12 20:20:33] testing.DEBUG: Enqueue created request. {"character_id":318,"request_id":18,"status":"pending"} 
+[2026-09-12 20:20:33] testing.DEBUG: Enqueue sees queue state. {"character_id":318,"queue_state_id":6,"is_processing":false,"heartbeat_at":null,"pending_count":1,"processing_count":0} 
+[2026-09-12 20:20:33] testing.INFO: Enqueue wakes processor. {"character_id":318} 
+[2026-09-12 20:20:33] testing.DEBUG: Processor job starts. Attempting lock. {"character_id":318,"lock_key":"character-reward-queue:318","job_attempt":1,"memory_usage":330301440} 
+[2026-09-12 20:20:33] testing.INFO: Processor lock acquired. {"character_id":318,"lock_key":"character-reward-queue:318","lock_acquired":true} 
+[2026-09-12 20:20:33] testing.INFO: recoverLedgerBackedProcessingRequests completed. {"character_id":318,"recovered_count":0} 
+[2026-09-12 20:20:33] testing.DEBUG: recoverOrphanedProcessingRequests: skipped — heartbeat is fresh or queue state is missing. {"character_id":318,"heartbeat_at":"2026-09-12T20:20:33-06:00"} 
+[2026-09-12 20:20:33] testing.DEBUG: Processor loop starts. {"character_id":318,"pending_count":1} 
+[2026-09-12 20:20:33] testing.DEBUG: Next request claim attempt. {"character_id":318,"processed_so_far":0,"elapsed_ms":3} 
+[2026-09-12 20:20:33] testing.DEBUG: Next request claim attempt. {"character_id":318,"request_id":18,"priority":"first","source_type":"guide_quest"} 
+[2026-09-12 20:20:33] testing.DEBUG: Request marked processing. {"character_id":318,"request_id":18,"source_type":"guide_quest","priority":"first","started_at":"2026-09-12T20:20:33-06:00"} 
+[2026-09-12 20:20:33] testing.DEBUG: Before reward processing. {"character_id":318,"request_id":18,"source_type":"guide_quest","priority":"first","status":"processing"} 
+[2026-09-12 20:20:34] testing.DEBUG: After reward processing. Starting final player updates. {"character_id":318,"request_id":18,"source_type":"guide_quest","elapsed_ms":389,"memory_usage":330301440} 
+[2026-09-12 20:20:34] testing.DEBUG: Top bar update attempted. {"character_id":318} 
+[2026-09-12 20:20:34] testing.DEBUG: Base character update attempted. {"character_id":318} 
+[2026-09-12 20:20:34] testing.DEBUG: Request marked completed. {"character_id":318,"request_id":18,"completed_at":"2026-09-12T20:20:34-06:00"} 
+[2026-09-12 20:20:34] testing.DEBUG: Final player updates finished. {"character_id":318,"request_id":18} 
+[2026-09-12 20:20:34] testing.DEBUG: Next request claim attempt. {"character_id":318,"processed_so_far":1,"elapsed_ms":682} 
+[2026-09-12 20:20:34] testing.DEBUG: Next request returns null: no pending or resumable rows. {"character_id":318} 
+[2026-09-12 20:20:34] testing.DEBUG: Next request returned null. Ending loop. {"character_id":318,"processed_so_far":1} 
+[2026-09-12 20:20:34] testing.INFO: Processor marked inactive: queue is empty. {"character_id":318,"queue_state_id":6} 
+[2026-09-12 20:20:34] testing.DEBUG: Lock released. {"character_id":318,"lock_key":"character-reward-queue:318","processed":1} 
+[2026-09-12 20:21:17] testing.DEBUG: Enqueue entered. {"character_id":504,"priority":"first","source_type":"quest","source_id":"quest:504:112"} 
+[2026-09-12 20:21:17] testing.DEBUG: Enqueue created request. {"character_id":504,"request_id":19,"status":"pending"} 
+[2026-09-12 20:21:17] testing.DEBUG: Enqueue sees queue state. {"character_id":504,"queue_state_id":7,"is_processing":false,"heartbeat_at":null,"pending_count":1,"processing_count":0} 
+[2026-09-12 20:21:17] testing.INFO: Enqueue wakes processor. {"character_id":504} 
+[2026-09-12 20:21:17] testing.DEBUG: Enqueue entered. {"character_id":505,"priority":"first","source_type":"quest","source_id":"quest:505:113"} 
+[2026-09-12 20:21:17] testing.DEBUG: Enqueue created request. {"character_id":505,"request_id":20,"status":"pending"} 
+[2026-09-12 20:21:17] testing.DEBUG: Enqueue sees queue state. {"character_id":505,"queue_state_id":8,"is_processing":false,"heartbeat_at":null,"pending_count":1,"processing_count":0} 
+[2026-09-12 20:21:18] testing.INFO: Enqueue wakes processor. {"character_id":505} 
+[2026-09-12 20:27:45] testing.DEBUG: Enqueue entered. {"character_id":1950,"priority":"second","source_type":"faction_loyalty","source_id":"faction_loyalty:1950:399:1"} 
+[2026-09-12 20:27:45] testing.DEBUG: Enqueue created request. {"character_id":1950,"request_id":25,"status":"pending"} 
+[2026-09-12 20:27:45] testing.DEBUG: Enqueue sees queue state. {"character_id":1950,"queue_state_id":9,"is_processing":false,"heartbeat_at":null,"pending_count":1,"processing_count":0} 
+[2026-09-12 20:27:45] testing.INFO: Enqueue wakes processor. {"character_id":1950} 
+[2026-09-12 20:27:45] testing.DEBUG: Enqueue entered. {"character_id":1951,"priority":"second","source_type":"faction_loyalty","source_id":"faction_loyalty:1951:400:1"} 
+[2026-09-12 20:27:45] testing.DEBUG: Enqueue created request. {"character_id":1951,"request_id":26,"status":"pending"} 
+[2026-09-12 20:27:45] testing.DEBUG: Enqueue sees queue state. {"character_id":1951,"queue_state_id":10,"is_processing":false,"heartbeat_at":null,"pending_count":1,"processing_count":0} 
+[2026-09-12 20:27:45] testing.INFO: Enqueue wakes processor. {"character_id":1951} 
+[2026-09-12 20:27:45] testing.DEBUG: Enqueue entered. {"character_id":1952,"priority":"second","source_type":"faction_loyalty","source_id":"faction_loyalty:1952:401:1"} 
+[2026-09-12 20:27:45] testing.DEBUG: Enqueue created request. {"character_id":1952,"request_id":27,"status":"pending"} 
+[2026-09-12 20:27:45] testing.DEBUG: Enqueue sees queue state. {"character_id":1952,"queue_state_id":11,"is_processing":false,"heartbeat_at":null,"pending_count":1,"processing_count":0} 
+[2026-09-12 20:27:45] testing.INFO: Enqueue wakes processor. {"character_id":1952} 
+[2026-09-12 20:27:45] testing.DEBUG: Enqueue entered. {"character_id":1953,"priority":"second","source_type":"faction_loyalty","source_id":"faction_loyalty:1953:402:24"} 
+[2026-09-12 20:27:45] testing.DEBUG: Enqueue created request. {"character_id":1953,"request_id":28,"status":"pending"} 
+[2026-09-12 20:27:45] testing.DEBUG: Enqueue sees queue state. {"character_id":1953,"queue_state_id":12,"is_processing":false,"heartbeat_at":null,"pending_count":1,"processing_count":0} 
+[2026-09-12 20:27:45] testing.INFO: Enqueue wakes processor. {"character_id":1953} 
+[2026-09-12 20:27:46] testing.DEBUG: Enqueue entered. {"character_id":1956,"priority":"second","source_type":"faction_loyalty","source_id":"faction_loyalty:1956:404:0"} 
+[2026-09-12 20:27:46] testing.DEBUG: Enqueue created request. {"character_id":1956,"request_id":29,"status":"pending"} 
+[2026-09-12 20:27:46] testing.DEBUG: Enqueue sees queue state. {"character_id":1956,"queue_state_id":13,"is_processing":false,"heartbeat_at":null,"pending_count":1,"processing_count":0} 
+[2026-09-12 20:27:46] testing.INFO: Enqueue wakes processor. {"character_id":1956} 
+[2026-09-12 20:27:46] testing.DEBUG: Enqueue entered. {"character_id":1957,"priority":"second","source_type":"faction_loyalty","source_id":"faction_loyalty:1957:405:1"} 
+[2026-09-12 20:27:46] testing.DEBUG: Enqueue created request. {"character_id":1957,"request_id":30,"status":"pending"} 
+[2026-09-12 20:27:46] testing.DEBUG: Enqueue sees queue state. {"character_id":1957,"queue_state_id":14,"is_processing":false,"heartbeat_at":null,"pending_count":1,"processing_count":0} 
+[2026-09-12 20:27:46] testing.INFO: Enqueue wakes processor. {"character_id":1957} 
+[2026-09-12 20:27:46] testing.DEBUG: Enqueue entered. {"character_id":1957,"priority":"second","source_type":"faction_loyalty","source_id":"faction_loyalty:1957:405:2"} 
+[2026-09-12 20:27:46] testing.DEBUG: Enqueue created request. {"character_id":1957,"request_id":31,"status":"pending"} 
+[2026-09-12 20:27:46] testing.DEBUG: Enqueue sees queue state. {"character_id":1957,"queue_state_id":14,"is_processing":true,"heartbeat_at":"2026-09-12T20:27:46-06:00","pending_count":2,"processing_count":0} 
+[2026-09-12 20:27:46] testing.INFO: recoverLedgerBackedProcessingRequests completed. {"character_id":1957,"recovered_count":0} 
+[2026-09-12 20:27:46] testing.DEBUG: Enqueue decides processor already running (fresh heartbeat, no ledger rows to recover). {"character_id":1957,"lock_available":true,"ledger_recovered":0} 
+[2026-09-12 20:28:01] testing.INFO: recoverLedgerBackedProcessingRequests completed. {"character_id":2025,"recovered_count":1} 
+[2026-09-12 20:28:04] testing.DEBUG: Enqueue entered. {"character_id":2036,"priority":"second","source_type":"faction_loyalty","source_id":"faction_loyalty:2036:99:1"} 
+[2026-09-12 20:28:04] testing.DEBUG: Enqueue created request. {"character_id":2036,"request_id":98,"status":"pending"} 
+[2026-09-12 20:28:04] testing.DEBUG: Enqueue sees queue state. {"character_id":2036,"queue_state_id":49,"is_processing":false,"heartbeat_at":null,"pending_count":1,"processing_count":0} 
+[2026-09-12 20:28:04] testing.INFO: Enqueue wakes processor. {"character_id":2036} 
+[2026-09-12 20:28:05] testing.DEBUG: Enqueue sees queue state. {"character_id":2037,"queue_state_id":50,"is_processing":false,"heartbeat_at":null,"pending_count":1,"processing_count":0} 
+[2026-09-12 20:28:05] testing.INFO: Enqueue wakes processor. {"character_id":2037} 
+[2026-09-12 20:28:05] testing.DEBUG: Enqueue entered. {"character_id":2039,"priority":"second","source_type":"faction_loyalty","source_id":"faction_loyalty:2039:99:1"} 
+[2026-09-12 20:28:05] testing.DEBUG: Enqueue created request. {"character_id":2039,"request_id":101,"status":"pending"} 
+[2026-09-12 20:28:05] testing.DEBUG: Enqueue sees queue state. {"character_id":2039,"queue_state_id":51,"is_processing":false,"heartbeat_at":null,"pending_count":1,"processing_count":0} 
+[2026-09-12 20:28:05] testing.INFO: Enqueue wakes processor. {"character_id":2039} 
+[2026-09-12 20:28:05] testing.DEBUG: Enqueue entered. {"character_id":2039,"priority":"second","source_type":"faction_loyalty","source_id":"faction_loyalty:2039:99:2"} 
+[2026-09-12 20:28:05] testing.DEBUG: Enqueue created request. {"character_id":2039,"request_id":102,"status":"pending"} 
+[2026-09-12 20:28:05] testing.DEBUG: Enqueue sees queue state. {"character_id":2039,"queue_state_id":51,"is_processing":true,"heartbeat_at":"2026-09-12T20:28:05-06:00","pending_count":2,"processing_count":0} 
+[2026-09-12 20:28:05] testing.INFO: recoverLedgerBackedProcessingRequests completed. {"character_id":2039,"recovered_count":0} 
+[2026-09-12 20:28:05] testing.DEBUG: Enqueue decides processor already running (fresh heartbeat, no ledger rows to recover). {"character_id":2039,"lock_available":true,"ledger_recovered":0} 
+[2026-09-12 20:33:58] testing.DEBUG: Enqueue entered. {"character_id":3501,"priority":"first","source_type":"quest","source_id":"quest:3501:191"} 
+[2026-09-12 20:33:58] testing.DEBUG: Enqueue created request. {"character_id":3501,"request_id":121,"status":"pending"} 
+[2026-09-12 20:33:58] testing.DEBUG: Enqueue sees queue state. {"character_id":3501,"queue_state_id":53,"is_processing":false,"heartbeat_at":null,"pending_count":1,"processing_count":0} 
+[2026-09-12 20:33:58] testing.INFO: Enqueue wakes processor. {"character_id":3501} 
+[2026-09-12 20:33:59] testing.DEBUG: Enqueue entered. {"character_id":3502,"priority":"first","source_type":"quest","source_id":"quest:3502:192"} 
+[2026-09-12 20:33:59] testing.DEBUG: Enqueue created request. {"character_id":3502,"request_id":122,"status":"pending"} 
+[2026-09-12 20:33:59] testing.DEBUG: Enqueue sees queue state. {"character_id":3502,"queue_state_id":54,"is_processing":false,"heartbeat_at":null,"pending_count":1,"processing_count":0} 
+[2026-09-12 20:33:59] testing.INFO: Enqueue wakes processor. {"character_id":3502} 
+[2026-09-12 20:33:59] testing.DEBUG: Enqueue entered. {"character_id":3503,"priority":"first","source_type":"raid_quest","source_id":"raid_quest:3503:193"} 
+[2026-09-12 20:33:59] testing.DEBUG: Enqueue created request. {"character_id":3503,"request_id":123,"status":"pending"} 
+[2026-09-12 20:33:59] testing.DEBUG: Enqueue sees queue state. {"character_id":3503,"queue_state_id":55,"is_processing":false,"heartbeat_at":null,"pending_count":1,"processing_count":0} 
+[2026-09-12 20:33:59] testing.INFO: Enqueue wakes processor. {"character_id":3503} 
+[2026-09-12 20:33:59] testing.DEBUG: Enqueue entered. {"character_id":3504,"priority":"first","source_type":"quest","source_id":"quest:3504:194"} 
+[2026-09-12 20:33:59] testing.DEBUG: Enqueue created request. {"character_id":3504,"request_id":124,"status":"pending"} 
+[2026-09-12 20:33:59] testing.DEBUG: Enqueue sees queue state. {"character_id":3504,"queue_state_id":56,"is_processing":false,"heartbeat_at":null,"pending_count":1,"processing_count":0} 
+[2026-09-12 20:33:59] testing.INFO: Enqueue wakes processor. {"character_id":3504} 
+[2026-09-12 20:33:59] testing.DEBUG: Processor job starts. Attempting lock. {"character_id":3504,"lock_key":"character-reward-queue:3504","job_attempt":1,"memory_usage":893386752} 
+[2026-09-12 20:33:59] testing.INFO: Processor lock acquired. {"character_id":3504,"lock_key":"character-reward-queue:3504","lock_acquired":true} 
+[2026-09-12 20:33:59] testing.INFO: recoverLedgerBackedProcessingRequests completed. {"character_id":3504,"recovered_count":0} 
+[2026-09-12 20:33:59] testing.DEBUG: recoverOrphanedProcessingRequests: skipped — heartbeat is fresh or queue state is missing. {"character_id":3504,"heartbeat_at":"2026-09-12T20:33:59-06:00"} 
+[2026-09-12 20:33:59] testing.DEBUG: Processor loop starts. {"character_id":3504,"pending_count":1} 
+[2026-09-12 20:33:59] testing.DEBUG: Next request claim attempt. {"character_id":3504,"processed_so_far":0,"elapsed_ms":1} 
+[2026-09-12 20:33:59] testing.DEBUG: Next request claim attempt. {"character_id":3504,"request_id":124,"priority":"first","source_type":"quest"} 
+[2026-09-12 20:33:59] testing.DEBUG: Request marked processing. {"character_id":3504,"request_id":124,"source_type":"quest","priority":"first","started_at":"2026-09-12T20:33:59-06:00"} 
+[2026-09-12 20:33:59] testing.DEBUG: Before reward processing. {"character_id":3504,"request_id":124,"source_type":"quest","priority":"first","status":"processing"} 
+[2026-09-12 20:33:59] testing.DEBUG: After reward processing. Starting final player updates. {"character_id":3504,"request_id":124,"source_type":"quest","elapsed_ms":148,"memory_usage":893386752} 
+[2026-09-12 20:33:59] testing.DEBUG: Top bar update attempted. {"character_id":3504} 
+[2026-09-12 20:33:59] testing.DEBUG: Base character update attempted. {"character_id":3504} 
+[2026-09-12 20:33:59] testing.DEBUG: Request marked completed. {"character_id":3504,"request_id":124,"completed_at":"2026-09-12T20:33:59-06:00"} 
+[2026-09-12 20:33:59] testing.DEBUG: Final player updates finished. {"character_id":3504,"request_id":124} 
+[2026-09-12 20:33:59] testing.DEBUG: Next request claim attempt. {"character_id":3504,"processed_so_far":1,"elapsed_ms":263} 
+[2026-09-12 20:33:59] testing.DEBUG: Next request returns null: no pending or resumable rows. {"character_id":3504} 
+[2026-09-12 20:33:59] testing.DEBUG: Next request returned null. Ending loop. {"character_id":3504,"processed_so_far":1} 
+[2026-09-12 20:33:59] testing.INFO: Processor marked inactive: queue is empty. {"character_id":3504,"queue_state_id":56} 
+[2026-09-12 20:33:59] testing.DEBUG: Lock released. {"character_id":3504,"lock_key":"character-reward-queue:3504","processed":1} 

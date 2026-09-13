@@ -2,7 +2,10 @@
 
 namespace App\Admin\GameMaps\Requests;
 
+use App\Admin\GameMaps\Values\AdminGameMapType;
+use App\Game\Maps\Values\MapName;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class GameMapIndexRequest extends FormRequest
 {
@@ -25,7 +28,8 @@ class GameMapIndexRequest extends FormRequest
             'search_text' => 'nullable|string|max:255',
             'sort_key' => 'required|string|in:name',
             'sort_direction' => 'required|string|in:asc,desc',
-            'filters' => 'nullable|array',
+            'plane' => ['nullable', 'string', Rule::enum(MapName::class)],
+            'map_type' => ['nullable', 'string', Rule::enum(AdminGameMapType::class)],
         ];
     }
 
@@ -40,7 +44,8 @@ class GameMapIndexRequest extends FormRequest
             'search_text' => $this->input('search_text', ''),
             'sort_key' => $this->input('sort_key', 'name'),
             'sort_direction' => $this->input('sort_direction', 'asc'),
-            'filters' => $this->input('filters', []),
+            'plane' => $this->input('plane') ?: null,
+            'map_type' => $this->input('map_type') ?: null,
         ]);
     }
 }

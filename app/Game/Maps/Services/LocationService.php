@@ -65,9 +65,9 @@ class LocationService
 
         $this->locationBasedEvents($character);
 
-        $this->kingdomManagement();
-
         $gameMap = $character->map->gameMap;
+
+        $this->kingdomManagement($gameMap);
 
         return [
             'tiles' => $gameMap->tile_map ?? [],
@@ -95,7 +95,7 @@ class LocationService
 
         $this->locationBasedEvents($character);
 
-        $this->kingdomManagement();
+        $this->kingdomManagement($character->map->gameMap);
 
         $lockedLocation = $this->getLockedLocation($character);
 
@@ -332,9 +332,9 @@ class LocationService
      * We determine the action the player can take. That is, can they settle?
      * Can they attack the kingdom or can they manage the kingdom?
      */
-    private function kingdomManagement(): void
+    private function kingdomManagement(GameMap $gameMap): void
     {
-        if (is_null($this->location)) {
+        if (is_null($this->location) && ! $gameMap->isGeneratedGemMap()) {
             $this->canSettle = true;
         }
     }
