@@ -17,6 +17,7 @@ import MonsterSectionProps from './types/monster-section-props';
 import { getImageTierByIndex } from './util/monster-image-tier';
 import AttackButtonsContainer from '../../components/fight-section/attack-buttons-container';
 import AttackMessages from '../../components/fight-section/attack-messages';
+import CharacterCombatStatus from '../../components/fight-section/character-combat-status';
 import CharacterDeadAction from '../../components/fight-section/character-dead-action';
 import { HealthBarType } from '../../components/fight-section/enums/health-bar-type';
 import HealthBar from '../../components/fight-section/health-bar';
@@ -32,6 +33,7 @@ import { ButtonGradientVarient } from 'ui/buttons/enums/button-gradient-variant'
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import GradientButton from 'ui/buttons/gradient-button';
 import InfiniteLoaderRoseDanube from 'ui/infinite-scroll/infinite-loader-rose-danube';
+import TimerBar from 'ui/timer-bar/timer-bar';
 
 const MonsterSection = ({
   show_monster_stats,
@@ -58,6 +60,9 @@ const MonsterSection = ({
   );
 
   const isCharacterDead = gameData?.character?.is_dead ?? false;
+  const isOnAttackCooldown =
+    !isCharacterDead && gameData?.character?.can_attack === false;
+  const attackCooldownSeconds = gameData?.character?.can_attack_again_at ?? 0;
 
   useEffect(() => {
     if (!monsters || monsters.length === 0) {
@@ -179,6 +184,7 @@ const MonsterSection = ({
             label="Initiate Fight"
             variant={ButtonVariant.PRIMARY}
             additional_css="block mx-auto w-48"
+            disabled={isOnAttackCooldown}
           />
           <Button
             on_click={handleSetupExploration}
@@ -215,6 +221,7 @@ const MonsterSection = ({
             variant={ButtonVariant.PRIMARY}
             additional_css="w-full lg:w-1/3"
             on_click={() => handelMonsterSelection(true)}
+            disabled={isOnAttackCooldown}
           />
           <Button
             label="Clear"
@@ -225,6 +232,8 @@ const MonsterSection = ({
         </div>
       );
     };
+
+    const isAttackDisabled = disableAttackButtons || isOnAttackCooldown;
 
     const renderAttackButtons = () => {
       if (
@@ -243,14 +252,14 @@ const MonsterSection = ({
               variant={ButtonVariant.PRIMARY}
               additional_css="w-full lg:w-1/3"
               on_click={() => handleAttackMonster(AttackType.ATTACK)}
-              disabled={disableAttackButtons}
+              disabled={isAttackDisabled}
             />
             <Button
               label="Cast"
               variant={ButtonVariant.PRIMARY}
               additional_css="w-full lg:w-1/3"
               on_click={() => handleAttackMonster(AttackType.CAST)}
-              disabled={disableAttackButtons}
+              disabled={isAttackDisabled}
             />
           </AttackButtonsContainer>
           <AttackButtonsContainer>
@@ -259,14 +268,14 @@ const MonsterSection = ({
               gradient={ButtonGradientVarient.DANGER_TO_PRIMARY}
               additional_css="w-full lg:w-1/3"
               on_click={() => handleAttackMonster(AttackType.ATTACK_AND_CAST)}
-              disabled={disableAttackButtons}
+              disabled={isAttackDisabled}
             />
             <GradientButton
               label="Cast & Atk"
               gradient={ButtonGradientVarient.PRIMARY_TO_DANGER}
               additional_css="w-full lg:w-1/3"
               on_click={() => handleAttackMonster(AttackType.CAST_AND_ATTACK)}
-              disabled={disableAttackButtons}
+              disabled={isAttackDisabled}
             />
           </AttackButtonsContainer>
           <AttackButtonsContainer>
@@ -275,15 +284,30 @@ const MonsterSection = ({
               variant={ButtonVariant.PRIMARY}
               additional_css="w-full lg:w-1/3"
               on_click={() => handleAttackMonster(AttackType.DEFEND)}
-              disabled={disableAttackButtons}
+              disabled={isAttackDisabled}
             />
           </AttackButtonsContainer>
         </>
       );
     };
 
+    const renderAttackCooldownBar = () => {
+      if (!isOnAttackCooldown) {
+        return null;
+      }
+
+      return (
+        <TimerBar
+          length={attackCooldownSeconds}
+          title="Next Attack"
+          additional_css="my-2"
+        />
+      );
+    };
+
     return (
       <>
+        <CharacterCombatStatus />
         <HealthBarContainer>
           <HealthBar
             current_health={data?.health.current_monster_health || 0}
@@ -298,6 +322,7 @@ const MonsterSection = ({
             health_bar_type={HealthBarType.PLAYER}
           />
         </HealthBarContainer>
+        {renderAttackCooldownBar()}
         {renderAttackButtons()}
         {renderAttackAgainButton()}
         <AttackMessages messages={data?.attack_messages || []} />

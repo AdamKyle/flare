@@ -67,6 +67,8 @@ export default interface CharacterSheetDefinition {
   can_talk_again_at?: string | null;
   view_port?: number;
   is_automation_running?: boolean;
+  can_attack?: boolean;
+  can_attack_again_at?: number;
   can_craft?: boolean;
   can_craft_again_at?: number;
   is_faction_loyalty_automation_running?: boolean;

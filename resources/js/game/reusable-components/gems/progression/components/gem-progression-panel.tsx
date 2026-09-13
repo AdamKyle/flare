@@ -92,6 +92,30 @@ const GemProgressionPanel = ({
   const globalAtCap = global.level >= global.max_level;
   const personalAtCap = personal.level >= personal.max_level;
 
+  if (activeDetail === 'global') {
+    return (
+      <GlobalProgressInfoScreen
+        global={mergedData.global}
+        scroll_drop={mergedData.scroll_drop}
+        reward_effect_breakdown={mergedData.reward_effect_breakdown}
+        rarity_effect_breakdown={mergedData.rarity_effect_breakdown}
+        on_close={() => setActiveDetail(null)}
+      />
+    );
+  }
+
+  if (activeDetail === 'personal') {
+    return (
+      <PersonalProgressInfoScreen
+        personal={mergedData.personal}
+        scroll_drop={mergedData.scroll_drop}
+        reward_effect_breakdown={mergedData.reward_effect_breakdown}
+        rarity_effect_breakdown={mergedData.rarity_effect_breakdown}
+        on_close={() => setActiveDetail(null)}
+      />
+    );
+  }
+
   return (
     <div className="flex h-full min-h-0 flex-col gap-4 overflow-y-auto px-4 py-4 sm:px-5">
       <div className="text-sm text-gray-700 dark:text-gray-300">
@@ -163,26 +187,6 @@ const GemProgressionPanel = ({
         variant={ButtonVariant.PRIMARY}
         on_click={() => openManageGemScrolls(characterId)}
       />
-
-      {activeDetail === 'global' && (
-        <GlobalProgressInfoScreen
-          global={mergedData.global}
-          scroll_drop={mergedData.scroll_drop}
-          reward_effect_breakdown={mergedData.reward_effect_breakdown}
-          rarity_effect_breakdown={mergedData.rarity_effect_breakdown}
-          on_close={() => setActiveDetail(null)}
-        />
-      )}
-
-      {activeDetail === 'personal' && (
-        <PersonalProgressInfoScreen
-          personal={mergedData.personal}
-          scroll_drop={mergedData.scroll_drop}
-          reward_effect_breakdown={mergedData.reward_effect_breakdown}
-          rarity_effect_breakdown={mergedData.rarity_effect_breakdown}
-          on_close={() => setActiveDetail(null)}
-        />
-      )}
     </div>
   );
 };
