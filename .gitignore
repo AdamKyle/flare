@@ -9,6 +9,7 @@
 /public/mix-manifest.json
 /storage/*.key
 /storage/framework/laravel-excel
+/storage/logs
 /vendor
 /test-coverage
 .env
