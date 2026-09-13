@@ -18,6 +18,7 @@ use App\Game\Events\Concerns\ShouldShowCraftingEventButton;
 use App\Game\Events\Concerns\ShouldShowEnchantingEventButton;
 use App\Game\Maps\Values\LocationType;
 use App\Game\Skills\Values\SkillTypeValue;
+use Carbon\Carbon;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -34,16 +35,18 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
     private User $user;
 
     /**
-     * Create a new event instance.
+     * @param Character $character
+     * @param AttackTimerService $attackTimerService
+     * @param float $attackCooldownSecondsOverride
      */
-    public function __construct(Character $character, ?AttackTimerService $attackTimerService = null)
+    public function __construct(Character $character, ?AttackTimerService $attackTimerService = null, ?float $attackCooldownSecondsOverride = null)
     {
         $attackTimerService ??= new AttackTimerService(new AutomationRestrictionService());
         $character = $attackTimerService->normalizeExpiredAttackTimer($character);
 
         $this->characterStatuses = [
             'can_attack' => $character->can_attack,
-            'can_attack_again_at' => now()->diffInSeconds($character->can_attack_again_at),
+            'can_attack_again_at' => $this->remainingAttackCooldownSeconds($character->can_attack_again_at, $attackCooldownSecondsOverride),
             'can_craft' => $character->can_craft,
             'can_craft_again_at' => $character->can_craft_again_at,
             'can_spin' => $character->can_spin,
@@ -74,6 +77,28 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
         ];
 
         $this->user = $character->user;
+    }
+
+    /**
+     * Get the remaining manual attack cooldown, in seconds, to a tenth of a second.
+     *
+     * @param Carbon $canAttackAgainAt
+     * @param float $secondsOverride
+     * @return float
+     */
+    private function remainingAttackCooldownSeconds(?Carbon $canAttackAgainAt, ?float $secondsOverride): float
+    {
+        if (is_null($canAttackAgainAt)) {
+            return 0.0;
+        }
+
+        if (! is_null($secondsOverride)) {
+            return max(0.0, round($secondsOverride, 1));
+        }
+
+        $remainingMilliseconds = $canAttackAgainAt->getPreciseTimestamp(3) - now()->getPreciseTimestamp(3);
+
+        return max(0.0, round($remainingMilliseconds / 1000, 1));
     }
 
     private function getTimeLeftOnAutomation(Character $character)

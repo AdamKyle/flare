@@ -8,7 +8,9 @@ export default interface UseAttackMonsterDefinition {
   data: UseAttackMonsterInitiationResponse | null;
   loading: boolean;
   disableAttackButtons: boolean;
+  awaitingAttackCooldownConfirmation: boolean;
   error: AxiosErrorDefinition | null;
   setRequestData: StateSetter<UseAttackMonsterRequestParams>;
   setReinitializeFight: StateSetter<boolean>;
+  acknowledgeAttackCooldown: () => void;
 }

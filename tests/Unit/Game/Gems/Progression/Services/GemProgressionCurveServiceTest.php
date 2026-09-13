@@ -21,9 +21,9 @@ class GemProgressionCurveServiceTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_global_level_one_requires_one_thousand_xp()
+    public function test_global_level_one_requires_fifty_thousand_xp()
     {
-        $this->assertSame(1000, $this->gemProgressionCurveService->xpRequiredForGlobalLevel(1));
+        $this->assertSame(50_000, $this->gemProgressionCurveService->xpRequiredForGlobalLevel(1));
     }
 
     public function test_global_level_ninety_nine_requires_one_million_xp()
@@ -38,7 +38,7 @@ class GemProgressionCurveServiceTest extends TestCase
 
     public function test_personal_level_one_matches_global_curve()
     {
-        $this->assertSame(1000, $this->gemProgressionCurveService->xpRequiredForPersonalLevel(1));
+        $this->assertSame(50_000, $this->gemProgressionCurveService->xpRequiredForPersonalLevel(1));
     }
 
     public function test_personal_level_ninety_nine_matches_global_curve()
@@ -95,5 +95,23 @@ class GemProgressionCurveServiceTest extends TestCase
         $xpRequired = $this->gemProgressionCurveService->xpRequiredForPersonalLevel(250);
 
         $this->assertSame(0, $xpRequired % 100);
+    }
+
+    public function test_global_level_one_is_not_trivial_from_a_single_high_level_monster_kill()
+    {
+        $xpRequired = $this->gemProgressionCurveService->xpRequiredForGlobalLevel(1);
+
+        $this->assertGreaterThan(1000, $xpRequired);
+    }
+
+    public function test_personal_growth_rate_is_more_aggressive_after_level_five_hundred()
+    {
+        $midBandGrowthRatio = $this->gemProgressionCurveService->xpRequiredForPersonalLevel(400)
+            / $this->gemProgressionCurveService->xpRequiredForPersonalLevel(399);
+
+        $highBandGrowthRatio = $this->gemProgressionCurveService->xpRequiredForPersonalLevel(600)
+            / $this->gemProgressionCurveService->xpRequiredForPersonalLevel(599);
+
+        $this->assertGreaterThan($midBandGrowthRatio, $highBandGrowthRatio);
     }
 }

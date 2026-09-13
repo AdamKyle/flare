@@ -6,6 +6,7 @@ import { timerBarSizeStyles } from 'ui/timer-bar/styles/timer-bar-size-styles';
 import TimerBarProps from 'ui/timer-bar/types/timer-bar-props';
 import {
   formatDetailedRemainingTime,
+  formatPreciseRemainingTime,
   formatRemainingTime,
 } from 'ui/timer-bar/util/format-remaining-time';
 import { getColorLevel } from 'ui/timer-bar/util/get-color-level';
@@ -22,6 +23,7 @@ const TimerBar = ({
   remaining: controlledRemaining,
   complete_at: completeAt,
   detailed_time: detailedTime = false,
+  precise_time: preciseTime = false,
   size = TimerBarSize.DEFAULT,
   additional_css,
   text_class: textClass,
@@ -96,9 +98,11 @@ const TimerBar = ({
     darkBgClass
   );
 
-  const formattedRemaining = detailedTime
-    ? formatDetailedRemainingTime(clampedRemaining)
-    : formatRemainingTime(clampedRemaining);
+  const formattedRemaining = preciseTime
+    ? formatPreciseRemainingTime(clampedRemaining)
+    : detailedTime
+      ? formatDetailedRemainingTime(clampedRemaining)
+      : formatRemainingTime(clampedRemaining);
 
   return (
     <div className={clsx('w-full', additional_css)}>

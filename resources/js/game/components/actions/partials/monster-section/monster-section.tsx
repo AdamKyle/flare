@@ -45,6 +45,8 @@ const MonsterSection = ({
     data,
     error,
     disableAttackButtons,
+    awaitingAttackCooldownConfirmation,
+    acknowledgeAttackCooldown,
     setReinitializeFight,
   } = useAttackMonster();
 
@@ -60,9 +62,70 @@ const MonsterSection = ({
   );
 
   const isCharacterDead = gameData?.character?.is_dead ?? false;
-  const isOnAttackCooldown =
-    !isCharacterDead && gameData?.character?.can_attack === false;
   const attackCooldownSeconds = gameData?.character?.can_attack_again_at ?? 0;
+
+  // Adjusted during render (not in an effect) so a new cooldown duration is
+  // reflected on the same render it arrives, avoiding a one-render gap.
+  const [prevAttackCooldownSeconds, setPrevAttackCooldownSeconds] = useState(
+    attackCooldownSeconds
+  );
+  const [attackCooldownEndsAt, setAttackCooldownEndsAt] = useState<
+    number | null
+  >(
+    attackCooldownSeconds > 0 ? Date.now() + attackCooldownSeconds * 1000 : null
+  );
+  const [attackCooldownTickedAt, setAttackCooldownTickedAt] = useState(() =>
+    Date.now()
+  );
+
+  if (attackCooldownSeconds !== prevAttackCooldownSeconds) {
+    const now = Date.now();
+
+    setPrevAttackCooldownSeconds(attackCooldownSeconds);
+    setAttackCooldownEndsAt(
+      attackCooldownSeconds > 0 ? now + attackCooldownSeconds * 1000 : null
+    );
+    setAttackCooldownTickedAt(now);
+  }
+
+  useEffect(() => {
+    if (attackCooldownEndsAt === null) {
+      return;
+    }
+
+    const intervalId = setInterval(() => {
+      setAttackCooldownTickedAt(Date.now());
+    }, 100);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [attackCooldownEndsAt]);
+
+  const attackCooldownRemaining =
+    attackCooldownEndsAt === null
+      ? 0
+      : Math.max(
+          0,
+          Math.round((attackCooldownEndsAt - attackCooldownTickedAt) / 100) / 10
+        );
+
+  const isOnAttackCooldown = !isCharacterDead && attackCooldownRemaining > 0;
+
+  // Clears the handoff lock regardless of whether the cooldown websocket or
+  // the fight-ending HTTP response is observed first.
+  useEffect(() => {
+    if (attackCooldownSeconds > 0 && awaitingAttackCooldownConfirmation) {
+      acknowledgeAttackCooldown();
+    }
+  }, [
+    attackCooldownSeconds,
+    awaitingAttackCooldownConfirmation,
+    acknowledgeAttackCooldown,
+  ]);
+
+  const isFightCooldownActive =
+    isOnAttackCooldown || awaitingAttackCooldownConfirmation;
 
   useEffect(() => {
     if (!monsters || monsters.length === 0) {
@@ -184,7 +247,7 @@ const MonsterSection = ({
             label="Initiate Fight"
             variant={ButtonVariant.PRIMARY}
             additional_css="block mx-auto w-48"
-            disabled={isOnAttackCooldown}
+            disabled={isFightCooldownActive}
           />
           <Button
             on_click={handleSetupExploration}
@@ -209,6 +272,7 @@ const MonsterSection = ({
               variant={ButtonVariant.DANGER}
               additional_css="w-full lg:w-1/3 mt-2"
               on_click={handleClearBattleResults}
+              disabled={isFightCooldownActive}
             />
           </div>
         );
@@ -221,19 +285,20 @@ const MonsterSection = ({
             variant={ButtonVariant.PRIMARY}
             additional_css="w-full lg:w-1/3"
             on_click={() => handelMonsterSelection(true)}
-            disabled={isOnAttackCooldown}
+            disabled={isFightCooldownActive}
           />
           <Button
             label="Clear"
             variant={ButtonVariant.DANGER}
             additional_css="w-full lg:w-1/3"
             on_click={handleClearBattleResults}
+            disabled={isFightCooldownActive}
           />
         </div>
       );
     };
 
-    const isAttackDisabled = disableAttackButtons || isOnAttackCooldown;
+    const isAttackDisabled = disableAttackButtons || isFightCooldownActive;
 
     const renderAttackButtons = () => {
       if (
@@ -299,6 +364,8 @@ const MonsterSection = ({
       return (
         <TimerBar
           length={attackCooldownSeconds}
+          remaining={attackCooldownRemaining}
+          precise_time
           title="Next Attack"
           additional_css="my-2"
         />

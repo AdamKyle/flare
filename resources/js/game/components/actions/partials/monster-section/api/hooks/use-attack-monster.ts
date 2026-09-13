@@ -12,6 +12,12 @@ import { BattleApiUrls } from '../enums/battle-api-urls';
 import UseAttackMonsterInitiationResponse from './definitions/use-attack-monster-initiation-response';
 import UseAttackMonsterRequestDefinition from './definitions/use-attack-monster-request-definition';
 
+const isTerminalBattleResult = (
+  result: UseAttackMonsterInitiationResponse
+): boolean =>
+  result.health.current_monster_health <= 0 ||
+  result.health.current_character_health <= 0;
+
 export const useAttackMonster = (): UseAttackMonsterDefinition => {
   const { apiHandler, getUrl } = useApiHandler();
   const { handleInactivity } = useActivityTimeout();
@@ -22,6 +28,10 @@ export const useAttackMonster = (): UseAttackMonsterDefinition => {
   const [error, setError] = useState<UseAttackMonsterDefinition['error']>(null);
   const [loading, setLoading] = useState(false);
   const [disableAttackButtons, setDisableAttackButtons] = useState(false);
+  const [
+    awaitingAttackCooldownConfirmation,
+    setAwaitingAttackCooldownConfirmation,
+  ] = useState(false);
   const [reinitializeFight, setReinitializeFight] = useState(false);
   const [requestData, setRequestData] = useState<UseAttackMonsterRequestParams>(
     {
@@ -31,6 +41,10 @@ export const useAttackMonster = (): UseAttackMonsterDefinition => {
       battle_type: BattleType.INITIATE,
     }
   );
+
+  const acknowledgeAttackCooldown = useCallback(() => {
+    setAwaitingAttackCooldownConfirmation(false);
+  }, []);
 
   const urlToUse = match(requestData.battle_type)
     .with(BattleType.INITIATE, () =>
@@ -63,6 +77,10 @@ export const useAttackMonster = (): UseAttackMonsterDefinition => {
       });
 
       setData(result);
+
+      if (isTerminalBattleResult(result)) {
+        setAwaitingAttackCooldownConfirmation(true);
+      }
     } catch (err) {
       if (err instanceof AxiosError) {
         handleInactivity({
@@ -90,6 +108,10 @@ export const useAttackMonster = (): UseAttackMonsterDefinition => {
       });
 
       setData(result);
+
+      if (isTerminalBattleResult(result)) {
+        setAwaitingAttackCooldownConfirmation(true);
+      }
     } catch (err) {
       if (err instanceof AxiosError) {
         handleInactivity({
@@ -144,8 +166,10 @@ export const useAttackMonster = (): UseAttackMonsterDefinition => {
   return {
     loading,
     disableAttackButtons,
+    awaitingAttackCooldownConfirmation,
     setRequestData,
     setReinitializeFight,
+    acknowledgeAttackCooldown,
     error,
     data,
   };

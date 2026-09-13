@@ -140,11 +140,14 @@ class GemWorldRewardService
      */
     private function applyGemXp(Character $character, ResolvedGemWorldProfile $resolvedProfile, array $effectiveMonster, int $qualifyingKills): array
     {
-        $baseGemXpPerKill = intval(round($effectiveMonster['xp'] * GemProgressionBands::GEM_SCROLL_BASE_XP_MULTIPLIER));
-        $globalXpTotal = $baseGemXpPerKill * $qualifyingKills;
+        $globalXpPerKill = intval(round($effectiveMonster['xp'] * GemProgressionBands::GLOBAL_BASE_XP_MULTIPLIER));
+        $globalXpTotal = $globalXpPerKill * $qualifyingKills;
+
+        $personalXpPerKill = intval(round($effectiveMonster['xp'] * GemProgressionBands::PERSONAL_BASE_XP_MULTIPLIER));
+        $personalBaseXpTotal = $personalXpPerKill * $qualifyingKills;
 
         $xpScrollBonus = $this->resolveScrollAggregate($character, $resolvedProfile)->xpBonusTotal();
-        $personalXpTotal = intval(round($globalXpTotal * (1 + $xpScrollBonus)));
+        $personalXpTotal = intval(round($personalBaseXpTotal * (1 + $xpScrollBonus)));
 
         if ($resolvedProfile->isMapProfile()) {
             $globalResult = $this->gemProgressionService->applyGlobalMapProgressionXp($resolvedProfile->mapProfile(), $globalXpTotal);

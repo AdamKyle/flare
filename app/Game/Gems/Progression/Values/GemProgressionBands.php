@@ -56,7 +56,9 @@ class GemProgressionBands
 
     public const float GEM_SCROLL_DROP_CHANCE = 0.02;
 
-    public const float GEM_SCROLL_BASE_XP_MULTIPLIER = 1.05;
+    public const float GLOBAL_BASE_XP_MULTIPLIER = 0.05;
+
+    public const float PERSONAL_BASE_XP_MULTIPLIER = 0.10;
 
     public const float ACTIVE_SCROLL_PRIMARY_BONUS_CAP = 20.0;
 

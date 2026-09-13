@@ -42,7 +42,7 @@ class AttackTimeOutListener
             'can_attack_again_at' => now()->addMilliseconds($timeInMilliseconds),
         ]);
 
-        event(new UpdateCharacterStatus($event->character));
+        event(new UpdateCharacterStatus($event->character, attackCooldownSecondsOverride: $time));
 
         event(new ShowTimeOutEvent($event->character->user, $time));
 

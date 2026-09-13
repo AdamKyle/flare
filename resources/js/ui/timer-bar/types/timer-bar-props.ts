@@ -6,6 +6,7 @@ export default interface TimerBarProps {
   remaining?: number;
   complete_at?: string;
   detailed_time?: boolean;
+  precise_time?: boolean;
   size?: TimerBarSize;
   additional_css?: string;
   text_class?: string;

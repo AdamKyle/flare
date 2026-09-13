@@ -57,14 +57,14 @@ class GemWorldRewardServiceTest extends TestCase
         $this->assertDatabaseHas('game_map_gem_progressions', [
             'game_map_gem_paramter_id' => $graph->mapProfile->id,
             'level' => 1,
-            'xp' => 105,
+            'xp' => 5,
         ]);
 
         $this->assertDatabaseHas('character_game_map_gem_progressions', [
             'character_id' => $graph->character->id,
             'game_map_gem_paramter_id' => $graph->mapProfile->id,
             'level' => 1,
-            'xp' => 105,
+            'xp' => 10,
         ]);
     }
 
@@ -83,7 +83,7 @@ class GemWorldRewardServiceTest extends TestCase
             'character_id' => $graph->character->id,
             'game_map_gem_paramter_id' => $graph->mapProfile->id,
             'level' => 1,
-            'xp' => 105,
+            'xp' => 10,
         ]);
 
         Event::assertDispatched(GemProgressionUpdateBroadcastEvent::class);
@@ -99,17 +99,17 @@ class GemWorldRewardServiceTest extends TestCase
 
         $this->assertDatabaseHas('game_location_gem_progressions', [
             'game_location_gem_paramter_id' => $graph->locationProfile->id,
-            'xp' => 105,
+            'xp' => 5,
         ]);
 
         $this->assertDatabaseHas('character_game_location_gem_progressions', [
             'character_id' => $graph->character->id,
             'game_location_gem_paramter_id' => $graph->locationProfile->id,
-            'xp' => 105,
+            'xp' => 10,
         ]);
     }
 
-    public function test_base_gem_xp_equals_effective_monster_xp_plus_five_percent_times_kills(): void
+    public function test_global_base_gem_xp_equals_five_percent_of_monster_xp_times_kills(): void
     {
         $graph = $this->gemWorldRewardTestFactory->buildGeneratedMapGemWorldCharacter();
         $step = $this->createCharacterBattleRewardRequestStep(['character_id' => $graph->character->id]);
@@ -118,7 +118,40 @@ class GemWorldRewardServiceTest extends TestCase
 
         $this->assertDatabaseHas('game_map_gem_progressions', [
             'game_map_gem_paramter_id' => $graph->mapProfile->id,
-            'xp' => 630,
+            'xp' => 30,
+        ]);
+    }
+
+    public function test_personal_base_gem_xp_equals_ten_percent_of_monster_xp_times_kills(): void
+    {
+        $graph = $this->gemWorldRewardTestFactory->buildGeneratedMapGemWorldCharacter();
+        $step = $this->createCharacterBattleRewardRequestStep(['character_id' => $graph->character->id]);
+
+        $this->gemWorldRewardTestFactory->buildService()->applyToLedgerStep($step, $graph->character, ['xp' => 200, 'gold' => 10], 3, []);
+
+        $this->assertDatabaseHas('character_game_map_gem_progressions', [
+            'character_id' => $graph->character->id,
+            'game_map_gem_paramter_id' => $graph->mapProfile->id,
+            'xp' => 60,
+        ]);
+    }
+
+    public function test_three_ordinary_high_level_monster_kills_do_not_produce_extreme_level_jumps(): void
+    {
+        $graph = $this->gemWorldRewardTestFactory->buildGeneratedMapGemWorldCharacter();
+        $step = $this->createCharacterBattleRewardRequestStep(['character_id' => $graph->character->id]);
+
+        $this->gemWorldRewardTestFactory->buildService()->applyToLedgerStep($step, $graph->character, ['xp' => 50_000, 'gold' => 10], 3, []);
+
+        $this->assertDatabaseHas('game_map_gem_progressions', [
+            'game_map_gem_paramter_id' => $graph->mapProfile->id,
+            'level' => 1,
+        ]);
+
+        $this->assertDatabaseHas('character_game_map_gem_progressions', [
+            'character_id' => $graph->character->id,
+            'game_map_gem_paramter_id' => $graph->mapProfile->id,
+            'level' => 1,
         ]);
     }
 
@@ -139,13 +172,13 @@ class GemWorldRewardServiceTest extends TestCase
 
         $this->assertDatabaseHas('game_map_gem_progressions', [
             'game_map_gem_paramter_id' => $graph->mapProfile->id,
-            'xp' => 105,
+            'xp' => 5,
         ]);
 
         $this->assertDatabaseHas('character_game_map_gem_progressions', [
             'character_id' => $graph->character->id,
             'game_map_gem_paramter_id' => $graph->mapProfile->id,
-            'xp' => 126,
+            'xp' => 12,
         ]);
     }
 
@@ -262,7 +295,7 @@ class GemWorldRewardServiceTest extends TestCase
 
         $this->assertDatabaseHas('game_map_gem_progressions', [
             'game_map_gem_paramter_id' => $graph->mapProfile->id,
-            'xp' => 105,
+            'xp' => 5,
         ]);
 
         $this->assertSame(1, AlchemyBagSlot::where('alchemy_bag_id', $graph->character->alchemyBag->id)->count());

@@ -57,7 +57,9 @@ class GemProgressionServiceTest extends TestCase
     {
         $profile = $this->createGameMapGemParamter();
 
-        $result = $this->gemProgressionService->applyGlobalMapProgressionXp($profile, 1500);
+        $costForLevelOne = $this->gemProgressionCurveService->xpRequiredForGlobalLevel(1);
+
+        $result = $this->gemProgressionService->applyGlobalMapProgressionXp($profile, $costForLevelOne + 500);
 
         $this->assertSame(2, $result->newLevel());
         $this->assertSame(500, $result->newXp());

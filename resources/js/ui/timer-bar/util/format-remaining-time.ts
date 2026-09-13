@@ -26,6 +26,9 @@ export const formatRemainingTime = (remainingSeconds: number): string => {
     .otherwise((d) => pluralizeUnit(d.seconds ?? 0, 'second'));
 };
 
+export const formatPreciseRemainingTime = (remainingSeconds: number): string =>
+  `${Math.max(0, remainingSeconds).toFixed(1)}s`;
+
 export const formatDetailedRemainingTime = (
   remainingSeconds: number
 ): string => {

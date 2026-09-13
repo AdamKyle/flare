@@ -11,6 +11,10 @@ use App\Game\Gems\Progression\Values\GemProgressionBands;
  */
 class GemProgressionCurveService
 {
+    private const int GLOBAL_LEVEL_ONE_XP = 50_000;
+
+    private const int GLOBAL_LEVEL_NINETY_NINE_XP = 1_000_000;
+
     /**
      * The maximum Gem progression level for the shared global track.
      */
@@ -66,7 +70,9 @@ class GemProgressionCurveService
      */
     private function globalLevelCost(int $currentLevel): float
     {
-        return 1000 * (1000 ** (($currentLevel - 1) / 98));
+        $growthRatio = self::GLOBAL_LEVEL_NINETY_NINE_XP / self::GLOBAL_LEVEL_ONE_XP;
+
+        return self::GLOBAL_LEVEL_ONE_XP * ($growthRatio ** (($currentLevel - 1) / 98));
     }
 
     /**
@@ -74,7 +80,7 @@ class GemProgressionCurveService
      */
     private function personalMidBandCost(int $currentLevel): float
     {
-        return 1_000_000 * (10 ** (($currentLevel - 100) / 400));
+        return self::GLOBAL_LEVEL_NINETY_NINE_XP * (10 ** (($currentLevel - 100) / 400));
     }
 
     /**

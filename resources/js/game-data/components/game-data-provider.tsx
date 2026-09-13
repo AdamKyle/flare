@@ -74,9 +74,9 @@ const GameDataProvider = (props: GameDataProviderProps) => {
     data: UseCharacterStatusStreamResponse
   ) => {
     updateCharacter({
-      is_dead: data.is_dead,
-      can_attack: data.can_attack,
-      can_attack_again_at: data.can_attack_again_at,
+      is_dead: data.characterStatuses.is_dead,
+      can_attack: data.characterStatuses.can_attack,
+      can_attack_again_at: data.characterStatuses.can_attack_again_at,
     });
   };
 
