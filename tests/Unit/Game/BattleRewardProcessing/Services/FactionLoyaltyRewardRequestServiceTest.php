@@ -7,9 +7,11 @@ use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestPriority;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestStatus;
 use App\Game\BattleRewardProcessing\Services\FactionLoyaltyRewardRequestService;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
+use PDOException;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 
@@ -114,6 +116,31 @@ class FactionLoyaltyRewardRequestServiceTest extends TestCase
             ->where('source_type', BattleRewardRequestSourceType::FACTION_LOYALTY)
             ->get()
         );
+    }
+
+    public function test_enqueue_returns_null_and_creates_no_request_when_the_enqueue_fails(): void
+    {
+        // Event::fake() swaps Model::$dispatcher to a fake that does not invoke
+        // registered `creating()` listeners, which would silently defeat the
+        // forced QueryException below. Queue::fake() alone does not touch the
+        // Eloquent event dispatcher, so it is kept to prevent a real dispatch.
+        Queue::fake();
+
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+
+        CharacterBattleRewardRequest::creating(function (): void {
+            throw new QueryException('mysql', 'insert into character_battle_reward_requests', [], new PDOException('Column not found', 1054));
+        });
+
+        $result = $this->factionLoyaltyRewardRequestService->enqueue(
+            $character->id,
+            99,
+            1,
+            ['xp_amount' => 1000],
+        );
+
+        $this->assertNull($result);
+        $this->assertSame(0, CharacterBattleRewardRequest::where('character_id', $character->id)->count());
     }
 
     public function test_different_reward_levels_produce_different_requests(): void

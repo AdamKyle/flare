@@ -11,6 +11,7 @@ use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Values\AutomationType;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\MonsterFightService;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Services\CharacterRewardService;
 use App\Game\Character\Exceptions\MissingInventoryException;
 use App\Game\Core\Combat\Values\AttackType;
@@ -246,7 +247,7 @@ class DelveExplorationTest extends TestCase
         }));
 
         $this->instance(BattleEventHandler::class, Mockery::mock(BattleEventHandler::class, function (MockInterface $mock) use ($character, $monster) {
-            $mock->shouldReceive('processMonsterDeath')->once()->with($character->id, $monster->id, Mockery::type('array'));
+            $mock->shouldReceive('processMonsterDeath')->once()->with($character->id, $monster->id, Mockery::type('array'), BattleRewardRequestSourceType::AUTOMATION);
         }));
 
         DelveExploration::dispatch($character->id, $location->id, $automation->id, $delveAutomation->id, ['attack_type' => AttackType::ATTACK->value], 3);
@@ -470,7 +471,8 @@ class DelveExplorationTest extends TestCase
             $mock->shouldReceive('processMonsterDeath')->once()->with(
                 Mockery::any(),
                 Mockery::any(),
-                Mockery::on(fn (array $battleData): bool => ($battleData['total_xp'] ?? null) == 100.0)
+                Mockery::on(fn (array $battleData): bool => ($battleData['total_xp'] ?? null) == 100.0),
+                BattleRewardRequestSourceType::AUTOMATION,
             );
         }));
 
@@ -525,7 +527,8 @@ class DelveExplorationTest extends TestCase
             $mock->shouldReceive('processMonsterDeath')->once()->with(
                 Mockery::any(),
                 Mockery::any(),
-                Mockery::on(fn (array $battleData): bool => ($battleData['total_xp'] ?? null) == 225.0)
+                Mockery::on(fn (array $battleData): bool => ($battleData['total_xp'] ?? null) == 225.0),
+                BattleRewardRequestSourceType::AUTOMATION,
             );
         }));
 
@@ -580,7 +583,8 @@ class DelveExplorationTest extends TestCase
             $mock->shouldReceive('processMonsterDeath')->once()->with(
                 Mockery::any(),
                 Mockery::any(),
-                Mockery::on(fn (array $battleData): bool => ($battleData['total_xp'] ?? null) == 500.0)
+                Mockery::on(fn (array $battleData): bool => ($battleData['total_xp'] ?? null) == 500.0),
+                BattleRewardRequestSourceType::AUTOMATION,
             );
         }));
 
@@ -635,7 +639,8 @@ class DelveExplorationTest extends TestCase
             $mock->shouldReceive('processMonsterDeath')->once()->with(
                 Mockery::any(),
                 Mockery::any(),
-                Mockery::on(fn (array $battleData): bool => ($battleData['total_xp'] ?? null) == 687)
+                Mockery::on(fn (array $battleData): bool => ($battleData['total_xp'] ?? null) == 687),
+                BattleRewardRequestSourceType::AUTOMATION,
             );
         }));
 

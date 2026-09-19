@@ -13,6 +13,9 @@ const GeneralToolTip = (props: GeneralToolTipProps) => {
     is_open,
     on_open,
     on_close,
+    trigger,
+    trigger_aria_label: triggerAriaLabel,
+    placement = 'auto',
   } = props;
 
   const localId = useId();
@@ -37,6 +40,9 @@ const GeneralToolTip = (props: GeneralToolTipProps) => {
       on_close={on_close}
       content={getMessage()}
       placementDeps={[label]}
+      trigger={trigger}
+      trigger_aria_label={triggerAriaLabel}
+      placement={placement}
     />
   );
 };

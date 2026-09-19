@@ -1,12 +1,18 @@
+import clsx from 'clsx';
 import React, { ReactNode } from 'react';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
 
-import { shortenNumber } from 'game-utils/format-number';
+import {
+  formatNumberWithCommas,
+  shortenNumber,
+} from 'game-utils/format-number';
 
 import { ProgressBarSize } from 'ui/progress/enums/progress-bar-size';
 import { ProgressBarVariant } from 'ui/progress/enums/progress-bar-variant';
 import ProgressBar from 'ui/progress/progress-bar';
+import Separator from 'ui/separator/separator';
+import GeneralToolTip from 'ui/tool-tips/general-tool-tip';
 
 interface CurrencyDisplay {
   key: string;
@@ -14,6 +20,7 @@ interface CurrencyDisplay {
   value: number;
   icon_class: string;
   icon_color_class: string;
+  description?: string;
 }
 
 /**
@@ -31,10 +38,6 @@ const CharacterCombatStatus = (): ReactNode => {
   }
 
   const isMaxLevel = character.level >= character.max_level;
-  const xpPercent = Math.min(
-    Math.round((character.xp / Math.max(character.xp_next, 1)) * 100),
-    100
-  );
 
   const currencies: CurrencyDisplay[] = [
     {
@@ -43,6 +46,7 @@ const CharacterCombatStatus = (): ReactNode => {
       value: character.gold,
       icon_class: 'ra ra-gold-bar',
       icon_color_class: 'text-marigold-600 dark:text-marigold-400',
+      description: 'Gold is the key currency of the game.',
     },
     {
       key: 'gold_dust',
@@ -67,6 +71,47 @@ const CharacterCombatStatus = (): ReactNode => {
     },
   ];
 
+  const renderCurrency = (currency: CurrencyDisplay): ReactNode => {
+    const fullAmount = `${currency.label}: ${formatNumberWithCommas(currency.value)}`;
+
+    const tooltipContent = (
+      <div className="space-y-2">
+        <p className={clsx('font-semibold', currency.icon_color_class)}>
+          {currency.label}
+        </p>
+        {currency.description && <p>{currency.description}</p>}
+        <Separator />
+        <div className="flex items-center gap-2">
+          <i
+            className={`${currency.icon_class} ${currency.icon_color_class} text-base`}
+            aria-hidden="true"
+          />
+          <span>{fullAmount}</span>
+        </div>
+      </div>
+    );
+
+    return (
+      <GeneralToolTip
+        key={currency.key}
+        label={currency.label}
+        message={tooltipContent}
+        placement="above"
+        size="md"
+        trigger_aria_label={fullAmount}
+        trigger={
+          <span className="flex items-center gap-1.5">
+            <i
+              className={`${currency.icon_class} ${currency.icon_color_class} text-base`}
+              aria-hidden="true"
+            />
+            <span aria-hidden="true">{shortenNumber(currency.value)}</span>
+          </span>
+        }
+      />
+    );
+  };
+
   return (
     <div className="space-y-2">
       <ProgressBar
@@ -74,25 +119,16 @@ const CharacterCombatStatus = (): ReactNode => {
         value={character.xp}
         max={Math.max(character.xp_next, 1)}
         size={ProgressBarSize.THIN}
-        variant={ProgressBarVariant.SUMMER}
-        value_label={isMaxLevel ? 'Max' : `${xpPercent}%`}
+        variant={ProgressBarVariant.XP}
+        value_label={
+          isMaxLevel
+            ? 'Max'
+            : `${formatNumberWithCommas(character.xp)}/${formatNumberWithCommas(character.xp_next)}`
+        }
         aria_label={`Character level ${character.level} experience progress`}
       />
       <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-gray-800 lg:grid-cols-4 dark:text-gray-200">
-        {currencies.map((currency) => (
-          <div
-            key={currency.key}
-            className="flex items-center gap-1.5"
-            title={currency.label}
-          >
-            <i
-              className={`${currency.icon_class} ${currency.icon_color_class} text-base`}
-              aria-hidden="true"
-            />
-            <span className="sr-only">{currency.label}:</span>
-            <span>{shortenNumber(currency.value)}</span>
-          </div>
-        ))}
+        {currencies.map(renderCurrency)}
       </div>
     </div>
   );

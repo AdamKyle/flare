@@ -6,6 +6,8 @@ use App\Game\BattleRewardProcessing\Enums\BattleRewardStepName;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepStatus;
 use App\Game\BattleRewardProcessing\Services\BattleRewardLedgerService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
+use App\Game\BattleRewardProcessing\Services\BattleRewardSharedContextService;
+use App\Game\BattleRewardProcessing\Services\BattleRewardStepPlanService;
 use App\Game\Core\Services\DropCheckService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
@@ -27,7 +29,7 @@ class BattleRewardItemDropIdempotencyTest extends TestCase
             'character_id' => $character->id,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
-        resolve(BattleRewardLedgerService::class)->ensureSteps($request);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request, resolve(BattleRewardStepPlanService::class)->planBattleLike($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster)));
         $request->steps()->where('step_name', '!=', BattleRewardStepName::ITEM_DROPS)->update(['status' => BattleRewardStepStatus::COMPLETED]);
         $request->steps()->where('step_name', BattleRewardStepName::ITEM_DROPS)->update([
             'payload_json' => ['plan' => ['drops' => [['item_id' => 1, 'is_mythic' => false, 'source' => 'monster_drop']]]],
@@ -37,7 +39,7 @@ class BattleRewardItemDropIdempotencyTest extends TestCase
         $dropCheckService->shouldReceive('applyPlannedDrops')->once()->andReturn([]);
         $this->instance(DropCheckService::class, $dropCheckService);
 
-        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster));
 
         $this->assertSame(BattleRewardStepStatus::COMPLETED, $request->steps()->where('step_name', BattleRewardStepName::ITEM_DROPS)->firstOrFail()->status);
     }
@@ -50,14 +52,14 @@ class BattleRewardItemDropIdempotencyTest extends TestCase
             'character_id' => $character->id,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
-        resolve(BattleRewardLedgerService::class)->ensureSteps($request);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request, resolve(BattleRewardStepPlanService::class)->planBattleLike($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster)));
         $request->steps()->update(['status' => BattleRewardStepStatus::COMPLETED]);
         $dropCheckService = Mockery::mock(DropCheckService::class);
         $dropCheckService->shouldReceive('planDrops')->never();
         $dropCheckService->shouldReceive('applyPlannedDrops')->never();
         $this->instance(DropCheckService::class, $dropCheckService);
 
-        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster));
 
         $this->assertSame(BattleRewardStepStatus::COMPLETED, $request->steps()->where('step_name', BattleRewardStepName::ITEM_DROPS)->firstOrFail()->status);
     }
@@ -70,7 +72,7 @@ class BattleRewardItemDropIdempotencyTest extends TestCase
             'character_id' => $character->id,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
-        resolve(BattleRewardLedgerService::class)->ensureSteps($request);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request, resolve(BattleRewardStepPlanService::class)->planBattleLike($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster)));
         $request->steps()->where('step_name', '!=', BattleRewardStepName::ITEM_DROPS)->update(['status' => BattleRewardStepStatus::COMPLETED]);
         $request->steps()->where('step_name', BattleRewardStepName::ITEM_DROPS)->update([
             'status' => BattleRewardStepStatus::RUNNING,
@@ -81,7 +83,7 @@ class BattleRewardItemDropIdempotencyTest extends TestCase
         $dropCheckService->shouldReceive('applyPlannedDrops')->once()->andReturn([]);
         $this->instance(DropCheckService::class, $dropCheckService);
 
-        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster));
 
         $this->assertSame(BattleRewardStepStatus::COMPLETED, $request->steps()->where('step_name', BattleRewardStepName::ITEM_DROPS)->firstOrFail()->status);
     }
@@ -94,7 +96,7 @@ class BattleRewardItemDropIdempotencyTest extends TestCase
             'character_id' => $character->id,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
-        resolve(BattleRewardLedgerService::class)->ensureSteps($request);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request, resolve(BattleRewardStepPlanService::class)->planBattleLike($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster)));
         $request->steps()->where('step_name', '!=', BattleRewardStepName::ITEM_DROPS)->update(['status' => BattleRewardStepStatus::COMPLETED]);
         $request->steps()->where('step_name', BattleRewardStepName::ITEM_DROPS)->update([
             'status' => BattleRewardStepStatus::RESUMABLE,
@@ -105,7 +107,7 @@ class BattleRewardItemDropIdempotencyTest extends TestCase
         $dropCheckService->shouldReceive('applyPlannedDrops')->once()->andReturn([]);
         $this->instance(DropCheckService::class, $dropCheckService);
 
-        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster));
 
         $this->assertSame(BattleRewardStepStatus::COMPLETED, $request->steps()->where('step_name', BattleRewardStepName::ITEM_DROPS)->firstOrFail()->status);
     }
@@ -118,7 +120,7 @@ class BattleRewardItemDropIdempotencyTest extends TestCase
             'character_id' => $character->id,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
-        resolve(BattleRewardLedgerService::class)->ensureSteps($request);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request, resolve(BattleRewardStepPlanService::class)->planBattleLike($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster)));
         $request->steps()->where('step_name', '!=', BattleRewardStepName::ITEM_DROPS)->update(['status' => BattleRewardStepStatus::COMPLETED]);
         $originalPlan = ['drops' => [['item_id' => 42, 'is_mythic' => true, 'source' => 'monster_drop']]];
         $request->steps()->where('step_name', BattleRewardStepName::ITEM_DROPS)->update([
@@ -137,7 +139,7 @@ class BattleRewardItemDropIdempotencyTest extends TestCase
             ->andReturn([]);
         $this->instance(DropCheckService::class, $dropCheckService);
 
-        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster));
 
         $this->assertSame(42, $capturedPlan['drops'][0]['item_id']);
         $this->assertTrue($capturedPlan['drops'][0]['is_mythic']);

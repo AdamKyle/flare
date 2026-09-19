@@ -7,6 +7,7 @@ use App\Flare\Models\Event;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
+use App\Game\BattleRewardProcessing\Values\BattleRewardSharedContext;
 use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Currency\Services\CurrencyLimit;
@@ -25,6 +26,12 @@ class GoldMinesRewardHandler
 {
     private array $earnedCurrencies = [];
 
+    /**
+     * @param RandomAffixGenerator $randomAffixGenerator
+     * @param BattleMessageHandler $battleMessageHandler
+     * @param RandomNumberGenerator $randomNumberGenerator
+     * @param ChanceCalculator $chanceCalculator
+     */
     public function __construct(
         private RandomAffixGenerator $randomAffixGenerator,
         private BattleMessageHandler $battleMessageHandler,
@@ -32,11 +39,24 @@ class GoldMinesRewardHandler
         private readonly ChanceCalculator $chanceCalculator,
     ) {}
 
+    /**
+     * Return the currencies earned by the most recently applied reward.
+     *
+     * @return array
+     */
     public function getEarnedCurrencies(): array
     {
         return $this->earnedCurrencies;
     }
 
+    /**
+     * Plan and immediately apply the Gold Mines reward for the Character's fight.
+     *
+     * @param Character $character
+     * @param Monster $monster
+     * @param int $killCount
+     * @return Character
+     */
     public function handleFightingAtGoldMines(Character $character, Monster $monster, int $killCount = 1): Character
     {
         $this->earnedCurrencies = [];
@@ -51,25 +71,32 @@ class GoldMinesRewardHandler
         return $character->refresh();
     }
 
-    public function planFightingAtGoldMines(Character $character, Monster $monster, int $killCount = 1, array $context = []): array
+    /**
+     * Plan the Gold Mines reward for the Character's fight without applying it.
+     *
+     * @param Character $character
+     * @param Monster $monster
+     * @param int $killCount
+     * @param array $context
+     * @param ?BattleRewardSharedContext $sharedContext
+     * @return array
+     */
+    public function planFightingAtGoldMines(Character $character, Monster $monster, int $killCount = 1, array $context = [], ?BattleRewardSharedContext $sharedContext = null): array
     {
-        $location = Location::where('x', $character->map->character_position_x)
-            ->where('y', $character->map->character_position_y)
-            ->where('game_map_id', $character->map->game_map_id)
-            ->first();
+        $locationSnapshot = $this->resolveLocationSnapshot($character, $sharedContext);
 
-        if (is_null($location) || is_null($location->locationType())) {
+        if (is_null($locationSnapshot) || is_null($locationSnapshot['type'])) {
             return $this->noopPlan($character, $monster, $killCount, $context, 'missing_location');
         }
 
-        if (! $location->locationType()->isGoldMines()) {
+        if (! $locationSnapshot['type']->isGoldMines()) {
             return $this->noopPlan($character, $monster, $killCount, $context, 'not_gold_mines');
         }
 
         $event = Event::where('type', EventType::GOLD_MINES)->first();
         $currencyPlan = $this->planCurrencyReward($character, $event, $killCount);
         $itemPlans = [];
-        $shouldAttemptItems = $character->currentAutomations->isEmpty() && $this->isMonsterAtLeastHalfWayOrMore($location, $monster);
+        $shouldAttemptItems = $character->currentAutomations->isEmpty() && $this->isMonsterAtLeastHalfWayOrMore($locationSnapshot['game_map_id'], $monster);
 
         if ($shouldAttemptItems) {
             $itemPlans = $this->planItemRewards($character, $monster, $event, $killCount);
@@ -84,12 +111,12 @@ class GoldMinesRewardHandler
             'monster_id' => $monster->id,
             'kill_count' => $killCount,
             'location' => [
-                'id' => $location->id,
-                'type' => $location->type,
-                'name' => $location->name,
-                'x' => $location->x,
-                'y' => $location->y,
-                'game_map_id' => $location->game_map_id,
+                'id' => $locationSnapshot['id'],
+                'type' => $locationSnapshot['type']->value,
+                'name' => $locationSnapshot['name'],
+                'x' => $locationSnapshot['x'],
+                'y' => $locationSnapshot['y'],
+                'game_map_id' => $locationSnapshot['game_map_id'],
             ],
             'event' => $shouldAttemptItems ? $this->planPossibleEvent($killCount) : ['create' => false],
             'currencies' => $currencyPlan,
@@ -97,6 +124,57 @@ class GoldMinesRewardHandler
         ];
     }
 
+    /**
+     * Resolve the Character's current Location identity, reusing the request's
+     * shared context when supplied instead of repeating the coordinate lookup.
+     *
+     * @param Character $character
+     * @param ?BattleRewardSharedContext $sharedContext
+     * @return ?array
+     */
+    private function resolveLocationSnapshot(Character $character, ?BattleRewardSharedContext $sharedContext): ?array
+    {
+        if (! is_null($sharedContext)) {
+            if (is_null($sharedContext->locationId())) {
+                return null;
+            }
+
+            return [
+                'id' => $sharedContext->locationId(),
+                'type' => $sharedContext->locationType(),
+                'name' => $sharedContext->locationName(),
+                'x' => $sharedContext->locationX(),
+                'y' => $sharedContext->locationY(),
+                'game_map_id' => $sharedContext->locationGameMapId(),
+            ];
+        }
+
+        $location = Location::where('x', $character->map->character_position_x)
+            ->where('y', $character->map->character_position_y)
+            ->where('game_map_id', $character->map->game_map_id)
+            ->first();
+
+        if (is_null($location)) {
+            return null;
+        }
+
+        return [
+            'id' => $location->id,
+            'type' => $location->locationType(),
+            'name' => $location->name,
+            'x' => $location->x,
+            'y' => $location->y,
+            'game_map_id' => $location->game_map_id,
+        ];
+    }
+
+    /**
+     * Apply a previously planned Gold Mines reward to the Character.
+     *
+     * @param Character $character
+     * @param array $plan
+     * @return array
+     */
     public function applyPlannedGoldMinesReward(Character $character, array $plan): array
     {
         if (! ($plan['applies'] ?? false)) {
@@ -116,14 +194,18 @@ class GoldMinesRewardHandler
     }
 
     /**
-     * is the monster at least halfway down the list?
+     * Determine whether the Monster is at least halfway down the current Map's Monster list.
+     *
+     * @param int $gameMapId
+     * @param Monster $monster
+     * @return bool
      */
-    protected function isMonsterAtLeastHalfWayOrMore(Location $location, Monster $monster): bool
+    private function isMonsterAtLeastHalfWayOrMore(int $gameMapId, Monster $monster): bool
     {
-        $monsters = Cache::get(MonsterCacheKey::forGameMap($location->game_map_id)) ?? [];
+        $monsters = Cache::get(MonsterCacheKey::forGameMap($gameMapId)) ?? [];
 
         $monsterCount = count($monsters);
-        $halfWay = (int) ($monsterCount / 2);
+        $halfWay = intdiv($monsterCount, 2);
 
         $position = array_search($monster->id, array_column($monsters, 'id'));
 
@@ -131,9 +213,12 @@ class GoldMinesRewardHandler
     }
 
     /**
-     * Reward the character with currencies.
+     * Apply the Gold Mines currency reward directly to the Character.
      *
-     * - Only gives copper coins if the character has
+     * @param Character $character
+     * @param ?Event $event
+     * @param int $killCount
+     * @return Character
      */
     public function currencyReward(Character $character, ?Event $event = null, int $killCount = 1): Character
     {
@@ -143,11 +228,17 @@ class GoldMinesRewardHandler
     }
 
     /**
-     * Handle item Reward for player.
+     * Roll and apply item rewards for the Character across the batch of kills.
+     *
+     * @param Character $character
+     * @param Monster $monster
+     * @param ?Event $event
+     * @param int $killCount
+     * @return Character
      *
      * @throws Exception
      */
-    protected function handleItemReward(Character $character, Monster $monster, ?Event $event = null, int $killCount = 1): Character
+    private function handleItemReward(Character $character, Monster $monster, ?Event $event = null, int $killCount = 1): Character
     {
         $lootingChance = $character->skills->where('baseSkill.name', 'Looting')->first()->skill_bonus;
         $maxRoll = 1_000;
@@ -159,7 +250,7 @@ class GoldMinesRewardHandler
 
         if (! is_null($event)) {
             $lootingChance = .30;
-            $maxRoll = (int) ($maxRoll / 2);
+            $maxRoll = intdiv($maxRoll, 2);
             $maximumChance = 0.45;
         }
 
@@ -184,12 +275,15 @@ class GoldMinesRewardHandler
     }
 
     /**
-     * Reward player with item.
+     * Reward the Character with a randomly generated Gold Mines item.
      *
+     * @param Character $character
+     * @param bool $isMythic
+     * @return void
      *
      * @throws Exception
      */
-    protected function rewardForCharacter(Character $character, bool $isMythic = false): void
+    private function rewardForCharacter(Character $character, bool $isMythic = false): void
     {
         $item = Item::whereNull('specialty_type')
             ->whereNull('item_prefix_id')
@@ -222,6 +316,16 @@ class GoldMinesRewardHandler
         }
     }
 
+    /**
+     * Build a plan that applies no reward, recording why the Location did not qualify.
+     *
+     * @param Character $character
+     * @param Monster $monster
+     * @param int $killCount
+     * @param array $context
+     * @param string $reason
+     * @return array
+     */
     private function noopPlan(Character $character, Monster $monster, int $killCount, array $context, string $reason): array
     {
         return [
@@ -236,6 +340,14 @@ class GoldMinesRewardHandler
         ];
     }
 
+    /**
+     * Plan the currency amounts to award for the Gold Mines reward.
+     *
+     * @param Character $character
+     * @param ?Event $event
+     * @param int $killCount
+     * @return array
+     */
     private function planCurrencyReward(Character $character, ?Event $event, int $killCount): array
     {
         $maximumAmount = is_null($event) ? 375 : 750;
@@ -249,6 +361,13 @@ class GoldMinesRewardHandler
         return $this->currencyPlanFromAmounts($character, $amounts);
     }
 
+    /**
+     * Build the starting and capped target currency amounts for a planned currency reward.
+     *
+     * @param Character $character
+     * @param array $amounts
+     * @return array
+     */
     private function currencyPlanFromAmounts(Character $character, array $amounts): array
     {
         $maximums = [
@@ -261,7 +380,7 @@ class GoldMinesRewardHandler
         $target = [];
 
         foreach ($amounts as $currency => $amount) {
-            $starting[$currency] = (int) $character->getAttribute($currency);
+            $starting[$currency] = $character->getAttribute($currency);
             $target[$currency] = min($maximums[$currency], $starting[$currency] + $amount);
         }
 
@@ -272,6 +391,13 @@ class GoldMinesRewardHandler
         ];
     }
 
+    /**
+     * Apply a previously planned currency reward to the Character, up to its capped target amounts.
+     *
+     * @param Character $character
+     * @param array $currencyPlan
+     * @return array
+     */
     private function applyPlannedCurrencies(Character $character, array $currencyPlan): array
     {
         $applied = [];
@@ -282,8 +408,8 @@ class GoldMinesRewardHandler
                 continue;
             }
 
-            $current = (int) $character->getAttribute($currency);
-            $target = (int) ($currencyPlan['target'][$currency] ?? $current);
+            $current = $character->getAttribute($currency);
+            $target = $currencyPlan['target'][$currency] ?? $current;
 
             if ($current >= $target) {
                 continue;
@@ -301,12 +427,21 @@ class GoldMinesRewardHandler
         $character = $character->refresh();
 
         foreach ($applied as $currency => $amount) {
-            $this->battleMessageHandler->handleCurrencyGainMessage($character->user, CurrenciesMessageTypes::from($currency), $amount, (int) $character->getAttribute($currency));
+            $this->battleMessageHandler->handleCurrencyGainMessage($character->user, CurrenciesMessageTypes::from($currency), $amount, $character->getAttribute($currency));
         }
 
         return $applied;
     }
 
+    /**
+     * Plan the item rewards to award across the batch of kills, bounded by remaining inventory slots.
+     *
+     * @param Character $character
+     * @param Monster $monster
+     * @param ?Event $event
+     * @param int $killCount
+     * @return array
+     */
     private function planItemRewards(Character $character, Monster $monster, ?Event $event, int $killCount): array
     {
         $lootingChance = $character->skills->where('baseSkill.name', 'Looting')->first()->skill_bonus;
@@ -319,7 +454,7 @@ class GoldMinesRewardHandler
 
         if (! is_null($event)) {
             $lootingChance = .30;
-            $maxRoll = (int) ($maxRoll / 2);
+            $maxRoll = intdiv($maxRoll, 2);
             $maximumChance = 0.45;
         }
 
@@ -342,6 +477,12 @@ class GoldMinesRewardHandler
         return $items;
     }
 
+    /**
+     * Plan a randomly generated Gold Mines item reward for the Character.
+     *
+     * @param Character $character
+     * @return ?array
+     */
     private function planItemReward(Character $character): ?array
     {
         $item = Item::whereNull('specialty_type')
@@ -371,6 +512,13 @@ class GoldMinesRewardHandler
         ];
     }
 
+    /**
+     * Apply the planned item rewards to the Character's inventory, skipping any already applied.
+     *
+     * @param Character $character
+     * @param array $items
+     * @return int
+     */
     private function applyPlannedItems(Character $character, array $items): int
     {
         $applied = 0;
@@ -396,6 +544,12 @@ class GoldMinesRewardHandler
         return $applied;
     }
 
+    /**
+     * Plan whether the Gold Mines global Event should be created.
+     *
+     * @param int $killCount
+     * @return array
+     */
     private function planPossibleEvent(int $killCount): array
     {
         if (Event::where('type', EventType::GOLD_MINES)->exists()) {
@@ -413,6 +567,12 @@ class GoldMinesRewardHandler
         ];
     }
 
+    /**
+     * Apply a previously planned Gold Mines global Event, if it plans to be created and none is already active.
+     *
+     * @param array $eventPlan
+     * @return bool
+     */
     private function applyPlannedEvent(array $eventPlan): bool
     {
         if (! ($eventPlan['create'] ?? false)) {
@@ -436,9 +596,12 @@ class GoldMinesRewardHandler
     }
 
     /**
-     * 1 out of 1 million chance to create an event.
+     * Roll for and immediately create the Gold Mines global Event, if one is not already active.
+     *
+     * @param int $killCount
+     * @return void
      */
-    protected function createPossibleEvent(int $killCount = 1): void
+    private function createPossibleEvent(int $killCount = 1): void
     {
         if (Event::where('type', EventType::GOLD_MINES)->exists()) {
             return;

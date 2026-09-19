@@ -12,6 +12,7 @@ use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestStatus;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepStatus;
 use App\Game\BattleRewardProcessing\Events\BattleRewardQueueUpdated;
 use App\Game\BattleRewardProcessing\Jobs\ProcessCharacterBattleRewardQueue;
+use App\Game\BattleRewardProcessing\Values\BattleRewardEnqueueResult;
 use App\Game\Core\Traits\SafelyBroadcastsEvents;
 use Carbon\Carbon;
 use Illuminate\Contracts\Cache\Lock;
@@ -40,11 +41,22 @@ class BattleRewardProcessingQueueManager
 
     public const ORPHANED_PROCESSING_FAILED_REASON = 'Orphaned processing request recovered after stale heartbeat and no live processor lock.';
 
+    /**
+     * The heartbeat cutoff before a processing queue state/request is considered stale.
+     *
+     * @return Carbon
+     */
     public function staleCutoff(): Carbon
     {
         return now()->subMinutes(self::STALE_AFTER_MINUTES);
     }
 
+    /**
+     * Determine whether the given queue state is processing with a stale or missing heartbeat.
+     *
+     * @param CharacterBattleRewardQueueState $state
+     * @return bool
+     */
     public function isQueueStateStale(CharacterBattleRewardQueueState $state): bool
     {
         return $state->is_processing
@@ -52,13 +64,23 @@ class BattleRewardProcessingQueueManager
                 || $state->heartbeat_at->lte($this->staleCutoff()));
     }
 
+    /**
+     * Create a new reward request for the Character and ensure its processor is running.
+     *
+     * @param Character|int $character
+     * @param BattleRewardRequestPriority $priority
+     * @param BattleRewardRequestSourceType $sourceType
+     * @param ?string $sourceId
+     * @param array $handlerPayload
+     * @return BattleRewardEnqueueResult
+     */
     public function enqueue(
         Character|int $character,
         BattleRewardRequestPriority $priority,
         BattleRewardRequestSourceType $sourceType,
-        int|string|null $sourceId,
+        ?string $sourceId,
         array $handlerPayload,
-    ): CharacterBattleRewardRequest {
+    ): BattleRewardEnqueueResult {
         $characterId = $character instanceof Character ? $character->id : $character;
 
         Log::channel('reward_processing')->debug('Enqueue entered.', [
@@ -77,15 +99,16 @@ class BattleRewardProcessingQueueManager
                     'character_id' => $characterId,
                     'priority' => $priority,
                     'source_type' => $sourceType,
-                    'source_id' => is_null($sourceId) ? null : (string) $sourceId,
+                    'source_id' => $sourceId,
                     'handler_payload' => $handlerPayload,
                     'status' => BattleRewardRequestStatus::PENDING,
                 ]);
 
                 break;
             } catch (QueryException $exception) {
-                $exceptionCode = (int) $exception->getCode();
-                $previousCode = (int) ($exception->getPrevious()?->getCode() ?? 0);
+                $previousException = $exception->getPrevious();
+                $exceptionCode = $this->numericErrorCode($exception);
+                $previousCode = ! is_null($previousException) ? $this->numericErrorCode($previousException) : null;
                 $isRetryable = in_array($exceptionCode, [1205, 1213], true)
                     || in_array($previousCode, [1205, 1213], true)
                     || str_contains($exception->getMessage(), '1205')
@@ -94,7 +117,7 @@ class BattleRewardProcessingQueueManager
                     || str_contains($exception->getMessage(), 'Deadlock found');
 
                 if (! $isRetryable) {
-                    throw $exception;
+                    return $this->failedEnqueueResult($exception, $characterId, $sourceType, $sourceId);
                 }
 
                 $firstLockException ??= $exception;
@@ -104,11 +127,11 @@ class BattleRewardProcessingQueueManager
                     'source_type' => $sourceType->value,
                     'source_id' => $sourceId,
                     'attempt' => $attempt,
-                    'exception_code' => $exceptionCode !== 0 ? $exceptionCode : $previousCode,
+                    'exception_code' => $exceptionCode ?? $previousCode,
                 ]);
 
                 if ($attempt === self::ENQUEUE_CREATE_ATTEMPTS) {
-                    throw $firstLockException;
+                    return $this->failedEnqueueResult($firstLockException, $characterId, $sourceType, $sourceId);
                 }
 
                 usleep(50_000);
@@ -127,9 +150,64 @@ class BattleRewardProcessingQueueManager
 
         $this->ensureProcessorRunning($characterId);
 
-        return $request;
+        return BattleRewardEnqueueResult::success($request);
     }
 
+    /**
+     * Log and build the failed enqueue result for a reward request creation failure.
+     *
+     * @param Throwable $exception
+     * @param int $characterId
+     * @param BattleRewardRequestSourceType $sourceType
+     * @param ?string $sourceId
+     * @return BattleRewardEnqueueResult
+     */
+    private function failedEnqueueResult(
+        Throwable $exception,
+        int $characterId,
+        BattleRewardRequestSourceType $sourceType,
+        ?string $sourceId,
+    ): BattleRewardEnqueueResult {
+        Log::channel('reward_processing')->error('Reward request creation failed.', [
+            'character_id' => $characterId,
+            'source_type' => $sourceType->value,
+            'source_id' => $sourceId,
+            'exception_class' => $exception::class,
+            'exception_message' => $exception->getMessage(),
+        ]);
+
+        return BattleRewardEnqueueResult::failed($exception);
+    }
+
+    /**
+     * Resolve the numeric MySQL error code carried by an exception's SQLSTATE-typed code, or null when it is not numeric.
+     *
+     * @param Throwable $exception
+     * @return ?int
+     */
+    private function numericErrorCode(Throwable $exception): ?int
+    {
+        $code = $exception->getCode();
+
+        if (is_int($code)) {
+            return $code;
+        }
+
+        if (! is_string($code)) {
+            return null;
+        }
+
+        $numericCode = filter_var($code, FILTER_VALIDATE_INT);
+
+        return $numericCode === false ? null : $numericCode;
+    }
+
+    /**
+     * Ensure a processor is running for the Character's reward lane, waking or recovering it when required.
+     *
+     * @param Character|int $character
+     * @return bool
+     */
     public function ensureProcessorRunning(Character|int $character): bool
     {
         $characterId = $character instanceof Character ? $character->id : $character;
@@ -141,9 +219,23 @@ class BattleRewardProcessingQueueManager
             'updated_at' => now(),
         ]);
 
-        $state = CharacterBattleRewardQueueState::where('character_id', $characterId)
+        $state = CharacterBattleRewardQueueState::where('character_id', $characterId)->first();
 
-            ->firstOrFail();
+        if (is_null($state)) {
+            Log::channel('reward_processing')->error('Enqueue could not resolve queue state immediately after insertOrIgnore.', [
+                'character_id' => $characterId,
+            ]);
+
+            return false;
+        }
+
+        if ($state->is_processing && $this->isProcessorLocked($characterId)) {
+            Log::channel('reward_processing')->debug('Enqueue decides processor already running (lock held).', [
+                'character_id' => $characterId,
+            ]);
+
+            return false;
+        }
 
         $pendingCount = CharacterBattleRewardRequest::forCharacter($characterId)->pending()->count();
         $processingCount = CharacterBattleRewardRequest::forCharacter($characterId)->processing()->count();
@@ -159,16 +251,6 @@ class BattleRewardProcessingQueueManager
 
         if ($state->is_processing) {
             $isStale = $this->isQueueStateStale($state);
-            $isLocked = $this->isProcessorLocked($characterId);
-
-            if ($isLocked) {
-                Log::channel('reward_processing')->debug('Enqueue decides processor already running (lock held).', [
-                    'character_id' => $characterId,
-                    'is_stale' => $isStale,
-                ]);
-
-                return false;
-            }
 
             $ledgerRecoveredCount = $this->recoverLedgerBackedProcessingRequests($characterId);
             $legacyRecoveredCount = $isStale ? $this->recoverOrphanedProcessingRequests($characterId) : 0;
@@ -249,6 +331,12 @@ class BattleRewardProcessingQueueManager
         return true;
     }
 
+    /**
+     * Recover legacy orphaned PROCESSING requests for the Character when the queue's heartbeat is stale.
+     *
+     * @param int $characterId
+     * @return int
+     */
     public function recoverOrphanedProcessingRequests(int $characterId): int
     {
         $state = CharacterBattleRewardQueueState::where('character_id', $characterId)->first();
@@ -324,6 +412,12 @@ class BattleRewardProcessingQueueManager
         return $count;
     }
 
+    /**
+     * Recover ledger-backed interrupted PROCESSING requests for the Character, regardless of heartbeat freshness.
+     *
+     * @param int $characterId
+     * @return int
+     */
     public function recoverLedgerBackedProcessingRequests(int $characterId): int
     {
         $count = 0;
@@ -379,6 +473,12 @@ class BattleRewardProcessingQueueManager
         return $count;
     }
 
+    /**
+     * Claim and return the Character's next resumable or pending reward request, or null when none is claimable.
+     *
+     * @param int $characterId
+     * @return ?CharacterBattleRewardRequest
+     */
     public function nextRequest(int $characterId): ?CharacterBattleRewardRequest
     {
         $request = CharacterBattleRewardRequest::forCharacter($characterId)
@@ -422,6 +522,12 @@ class BattleRewardProcessingQueueManager
         return $this->markProcessing($request);
     }
 
+    /**
+     * Mark a pending/resumable request as currently processing.
+     *
+     * @param CharacterBattleRewardRequest $request
+     * @return CharacterBattleRewardRequest
+     */
     public function markProcessing(
         CharacterBattleRewardRequest $request,
     ): CharacterBattleRewardRequest {
@@ -453,6 +559,12 @@ class BattleRewardProcessingQueueManager
         return $request->refresh();
     }
 
+    /**
+     * Mark the request completed.
+     *
+     * @param CharacterBattleRewardRequest $request
+     * @return void
+     */
     public function markCompleted(CharacterBattleRewardRequest $request): void
     {
         $request->update([
@@ -474,6 +586,13 @@ class BattleRewardProcessingQueueManager
         );
     }
 
+    /**
+     * Mark the request failed with the given exception or reason.
+     *
+     * @param CharacterBattleRewardRequest $request
+     * @param Throwable|string $reason
+     * @return void
+     */
     public function markFailed(CharacterBattleRewardRequest $request, Throwable|string $reason): void
     {
         $failedReason = $reason instanceof Throwable
@@ -500,6 +619,12 @@ class BattleRewardProcessingQueueManager
         );
     }
 
+    /**
+     * Mark the request failed because the Character's inventory is missing.
+     *
+     * @param CharacterBattleRewardRequest $request
+     * @return void
+     */
     public function markCorruptedInventory(CharacterBattleRewardRequest $request): void
     {
         $request->update([
@@ -516,6 +641,14 @@ class BattleRewardProcessingQueueManager
         ]);
     }
 
+    /**
+     * Mark the request and its active step retryable after a notification/output failure.
+     *
+     * @param CharacterBattleRewardRequest $request
+     * @param CharacterBattleRewardRequestStep $step
+     * @param Throwable $throwable
+     * @return void
+     */
     public function markNotificationRetryable(
         CharacterBattleRewardRequest $request,
         CharacterBattleRewardRequestStep $step,
@@ -542,6 +675,12 @@ class BattleRewardProcessingQueueManager
         ]);
     }
 
+    /**
+     * Refresh the Character's queue state heartbeat timestamp.
+     *
+     * @param int $characterId
+     * @return void
+     */
     public function updateHeartbeat(int $characterId): void
     {
         CharacterBattleRewardQueueState::where('character_id', $characterId)->update([
@@ -549,6 +688,12 @@ class BattleRewardProcessingQueueManager
         ]);
     }
 
+    /**
+     * Mark the Character's queue state inactive when no pending or processing requests remain.
+     *
+     * @param int $characterId
+     * @return bool
+     */
     public function markQueueInactiveIfEmpty(int $characterId): bool
     {
         $state = CharacterBattleRewardQueueState::where('character_id', $characterId)
@@ -604,6 +749,12 @@ class BattleRewardProcessingQueueManager
         return true;
     }
 
+    /**
+     * Determine whether the Character has any pending or resumable requests.
+     *
+     * @param int $characterId
+     * @return bool
+     */
     public function hasPendingRequests(int $characterId): bool
     {
         return CharacterBattleRewardRequest::forCharacter($characterId)
@@ -614,16 +765,34 @@ class BattleRewardProcessingQueueManager
             ->exists();
     }
 
+    /**
+     * Determine whether the Character has an active processing request.
+     *
+     * @param int $characterId
+     * @return bool
+     */
     public function hasProcessingRequests(int $characterId): bool
     {
         return CharacterBattleRewardRequest::forCharacter($characterId)->processing()->exists();
     }
 
+    /**
+     * Build the Character's processor lock instance.
+     *
+     * @param int $characterId
+     * @return Lock
+     */
     public function processorLock(int $characterId): Lock
     {
         return Cache::lock($this->processorLockKey($characterId), self::PROCESSOR_LOCK_SECONDS);
     }
 
+    /**
+     * Determine whether another process currently holds the Character's processor lock.
+     *
+     * @param int $characterId
+     * @return bool
+     */
     public function isProcessorLocked(int $characterId): bool
     {
         $lock = $this->processorLock($characterId);
@@ -637,11 +806,23 @@ class BattleRewardProcessingQueueManager
         return false;
     }
 
+    /**
+     * Force release the Character's processor lock regardless of ownership.
+     *
+     * @param int $characterId
+     * @return void
+     */
     public function forceReleaseProcessorLock(int $characterId): void
     {
         $this->processorLock($characterId)->forceRelease();
     }
 
+    /**
+     * Build the cache key used for the Character's processor lock.
+     *
+     * @param int $characterId
+     * @return string
+     */
     private function processorLockKey(int $characterId): string
     {
         return 'character-reward-queue:'.$characterId;

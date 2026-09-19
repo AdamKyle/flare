@@ -7,12 +7,14 @@ use App\Flare\Models\Monster;
 use App\Flare\Models\WeeklyMonsterFight;
 use App\Game\BattleRewardProcessing\Handlers\LocationSpecialtyHandler;
 use App\Game\Maps\Values\LocationType;
-use Exception;
 
 class WeeklyBattleService
 {
     private LocationSpecialtyHandler $locationSpecialtyHandler;
 
+    /**
+     * @param LocationSpecialtyHandler $locationSpecialtyHandler
+     */
     public function __construct(LocationSpecialtyHandler $locationSpecialtyHandler)
     {
         $this->locationSpecialtyHandler = $locationSpecialtyHandler;
@@ -20,6 +22,10 @@ class WeeklyBattleService
 
     /**
      * Handle creating or updating the weekly fights record when a character dies.
+     *
+     * @param Character $character
+     * @param Monster $monster
+     * @return void
      */
     public function handleCharacterDeath(Character $character, Monster $monster): void
     {
@@ -47,15 +53,15 @@ class WeeklyBattleService
     /**
      * Handle creating or updating the weekly fights record when a monster dies.
      *
-     * @throws Exception
+     * @param Character $character
+     * @param Monster $monster
+     * @return Character
      */
     public function handleMonsterDeath(Character $character, Monster $monster): Character
     {
         if (! in_array($monster->only_for_location_type, LocationType::weeklyFightLocationTypes())) {
             return $character;
         }
-
-        $this->claimMonsterDeath($character, $monster);
 
         $weeklyMonsterFight = WeeklyMonsterFight::where('character_id', $character->id)
             ->where('monster_id', $monster->id)
@@ -72,6 +78,13 @@ class WeeklyBattleService
         return $character;
     }
 
+    /**
+     * Record that the weekly Monster was killed, without processing its reward.
+     *
+     * @param Character $character
+     * @param Monster $monster
+     * @return void
+     */
     public function claimMonsterDeath(Character $character, Monster $monster): void
     {
         if (! in_array($monster->only_for_location_type, LocationType::weeklyFightLocationTypes())) {
@@ -89,6 +102,10 @@ class WeeklyBattleService
 
     /**
      * Can we fight the monster?
+     *
+     * @param Character $character
+     * @param Monster $monster
+     * @return bool
      */
     public function canFightMonster(Character $character, Monster $monster): bool
     {
@@ -101,6 +118,12 @@ class WeeklyBattleService
         return ! $weeklyMonsterFight->monster_was_killed;
     }
 
+    /**
+     * Determine whether the Monster only fights at a weekly-fight Location type.
+     *
+     * @param Monster $monster
+     * @return bool
+     */
     public function isWeeklyMonster(Monster $monster): bool
     {
         return in_array($monster->only_for_location_type, LocationType::weeklyFightLocationTypes(), true);
@@ -109,7 +132,10 @@ class WeeklyBattleService
     /**
      * Handle rewarding the player.
      *
-     * @throws Exception
+     * @param Character $character
+     * @param Monster $monster
+     * @param WeeklyMonsterFight $weeklyMonsterFight
+     * @return Character
      */
     private function handleReward(Character $character, Monster $monster, WeeklyMonsterFight $weeklyMonsterFight): Character
     {

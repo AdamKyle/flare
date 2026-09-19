@@ -20,8 +20,8 @@ interface PersonalBonusRow {
 
 /**
  * Stacked detail screen for a Character's own Personal progression on one
- * Gem profile: positive additions, the negative-effect increase past level
- * 100, rarity/equipment unlocks, and the current Character-effective totals.
+ * Gem profile: current effective effects, the negative-effect increase past
+ * level 100, reward unlock bonuses, Gem Scroll eligibility, and next unlock.
  */
 const PersonalProgressInfoScreen = ({
   personal,
@@ -35,10 +35,6 @@ const PersonalProgressInfoScreen = ({
     ...rarityEffectBreakdown,
   ];
   const atCap = personal.level >= personal.max_level;
-
-  const positiveAdditions = combinedBreakdown.filter(
-    (breakdown) => breakdown.personal > 0
-  );
 
   const rarityRows: PersonalBonusRow[] = [
     {
@@ -79,26 +75,36 @@ const PersonalProgressInfoScreen = ({
         />
       </div>
 
-      {positiveAdditions.length > 0 && (
-        <Fragment>
-          <Separator />
-          <div>
-            <h3 className="mb-1 text-sm font-semibold text-gray-800 dark:text-gray-200">
-              Your Positive Gem Additions
-            </h3>
-            <div className="flex flex-col divide-y divide-gray-100 dark:divide-gray-800">
-              {positiveAdditions.map((breakdown) => (
-                <GemEffectRow
-                  key={breakdown.field}
-                  field={breakdown.field}
-                  label={resolveGemProgressionFieldLabel(breakdown.field)}
-                  value={breakdown.personal}
-                />
-              ))}
-            </div>
+      <p className="text-sm text-gray-700 dark:text-gray-300">
+        Personal Progress applies only to your Character. It increases your
+        effective positive Gem effects. After level 100 it also increases this
+        Gem World&apos;s negative effects for your Character and unlocks Gem
+        Scroll drop eligibility.
+      </p>
+
+      <Separator />
+
+      <div>
+        <h3 className="mb-1 text-sm font-semibold text-gray-800 dark:text-gray-200">
+          Your Effective Gem Effects
+        </h3>
+        {combinedBreakdown.length === 0 ? (
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            No positive Gem effects currently roll for this profile.
+          </p>
+        ) : (
+          <div className="flex flex-col">
+            {combinedBreakdown.map((breakdown) => (
+              <GemEffectRow
+                key={breakdown.field}
+                field={breakdown.field}
+                label={resolveGemProgressionFieldLabel(breakdown.field)}
+                value={breakdown.effective}
+              />
+            ))}
           </div>
-        </Fragment>
-      )}
+        )}
+      </div>
 
       <Separator />
 
@@ -107,8 +113,8 @@ const PersonalProgressInfoScreen = ({
           Personal Negative Effect Increase
         </h3>
         <p className="text-sm text-gray-700 dark:text-gray-300">
-          Past level 100, your Personal progression also increases how difficult
-          this Gem World&apos;s Monsters are for you specifically.
+          After Personal level 100, Personal Progress increases active negative
+          Gem effects that apply to your Character.
         </p>
         <GemEffectRow
           field="personal_negative_effect_increase"
@@ -122,9 +128,9 @@ const PersonalProgressInfoScreen = ({
           <Separator />
           <div>
             <h3 className="mb-1 text-sm font-semibold text-gray-800 dark:text-gray-200">
-              Rarity and Equipment Progression
+              Personal Reward Unlock Bonuses
             </h3>
-            <div className="flex flex-col divide-y divide-gray-100 dark:divide-gray-800">
+            <div className="flex flex-col">
               {rarityRows.map((row) => (
                 <GemEffectRow
                   key={row.field}
@@ -162,33 +168,6 @@ const PersonalProgressInfoScreen = ({
               {personal.next_unlock.description} at level{' '}
               {personal.next_unlock.level}
             </p>
-          </div>
-        </Fragment>
-      )}
-
-      {combinedBreakdown.length > 0 && (
-        <Fragment>
-          <Separator />
-          <div>
-            <h3 className="mb-1 text-sm font-semibold text-gray-800 dark:text-gray-200">
-              Effective For You
-            </h3>
-            <div className="flex flex-col divide-y divide-gray-100 dark:divide-gray-800">
-              {combinedBreakdown.map((breakdown) => (
-                <Fragment key={breakdown.field}>
-                  <GemEffectRow
-                    field={breakdown.field}
-                    label={resolveGemProgressionFieldLabel(breakdown.field)}
-                    value={breakdown.effective}
-                  />
-                  <p className="pb-1 text-xs text-gray-500 dark:text-gray-400">
-                    Base {formatPercent(breakdown.base)} + Global{' '}
-                    {formatPercent(breakdown.global)} + Personal{' '}
-                    {formatPercent(breakdown.personal)}
-                  </p>
-                </Fragment>
-              ))}
-            </div>
           </div>
         </Fragment>
       )}

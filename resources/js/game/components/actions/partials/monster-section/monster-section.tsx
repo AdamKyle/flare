@@ -16,6 +16,7 @@ import MonsterExplorationConfiguration from './monster-exploration-configuration
 import MonsterSectionProps from './types/monster-section-props';
 import { getImageTierByIndex } from './util/monster-image-tier';
 import AttackButtonsContainer from '../../components/fight-section/attack-buttons-container';
+import AttackCooldownTimer from '../../components/fight-section/attack-cooldown-timer';
 import AttackMessages from '../../components/fight-section/attack-messages';
 import CharacterCombatStatus from '../../components/fight-section/character-combat-status';
 import CharacterDeadAction from '../../components/fight-section/character-dead-action';
@@ -33,7 +34,6 @@ import { ButtonGradientVarient } from 'ui/buttons/enums/button-gradient-variant'
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import GradientButton from 'ui/buttons/gradient-button';
 import InfiniteLoaderRoseDanube from 'ui/infinite-scroll/infinite-loader-rose-danube';
-import TimerBar from 'ui/timer-bar/timer-bar';
 
 const MonsterSection = ({
   show_monster_stats,
@@ -50,8 +50,9 @@ const MonsterSection = ({
     setReinitializeFight,
   } = useAttackMonster();
 
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [monsterName, setMonsterName] = useState<string | null>(null);
+  const [selectedMonsterId, setSelectedMonsterId] = useState<number | null>(
+    null
+  );
   const [monsterToFight, setMonsterToFight] = useState<number | null>(null);
   const [showExplorationConfiguration, setShowExplorationConfiguration] =
     useState(false);
@@ -63,54 +64,7 @@ const MonsterSection = ({
 
   const isCharacterDead = gameData?.character?.is_dead ?? false;
   const attackCooldownSeconds = gameData?.character?.can_attack_again_at ?? 0;
-
-  // Adjusted during render (not in an effect) so a new cooldown duration is
-  // reflected on the same render it arrives, avoiding a one-render gap.
-  const [prevAttackCooldownSeconds, setPrevAttackCooldownSeconds] = useState(
-    attackCooldownSeconds
-  );
-  const [attackCooldownEndsAt, setAttackCooldownEndsAt] = useState<
-    number | null
-  >(
-    attackCooldownSeconds > 0 ? Date.now() + attackCooldownSeconds * 1000 : null
-  );
-  const [attackCooldownTickedAt, setAttackCooldownTickedAt] = useState(() =>
-    Date.now()
-  );
-
-  if (attackCooldownSeconds !== prevAttackCooldownSeconds) {
-    const now = Date.now();
-
-    setPrevAttackCooldownSeconds(attackCooldownSeconds);
-    setAttackCooldownEndsAt(
-      attackCooldownSeconds > 0 ? now + attackCooldownSeconds * 1000 : null
-    );
-    setAttackCooldownTickedAt(now);
-  }
-
-  useEffect(() => {
-    if (attackCooldownEndsAt === null) {
-      return;
-    }
-
-    const intervalId = setInterval(() => {
-      setAttackCooldownTickedAt(Date.now());
-    }, 100);
-
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [attackCooldownEndsAt]);
-
-  const attackCooldownRemaining =
-    attackCooldownEndsAt === null
-      ? 0
-      : Math.max(
-          0,
-          Math.round((attackCooldownEndsAt - attackCooldownTickedAt) / 100) / 10
-        );
-
-  const isOnAttackCooldown = !isCharacterDead && attackCooldownRemaining > 0;
+  const isOnAttackCooldown = !isCharacterDead && attackCooldownSeconds > 0;
 
   // Clears the handoff lock regardless of whether the cooldown websocket or
   // the fight-ending HTTP response is observed first.
@@ -127,24 +81,43 @@ const MonsterSection = ({
   const isFightCooldownActive =
     isOnAttackCooldown || awaitingAttackCooldownConfirmation;
 
+  const matchedMonsterIndex = monsters.findIndex(
+    (monster) => monster.id === selectedMonsterId
+  );
+  const currentIndex = matchedMonsterIndex === -1 ? 0 : matchedMonsterIndex;
+  const selectedMonster = monsters[currentIndex] as
+    MonsterDefinition | undefined;
+  const monsterName = selectedMonster ? selectedMonster.name : null;
+
   useEffect(() => {
-    if (!monsters || monsters.length === 0) {
+    if (monsters.length === 0) {
+      if (selectedMonsterId !== null) {
+        setSelectedMonsterId(null);
+      }
+
       return;
     }
 
-    setMonsterName(monsters[0].name);
-  }, [monsters]);
+    const stillExists = monsters.some(
+      (monster) => monster.id === selectedMonsterId
+    );
+
+    if (stillExists) {
+      return;
+    }
+
+    setSelectedMonsterId(monsters[0].id);
+  }, [monsters, selectedMonsterId]);
 
   useEffect(() => {
     listenForMonsterUpdates();
   }, [listenForMonsterUpdates]);
 
   const handelMonsterSelection = (shouldFightAgain?: boolean) => {
-    if (!monsters || !monsters[currentIndex] || !gameData?.character) {
+    if (!selectedMonster || !gameData?.character) {
       return;
     }
 
-    const selectedMonster = monsters[currentIndex] as MonsterDefinition;
     setMonsterToFight(selectedMonster.id);
 
     setRequestData({
@@ -160,22 +133,20 @@ const MonsterSection = ({
   };
 
   const handleMonsterSelected = (index: number) => {
-    if (!monsters || !monsters[index]) {
+    const monster = monsters[index];
+
+    if (!monster) {
       return;
     }
 
-    const selectedMonster = monsters[index] as MonsterDefinition;
-    setCurrentIndex(index);
+    setSelectedMonsterId(monster.id);
     setMonsterToFight(null);
-    setMonsterName(selectedMonster.name);
   };
 
   const handleAttackMonster = (attackType: AttackType) => {
-    if (!monsters || !monsters[currentIndex] || !gameData?.character) {
+    if (!selectedMonster || !gameData?.character) {
       return;
     }
-
-    const selectedMonster = monsters[currentIndex] as MonsterDefinition;
 
     setRequestData({
       character_id: gameData.character.id,
@@ -198,7 +169,7 @@ const MonsterSection = ({
   };
 
   const getMonsterImage = () => {
-    if (!monsters || monsters.length === 0) {
+    if (monsters.length === 0) {
       return MonsterImageProgression[0];
     }
 
@@ -213,6 +184,14 @@ const MonsterSection = ({
 
   const handleClearBattleResults = () => {
     setMonsterToFight(null);
+  };
+
+  const renderAttackCooldownTimer = (): ReactNode => {
+    if (!isOnAttackCooldown) {
+      return null;
+    }
+
+    return <AttackCooldownTimer cooldown_seconds={attackCooldownSeconds} />;
   };
 
   const renderMonsterFightSection = () => {
@@ -242,6 +221,7 @@ const MonsterSection = ({
     if (isNil(monsterToFight)) {
       return (
         <div className="my-4 text-center">
+          {renderAttackCooldownTimer()}
           <Button
             on_click={handelMonsterSelection}
             label="Initiate Fight"
@@ -356,22 +336,6 @@ const MonsterSection = ({
       );
     };
 
-    const renderAttackCooldownBar = () => {
-      if (!isOnAttackCooldown) {
-        return null;
-      }
-
-      return (
-        <TimerBar
-          length={attackCooldownSeconds}
-          remaining={attackCooldownRemaining}
-          precise_time
-          title="Next Attack"
-          additional_css="my-2"
-        />
-      );
-    };
-
     return (
       <>
         <CharacterCombatStatus />
@@ -389,7 +353,7 @@ const MonsterSection = ({
             health_bar_type={HealthBarType.PLAYER}
           />
         </HealthBarContainer>
-        {renderAttackCooldownBar()}
+        {renderAttackCooldownTimer()}
         {renderAttackButtons()}
         {renderAttackAgainButton()}
         <AttackMessages messages={data?.attack_messages || []} />

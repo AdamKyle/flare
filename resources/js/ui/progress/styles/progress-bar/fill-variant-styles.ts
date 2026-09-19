@@ -18,5 +18,6 @@ export const fillVariantStyles = (variant: ProgressBarVariant): string => {
       ProgressBarVariant.DE_YORK,
       () => 'bg-de-york-500 dark:bg-de-york-300'
     )
+    .with(ProgressBarVariant.XP, () => 'bg-orange-600 dark:bg-orange-500')
     .otherwise(() => '');
 };

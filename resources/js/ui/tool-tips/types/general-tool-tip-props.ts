@@ -8,4 +8,7 @@ export default interface GeneralToolTipProps {
   on_close?: () => void;
   align?: 'left' | 'right' | 'auto';
   size?: 'sm' | 'md';
+  trigger?: React.ReactNode;
+  trigger_aria_label?: string;
+  placement?: 'auto' | 'above';
 }

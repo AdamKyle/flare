@@ -4,9 +4,9 @@ namespace App\Game\BattleRewardProcessing\Services;
 
 use App\Flare\Models\CharacterBattleRewardRequest;
 use App\Flare\Models\CharacterBattleRewardRequestStep;
-use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepName;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepStatus;
+use App\Game\BattleRewardProcessing\Values\BattleRewardStepPlan;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -14,44 +14,51 @@ use Throwable;
 
 class BattleRewardLedgerService
 {
-    public function ensureSteps(CharacterBattleRewardRequest $request): Collection
+    /**
+     * Ensure the planned ledger rows exist for the request, bulk-inserting
+     * them exactly once for a new request and returning the existing rows
+     * unchanged when the ledger was already created.
+     *
+     * @param CharacterBattleRewardRequest $request
+     * @param BattleRewardStepPlan $stepPlan
+     * @return Collection
+     */
+    public function ensureSteps(CharacterBattleRewardRequest $request, BattleRewardStepPlan $stepPlan): Collection
     {
-        $createdCount = 0;
-
-        $stepsOrder = $request->source_type === BattleRewardRequestSourceType::FACTION_LOYALTY
-            ? BattleRewardStepName::orderedForFactionLoyalty()
-            : BattleRewardStepName::ordered();
-
-        foreach ($stepsOrder as $stepName) {
-            $step = CharacterBattleRewardRequestStep::query()->firstOrCreate(
-                [
-                    'character_battle_reward_request_id' => $request->id,
-                    'step_name' => $stepName,
-                ],
-                [
-                    'character_id' => $request->character_id,
-                    'status' => BattleRewardStepStatus::PENDING,
-                ],
-            );
-
-            if ($step->wasRecentlyCreated) {
-                $createdCount++;
-                $this->log('step.created', $request, $step);
-            }
+        if ($request->steps()->exists()) {
+            return $this->stepsForRequest($request);
         }
 
-        if ($createdCount > 0) {
-            $this->log('ledger.created', $request, null, ['status' => 'created']);
-        }
+        $now = now();
+
+        $rows = array_map(fn (BattleRewardStepName $stepName): array => [
+            'character_battle_reward_request_id' => $request->id,
+            'character_id' => $request->character_id,
+            'step_name' => $stepName->value,
+            'status' => BattleRewardStepStatus::PENDING->value,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ], $stepPlan->steps());
+
+        CharacterBattleRewardRequestStep::query()->insertOrIgnore($rows);
+
+        $this->log('ledger.created', $request, null, [
+            'status' => 'created',
+            'planned_step_count' => count($rows),
+        ]);
 
         return $this->stepsForRequest($request);
     }
 
+    /**
+     * Resolve the request's persisted ledger rows in source-aware execution order.
+     *
+     * @param CharacterBattleRewardRequest $request
+     * @return Collection
+     */
     public function stepsForRequest(CharacterBattleRewardRequest $request): Collection
     {
-        $stepsOrder = $request->source_type === BattleRewardRequestSourceType::FACTION_LOYALTY
-            ? BattleRewardStepName::orderedForFactionLoyalty()
-            : BattleRewardStepName::ordered();
+        $stepsOrder = BattleRewardStepName::orderedForSource($request->source_type);
 
         $steps = $request->steps()->get()->keyBy(fn (CharacterBattleRewardRequestStep $step): string => $step->step_name->value);
 
@@ -61,6 +68,12 @@ class BattleRewardLedgerService
             ->values();
     }
 
+    /**
+     * Resolve the request's first non-completed persisted step, in source-aware execution order.
+     *
+     * @param CharacterBattleRewardRequest $request
+     * @return ?CharacterBattleRewardRequestStep
+     */
     public function firstNonCompletedStep(CharacterBattleRewardRequest $request): ?CharacterBattleRewardRequestStep
     {
         return $this->stepsForRequest($request)
@@ -69,9 +82,10 @@ class BattleRewardLedgerService
 
     /**
      * Resolve the persisted result of an already-completed step for the
-     * given request, so a later step can recover its authoritative output
-     * on resume instead of depending on transient in-memory state. Returns
-     * null when the step does not exist or has not completed.
+     * given request with a single direct query, so a later step can recover
+     * its authoritative output on resume instead of depending on transient
+     * in-memory state. Returns null when the step does not exist or has not
+     * completed.
      *
      * @param CharacterBattleRewardRequest $request
      * @param BattleRewardStepName $stepName
@@ -79,16 +93,22 @@ class BattleRewardLedgerService
      */
     public function completedStepResult(CharacterBattleRewardRequest $request, BattleRewardStepName $stepName): ?array
     {
-        $step = $this->stepsForRequest($request)
-            ->first(fn (CharacterBattleRewardRequestStep $step): bool => $step->step_name === $stepName);
+        $step = CharacterBattleRewardRequestStep::query()
+            ->where('character_battle_reward_request_id', $request->id)
+            ->where('step_name', $stepName->value)
+            ->where('status', BattleRewardStepStatus::COMPLETED->value)
+            ->first();
 
-        if (is_null($step) || $step->status !== BattleRewardStepStatus::COMPLETED) {
-            return null;
-        }
-
-        return $step->result_json;
+        return $step?->result_json;
     }
 
+    /**
+     * Mark a step running, recording its payload and incrementing its attempt count.
+     *
+     * @param CharacterBattleRewardRequestStep $step
+     * @param ?array $payload
+     * @return CharacterBattleRewardRequestStep
+     */
     public function startStep(CharacterBattleRewardRequestStep $step, ?array $payload = null): CharacterBattleRewardRequestStep
     {
         if ($step->status === BattleRewardStepStatus::COMPLETED) {
@@ -107,12 +127,18 @@ class BattleRewardLedgerService
             'attempts' => $step->attempts + 1,
         ]);
 
-        $step = $step->refresh();
         $this->log('step.started', $step->request, $step);
 
         return $step;
     }
 
+    /**
+     * Mark a step completed with its final result payload.
+     *
+     * @param CharacterBattleRewardRequestStep $step
+     * @param ?array $result
+     * @return CharacterBattleRewardRequestStep
+     */
     public function completeStep(CharacterBattleRewardRequestStep $step, ?array $result = null): CharacterBattleRewardRequestStep
     {
         $step->update([
@@ -124,12 +150,18 @@ class BattleRewardLedgerService
             'failed_reason' => null,
         ]);
 
-        $step = $step->refresh();
         $this->log('step.completed', $step->request, $step);
 
         return $step;
     }
 
+    /**
+     * Record a mid-step checkpoint so a resumed step can continue from its last known progress.
+     *
+     * @param CharacterBattleRewardRequestStep $step
+     * @param array $checkpoint
+     * @return CharacterBattleRewardRequestStep
+     */
     public function checkpointStep(CharacterBattleRewardRequestStep $step, array $checkpoint): CharacterBattleRewardRequestStep
     {
         $step->update([
@@ -138,7 +170,6 @@ class BattleRewardLedgerService
             'heartbeat_at' => now(),
         ]);
 
-        $step = $step->refresh();
         $this->log('step.checkpointed', $step->request, $step, [
             'checkpoint_summary' => implode(',', array_keys($checkpoint)),
         ]);
@@ -146,6 +177,13 @@ class BattleRewardLedgerService
         return $step;
     }
 
+    /**
+     * Persist a step's planned payload before it is applied.
+     *
+     * @param CharacterBattleRewardRequestStep $step
+     * @param array $payload
+     * @return CharacterBattleRewardRequestStep
+     */
     public function updateStepPayload(CharacterBattleRewardRequestStep $step, array $payload): CharacterBattleRewardRequestStep
     {
         $step->update([
@@ -153,14 +191,27 @@ class BattleRewardLedgerService
             'heartbeat_at' => now(),
         ]);
 
-        return $step->refresh();
+        return $step;
     }
 
+    /**
+     * Refresh a step's heartbeat timestamp so it is not treated as stale during long-running work.
+     *
+     * @param CharacterBattleRewardRequestStep $step
+     * @return void
+     */
     public function updateHeartbeat(CharacterBattleRewardRequestStep $step): void
     {
         $step->update(['heartbeat_at' => now()]);
     }
 
+    /**
+     * Mark a step failed with the given exception or reason.
+     *
+     * @param CharacterBattleRewardRequestStep $step
+     * @param Throwable|string $reason
+     * @return CharacterBattleRewardRequestStep
+     */
     public function failStep(CharacterBattleRewardRequestStep $step, Throwable|string $reason): CharacterBattleRewardRequestStep
     {
         $failedReason = $reason instanceof Throwable
@@ -183,12 +234,18 @@ class BattleRewardLedgerService
             'heartbeat_at' => now(),
         ]);
 
-        $step = $step->refresh();
         $this->log('step.failed', $step->request, $step, $context);
 
         return $step;
     }
 
+    /**
+     * Mark a running/checkpointed step resumable when its heartbeat is older than the given cutoff.
+     *
+     * @param CharacterBattleRewardRequestStep $step
+     * @param CarbonInterface $cutoff
+     * @return bool
+     */
     public function markStaleStepResumable(CharacterBattleRewardRequestStep $step, CarbonInterface $cutoff): bool
     {
         if (! in_array($step->status, [BattleRewardStepStatus::RUNNING, BattleRewardStepStatus::CHECKPOINTED], true)) {
@@ -204,11 +261,20 @@ class BattleRewardLedgerService
             'heartbeat_at' => now(),
         ]);
 
-        $this->log('step.resumable', $step->request, $step->refresh());
+        $this->log('step.resumable', $step->request, $step);
 
         return true;
     }
 
+    /**
+     * Write one structured ledger diagnostic log entry.
+     *
+     * @param string $event
+     * @param CharacterBattleRewardRequest $request
+     * @param ?CharacterBattleRewardRequestStep $step
+     * @param array $context
+     * @return void
+     */
     public function log(string $event, CharacterBattleRewardRequest $request, ?CharacterBattleRewardRequestStep $step = null, array $context = []): void
     {
         Log::channel('reward_ledger')->debug($event, array_filter([
@@ -223,6 +289,7 @@ class BattleRewardLedgerService
             'checkpoint_summary' => $context['checkpoint_summary'] ?? null,
             'exception_class' => $context['exception_class'] ?? null,
             'exception_message' => $context['exception_message'] ?? null,
+            'planned_step_count' => $context['planned_step_count'] ?? null,
         ], fn ($value): bool => ! is_null($value)));
     }
 }

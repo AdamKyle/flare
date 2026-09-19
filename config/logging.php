@@ -68,14 +68,14 @@ return [
         'reward_processing' => [
             'driver' => 'daily',
             'path' => storage_path('logs/reward_processing.log'),
-            'level' => 'debug',
+            'level' => env('REWARD_PROCESSING_LOG_LEVEL', 'info'),
             'days' => 14,
         ],
 
         'reward_ledger' => [
             'driver' => 'daily',
             'path' => storage_path('logs/reward_ledger.log'),
-            'level' => 'debug',
+            'level' => env('REWARD_LEDGER_LOG_LEVEL', 'warning'),
             'days' => 14,
         ],
 

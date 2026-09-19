@@ -18,7 +18,6 @@ use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Types\CharacterMessageTypes;
 use App\Game\Shop\Services\ShopService;
 use App\Game\Skills\Services\DisenchantService;
-use Exception;
 use Facades\App\Game\Core\Chance\DropCheckCalculator;
 use Facades\App\Game\Core\Items\Pricing\SellItemCalculator;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
@@ -43,13 +42,21 @@ class BattleDrop
         'auto_sold_gold' => 0,
     ];
 
+    /**
+     * @param RandomItemDropBuilder $randomItemDropBuilder
+     * @param DisenchantService $disenchantService
+     * @param ShopService $shopService
+     */
     public function __construct(
         private readonly RandomItemDropBuilder $randomItemDropBuilder,
         private readonly DisenchantService $disenchantService,
         private readonly ShopService $shopService) {}
 
     /**
-     * Set Monster.
+     * Set the Monster whose drops are being resolved.
+     *
+     * @param Monster $monster
+     * @return BattleDrop
      */
     public function setMonster(Monster $monster): BattleDrop
     {
@@ -59,7 +66,10 @@ class BattleDrop
     }
 
     /**
-     * Set Special Location.
+     * Set the special Location whose drop effect applies to this drop resolution.
+     *
+     * @param ?Location $location
+     * @return BattleDrop
      */
     public function setSpecialLocation(?Location $location = null): BattleDrop
     {
@@ -68,6 +78,12 @@ class BattleDrop
         return $this;
     }
 
+    /**
+     * Set the Location that manually gates a quest item drop for this drop resolution.
+     *
+     * @param ?Location $location
+     * @return BattleDrop
+     */
     public function setManualQuestItemLocation(?Location $location = null): BattleDrop
     {
         $this->manualQuestItemLocation = $location;
@@ -76,7 +92,10 @@ class BattleDrop
     }
 
     /**
-     * Set Game Map Bonus.
+     * Set the Game Map's drop chance bonus.
+     *
+     * @param float $gameMapBonus
+     * @return BattleDrop
      */
     public function setGameMapBonus(float $gameMapBonus = 0.0): BattleDrop
     {
@@ -87,6 +106,9 @@ class BattleDrop
 
     /**
      * Set the resolved Gem quest item drop chance bonus for the Monster's own quest item drop check.
+     *
+     * @param float $questItemDropBonus
+     * @return BattleDrop
      */
     public function setQuestItemDropBonus(float $questItemDropBonus = 0.0): BattleDrop
     {
@@ -96,7 +118,10 @@ class BattleDrop
     }
 
     /**
-     * Set Location Chance.
+     * Set the Character's looting chance for this drop resolution.
+     *
+     * @param float $lootingChance
+     * @return BattleDrop
      */
     public function setLootingChance(float $lootingChance = 0.0): BattleDrop
     {
@@ -105,6 +130,11 @@ class BattleDrop
         return $this;
     }
 
+    /**
+     * Reset the accumulated reward totals for a new drop resolution.
+     *
+     * @return BattleDrop
+     */
     public function resetRewardTotals(): BattleDrop
     {
         $this->rewardTotals = [
@@ -114,16 +144,23 @@ class BattleDrop
         return $this;
     }
 
+    /**
+     * Return the reward totals accumulated during this drop resolution.
+     *
+     * @return array
+     */
     public function rewardTotals(): array
     {
         return $this->rewardTotals;
     }
 
     /**
-     * Handles fetching the drop for the player.
+     * Handle fetching the drop for the player, attempting pickup unless the resolved Item is returned instead.
      *
-     * If the player can get the drop we will handle all aspects including
-     * attempting to pick up the drop.
+     * @param Character $character
+     * @param bool $canGetDrop
+     * @param bool $returnItem
+     * @return ?Item
      */
     public function handleDrop(Character $character, bool $canGetDrop, bool $returnItem = false): ?Item
     {
@@ -143,19 +180,23 @@ class BattleDrop
     }
 
     /**
-     * Give player a mythical item.
+     * Give the player a mythical item.
      *
+     * @param Character $character
+     * @param Item $item
      * @return void
      */
-    public function giveMythicItem(Character $character, Item $item)
+    public function giveMythicItem(Character $character, Item $item): void
     {
         $this->giveItemToPlayer($character, $item, true);
     }
 
     /**
-     * Handles the monsters quest drop.
+     * Handle the Monster's quest drop, attempting pickup unless the resolved Item is returned instead.
      *
-     * Can return the item.
+     * @param Character $character
+     * @param bool $returnItem
+     * @return ?Item
      */
     public function handleMonsterQuestDrop(Character $character, bool $returnItem = false): ?Item
     {
@@ -178,6 +219,12 @@ class BattleDrop
         return null;
     }
 
+    /**
+     * Plan the Delve Location's quest item drop without applying it.
+     *
+     * @param Character $character
+     * @return ?Item
+     */
     public function planDelveLocationQuestItem(Character $character): ?Item
     {
         $automation = $character->currentAutomations()->where('type', AutomationType::DELVE->value)->first();
@@ -204,6 +251,12 @@ class BattleDrop
         return $this->eligibleLocationQuestItem($character, $location, $this->lootingChance);
     }
 
+    /**
+     * Plan the special Location's manually gated quest item drop without applying it.
+     *
+     * @param Character $character
+     * @return ?Item
+     */
     public function planSpecialLocationQuestItem(Character $character): ?Item
     {
         if ($character->currentAutomations()->where('type', AutomationType::EXPLORING->value)->exists()) {
@@ -218,9 +271,10 @@ class BattleDrop
     }
 
     /**
-     * Handle when a character is in a delve exploration for quest items
+     * Handle the Character's Delve Location quest item drop when in a Delve automation.
      *
-     * @throws Exception
+     * @param Character $character
+     * @return void
      */
     public function handleDelveLocationQuestItems(Character $character): void
     {
@@ -299,7 +353,10 @@ class BattleDrop
     }
 
     /**
-     * @throws Exception
+     * Handle the special Location's manually gated quest item drop.
+     *
+     * @param Character $character
+     * @return void
      */
     public function handleSpecialLocationQuestItem(Character $character): void
     {
@@ -366,14 +423,16 @@ class BattleDrop
         $this->attemptToPickUpItem($character, $eligibleItems->random());
     }
 
-    public function applyPlannedItem(Character $character, int $itemId, bool $isMythic = false): void
+    /**
+     * Apply one already-resolved planned Item reward to the Character.
+     *
+     * @param Character $character
+     * @param Item $item
+     * @param bool $isMythic
+     * @return void
+     */
+    public function applyPlannedItem(Character $character, Item $item, bool $isMythic = false): void
     {
-        $item = Item::find($itemId);
-
-        if (is_null($item)) {
-            return;
-        }
-
         if ($isMythic) {
             $this->giveMythicItem($character, $item);
 
@@ -383,6 +442,14 @@ class BattleDrop
         $this->attemptToPickUpItem($character, $item);
     }
 
+    /**
+     * Resolve one eligible, not-yet-owned, not-yet-blocked quest Item for the given Location.
+     *
+     * @param Character $character
+     * @param Location $location
+     * @param float $lootingChance
+     * @return ?Item
+     */
     private function eligibleLocationQuestItem(Character $character, Location $location, float $lootingChance): ?Item
     {
         $items = Item::where('drop_location_id', $location->id)
@@ -438,12 +505,26 @@ class BattleDrop
         return $eligibleItems->random();
     }
 
-    protected function getDropFromCache(Character $character, string $gameMapName, ?Location $locationWithEffect = null): ?Item
+    /**
+     * Generate a random Item drop scaled to the Character's plane-based max level.
+     *
+     * @param Character $character
+     * @param string $gameMapName
+     * @param ?Location $locationWithEffect
+     * @return ?Item
+     */
+    private function getDropFromCache(Character $character, string $gameMapName, ?Location $locationWithEffect = null): ?Item
     {
         return $this->randomItemDropBuilder->generateItem($this->getMaxLevelBasedOnPlane($character));
     }
 
-    protected function getMaxLevelBasedOnPlane(Character $character): int
+    /**
+     * Resolve the Character's max Item level based on their current plane's map type.
+     *
+     * @param Character $character
+     * @return int
+     */
+    private function getMaxLevelBasedOnPlane(Character $character): int
     {
         $characterLevel = $character->level;
         $mapType = $character->map->gameMap->mapType();
@@ -484,80 +565,94 @@ class BattleDrop
     }
 
     /**
-     * Attempts to pick up the item and give it to the player.
+     * Attempt to pick up the Item, routing it to auto-disenchant when the player has that setting enabled.
      *
-     * @throws Exception
+     * @param Character $character
+     * @param Item $item
+     * @return void
      */
-    protected function attemptToPickUpItem(Character $character, Item $item): void
+    private function attemptToPickUpItem(Character $character, Item $item): void
     {
         $user = $character->user;
 
         if ($user->auto_disenchant && $item->type !== 'quest') {
             $this->autoDisenchantItem($character, $item);
-        } else {
-            if (! $character->isInventoryFull()) {
-                $this->giveItemToPlayer($character, $item);
-            } else {
-                ServerMessageHandler::handleMessage($character->user, CharacterMessageTypes::INVENTORY_IS_FULL);
-            }
+
+            return;
         }
+
+        if ($character->isInventoryFull()) {
+            ServerMessageHandler::handleMessage($character->user, CharacterMessageTypes::INVENTORY_IS_FULL);
+
+            return;
+        }
+
+        $this->giveItemToPlayer($character, $item);
     }
 
     /**
-     * Auto disenchants the item using the characters disenchanting skill.
+     * Auto disenchant the Item using the Character's Disenchanting skill, per the player's auto-disenchant amount setting.
      *
-     * @throws Exception
+     * @param Character $character
+     * @param Item $item
+     * @return void
      */
     private function autoDisenchantItem(Character $character, Item $item): void
     {
         $user = $character->user;
 
         if ($user->auto_disenchant_amount === 'all') {
-
             $this->handleDisenchantOrAutoSell($character, $item);
 
             return;
         }
 
-        if ($user->auto_disenchant_amount === '1-billion') {
-            $cost = SellItemCalculator::fetchSalePriceWithAffixes($item);
-
-            if ($cost >= 1_000_000_000) {
-                $this->giveItemToPlayer($character, $item);
-            } else {
-                $this->handleDisenchantOrAutoSell($character, $item);
-            }
+        if ($user->auto_disenchant_amount !== '1-billion') {
+            return;
         }
+
+        $cost = SellItemCalculator::fetchSalePriceWithAffixes($item);
+
+        if ($cost >= 1_000_000_000) {
+            $this->giveItemToPlayer($character, $item);
+
+            return;
+        }
+
+        $this->handleDisenchantOrAutoSell($character, $item);
     }
 
     /**
-     * Handle either auto selling the item or auto disenchanting the item.
+     * Handle either auto selling the Item or auto disenchanting the Item, depending on the player's settings and Gold Dust cap.
      *
-     * @throws Exception
+     * @param Character $character
+     * @param Item $item
+     * @return void
      */
     private function handleDisenchantOrAutoSell(Character $character, Item $item): void
     {
         $maxCurrenciesValue = new CurrencyLimit($character->gold_dust, CurrencyType::GOLD_DUST);
 
-        if ($character->user->auto_sell_item) {
-            if ($maxCurrenciesValue->canNotGiveCurrency()) {
-                $this->rewardTotals['auto_sold_gold'] += SellItemCalculator::fetchSalePriceWithAffixes($item);
+        if ($character->user->auto_sell_item && $maxCurrenciesValue->canNotGiveCurrency()) {
+            $this->rewardTotals['auto_sold_gold'] += SellItemCalculator::fetchSalePriceWithAffixes($item);
 
-                $this->shopService->autoSellItem($character, $item);
+            $this->shopService->autoSellItem($character, $item);
 
-                return;
-            }
+            return;
         }
 
         $this->disenchantService->setUp($character)->disenchantItemWithSkill();
     }
 
     /**
-     * If the player can have the item, give it to them.
+     * If the player can have the Item, give it to them.
      *
+     * @param Character $character
+     * @param Item $item
+     * @param bool $isMythic
      * @return void
      */
-    private function giveItemToPlayer(Character $character, Item $item, bool $isMythic = false)
+    private function giveItemToPlayer(Character $character, Item $item, bool $isMythic = false): void
     {
         if ($item->type === 'quest') {
             $this->giveQuestItemToPlayer($character, $item);
@@ -582,11 +677,11 @@ class BattleDrop
     }
 
     /**
-     * Give a quest item to the player.
+     * Give a quest Item to the player, locking the character's inventory row for the duration of the ownership check and slot creation so concurrent drop processes cannot both insert the same quest item.
      *
-     * Locks the character's inventory row for the duration of the ownership
-     * check and slot creation so concurrent drop processes cannot both
-     * insert the same quest item.
+     * @param Character $character
+     * @param Item $item
+     * @return void
      */
     private function giveQuestItemToPlayer(Character $character, Item $item): void
     {

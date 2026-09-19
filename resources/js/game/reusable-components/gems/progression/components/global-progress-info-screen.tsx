@@ -1,12 +1,10 @@
-import React, { Fragment, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 
 import ProgressInfoScreenLayout from './progress-info-screen-layout';
 import GlobalProgressInfoScreenProps from './types/global-progress-info-screen-props';
 import GemEffectRow from '../../components/gem-effect-row';
 import { GemFieldProgressionBreakdownDefinition } from '../api/definitions/gem-progression-status-definition';
 import { resolveGemProgressionFieldLabel } from '../utils/gem-progression-field-label';
-
-import { formatPercent } from 'game-utils/format-number';
 
 import { ProgressBarVariant } from 'ui/progress/enums/progress-bar-variant';
 import ProgressBar from 'ui/progress/progress-bar';
@@ -19,7 +17,6 @@ import Separator from 'ui/separator/separator';
  */
 const GlobalProgressInfoScreen = ({
   global,
-  scroll_drop: scrollDrop,
   reward_effect_breakdown: rewardEffectBreakdown,
   rarity_effect_breakdown: rarityEffectBreakdown,
   on_close: onClose,
@@ -47,51 +44,34 @@ const GlobalProgressInfoScreen = ({
       </div>
 
       <p className="text-sm text-gray-700 dark:text-gray-300">
-        Global progression is shared by every Character who benefits from this
-        Gem profile. Every qualifying kill any Character makes here contributes
-        Global XP, and the improvement below applies for everyone.
+        Every qualifying kill in this Gem World adds Global XP. Global levels
+        increase this Gem profile&apos;s positive effects for every Character
+        who benefits from it. The values below are the current shared effects
+        after the Global bonus is applied.
       </p>
 
       <Separator />
 
       <div>
         <h3 className="mb-1 text-sm font-semibold text-gray-800 dark:text-gray-200">
-          Base Gem &amp; Global Improvement
+          Shared Gem Effects
         </h3>
         {combinedBreakdown.length === 0 ? (
           <p className="text-sm text-gray-600 dark:text-gray-400">
             No positive Gem effects currently roll for this profile.
           </p>
         ) : (
-          <div className="flex flex-col divide-y divide-gray-100 dark:divide-gray-800">
+          <div className="flex flex-col">
             {combinedBreakdown.map((breakdown) => (
-              <Fragment key={breakdown.field}>
-                <GemEffectRow
-                  field={breakdown.field}
-                  label={`${resolveGemProgressionFieldLabel(breakdown.field)} (Global Effective)`}
-                  value={breakdown.global_effective}
-                />
-                <p className="pb-1 text-xs text-gray-500 dark:text-gray-400">
-                  Base {formatPercent(breakdown.base)} + Global{' '}
-                  {formatPercent(breakdown.global)}
-                </p>
-              </Fragment>
+              <GemEffectRow
+                key={breakdown.field}
+                field={breakdown.field}
+                label={resolveGemProgressionFieldLabel(breakdown.field)}
+                value={breakdown.global_effective}
+              />
             ))}
           </div>
         )}
-      </div>
-
-      <Separator />
-
-      <div>
-        <h3 className="mb-1 text-sm font-semibold text-gray-800 dark:text-gray-200">
-          Gem Scroll Drops
-        </h3>
-        <p className="text-sm text-gray-700 dark:text-gray-300">
-          Once a Character reaches Personal level 100 for this profile,
-          qualifying kills anywhere in this Gem World have a{' '}
-          {formatPercent(scrollDrop.chance)} chance to drop a Gem Scroll.
-        </p>
       </div>
     </ProgressInfoScreenLayout>
   );

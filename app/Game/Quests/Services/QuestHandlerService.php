@@ -23,6 +23,7 @@ use App\Game\Monsters\Values\MonsterCacheKey;
 use App\Game\Quests\Handlers\NpcQuestsHandler;
 use App\Game\Quests\Traits\QuestDetails;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class QuestHandlerService
 {
@@ -63,6 +64,8 @@ class QuestHandlerService
 
     /**
      * Fetch the npc quest handler instance.
+     *
+     * @return NpcQuestsHandler
      */
     public function npcQuestsHandler(): NpcQuestsHandler
     {
@@ -71,6 +74,10 @@ class QuestHandlerService
 
     /**
      * Should we bail on the quest?
+     *
+     * @param Character $character
+     * @param Quest $quest
+     * @return bool
      */
     public function shouldBailOnQuest(Character $character, Quest $quest): bool
     {
@@ -167,6 +174,10 @@ class QuestHandlerService
 
     /**
      * Move the character to the Quest NPC location.
+     *
+     * @param Character $character
+     * @param Npc $npc
+     * @return array|Character
      */
     public function moveCharacter(Character $character, Npc $npc): array|Character
     {
@@ -223,7 +234,7 @@ class QuestHandlerService
      * @param Character $character
      * @return void
      */
-    protected function updateMapDetails(Character $character): void
+    private function updateMapDetails(Character $character): void
     {
         $monsters = $this->resolveMapMonsterDataset($character);
 
@@ -253,6 +264,10 @@ class QuestHandlerService
 
     /**
      * Complete and hand in the Quest for the character.
+     *
+     * @param Character $character
+     * @param Quest $quest
+     * @return array
      */
     public function handInQuest(Character $character, Quest $quest)
     {
@@ -263,7 +278,7 @@ class QuestHandlerService
             ? BattleRewardRequestSourceType::QUEST
             : BattleRewardRequestSourceType::RAID_QUEST;
 
-        $this->battleRewardProcessingQueueManager->enqueue(
+        $enqueueResult = $this->battleRewardProcessingQueueManager->enqueue(
             $character,
             BattleRewardRequestPriority::FIRST,
             $sourceType,
@@ -273,6 +288,20 @@ class QuestHandlerService
                 'quest_id' => $quest->id,
             ],
         );
+
+        if (! $enqueueResult->successful()) {
+            $failure = $enqueueResult->failure();
+
+            Log::channel('reward_processing')->error('Quest reward enqueue failed.', [
+                'character_id' => $character->id,
+                'quest_id' => $quest->id,
+                'source_type' => $sourceType->value,
+                'exception_class' => is_null($failure) ? null : $failure::class,
+                'exception_message' => $failure?->getMessage(),
+            ]);
+
+            return $this->errorResult('Your quest reward could not be queued right now. Please try handing in this quest again.');
+        }
 
         $character = $character->refresh();
 
@@ -291,6 +320,8 @@ class QuestHandlerService
 
     /**
      * get the bail reason.
+     *
+     * @return string
      */
     public function getBailMessage(): string
     {

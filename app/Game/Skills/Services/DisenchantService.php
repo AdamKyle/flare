@@ -23,25 +23,30 @@ class DisenchantService
 {
     use ResponseBuilder;
 
-    private EnchantingService $enchantingService;
-
     private Character $character;
 
     private Skill $disenchantingSkill;
 
     private ?InventorySlot $questSlot = null;
 
+    /**
+     * @param SkillCheckService $skillCheckService
+     * @param RandomNumberGenerator $randomNumberGenerator
+     * @param ChanceCalculator $chanceCalculator
+     * @param EnchantingAffixService $enchantingAffixService
+     */
     public function __construct(
         private readonly SkillCheckService $skillCheckService,
         private readonly RandomNumberGenerator $randomNumberGenerator,
         private readonly ChanceCalculator $chanceCalculator,
+        private readonly EnchantingAffixService $enchantingAffixService,
     ) {}
 
     /**
      * Set up the service for the given character, resolving their Disenchanting skill and Gold Dust Rush quest slot.
      *
-     * @param Character $character The character disenchanting an item.
-     * @return DisenchantService The configured service instance.
+     * @param Character $character
+     * @return DisenchantService
      */
     public function setUp(Character $character): DisenchantService
     {
@@ -61,9 +66,9 @@ class DisenchantService
     /**
      * Disenchant the item held in an Inventory or Set slot and return the response payload.
      *
-     * @param InventorySlot|SetSlot $slot The slot holding the item being disenchanted.
-     * @param bool $doNotSendResponse Whether to suppress the player-facing response message.
-     * @return array The disenchant response payload.
+     * @param InventorySlot|SetSlot $slot
+     * @param bool $doNotSendResponse
+     * @return array
      */
     public function disenchantItem(InventorySlot|SetSlot $slot, bool $doNotSendResponse = false): array
     {
@@ -87,8 +92,8 @@ class DisenchantService
     /**
      * Roll the Disenchanting skill check, award or deny Gold Dust, and delete the disenchanted slot.
      *
-     * @param InventorySlot|SetSlot $slot The slot holding the item being disenchanted.
-     * @return void This method does not return a value.
+     * @param InventorySlot|SetSlot $slot
+     * @return void
      */
     public function disenchantWithSkill(InventorySlot|SetSlot $slot): void
     {
@@ -100,7 +105,7 @@ class DisenchantService
 
         if ($this->character->gold_dust >= CurrencyLimit::MAX_GOLD_DUST) {
 
-            $affixData = resolve(EnchantingService::class)->fetchAffixes($this->character->refresh());
+            $affixData = $this->enchantingAffixService->fetchAffixes($this->character->refresh());
 
             if ($disenchanted) {
                 event(new UpdateSkillEvent($this->disenchantingSkill));
@@ -140,7 +145,7 @@ class DisenchantService
 
         $slot->delete();
 
-        $affixData = resolve(EnchantingService::class)->fetchAffixes($this->character->refresh());
+        $affixData = $this->enchantingAffixService->fetchAffixes($this->character->refresh());
 
         event(new UpdateCharacterEnchantingList(
             $this->character->user,
@@ -152,12 +157,9 @@ class DisenchantService
     }
 
     /**
-     * Disenchant a Batch Crafting produced item that was never placed into an Inventory slot.
+     * Disenchant a Batch Crafting produced item that was never placed into an Inventory slot, mirroring disenchantWithSkill()'s roll and Gold Dust reward without any slot to update or delete.
      *
-     * Mirrors disenchantWithSkill()'s roll and Gold Dust reward without any slot to update or
-     * delete, since a Batch Crafting disenchant target never entered the character's Inventory.
-     *
-     * @return void This method does not return a value.
+     * @return void
      */
     public function disenchantBatchCraftedItem(): void
     {
@@ -184,7 +186,7 @@ class DisenchantService
     /**
      * Roll the Disenchanting skill check and award or deny Gold Dust, sending the maxed-currency message when capped.
      *
-     * @return void This method does not return a value.
+     * @return void
      */
     public function disenchantItemWithSkill(): void
     {
@@ -199,49 +201,62 @@ class DisenchantService
         if ($characterCurrentGoldDust >= CurrencyLimit::MAX_GOLD_DUST && $canDisenchant) {
             event(new UpdateSkillEvent($this->disenchantingSkill));
 
-            event(new UpdateCharacterInventoryCountEvent($this->character));
-
             ServerMessageHandler::sendBasicMessage($this->character->user, 'Disenchanted item but got no gold dust as you are capped. Maybe you want to auto sell it (can be enabled in your settings, profile icon -> settings, scroll down to Auto Disenchant)?');
 
             return;
         }
 
         if ($canDisenchant) {
-            $goldDust = $this->updateGoldDust($this->character);
+            $goldDust = $this->persistGoldDust($this->character);
 
             ServerMessageHandler::handleMessage($this->character->user, CraftingMessageTypes::DISENCHANTED, number_format($goldDust));
 
             event(new UpdateSkillEvent($this->disenchantingSkill));
-
-            event(new UpdateCharacterInventoryCountEvent($this->character));
         } else {
-            $this->updateGoldDust($this->character, true);
+            $this->persistGoldDust($this->character, true);
 
             ServerMessageHandler::handleMessage($this->character->user, CraftingMessageTypes::FAILED_TO_DISENCHANT);
         }
     }
 
     /**
-     * Roll and award the character's Gold Dust for a disenchant outcome, applying the Disenchanting skill bonus.
+     * Roll and award the character's Gold Dust for a disenchant outcome, dispatching a Character-details refresh.
      *
-     * @param Character $character The character being awarded Gold Dust.
-     * @param bool $failedCheck Whether the disenchant skill check failed.
-     * @param bool $canRollGoldDustRush Whether this award may also roll the Gold Dust Rush bonus.
-     * @return int The Gold Dust amount awarded before the Gold Dust Rush bonus.
+     * @param Character $character
+     * @param bool $failedCheck
+     * @param bool $canRollGoldDustRush
+     * @return int
      */
     public function updateGoldDust(Character $character, bool $failedCheck = false, bool $canRollGoldDustRush = true): int
     {
+        $goldDust = $this->persistGoldDust($character, $failedCheck, $canRollGoldDustRush);
 
+        event(new UpdateCharacterBaseDetailsEvent($character->refresh()));
+
+        return $goldDust;
+    }
+
+    /**
+     * Persist one Gold Dust disenchant result without dispatching a Character-details refresh.
+     *
+     * @param Character $character
+     * @param bool $failedCheck
+     * @param bool $canRollGoldDustRush
+     * @return int
+     */
+    private function persistGoldDust(Character $character, bool $failedCheck = false, bool $canRollGoldDustRush = true): int
+    {
         $goldDust = ! $failedCheck ? $this->fetchGoldDustAmount() : 1;
 
-        $goldDust = (int) ($goldDust + $goldDust * $this->disenchantingSkill->bonus);
+        $goldDustBonusMultiplier = $this->disenchantingSkill->bonus ?? 0;
+        $goldDust += $goldDust * $goldDustBonusMultiplier;
 
         $characterTotalGoldDust = $character->gold_dust + $goldDust;
         $goldDustRushAwarded = false;
 
         if (! $failedCheck) {
             if ($canRollGoldDustRush && $this->canAwardGoldDustRush() && $this->fetchDCRoll() === 100) {
-                $characterTotalGoldDust += (int) floor($goldDust * 0.05);
+                $characterTotalGoldDust += intdiv($goldDust, 20);
                 $goldDustRushAwarded = true;
             }
         }
@@ -253,8 +268,6 @@ class DisenchantService
         $character->update([
             'gold_dust' => $characterTotalGoldDust,
         ]);
-
-        event(new UpdateCharacterBaseDetailsEvent($character->refresh()));
 
         if ($goldDustRushAwarded) {
             if ($characterTotalGoldDust >= CurrencyLimit::MAX_GOLD_DUST) {
@@ -270,9 +283,9 @@ class DisenchantService
     /**
      * Award the Gold Dust Rush quest-effect bonus on top of a successful disenchant, when eligible.
      *
-     * @param Character $character The character being awarded the bonus.
-     * @param int $goldDustGain The base Gold Dust gained from the disenchant.
-     * @return void This method does not return a value.
+     * @param Character $character
+     * @param int $goldDustGain
+     * @return void
      */
     public function applyGoldDustRushBonus(Character $character, int $goldDustGain): void
     {
@@ -284,7 +297,7 @@ class DisenchantService
             return;
         }
 
-        $characterTotalGoldDust = $character->gold_dust + (int) floor($goldDustGain * 0.05);
+        $characterTotalGoldDust = $character->gold_dust + intdiv($goldDustGain, 20);
 
         if ($characterTotalGoldDust >= CurrencyLimit::MAX_GOLD_DUST) {
             $characterTotalGoldDust = CurrencyLimit::MAX_GOLD_DUST;
@@ -300,7 +313,7 @@ class DisenchantService
     /**
      * Determine whether the current disenchant has the Gold Dust Rush quest effect active.
      *
-     * @return bool True when the quest effect is active for this disenchant.
+     * @return bool
      */
     private function canAwardGoldDustRush(): bool
     {
@@ -310,7 +323,7 @@ class DisenchantService
     /**
      * Roll the random Gold Dust Rush bonus amount.
      *
-     * @return int The rolled Gold Dust bonus amount.
+     * @return int
      */
     private function fetchGoldDustAmount(): int
     {
@@ -318,9 +331,9 @@ class DisenchantService
     }
 
     /**
-     * Roll the Gold Dust Rush one-in-a-hundred chance check.
+     * Roll the Gold Dust Rush one-in-a-hundred chance check, returning 100 when the roll passes, otherwise 99.
      *
-     * @return int 100 when the roll passes, otherwise 99.
+     * @return int
      */
     private function fetchDCRoll(): int
     {

@@ -242,7 +242,7 @@ class GemWorldRewardDeliveryService
         $item = $this->buildRarityItem($character, $roll->candidateRarity(), $onlyTypes);
         $item = $this->applySocketsAndGems($item, $roll);
 
-        $this->battleDrop->applyPlannedItem($character, $item->id);
+        $this->battleDrop->applyPlannedItem($character, $item);
 
         $tally[$isEnhanced ? 'enhanced_items_delivered' : 'item_opportunity_items_delivered']++;
         $deliveredItemIds[] = $item->id;
@@ -296,6 +296,7 @@ class GemWorldRewardDeliveryService
      *
      * @param Item $item
      * @param int $gemCount
+     * @return void
      */
     private function attachTierFourGems(Item $item, int $gemCount): void
     {

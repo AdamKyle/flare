@@ -2,6 +2,8 @@
 
 namespace App\Game\BattleRewardProcessing\Enums;
 
+use RuntimeException;
+
 enum BattleRewardStepName: string
 {
     case BUILD_REWARD_PLAN = 'build_reward_plan';
@@ -25,6 +27,11 @@ enum BattleRewardStepName: string
     case FINAL_PLAYER_UPDATES = 'final_player_updates';
     case MESSAGE_OUTBOX = 'message_outbox';
 
+    /**
+     * The full battle-ledger step order used by BATTLE, EXPLORATION, and AUTOMATION requests.
+     *
+     * @return array
+     */
     public static function ordered(): array
     {
         return [
@@ -47,6 +54,11 @@ enum BattleRewardStepName: string
         ];
     }
 
+    /**
+     * The seven-step ledger order used by FACTION_LOYALTY requests.
+     *
+     * @return array
+     */
     public static function orderedForFactionLoyalty(): array
     {
         return [
@@ -58,5 +70,42 @@ enum BattleRewardStepName: string
             self::FINAL_PLAYER_UPDATES,
             self::MESSAGE_OUTBOX,
         ];
+    }
+
+    /**
+     * The queue-wrapper-only step order for Quest, Raid Quest, and Guide Quest
+     * requests. Their reward source handler runs outside this ledger; only the
+     * final live-update/message-outbox queue wrapper steps are ledger-owned.
+     *
+     * @return array
+     */
+    public static function orderedForQuest(): array
+    {
+        return [
+            self::FINAL_PLAYER_UPDATES,
+            self::MESSAGE_OUTBOX,
+        ];
+    }
+
+    /**
+     * Resolve the persisted step ordering for the given request source type.
+     *
+     * @param BattleRewardRequestSourceType $sourceType
+     * @return array
+     */
+    public static function orderedForSource(BattleRewardRequestSourceType $sourceType): array
+    {
+        return match ($sourceType) {
+            BattleRewardRequestSourceType::FACTION_LOYALTY => self::orderedForFactionLoyalty(),
+            BattleRewardRequestSourceType::QUEST,
+            BattleRewardRequestSourceType::RAID_QUEST,
+            BattleRewardRequestSourceType::GUIDE_QUEST => self::orderedForQuest(),
+            BattleRewardRequestSourceType::BATTLE,
+            BattleRewardRequestSourceType::EXPLORATION,
+            BattleRewardRequestSourceType::AUTOMATION => self::ordered(),
+            BattleRewardRequestSourceType::FUTURE => throw new RuntimeException(
+                'No ledger step ordering exists for future reward requests.',
+            ),
+        };
     }
 }

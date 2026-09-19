@@ -73,6 +73,7 @@ const Dropdown = ({
   empty_message,
   search_placeholder,
   on_open,
+  on_close,
   aria_described_by,
   aria_invalid,
   aria_required,
@@ -153,7 +154,8 @@ const Dropdown = ({
     setIsOpen(false);
     setFocusedIndex(null);
     setInternalSearchTerm('');
-  }, []);
+    on_close?.();
+  }, [on_close]);
 
   useLayoutEffect(() => {
     if (!isOpen) {

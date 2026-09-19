@@ -10,6 +10,7 @@ use App\Game\Automation\Exploration\Jobs\Exploration;
 use App\Game\Automation\Exploration\Services\ExplorationCreatureCountCalculator;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\MonsterFightService;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\BattleRewardProcessing\Services\CharacterRewardService;
 use App\Game\Character\Exceptions\MissingInventoryException;
@@ -146,7 +147,7 @@ class ExplorationTest extends TestCase
         }));
 
         $this->instance(BattleEventHandler::class, Mockery::mock(BattleEventHandler::class, function (MockInterface $mock) use ($character, $monster) {
-            $mock->shouldReceive('processMonsterDeath')->once()->with($character->id, $monster->id, Mockery::type('array'));
+            $mock->shouldReceive('processMonsterDeath')->once()->with($character->id, $monster->id, Mockery::type('array'), BattleRewardRequestSourceType::EXPLORATION);
         }));
 
         Exploration::dispatch($character, $automation->id, AttackType::ATTACK->value, 3);
@@ -490,7 +491,7 @@ class ExplorationTest extends TestCase
         }));
 
         $this->instance(BattleEventHandler::class, Mockery::mock(BattleEventHandler::class, function (MockInterface $mock) use ($character, $nextMonster) {
-            $mock->shouldReceive('processMonsterDeath')->once()->with($character->id, $nextMonster->id, Mockery::type('array'));
+            $mock->shouldReceive('processMonsterDeath')->once()->with($character->id, $nextMonster->id, Mockery::type('array'), BattleRewardRequestSourceType::EXPLORATION);
         }));
 
         Exploration::dispatch($character, $automation->id, AttackType::ATTACK->value, 3);
@@ -606,7 +607,8 @@ class ExplorationTest extends TestCase
             $mock->shouldReceive('processMonsterDeath')->once()->with(
                 $character->id,
                 $monster->id,
-                Mockery::on(fn (array $context): bool => ($context['exploration_log_id'] ?? null) === $log->id)
+                Mockery::on(fn (array $context): bool => ($context['exploration_log_id'] ?? null) === $log->id),
+                BattleRewardRequestSourceType::EXPLORATION,
             );
         }));
 
@@ -1183,6 +1185,62 @@ class ExplorationTest extends TestCase
         $this->assertSame(50, $log->fresh()->weapon_damage);
     }
 
+    public function test_handle_fails_the_automation_instead_of_awarding_fake_damage_when_a_matched_battle_message_number_is_out_of_range(): void
+    {
+        Event::fake();
+        $this->instance(CharacterRewardService::class, Mockery::mock(CharacterRewardService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('setCharacter')->andReturnSelf();
+            $mock->shouldReceive('fetchXpForMonster')->andReturn(10);
+        }));
+
+        $this->instance(SkillService::class, Mockery::mock(SkillService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('setSkillInTraining')->andReturnSelf();
+            $mock->shouldReceive('getXpForSkillIntraining')->andReturn(5);
+        }));
+
+        $this->instance(ExplorationCreatureCountCalculator::class, Mockery::mock(ExplorationCreatureCountCalculator::class, function (MockInterface $mock) {
+            $mock->shouldReceive('calculate')->andReturn(1);
+        }));
+
+        $this->instance(FactionHandler::class, Mockery::mock(FactionHandler::class, function (MockInterface $mock) {
+            $mock->shouldReceive('getFactionPointsPerKill')->andReturn(0);
+        }));
+
+        $character = $this->character->getCharacter();
+        $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+
+        $automation = $this->createCharacterAutomation([
+            'character_id' => $character->id,
+            'monster_id' => $monster->id,
+            'started_at' => now(),
+            'completed_at' => now()->addMinute(),
+            'attack_type' => AttackType::ATTACK->value,
+        ]);
+
+        // The regex only constrains the captured value to digits/commas, so a matched but
+        // numerically out-of-range value is a real malformed-data case, not an absent one.
+        $this->instance(MonsterFightService::class, Mockery::mock(MonsterFightService::class, function (MockInterface $mock) use ($monster) {
+            $mock->shouldReceive('setupMonster')->andReturn([
+                'health' => ['current_character_health' => 10, 'current_monster_health' => 0],
+            ]);
+            $mock->shouldReceive('fightMonster')->andReturn([
+                'health' => ['current_character_health' => 10, 'current_monster_health' => 0],
+                'attack_messages' => [
+                    ['message' => 'Your weapon hits Goblin for: 99999999999999999999999999999999'],
+                ],
+            ]);
+            $mock->shouldReceive('getMonster')->andReturn($monster);
+        }));
+
+        $this->instance(BattleEventHandler::class, Mockery::mock(BattleEventHandler::class, function (MockInterface $mock) {
+            $mock->shouldReceive('processMonsterDeath');
+        }));
+
+        Exploration::dispatch($character, $automation->id, AttackType::ATTACK->value, 3);
+
+        $this->assertNull(CharacterAutomation::find($automation->id));
+    }
+
     public function test_handle_includes_exploration_log_id_in_reward_context_when_round_completes_and_reschedules(): void
     {
         Event::fake();
@@ -1237,7 +1295,8 @@ class ExplorationTest extends TestCase
             $mock->shouldReceive('processMonsterDeath')->once()->with(
                 $character->id,
                 $monster->id,
-                Mockery::on(fn (array $context): bool => ($context['exploration_log_id'] ?? null) === $log->id)
+                Mockery::on(fn (array $context): bool => ($context['exploration_log_id'] ?? null) === $log->id),
+                BattleRewardRequestSourceType::EXPLORATION,
             );
         }));
 

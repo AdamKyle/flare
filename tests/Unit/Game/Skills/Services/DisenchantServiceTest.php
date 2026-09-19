@@ -6,8 +6,10 @@ use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Game\Character\CharacterInventory\Jobs\DisenchantMany;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Currency\Services\CurrencyLimit;
+use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -480,6 +482,10 @@ class DisenchantServiceTest extends TestCase
         $character = $character->refresh();
 
         $this->assertSame(1000, $character->gold_dust);
+
+        Event::assertDispatched(UpdateSkillEvent::class);
+        Event::assertNotDispatched(UpdateCharacterInventoryCountEvent::class);
+        Event::assertNotDispatched(UpdateCharacterBaseDetailsEvent::class);
     }
 
     public function test_call_disenchant_item_and_succeed_but_get_no_gold_dust_when_maxed(): void
@@ -504,6 +510,8 @@ class DisenchantServiceTest extends TestCase
         $character = $character->refresh();
 
         $this->assertEquals(CurrencyLimit::MAX_GOLD_DUST, $character->gold_dust);
+
+        Event::assertNotDispatched(UpdateCharacterInventoryCountEvent::class);
     }
 
     public function test_call_disenchant_item_and_fail(): void
@@ -529,6 +537,8 @@ class DisenchantServiceTest extends TestCase
         Event::assertDispatched(function (ServerMessageEvent $event) {
             return $event->message === resolve(ServerMessageBuilder::class)->build(CraftingMessageTypes::FAILED_TO_DISENCHANT);
         });
+        Event::assertNotDispatched(UpdateCharacterInventoryCountEvent::class);
+        Event::assertNotDispatched(UpdateCharacterBaseDetailsEvent::class);
     }
 
     public function test_cannot_disentchant_item_that_does_not_exist(): void
@@ -665,5 +675,35 @@ class DisenchantServiceTest extends TestCase
         $this->assertEquals($goldDustBefore + 1, $character->gold_dust);
 
         Event::assertNotDispatched(UpdateSkillEvent::class);
+    }
+
+    public function test_disenchant_dispatches_enchanting_list_update_with_the_real_remaining_inventory(): void
+    {
+        Event::fake();
+
+        $remainingItem = $this->createItem([
+            'cost' => 500,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 100,
+            'crafting_type' => 'weapon',
+            'type' => 'weapon',
+            'can_craft' => true,
+            'default_position' => 'hammer',
+        ]);
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($this->itemToDisenchant)
+            ->giveItem($remainingItem)
+            ->getCharacter();
+
+        $slot = $character->inventory->slots->firstWhere('item_id', $this->itemToDisenchant->id);
+
+        resolve(DisenchantService::class)->setUp($character)->disenchantWithSkill($slot);
+
+        Event::assertDispatched(function (UpdateCharacterEnchantingList $event) use ($remainingItem) {
+            return $event->inventory->count() === 1
+                && $event->inventory->first()->item_id === $remainingItem->id;
+        });
     }
 }

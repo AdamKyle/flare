@@ -7,18 +7,20 @@ use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Currency\Values\CurrencyType;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Messages\Types\CurrenciesMessageTypes;
-use Exception;
 use Facades\App\Game\Core\Chance\GoldRushCheckCalculator;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class GoldRush
 {
     /**
-     * Process potential gold rush
+     * Roll for and apply a potential Gold Rush bonus on top of the gold already gained.
      *
-     * @throws Exception
+     * @param Character $character
+     * @param int $goldGained
+     * @param bool $dispatchCurrencyUpdate
+     * @return void
      */
-    public function processPotentialGoldRush(Character $character, int $goldGained): void
+    public function processPotentialGoldRush(Character $character, int $goldGained, bool $dispatchCurrencyUpdate = true): void
     {
         if ($goldGained <= 0) {
             return;
@@ -31,21 +33,23 @@ class GoldRush
         if (GoldRushCheckCalculator::fetchGoldRushChance($this->getGameMapBonus($character), 0.0)) {
             $this->giveGoldRush($character, $goldGained);
 
-            if (! $character->is_auto_battling && $character->isLoggedIn()) {
+            if ($dispatchCurrencyUpdate && ! $character->is_auto_battling && $character->isLoggedIn()) {
                 event(new UpdateCharacterCurrenciesEvent($character->refresh()));
             }
         }
     }
 
     /**
-     * Give the player a gold rush.
+     * Give the Character a Gold Rush bonus of one twentieth of the gold gained.
      *
-     * @throws Exception
+     * @param Character $character
+     * @param int $goldGained
+     * @return void
      */
     private function giveGoldRush(Character $character, int $goldGained): void
     {
 
-        $amountGiven = (int) floor($goldGained * 0.05);
+        $amountGiven = intdiv($goldGained, 20);
 
         $goldRush = $character->gold + $amountGiven;
 
@@ -68,6 +72,12 @@ class GoldRush
         ServerMessageHandler::handleMessageWithNewValue($character->user, $type, number_format($amountGiven), number_format($character->gold));
     }
 
+    /**
+     * Resolve the current Game Map's drop chance bonus applied to the Gold Rush roll.
+     *
+     * @param Character $character
+     * @return float
+     */
     private function getGameMapBonus(Character $character): float
     {
         $gameMap = $character->map->gameMap;

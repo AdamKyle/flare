@@ -10,6 +10,7 @@ use App\Game\ClassRanks\Values\WeaponMasteryValue;
 use App\Game\Core\Items\Values\ItemType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use RuntimeException;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterClassRank;
@@ -760,6 +761,20 @@ class ClassRankServiceTest extends TestCase
         $newLevel = $character->classRanks->first()->level;
 
         $this->assertNotEquals($currentlevel, $newLevel);
+    }
+
+    public function test_extreme_gem_bonus_fails_explicitly_instead_of_awarding_fake_class_rank_xp(): void
+    {
+        $character = $this->character->getCharacter();
+        $startingXp = $character->classRanks->first()->current_xp;
+
+        $this->classRankService->giveXpToClassRank($character, 1, 1.0e20);
+
+        $character = $character->refresh();
+        $failure = $this->classRankService->classRankXpCalculationFailure();
+
+        $this->assertInstanceOf(RuntimeException::class, $failure);
+        $this->assertSame($startingXp, $character->classRanks->first()->current_xp);
     }
 
     public function test_do_not_level_up_specialty_when_at_max()

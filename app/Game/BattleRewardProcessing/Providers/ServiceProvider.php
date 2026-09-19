@@ -2,7 +2,6 @@
 
 namespace App\Game\BattleRewardProcessing\Providers;
 
-use App\Game\BattleRewardProcessing\Handlers\BattleGlobalEventParticipationHandler;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\BattleRewardProcessing\Handlers\FactionLoyaltyBountyHandler;
@@ -31,11 +30,9 @@ use App\Game\Core\Items\Builders\RandomAffixGenerator;
 use App\Game\Core\Services\CharacterService;
 use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\GoldRush;
-use App\Game\Events\Services\EventGoalsService;
-use App\Game\Events\Services\GlobalEventGoalEligibilityService;
-use App\Game\Events\Services\GlobalEventGoalProgressionService;
+use App\Game\Events\Contracts\BattleGlobalEventParticipation;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
-use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
+use App\Game\Gems\Progression\Contracts\CharacterAreaGemEffects;
 use App\Game\Gems\Progression\Services\GemWorldRewardService;
 use App\Game\Gems\Services\AreaGemEffectService;
 use App\Game\GuideQuests\Services\GuideQuestService;
@@ -56,13 +53,13 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->singleton(CharacterCurrencyRewardService::class, fn ($app) => new CharacterCurrencyRewardService(
             $app->make(BattleMessageHandler::class),
             $app->make(RandomNumberGenerator::class),
-            $app->make(CharacterAreaGemEffectService::class),
+            $app->make(CharacterAreaGemEffects::class),
         ));
         $this->app->bind(CharacterXPService::class, fn ($app) => new CharacterXPService(
             $app->make(CharacterService::class),
             $app->make(SkillService::class),
             $app->make(BattleMessageHandler::class),
-            $app->make(CharacterAreaGemEffectService::class),
+            $app->make(CharacterAreaGemEffects::class),
         ));
         $this->app->bind(CharacterRewardService::class, fn ($app) => new CharacterRewardService(
             $app->make(CharacterXPService::class),
@@ -101,14 +98,6 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(GlobalEventParticipation::class, function ($app) {
             return new GlobalEventParticipation(
                 $app->make(RandomAffixGenerator::class),
-            );
-        });
-
-        $this->app->bind(BattleGlobalEventParticipationHandler::class, function ($app) {
-            return new BattleGlobalEventParticipationHandler(
-                $app->make(RandomAffixGenerator::class),
-                $app->make(EventGoalsService::class),
-                $app->make(GlobalEventGoalProgressionService::class),
             );
         });
 
@@ -165,13 +154,12 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(DropCheckService::class),
                 $app->make(WeeklyBattleService::class),
                 $app->make(SecondaryRewardService::class),
-                $app->make(BattleGlobalEventParticipationHandler::class),
+                $app->make(BattleGlobalEventParticipation::class),
                 $app->make(SkillService::class),
                 $app->make(BattleRewardLedgerService::class),
                 $app->make(BattleRewardMessageContext::class),
                 $app->make(RandomAffixGenerator::class),
                 $app->make(BroadcastTopsUpdateService::class),
-                $app->make(GlobalEventGoalEligibilityService::class),
                 $app->make(GemWorldRewardService::class),
                 $app->make(MonsterListService::class),
             );

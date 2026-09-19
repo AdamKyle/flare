@@ -2,6 +2,7 @@
 
 namespace App\Game\Battle\Handlers;
 
+use App\Admin\Services\MonitoredBugReportService;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterInCelestialFight;
 use App\Flare\Models\Monster;
@@ -16,19 +17,32 @@ use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
 use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class BattleEventHandler
 {
     use FetchEquipped;
 
+    /**
+     * @param BattleRewardProcessingQueueManager $battleRewardProcessingQueueManager
+     * @param WeeklyBattleService $weeklyBattleService
+     * @param BatchCraftingAutomationService $batchCraftingAutomationService
+     * @param MonitoredBugReportService $monitoredBugReportService
+     */
     public function __construct(
         private BattleRewardProcessingQueueManager $battleRewardProcessingQueueManager,
         private WeeklyBattleService $weeklyBattleService,
         private BatchCraftingAutomationService $batchCraftingAutomationService,
+        private readonly MonitoredBugReportService $monitoredBugReportService,
     ) {}
 
     /**
      * Process the fact the character has died.
+     *
+     * @param Character $character
+     * @param ?Monster $monster
+     * @return void
      */
     public function processDeadCharacter(Character $character, ?Monster $monster = null): void
     {
@@ -61,9 +75,19 @@ class BattleEventHandler
      * Processes what we should do when the monster dies.
      *
      * - Handles rewarding the player
+     *
+     * @param int $characterId
+     * @param int $monsterId
+     * @param array $context
+     * @param BattleRewardRequestSourceType $sourceType
+     * @return void
      */
-    public function processMonsterDeath(int $characterId, int $monsterId, array $context = []): void
-    {
+    public function processMonsterDeath(
+        int $characterId,
+        int $monsterId,
+        array $context = [],
+        BattleRewardRequestSourceType $sourceType = BattleRewardRequestSourceType::BATTLE,
+    ): void {
         $character = Character::find($characterId);
         $monster = Monster::find($monsterId);
 
@@ -71,12 +95,9 @@ class BattleEventHandler
             $this->weeklyBattleService->claimMonsterDeath($character, $monster);
         }
 
-        $sourceType = isset($context['exploration_log_id'])
-            ? BattleRewardRequestSourceType::EXPLORATION
-            : BattleRewardRequestSourceType::BATTLE;
         $sourceId = $this->buildSourceId($sourceType, $characterId, $monsterId, $context);
 
-        $this->battleRewardProcessingQueueManager->enqueue(
+        $enqueueResult = $this->battleRewardProcessingQueueManager->enqueue(
             $characterId,
             BattleRewardRequestPriority::SECOND,
             $sourceType,
@@ -87,8 +108,59 @@ class BattleEventHandler
                 'context' => $context,
             ],
         );
+
+        if (! $enqueueResult->successful()) {
+            $this->reportFailedRewardEnqueue($enqueueResult->failure(), $characterId, $monsterId, $sourceType, $sourceId);
+        }
     }
 
+    /**
+     * Log and report a failed battle reward enqueue without granting a reward synchronously.
+     *
+     * @param ?Throwable $failure
+     * @param int $characterId
+     * @param int $monsterId
+     * @param BattleRewardRequestSourceType $sourceType
+     * @param string $sourceId
+     * @return void
+     */
+    private function reportFailedRewardEnqueue(
+        ?Throwable $failure,
+        int $characterId,
+        int $monsterId,
+        BattleRewardRequestSourceType $sourceType,
+        string $sourceId,
+    ): void {
+        $failureClass = is_null($failure) ? null : $failure::class;
+
+        Log::channel('reward_processing')->error('Battle reward enqueue failed for a monster death.', [
+            'character_id' => $characterId,
+            'monster_id' => $monsterId,
+            'source_type' => $sourceType->value,
+            'source_id' => $sourceId,
+            'exception_class' => $failureClass,
+            'exception_message' => $failure?->getMessage(),
+        ]);
+
+        $this->monitoredBugReportService->reportError(
+            'battle-reward-enqueue',
+            $failure?->getMessage() ?? 'Battle reward enqueue failed without a recorded exception.',
+            ['character_id' => $characterId, 'monster_id' => $monsterId, 'source_type' => $sourceType->value],
+            $failureClass,
+            $characterId,
+            $sourceId,
+        );
+    }
+
+    /**
+     * Build the unique reward request source id for the Monster's death.
+     *
+     * @param BattleRewardRequestSourceType $sourceType
+     * @param int $characterId
+     * @param int $monsterId
+     * @param array $context
+     * @return string
+     */
     private function buildSourceId(
         BattleRewardRequestSourceType $sourceType,
         int $characterId,
@@ -117,6 +189,9 @@ class BattleEventHandler
 
     /**
      * Handle when a character revives.
+     *
+     * @param Character $character
+     * @return Character
      */
     public function processRevive(Character $character): Character
     {

@@ -16,10 +16,13 @@ use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Events\Values\EventType;
-use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
+use App\Game\Gems\Progression\Contracts\CharacterAreaGemEffects;
 use App\Game\Gems\Values\AreaGemRewardEffect;
+use App\Game\Gems\Values\ResolvedAreaGemEffects;
 use App\Game\Maps\Values\LocationType;
 use App\Game\Messages\Types\CurrenciesMessageTypes;
+use RuntimeException;
+use Throwable;
 
 class CharacterCurrencyRewardService
 {
@@ -32,15 +35,17 @@ class CharacterCurrencyRewardService
         'copper_coins' => 0,
     ];
 
+    private ?Throwable $currencyCalculationFailure = null;
+
     /**
      * @param BattleMessageHandler $battleMessageHandler
      * @param RandomNumberGenerator $randomNumberGenerator
-     * @param CharacterAreaGemEffectService $characterAreaGemEffectService
+     * @param CharacterAreaGemEffects $characterAreaGemEffects
      */
     public function __construct(
         private readonly BattleMessageHandler $battleMessageHandler,
         private readonly RandomNumberGenerator $randomNumberGenerator,
-        private readonly CharacterAreaGemEffectService $characterAreaGemEffectService,
+        private readonly CharacterAreaGemEffects $characterAreaGemEffects,
     ) {}
 
     /**
@@ -58,8 +63,21 @@ class CharacterCurrencyRewardService
             'shards' => 0,
             'copper_coins' => 0,
         ];
+        $this->currencyCalculationFailure = null;
 
         return $this;
+    }
+
+    /**
+     * Return the invalid whole-currency calculation failure recorded during the most recent
+     * currency operation, if one occurred, so the caller can fail the owning reward operation
+     * instead of treating a corrupted calculation as a silent or extreme currency reward.
+     *
+     * @return ?Throwable
+     */
+    public function currencyCalculationFailure(): ?Throwable
+    {
+        return $this->currencyCalculationFailure;
     }
 
     /**
@@ -81,6 +99,13 @@ class CharacterCurrencyRewardService
         return $this->earnedCurrencies;
     }
 
+    /**
+     * Plan the currency rewards for the Monster without applying them.
+     *
+     * @param Monster $monster
+     * @param int $killCount
+     * @return array
+     */
     public function planCurrencies(Monster $monster, int $killCount = 1): array
     {
         $goldToReward = $monster->gold * $killCount;
@@ -192,7 +217,14 @@ class CharacterCurrencyRewardService
         return ['granted' => $granted, 'wasted' => $wasted];
     }
 
-    public function applyPlannedCurrencies(array $plan): array
+    /**
+     * Apply an already-planned currency reward to the Character.
+     *
+     * @param array $plan
+     * @param ?ResolvedAreaGemEffects $resolvedAreaGemEffects
+     * @return array
+     */
+    public function applyPlannedCurrencies(array $plan, ?ResolvedAreaGemEffects $resolvedAreaGemEffects = null): array
     {
         $this->earnedCurrencies = [
             'gold' => 0,
@@ -200,12 +232,20 @@ class CharacterCurrencyRewardService
             'shards' => 0,
             'copper_coins' => 0,
         ];
+        $this->currencyCalculationFailure = null;
 
-        $this->applyGold((int) ($plan['gold'] ?? 0));
-        $this->applyCopperCoins((int) ($plan['copper_coins'] ?? 0));
+        $resolvedAreaGemEffects ??= $this->characterAreaGemEffects->resolveForCharacterId($this->character->id);
+
+        $this->applyGold($plan['gold'] ?? 0, $resolvedAreaGemEffects);
+
+        $copperCoins = $this->truncateToWholeCurrency($plan['copper_coins'] ?? 0);
+
+        if (! is_null($copperCoins)) {
+            $this->applyCopperCoins($copperCoins, $resolvedAreaGemEffects);
+        }
 
         if (($plan['event']['active'] ?? false) === true) {
-            $this->applyEventCurrencies($plan['event']);
+            $this->applyEventCurrencies($plan['event'], $resolvedAreaGemEffects);
         }
 
         return $this->earnedCurrencies;
@@ -233,10 +273,14 @@ class CharacterCurrencyRewardService
 
             $goldDust = $this->randomNumberGenerator->numberBetween(1, 375) * $killCount;
 
-            $resolvedAreaGemEffects = $this->characterAreaGemEffectService->resolveForCharacter($this->character);
+            $resolvedAreaGemEffects = $this->characterAreaGemEffects->resolveForCharacterId($this->character->id);
 
-            $shards = (int) round($shards * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::SHARDS_GAIN)));
-            $goldDust = (int) round($goldDust * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::GOLD_DUST_GAIN)));
+            $shards = $this->roundToWholeCurrency($shards * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::SHARDS_GAIN)));
+            $goldDust = $this->roundToWholeCurrency($goldDust * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::GOLD_DUST_GAIN)));
+
+            if (is_null($shards) || is_null($goldDust)) {
+                return $this;
+            }
 
             $this->earnedCurrencies['shards'] += $shards;
             $this->earnedCurrencies['gold_dust'] += $goldDust;
@@ -246,7 +290,12 @@ class CharacterCurrencyRewardService
 
             if ($canHaveCopperCoins) {
                 $copperCoins = $this->randomNumberGenerator->numberBetween(1, 115) * $killCount;
-                $copperCoins = (int) round($copperCoins * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::COPPER_COIN_GAIN)));
+                $copperCoins = $this->roundToWholeCurrency($copperCoins * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::COPPER_COIN_GAIN)));
+
+                if (is_null($copperCoins)) {
+                    return $this;
+                }
+
                 $this->earnedCurrencies['copper_coins'] += $copperCoins;
 
                 $characterCopperCoins = $this->character->copper_coins + $copperCoins;
@@ -301,6 +350,7 @@ class CharacterCurrencyRewardService
      *
      * @param Monster $monster
      * @param int $killCount
+     * @return void
      */
     private function distributeGold(Monster $monster, int $killCount): void
     {
@@ -312,17 +362,28 @@ class CharacterCurrencyRewardService
      * Apply the Gem-adjusted gold reward to the character and report the gain.
      *
      * @param int $goldToReward
+     * @param ?ResolvedAreaGemEffects $resolvedAreaGemEffects
+     * @return void
      */
-    private function applyGold(int $goldToReward): void
+    private function applyGold(int $goldToReward, ?ResolvedAreaGemEffects $resolvedAreaGemEffects = null): void
     {
         if ($goldToReward <= 0) {
             return;
         }
 
-        $resolvedAreaGemEffects = $this->characterAreaGemEffectService->resolveForCharacter($this->character);
+        $resolvedAreaGemEffects ??= $this->characterAreaGemEffects->resolveForCharacterId($this->character->id);
 
-        $goldToReward = (int) round($goldToReward * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::MONSTER_GOLD_DROP_INCREASE)));
-        $goldToReward = (int) round($goldToReward * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::GOLD_GAIN)));
+        $goldToReward = $this->roundToWholeCurrency($goldToReward * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::MONSTER_GOLD_DROP_INCREASE)));
+
+        if (is_null($goldToReward)) {
+            return;
+        }
+
+        $goldToReward = $this->roundToWholeCurrency($goldToReward * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::GOLD_GAIN)));
+
+        if (is_null($goldToReward)) {
+            return;
+        }
 
         $this->earnedCurrencies['gold'] += $goldToReward;
 
@@ -346,6 +407,7 @@ class CharacterCurrencyRewardService
      *
      * @param Monster $monster
      * @param int $killCount
+     * @return void
      */
     private function distributeCopperCoins(Monster $monster, int $killCount): void
     {
@@ -379,7 +441,7 @@ class CharacterCurrencyRewardService
 
                 $coins = $coins + $coins * $mercenarySlotBonus;
 
-                $copperCoinGain = $this->characterAreaGemEffectService->resolveForCharacter($this->character)->rewardEffect(AreaGemRewardEffect::COPPER_COIN_GAIN);
+                $copperCoinGain = $this->characterAreaGemEffects->resolveForCharacterId($this->character->id)->rewardEffect(AreaGemRewardEffect::COPPER_COIN_GAIN);
                 $coins = $coins + $coins * $copperCoinGain;
 
                 $this->earnedCurrencies['copper_coins'] += $coins;
@@ -401,15 +463,21 @@ class CharacterCurrencyRewardService
      * Apply the Gem-adjusted copper coin reward to the character and report the gain.
      *
      * @param int $coins
+     * @param ResolvedAreaGemEffects $resolvedAreaGemEffects
+     * @return void
      */
-    private function applyCopperCoins(int $coins): void
+    private function applyCopperCoins(int $coins, ResolvedAreaGemEffects $resolvedAreaGemEffects): void
     {
         if ($coins <= 0) {
             return;
         }
 
-        $copperCoinGain = $this->characterAreaGemEffectService->resolveForCharacter($this->character)->rewardEffect(AreaGemRewardEffect::COPPER_COIN_GAIN);
-        $coins = (int) round($coins * (1 + $copperCoinGain));
+        $copperCoinGain = $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::COPPER_COIN_GAIN);
+        $coins = $this->roundToWholeCurrency($coins * (1 + $copperCoinGain));
+
+        if (is_null($coins)) {
+            return;
+        }
 
         $this->earnedCurrencies['copper_coins'] += $coins;
         $newCoins = $this->character->copper_coins + $coins;
@@ -428,18 +496,22 @@ class CharacterCurrencyRewardService
      * Apply the Gem-adjusted planned event currency rewards to the character and report the gains.
      *
      * @param array $eventPlan
+     * @param ResolvedAreaGemEffects $resolvedAreaGemEffects
+     * @return void
      */
-    private function applyEventCurrencies(array $eventPlan): void
+    private function applyEventCurrencies(array $eventPlan, ResolvedAreaGemEffects $resolvedAreaGemEffects): void
     {
-        $shards = (int) ($eventPlan['shards'] ?? 0);
-        $goldDust = (int) ($eventPlan['gold_dust'] ?? 0);
-        $copperCoins = (int) ($eventPlan['copper_coins'] ?? 0);
+        $shards = $eventPlan['shards'] ?? 0;
+        $goldDust = $eventPlan['gold_dust'] ?? 0;
+        $copperCoins = $eventPlan['copper_coins'] ?? 0;
 
-        $resolvedAreaGemEffects = $this->characterAreaGemEffectService->resolveForCharacter($this->character);
+        $shards = $this->roundToWholeCurrency($shards * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::SHARDS_GAIN)));
+        $goldDust = $this->roundToWholeCurrency($goldDust * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::GOLD_DUST_GAIN)));
+        $copperCoins = $this->roundToWholeCurrency($copperCoins * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::COPPER_COIN_GAIN)));
 
-        $shards = (int) round($shards * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::SHARDS_GAIN)));
-        $goldDust = (int) round($goldDust * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::GOLD_DUST_GAIN)));
-        $copperCoins = (int) round($copperCoins * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::COPPER_COIN_GAIN)));
+        if (is_null($shards) || is_null($goldDust) || is_null($copperCoins)) {
+            return;
+        }
 
         $this->earnedCurrencies['shards'] += $shards;
         $this->earnedCurrencies['gold_dust'] += $goldDust;
@@ -491,5 +563,55 @@ class CharacterCurrencyRewardService
             ->where('game_map_id', $map->game_map_id)
             ->where('type', LocationType::PURGATORY_DUNGEONS->value)
             ->first();
+    }
+
+    /**
+     * Round a Gem-adjusted floating currency calculation to its nearest whole currency unit, or
+     * null when the calculation is invalid.
+     *
+     * @param float $amount
+     * @return ?int
+     */
+    private function roundToWholeCurrency(float $amount): ?int
+    {
+        return $this->wholeCurrencyAmount(round($amount));
+    }
+
+    /**
+     * Truncate a floating planned currency amount down to a whole currency unit, or null when the
+     * calculation is invalid.
+     *
+     * @param float $amount
+     * @return ?int
+     */
+    private function truncateToWholeCurrency(float $amount): ?int
+    {
+        return $this->wholeCurrencyAmount(floor($amount));
+    }
+
+    /**
+     * Validate and extract the genuine integer value of an already-whole floating currency amount,
+     * or null when the calculation is invalid. The game's currency domain never exceeds the platform
+     * integer range, so a failed validation means the calculation that produced this amount is
+     * corrupted; that failure is recorded on `currencyCalculationFailure()` instead of silently
+     * applying a zero, `PHP_INT_MAX`, or `PHP_INT_MIN` currency reward, so the caller can fail the
+     * owning reward operation.
+     *
+     * @param float $amount
+     * @return ?int
+     */
+    private function wholeCurrencyAmount(float $amount): ?int
+    {
+        $wholeAmount = filter_var($amount, FILTER_VALIDATE_INT);
+
+        if ($wholeAmount === false) {
+            $this->currencyCalculationFailure = new RuntimeException(
+                'Invalid whole currency amount calculated: '.$amount.' cannot be represented as an integer.',
+            );
+
+            return null;
+        }
+
+        return $wholeAmount;
     }
 }

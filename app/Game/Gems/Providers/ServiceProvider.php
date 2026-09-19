@@ -7,6 +7,8 @@ use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Transformers\CharacterGemsTransformer;
 use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Gems\Builders\GemBuilder;
+use App\Game\Gems\Progression\Contracts\CharacterAreaGemEffects;
+use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
 use App\Game\Gems\Services\AttachedGemService;
 use App\Game\Gems\Services\GemComparison;
 use App\Game\Gems\Services\ItemAtonements;
@@ -47,6 +49,8 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(GemBuilder::class, function ($app) {
             return new GemBuilder($app->make(RandomNumberGenerator::class));
         });
+
+        $this->app->bind(CharacterAreaGemEffects::class, CharacterAreaGemEffectService::class);
     }
 
     /**

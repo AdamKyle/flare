@@ -12,6 +12,7 @@ use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
 use App\Game\Maps\Values\LocationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
+use RuntimeException;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterAutomation;
@@ -744,6 +745,23 @@ class CharacterCurrencyRewardServiceTest extends TestCase
         $this->assertEquals(CurrencyLimit::MAX_SHARDS, $character->shards);
         $this->assertEquals(CurrencyLimit::MAX_GOLD_DUST, $character->gold_dust);
         $this->assertEquals(0, $character->copper_coins);
+    }
+
+    public function test_applying_a_corrupted_copper_coin_plan_fails_explicitly_instead_of_awarding_currency(): void
+    {
+        $character = $this->character->getCharacter();
+        $character->update(['copper_coins' => 500]);
+
+        $service = $this->characterCurrencyRewardService->setCharacter($character->refresh());
+
+        $earned = $service->applyPlannedCurrencies(['gold' => 0, 'copper_coins' => INF, 'event' => ['active' => false]]);
+
+        $failure = $service->currencyCalculationFailure();
+        $character = $service->getCharacter();
+
+        $this->assertInstanceOf(RuntimeException::class, $failure);
+        $this->assertSame(0, $earned['copper_coins']);
+        $this->assertSame(500, $character->copper_coins);
     }
 
     public function test_currency_event_reward_applies_copper_coin_gain_bonus_to_event_copper_coins(): void

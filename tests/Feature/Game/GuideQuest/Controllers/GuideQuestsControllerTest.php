@@ -4,9 +4,16 @@ namespace Tests\Feature\Game\GuideQuest\Controllers;
 
 use App\Flare\Models\CharacterBattleRewardRequest;
 use App\Flare\Models\QuestsCompleted;
+use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
+use App\Game\BattleRewardProcessing\Values\BattleRewardEnqueueResult;
 use App\Game\Core\Items\Values\AlchemyItemType;
+use App\Game\GuideQuests\Events\ShowGuideQuestCompletedToast;
 use App\Game\GuideQuests\Services\GuideQuestService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
+use Mockery;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use RuntimeException;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGuideQuest;
@@ -15,7 +22,7 @@ use Tests\Traits\CreateItemAffix;
 
 class GuideQuestsControllerTest extends TestCase
 {
-    use CreateGuideQuest, CreateItem, CreateItemAffix, RefreshDatabase;
+    use CreateGuideQuest, CreateItem, CreateItemAffix, MockeryPHPUnitIntegration, RefreshDatabase;
 
     private ?CharacterFactory $character = null;
 
@@ -49,6 +56,24 @@ class GuideQuestsControllerTest extends TestCase
         $this->assertFalse($secondResult);
         $this->assertSame(1, QuestsCompleted::where('character_id', $character->id)->where('guide_quest_id', $quest->id)->count());
         $this->assertSame(1, CharacterBattleRewardRequest::where('character_id', $character->id)->count());
+    }
+
+    public function test_hand_in_quest_returns_false_and_removes_the_completion_when_the_reward_enqueue_fails(): void
+    {
+        Event::fake();
+        $quest = $this->createGuideQuest(['required_level' => 1]);
+        $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
+
+        $queueManager = Mockery::mock(BattleRewardProcessingQueueManager::class);
+        $queueManager->shouldReceive('enqueue')->once()->andReturn(BattleRewardEnqueueResult::failed(new RuntimeException('database is unavailable')));
+        $this->app->instance(BattleRewardProcessingQueueManager::class, $queueManager);
+
+        $result = resolve(GuideQuestService::class)->handInQuest($character, $quest);
+
+        $this->assertFalse($result);
+        $this->assertSame(0, QuestsCompleted::where('character_id', $character->id)->where('guide_quest_id', $quest->id)->count());
+        $this->assertSame(0, CharacterBattleRewardRequest::where('character_id', $character->id)->count());
+        Event::assertNotDispatched(ShowGuideQuestCompletedToast::class);
     }
 
     public function test_should_see_completed_guide_quest()

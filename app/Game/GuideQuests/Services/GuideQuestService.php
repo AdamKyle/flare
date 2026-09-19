@@ -18,6 +18,7 @@ use App\Game\Core\Traits\HandleCharacterLevelUp;
 use App\Game\Events\Values\EventType;
 use App\Game\GuideQuests\Events\ShowGuideQuestCompletedToast;
 use App\Game\Messages\Events\ServerMessageEvent;
+use Illuminate\Support\Facades\Log;
 
 class GuideQuestService
 {
@@ -27,6 +28,10 @@ class GuideQuestService
 
     private array $completedAttributes = [];
 
+    /**
+     * @param GuideQuestRequirementsService $guideQuestRequirementsService
+     * @param BattleRewardProcessingQueueManager $battleRewardProcessingQueueManager
+     */
     public function __construct(
         GuideQuestRequirementsService $guideQuestRequirementsService,
         private readonly BattleRewardProcessingQueueManager $battleRewardProcessingQueueManager,
@@ -35,6 +40,9 @@ class GuideQuestService
     }
 
     /**
+     * Return the Character's currently applicable Guide Quests.
+     *
+     * @param Character $character
      * @return GuideQuest[]
      */
     public function getCurrentQuestsForCharacter(Character $character): array
@@ -42,6 +50,12 @@ class GuideQuestService
         return $this->fetchNextGuideQuest($character);
     }
 
+    /**
+     * Build the Character's current Guide Quest list with hand-in eligibility and completed requirements.
+     *
+     * @param Character $character
+     * @return array
+     */
     public function fetchQuestForCharacter(Character $character): array
     {
 
@@ -75,6 +89,13 @@ class GuideQuestService
         ];
     }
 
+    /**
+     * Complete and hand in the Guide Quest for the Character, queuing its reward.
+     *
+     * @param Character $character
+     * @param GuideQuest $quest
+     * @return bool
+     */
     public function handInQuest(Character $character, GuideQuest $quest): bool
     {
         $character = Character::find($character->id);
@@ -103,7 +124,7 @@ class GuideQuestService
             return false;
         }
 
-        $this->battleRewardProcessingQueueManager->enqueue(
+        $enqueueResult = $this->battleRewardProcessingQueueManager->enqueue(
             $character,
             BattleRewardRequestPriority::FIRST,
             BattleRewardRequestSourceType::GUIDE_QUEST,
@@ -118,11 +139,33 @@ class GuideQuestService
             ],
         );
 
+        if (! $enqueueResult->successful()) {
+            $failure = $enqueueResult->failure();
+
+            Log::channel('reward_processing')->error('Guide Quest reward enqueue failed.', [
+                'character_id' => $character->id,
+                'guide_quest_id' => $quest->id,
+                'exception_class' => is_null($failure) ? null : $failure::class,
+                'exception_message' => $failure?->getMessage(),
+            ]);
+
+            $completion->delete();
+
+            return false;
+        }
+
         event(new ShowGuideQuestCompletedToast($character->user, false));
 
         return true;
     }
 
+    /**
+     * Apply the Guide Quest's queued currency and XP rewards to the Character.
+     *
+     * @param Character $character
+     * @param GuideQuest $quest
+     * @return void
+     */
     public function processQueuedRewards(Character $character, GuideQuest $quest): void
     {
         $gold = $character->gold + $quest->gold_reward;
@@ -166,6 +209,14 @@ class GuideQuestService
         event(new UpdateTopBarEvent($character));
     }
 
+    /**
+     * Determine whether the Character currently satisfies every requirement of the Guide Quest.
+     *
+     * @param Character $character
+     * @param GuideQuest $quest
+     * @param bool $ignoreAutomation
+     * @return bool
+     */
     public function canHandInQuest(Character $character, GuideQuest $quest, bool $ignoreAutomation = false): bool
     {
 
@@ -238,6 +289,13 @@ class GuideQuestService
         return false;
     }
 
+    /**
+     * Award the Guide Quest's XP reward to the Character and handle any resulting level up.
+     *
+     * @param Character $character
+     * @param GuideQuest $guideQuest
+     * @return Character
+     */
     private function giveXP(Character $character, GuideQuest $guideQuest): Character
     {
 
@@ -258,6 +316,13 @@ class GuideQuestService
         return $character;
     }
 
+    /**
+     * Consume the Guide Quest's required batch-crafted or alchemy bag items from the Character.
+     *
+     * @param Character $character
+     * @param GuideQuest $quest
+     * @return bool
+     */
     private function consumeRequiredBatchCraftedItems(Character $character, GuideQuest $quest): bool
     {
         if (empty($quest->required_batch_crafted_items)) {
@@ -283,7 +348,7 @@ class GuideQuestService
 
             $slotIds = $this->guideQuestRequirementsService->matchingBatchCraftedItemSlotIds($character, $requiredBatchCraftedItem);
 
-            if (count($slotIds) < (int) $requiredBatchCraftedItem['amount']) {
+            if (count($slotIds) < $requiredBatchCraftedItem['amount']) {
                 return false;
             }
 
@@ -295,13 +360,20 @@ class GuideQuestService
         return true;
     }
 
+    /**
+     * Consume the required amount of a single Alchemy Bag item from the Character.
+     *
+     * @param Character $character
+     * @param array $requiredBatchCraftedItem
+     * @return bool
+     */
     private function consumeRequiredAlchemyBagItems(Character $character, array $requiredBatchCraftedItem): bool
     {
         if (! $this->guideQuestRequirementsService->hasRequiredAlchemyBagItemAmount($character, $requiredBatchCraftedItem)) {
             return false;
         }
 
-        $remainingAmountToConsume = (int) $requiredBatchCraftedItem['amount'];
+        $remainingAmountToConsume = $requiredBatchCraftedItem['amount'];
         $alchemyBagSlots = AlchemyBagSlot::where('character_id', $character->id)
             ->where('item_id', $requiredBatchCraftedItem['item_id'])
             ->orderBy('id')
@@ -329,6 +401,12 @@ class GuideQuestService
         return $remainingAmountToConsume === 0;
     }
 
+    /**
+     * Determine whether the Character has an active, uncompleted Batch Crafting run.
+     *
+     * @param Character $character
+     * @return bool
+     */
     private function hasActiveBatchCrafting(Character $character): bool
     {
         return BatchCrafting::where('character_id', $character->id)
@@ -336,6 +414,12 @@ class GuideQuestService
             ->exists();
     }
 
+    /**
+     * Resolve the Character's next regular and event Guide Quests.
+     *
+     * @param Character $character
+     * @return array
+     */
     private function fetchNextGuideQuest(Character $character): array
     {
 
@@ -388,6 +472,12 @@ class GuideQuestService
         return $guideQuests;
     }
 
+    /**
+     * Resolve the Character's next incomplete regular (non-event) Guide Quest.
+     *
+     * @param Character $character
+     * @return ?GuideQuest
+     */
     private function fetchNextRegularGuideQuest(Character $character): ?GuideQuest
     {
         $completedGuideQuestIds = $character->questsCompleted()
@@ -417,6 +507,10 @@ class GuideQuestService
      *
      * Only descends into a quest's children once the quest itself is
      * completed, so a child is never returned before its parent.
+     *
+     * @param GuideQuest $quest
+     * @param array $completedGuideQuestIds
+     * @return ?GuideQuest
      */
     private function findNextIncompleteRegularGuideQuest(GuideQuest $quest, array $completedGuideQuestIds): ?GuideQuest
     {
@@ -441,6 +535,13 @@ class GuideQuestService
         return null;
     }
 
+    /**
+     * Resolve the Character's next incomplete quest in an event Guide Quest chain.
+     *
+     * @param Character $character
+     * @param GuideQuest $initialEventGuideQuest
+     * @return ?GuideQuest
+     */
     private function fetchNextEventQuest(Character $character, GuideQuest $initialEventGuideQuest): ?GuideQuest
     {
         $completedFirstEventQuest = $character->questsCompleted()
@@ -460,6 +561,12 @@ class GuideQuestService
         return $this->fetchNextEventQuest($character, $nextGuideQuest);
     }
 
+    /**
+     * List the Guide Quest's populated `required_*` attribute names.
+     *
+     * @param GuideQuest $quest
+     * @return array
+     */
     private function requiredAttributeNames(GuideQuest $quest): array
     {
 

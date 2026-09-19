@@ -6,6 +6,7 @@ use App\Admin\Services\MonitoredBugReportService;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterBattleRewardRequest;
 use App\Flare\Models\GuideQuest;
+use App\Flare\Models\Monster;
 use App\Flare\Models\Quest;
 use App\Game\Automation\Delve\Events\DelveStatusUpdated;
 use App\Game\Automation\Exploration\Services\ExplorationLogService;
@@ -15,14 +16,14 @@ use App\Game\BattleRewardProcessing\Enums\BattleRewardStepName;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepStatus;
 use App\Game\BattleRewardProcessing\Exceptions\WeeklyRewardInventoryFullException;
 use App\Game\BattleRewardProcessing\Services\BattleRewardLedgerService;
+use App\Game\BattleRewardProcessing\Services\BattleRewardLiveUpdateService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardMessageOutboxService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
-use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Game\BattleRewardProcessing\Services\BattleRewardSharedContextService;
+use App\Game\BattleRewardProcessing\Services\BattleRewardStepPlanService;
+use App\Game\BattleRewardProcessing\Values\BattleRewardSharedContext;
 use App\Game\Character\Exceptions\MissingInventoryException;
-use App\Game\Core\Events\UpdateBaseCharacterInformation;
-use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\SafelyBroadcastsEvents;
 use App\Game\GuideQuests\Services\GuideQuestService;
 use App\Game\Messages\Events\GlobalMessageEvent;
@@ -33,8 +34,6 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
 use RuntimeException;
 use Throwable;
 
@@ -48,16 +47,35 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
 
     public int $timeout = 300;
 
+    /**
+     * @param int $characterId
+     */
     public function __construct(private readonly int $characterId) {}
 
+    /**
+     * Process the Character's pending battle reward requests under the per-Character processor lock.
+     *
+     * @param BattleRewardProcessingQueueManager $queueManager
+     * @param BattleRewardService $battleRewardService
+     * @param NpcQuestRewardHandler $npcQuestRewardHandler
+     * @param GuideQuestService $guideQuestService
+     * @param ExplorationLogService $explorationLogService
+     * @param BattleRewardStepPlanService $battleRewardStepPlanService
+     * @param BattleRewardSharedContextService $battleRewardSharedContextService
+     * @param BattleRewardLiveUpdateService $battleRewardLiveUpdateService
+     * @param ?BattleRewardLedgerService $battleRewardLedgerService
+     * @param ?BattleRewardMessageOutboxService $battleRewardMessageOutboxService
+     * @return void
+     */
     public function handle(
         BattleRewardProcessingQueueManager $queueManager,
         BattleRewardService $battleRewardService,
         NpcQuestRewardHandler $npcQuestRewardHandler,
         GuideQuestService $guideQuestService,
-        Manager $manager,
-        CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer,
         ExplorationLogService $explorationLogService,
+        BattleRewardStepPlanService $battleRewardStepPlanService,
+        BattleRewardSharedContextService $battleRewardSharedContextService,
+        BattleRewardLiveUpdateService $battleRewardLiveUpdateService,
         ?BattleRewardLedgerService $battleRewardLedgerService = null,
         ?BattleRewardMessageOutboxService $battleRewardMessageOutboxService = null,
     ): void {
@@ -113,10 +131,12 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
         }
 
         $startedAt = microtime(true);
+        $loopStartedAtNs = hrtime(true);
         $processed = 0;
         $shouldDispatchAfterUnlock = false;
         $shouldCheckPendingAfterUnlock = false;
         $capacityRetryPaused = false;
+        $secondaryPlayerUpdatesDirty = false;
         $heartbeatCallback = fn () => $queueManager->updateHeartbeat($this->characterId);
 
         Log::channel('reward_processing')->debug('Processor loop starts.', [
@@ -129,7 +149,7 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
                 Log::channel('reward_processing')->debug('Next request claim attempt.', [
                     'character_id' => $this->characterId,
                     'processed_so_far' => $processed,
-                    'elapsed_ms' => (int) ((microtime(true) - $startedAt) * 1000),
+                    'elapsed_ms' => intdiv(hrtime(true) - $loopStartedAtNs, 1_000_000),
                 ]);
 
                 $request = $queueManager->nextRequest($this->characterId);
@@ -152,9 +172,55 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
                 ]);
 
                 $notificationRetryScheduled = false;
+                $requestStartedAtNs = hrtime(true);
+                $requestResult = 'failed';
 
                 try {
                     $payload = $request->handler_payload;
+
+                    $sharedContext = null;
+
+                    if (in_array($request->source_type, [
+                        BattleRewardRequestSourceType::BATTLE,
+                        BattleRewardRequestSourceType::EXPLORATION,
+                        BattleRewardRequestSourceType::AUTOMATION,
+                    ], true)) {
+                        $character = Character::find($request->character_id);
+                        $monster = Monster::find($payload['monster_id']);
+
+                        if (is_null($character) || is_null($monster)) {
+                            throw new RuntimeException(
+                                'Unable to build battle reward context for request '.$request->id.' because the Character or Monster no longer exists.',
+                            );
+                        }
+
+                        $sharedContext = $battleRewardSharedContextService->build(
+                            $request,
+                            $character,
+                            $monster,
+                        );
+                    }
+
+                    $stepPlan = match ($request->source_type) {
+                        BattleRewardRequestSourceType::BATTLE,
+                        BattleRewardRequestSourceType::EXPLORATION,
+                        BattleRewardRequestSourceType::AUTOMATION => $battleRewardStepPlanService->planBattleLike(
+                            $request,
+                            $sharedContext,
+                        ),
+                        BattleRewardRequestSourceType::FACTION_LOYALTY => $battleRewardStepPlanService->planFactionLoyalty(),
+                        BattleRewardRequestSourceType::QUEST,
+                        BattleRewardRequestSourceType::RAID_QUEST,
+                        BattleRewardRequestSourceType::GUIDE_QUEST => $battleRewardStepPlanService->planQuest(),
+                        BattleRewardRequestSourceType::FUTURE => throw new RuntimeException(
+                            'No ledger step plan exists for future reward requests.',
+                        ),
+                    };
+
+                    $battleRewardLedgerService->ensureSteps(
+                        $request,
+                        $stepPlan,
+                    );
 
                     match ($request->source_type) {
                         BattleRewardRequestSourceType::BATTLE,
@@ -163,38 +229,29 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
                         BattleRewardRequestSourceType::FACTION_LOYALTY => $this->processBattleRewardRequest(
                             $battleRewardService,
                             $request,
-                            $payload,
+                            $sharedContext,
                             $heartbeatCallback,
                         ),
                         BattleRewardRequestSourceType::QUEST,
                         BattleRewardRequestSourceType::RAID_QUEST => $this->processQuestReward(
                             $npcQuestRewardHandler,
-                            (int) $payload['quest_id'],
+                            $payload['quest_id'],
                         ),
                         BattleRewardRequestSourceType::GUIDE_QUEST => $guideQuestService
                             ->processQueuedRewards(
                                 Character::findOrFail($this->characterId),
-                                GuideQuest::findOrFail((int) $payload['guide_quest_id']),
+                                GuideQuest::findOrFail($payload['guide_quest_id']),
                             ),
                         BattleRewardRequestSourceType::FUTURE => throw new RuntimeException(
                             'No reward processor exists for future reward requests.',
                         ),
                     };
 
-                    if (! in_array($request->source_type, [
-                        BattleRewardRequestSourceType::BATTLE,
-                        BattleRewardRequestSourceType::EXPLORATION,
-                        BattleRewardRequestSourceType::AUTOMATION,
-                        BattleRewardRequestSourceType::FACTION_LOYALTY,
-                    ], true)) {
-                        $this->completeUnsupportedRewardSteps($request, $battleRewardLedgerService);
-                    }
-
                     Log::channel('reward_processing')->debug('After reward processing. Starting final player updates.', [
                         'character_id' => $this->characterId,
                         'request_id' => $request->id,
                         'source_type' => $request->source_type?->value,
-                        'elapsed_ms' => (int) ((microtime(true) - $startedAt) * 1000),
+                        'elapsed_ms' => intdiv(hrtime(true) - $loopStartedAtNs, 1_000_000),
                         'memory_usage' => memory_get_usage(true),
                     ]);
 
@@ -202,10 +259,11 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
                         $request,
                         $battleRewardLedgerService,
                         $request->source_type,
-                        $manager,
-                        $characterSheetBaseInfoTransformer,
+                        $battleRewardLiveUpdateService,
                         $explorationLogService,
                     );
+
+                    $secondaryPlayerUpdatesDirty = true;
 
                     $this->runMessageOutboxStep(
                         $request,
@@ -214,6 +272,8 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
                     );
 
                     $queueManager->markCompleted($request);
+
+                    $requestResult = 'completed';
 
                     Log::channel('reward_processing')->debug('Final player updates finished.', [
                         'character_id' => $this->characterId,
@@ -230,6 +290,7 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
                             'exception' => $exception,
                         ]);
                         $capacityRetryPaused = true;
+                        $requestResult = 'capacity_paused';
 
                         break;
                     }
@@ -240,7 +301,7 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
                         'source_type' => $request->source_type?->value ?? 'unknown',
                         'exception_class' => $exception::class,
                         'exception_message' => $exception->getMessage(),
-                        'elapsed_ms' => (int) ((microtime(true) - $startedAt) * 1000),
+                        'elapsed_ms' => intdiv(hrtime(true) - $loopStartedAtNs, 1_000_000),
                     ]);
 
                     if ($request->refresh()->status !== BattleRewardRequestStatus::COMPLETED) {
@@ -259,6 +320,7 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
                             $queueManager->markNotificationRetryable($request, $activeStep, $exception);
                             $notificationRetryScheduled = true;
                             $capacityRetryPaused = true;
+                            $requestResult = 'retryable';
                         } elseif (! is_null($activeStep) && in_array($activeStep->step_name, [
                             BattleRewardStepName::FINAL_PLAYER_UPDATES,
                             BattleRewardStepName::MESSAGE_OUTBOX,
@@ -266,12 +328,14 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
                             $queueManager->markNotificationRetryable($request, $activeStep, $exception);
                             $notificationRetryScheduled = true;
                             $shouldDispatchAfterUnlock = true;
+                            $requestResult = 'retryable';
                         } else {
                             if (! is_null($activeStep)) {
                                 $battleRewardLedgerService->failStep($activeStep, $exception);
                             }
 
                             $queueManager->markFailed($request, $exception);
+                            $requestResult = 'failed';
                         }
                     }
 
@@ -284,6 +348,16 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
                             $this->characterId,
                         );
                     }
+                } finally {
+                    Log::channel('reward_processing')->info('Request processing summary.', [
+                        'character_id' => $this->characterId,
+                        'request_id' => $request->id,
+                        'source_type' => $request->source_type?->value,
+                        'priority' => $request->priority?->value,
+                        'queue_wait_ms' => $request->created_at->diffInMilliseconds($request->started_at),
+                        'processing_ms' => intdiv(hrtime(true) - $requestStartedAtNs, 1_000_000),
+                        'result' => $requestResult,
+                    ]);
                 }
 
                 $processed++;
@@ -301,7 +375,7 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
                 Log::channel('reward_processing')->info('Pending rows remain after loop. Continuation needed.', [
                     'character_id' => $this->characterId,
                     'processed' => $processed,
-                    'elapsed_ms' => (int) ((microtime(true) - $startedAt) * 1000),
+                    'elapsed_ms' => intdiv(hrtime(true) - $loopStartedAtNs, 1_000_000),
                 ]);
 
                 $queueManager->updateHeartbeat($this->characterId);
@@ -323,6 +397,12 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
                 'lock_key' => $lockKey,
                 'processed' => $processed,
             ]);
+
+            if ($secondaryPlayerUpdatesDirty) {
+                DispatchBattleRewardSecondaryUpdates::dispatch($this->characterId)
+                    ->onConnection('battle_reward_processing')
+                    ->onQueue('battle_reward_secondary');
+            }
         }
 
         if ($shouldCheckPendingAfterUnlock && $queueManager->hasPendingRequests($this->characterId)) {
@@ -345,19 +425,32 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
         }
     }
 
+    /**
+     * Run the request's FINAL_PLAYER_UPDATES ledger step, dispatching the source-specific live update.
+     *
+     * @param CharacterBattleRewardRequest $request
+     * @param BattleRewardLedgerService $battleRewardLedgerService
+     * @param BattleRewardRequestSourceType $sourceType
+     * @param BattleRewardLiveUpdateService $battleRewardLiveUpdateService
+     * @param ExplorationLogService $explorationLogService
+     * @return void
+     */
     private function runFinalPlayerUpdatesStep(
         CharacterBattleRewardRequest $request,
         BattleRewardLedgerService $battleRewardLedgerService,
         BattleRewardRequestSourceType $sourceType,
-        Manager $manager,
-        CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer,
+        BattleRewardLiveUpdateService $battleRewardLiveUpdateService,
         ExplorationLogService $explorationLogService,
     ): void {
-        $battleRewardLedgerService->ensureSteps($request);
-
         $step = $request->steps()
             ->where('step_name', BattleRewardStepName::FINAL_PLAYER_UPDATES)
-            ->firstOrFail();
+            ->first();
+
+        if (is_null($step)) {
+            throw new RuntimeException(
+                'Reward request '.$request->id.' has no FINAL_PLAYER_UPDATES ledger row. The ledger is incomplete.',
+            );
+        }
 
         if ($step->status === BattleRewardStepStatus::COMPLETED) {
             $battleRewardLedgerService->log('step.skipped_completed', $request, $step);
@@ -370,8 +463,7 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
         try {
             $this->dispatchFinalPlayerUpdates(
                 $sourceType,
-                $manager,
-                $characterSheetBaseInfoTransformer,
+                $battleRewardLiveUpdateService,
                 $explorationLogService,
             );
 
@@ -383,52 +475,48 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
         }
     }
 
+    /**
+     * Process the ledger-aware rewards for a single battle reward request.
+     *
+     * @param BattleRewardService $battleRewardService
+     * @param CharacterBattleRewardRequest $request
+     * @param ?BattleRewardSharedContext $sharedContext
+     * @param callable $heartbeatCallback
+     * @return void
+     */
     private function processBattleRewardRequest(
         BattleRewardService $battleRewardService,
         CharacterBattleRewardRequest $request,
-        array $payload,
+        ?BattleRewardSharedContext $sharedContext,
         callable $heartbeatCallback,
     ): void {
-        try {
-            $battleRewardService
-                ->withHeartbeatCallback($heartbeatCallback)
-                ->processLedgerAwareRewards($request, true);
-        } catch (Throwable $throwable) {
-            if (! str_starts_with($throwable::class, 'Mockery\\')) {
-                throw $throwable;
-            }
+        $result = $battleRewardService
+            ->withHeartbeatCallback($heartbeatCallback)
+            ->processLedgerAwareRewards($request, $sharedContext);
 
-            $battleRewardService
-                ->setUp($this->characterId, (int) $payload['monster_id'])
-                ->setContext($payload['context'] ?? [])
-                ->processRewards(true);
+        if ($result->successful()) {
+            return;
         }
+
+        $failure = $result->failure();
+
+        if (is_null($failure)) {
+            throw new RuntimeException(
+                'Battle reward processing failed without a recorded failure for request '.$request->id.'.',
+            );
+        }
+
+        throw $failure;
     }
 
-    private function completeUnsupportedRewardSteps(
-        CharacterBattleRewardRequest $request,
-        BattleRewardLedgerService $battleRewardLedgerService,
-    ): void {
-        $battleRewardLedgerService->ensureSteps($request);
-
-        foreach ($battleRewardLedgerService->stepsForRequest($request) as $step) {
-            if (in_array($step->step_name, [BattleRewardStepName::FINAL_PLAYER_UPDATES, BattleRewardStepName::MESSAGE_OUTBOX], true)) {
-                continue;
-            }
-
-            if ($step->status === BattleRewardStepStatus::COMPLETED) {
-                continue;
-            }
-
-            $step = $battleRewardLedgerService->startStep($step);
-            $battleRewardLedgerService->completeStep($step, [
-                'skipped' => true,
-                'reason' => 'unsupported_source_type',
-                'source_type' => $request->source_type?->value,
-            ]);
-        }
-    }
-
+    /**
+     * Run the request's MESSAGE_OUTBOX ledger step, emitting any unemitted durable messages.
+     *
+     * @param CharacterBattleRewardRequest $request
+     * @param BattleRewardLedgerService $battleRewardLedgerService
+     * @param BattleRewardMessageOutboxService $battleRewardMessageOutboxService
+     * @return void
+     */
     private function runMessageOutboxStep(
         CharacterBattleRewardRequest $request,
         BattleRewardLedgerService $battleRewardLedgerService,
@@ -449,6 +537,12 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
         $battleRewardLedgerService->completeStep($step, ['emitted_message_count' => $emittedCount]);
     }
 
+    /**
+     * Recover the Character's interrupted or orphaned reward requests after the job ultimately fails.
+     *
+     * @param Throwable $exception
+     * @return void
+     */
     public function failed(Throwable $exception): void
     {
         Log::channel('reward_processing')->error('Job failed method invoked by Laravel failure hook.', [
@@ -504,10 +598,17 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
             ->onQueue('battle_reward_processing');
     }
 
+    /**
+     * Dispatch the authoritative live player update, plus any source-specific output update.
+     *
+     * @param BattleRewardRequestSourceType $sourceType
+     * @param BattleRewardLiveUpdateService $battleRewardLiveUpdateService
+     * @param ExplorationLogService $explorationLogService
+     * @return void
+     */
     private function dispatchFinalPlayerUpdates(
         BattleRewardRequestSourceType $sourceType,
-        Manager $manager,
-        CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer,
+        BattleRewardLiveUpdateService $battleRewardLiveUpdateService,
         ExplorationLogService $explorationLogService,
     ): void {
         $character = Character::find($this->characterId)?->refresh();
@@ -516,43 +617,11 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
             return;
         }
 
-        Log::channel('reward_processing')->debug('Top bar update attempted.', [
+        Log::channel('reward_processing')->debug('Authoritative live reward update attempted.', [
             'character_id' => $this->characterId,
         ]);
 
-        $this->safelyDispatchBroadcastEvent(
-            new UpdateTopBarEvent($character),
-            ['character_id' => $this->characterId]
-        );
-        event(new UpdateCharacterCurrenciesEvent($character));
-
-        Log::channel('reward_processing')->debug('Base character update attempted.', [
-            'character_id' => $this->characterId,
-        ]);
-
-        try {
-            $characterData = new Item($character, $characterSheetBaseInfoTransformer);
-
-            $this->safelyDispatchBroadcastEvent(
-                new UpdateBaseCharacterInformation(
-                    $character->user,
-                    $manager->createData($characterData)->toArray(),
-                ),
-                ['character_id' => $this->characterId]
-            );
-        } catch (Throwable $throwable) {
-            Log::channel('reward_processing')->warning('Base character update failed. Reward row will not be marked failed.', [
-                'character_id' => $this->characterId,
-                'exception_class' => $throwable::class,
-                'exception_message' => $throwable->getMessage(),
-            ]);
-
-            Log::warning('Unable to dispatch base character reward queue update.', [
-                'character_id' => $this->characterId,
-                'exception_class' => $throwable::class,
-                'exception' => $throwable->getMessage(),
-            ]);
-        }
+        $battleRewardLiveUpdateService->broadcast($this->characterId);
 
         if ($sourceType === BattleRewardRequestSourceType::EXPLORATION) {
             Log::channel('reward_processing')->debug('Exploration output update attempted.', [
@@ -588,6 +657,13 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
         }
     }
 
+    /**
+     * Process the NPC Quest reward for the Character and announce its completion.
+     *
+     * @param NpcQuestRewardHandler $npcQuestRewardHandler
+     * @param int $questId
+     * @return void
+     */
     private function processQuestReward(
         NpcQuestRewardHandler $npcQuestRewardHandler,
         int $questId,

@@ -13,30 +13,28 @@ use App\Game\Automation\Exploration\Services\ExplorationLogService;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepName;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepStatus;
-use App\Game\BattleRewardProcessing\Handlers\BattleGlobalEventParticipationHandler;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\BattleRewardProcessing\Handlers\FactionLoyaltyBountyHandler;
 use App\Game\BattleRewardProcessing\Jobs\Events\WinterEventChristmasGiftHandler;
+use App\Game\BattleRewardProcessing\Values\BattleRewardProcessingResult;
+use App\Game\BattleRewardProcessing\Values\BattleRewardSharedContext;
 use App\Game\Core\Currency\Services\CurrencyLimit;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Items\Builders\RandomAffixGenerator;
 use App\Game\Core\Items\Values\RandomAffixTier;
 use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\GoldRush;
 use App\Game\Core\Traits\SafelyBroadcastsEvents;
-use App\Game\Events\Services\GlobalEventGoalEligibilityService;
-use App\Game\Events\Values\EventType;
-use App\Game\Events\Values\GlobalEventSteps;
+use App\Game\Events\Contracts\BattleGlobalEventParticipation;
 use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyUpdate;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Gems\Progression\Services\GemWorldRewardService;
+use App\Game\Gems\Values\AreaGemRewardEffect;
 use App\Game\Messages\Types\CurrenciesMessageTypes;
 use App\Game\Monsters\Services\MonsterListService;
 use App\Game\Skills\Services\SkillService;
 use App\Game\Tops\Services\BroadcastTopsUpdateService;
 use Closure;
-use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -49,10 +47,32 @@ class BattleRewardService
 
     private ?Monster $monster;
 
+    private ?BattleRewardSharedContext $sharedContext = null;
+
     private array $context = [];
 
     private array $earnedCurrencies = [];
 
+    /**
+     * @param BattleMessageHandler $battleMessageHandler
+     * @param CharacterRewardService $characterRewardService
+     * @param FactionHandler $factionHandler
+     * @param FactionLoyaltyBountyHandler $factionLoyaltyBountyHandler
+     * @param FactionLoyaltyService $factionLoyaltyService
+     * @param GoldRush $goldRush
+     * @param BattleLocationRewardService $battleLocationRewardService
+     * @param DropCheckService $dropCheckService
+     * @param WeeklyBattleService $weeklyBattleService
+     * @param SecondaryRewardService $secondaryRewardService
+     * @param BattleGlobalEventParticipation $battleGlobalEventParticipation
+     * @param SkillService $skillService
+     * @param BattleRewardLedgerService $battleRewardLedgerService
+     * @param BattleRewardMessageContext $battleRewardMessageContext
+     * @param RandomAffixGenerator $randomAffixGenerator
+     * @param BroadcastTopsUpdateService $broadcastTopsUpdateService
+     * @param GemWorldRewardService $gemWorldRewardService
+     * @param MonsterListService $monsterListService
+     */
     public function __construct(
         private readonly BattleMessageHandler $battleMessageHandler,
         private readonly CharacterRewardService $characterRewardService,
@@ -64,19 +84,21 @@ class BattleRewardService
         private readonly DropCheckService $dropCheckService,
         private readonly WeeklyBattleService $weeklyBattleService,
         private readonly SecondaryRewardService $secondaryRewardService,
-        private readonly BattleGlobalEventParticipationHandler $battleGlobalEventParticipationHandler,
+        private readonly BattleGlobalEventParticipation $battleGlobalEventParticipation,
         private readonly SkillService $skillService,
         private readonly BattleRewardLedgerService $battleRewardLedgerService,
         private readonly BattleRewardMessageContext $battleRewardMessageContext,
         private readonly RandomAffixGenerator $randomAffixGenerator,
         private readonly BroadcastTopsUpdateService $broadcastTopsUpdateService,
-        private readonly GlobalEventGoalEligibilityService $globalEventGoalEligibilityService,
         private readonly GemWorldRewardService $gemWorldRewardService,
         private readonly MonsterListService $monsterListService,
     ) {}
 
     /**
-     * Set up the battle reward service
+     * Register a heartbeat callback with the underlying Character reward service.
+     *
+     * @param ?Closure $callback
+     * @return self
      */
     public function withHeartbeatCallback(?Closure $callback): self
     {
@@ -85,6 +107,13 @@ class BattleRewardService
         return $this;
     }
 
+    /**
+     * Load the Character and Monster for reward processing.
+     *
+     * @param int $characterId
+     * @param int $monsterId
+     * @return BattleRewardService
+     */
     public function setUp(int $characterId, int $monsterId): BattleRewardService
     {
 
@@ -96,9 +125,10 @@ class BattleRewardService
     }
 
     /**
-     * Set the context for the service.
+     * Set the source-specific reward context used by the current reward execution.
      *
-     * @return $this
+     * @param array $context
+     * @return BattleRewardService
      */
     public function setContext(array $context): BattleRewardService
     {
@@ -108,7 +138,10 @@ class BattleRewardService
     }
 
     /**
-     * @throws Throwable
+     * Process the legacy non-ledger battle reward pipeline for the currently set-up Character and Monster.
+     *
+     * @param bool $includeWinterEvent
+     * @return void
      */
     public function processRewards(bool $includeWinterEvent = false): void
     {
@@ -193,27 +226,35 @@ class BattleRewardService
         }
     }
 
-    public function processLedgerAwareRewards(CharacterBattleRewardRequest $request, bool $includeWinterEvent = false): void
+    /**
+     * Process every pending ledger step for the given reward request, resuming from checkpoints as needed.
+     *
+     * @param CharacterBattleRewardRequest $request
+     * @param ?BattleRewardSharedContext $sharedContext
+     * @return BattleRewardProcessingResult
+     */
+    public function processLedgerAwareRewards(CharacterBattleRewardRequest $request, ?BattleRewardSharedContext $sharedContext = null): BattleRewardProcessingResult
     {
+        $this->sharedContext = $sharedContext;
+
         if ($request->source_type === BattleRewardRequestSourceType::FACTION_LOYALTY) {
             $this->character = Character::find($request->character_id);
             $this->earnedCurrencies = [];
 
             if (is_null($this->character)) {
-                return;
+                return BattleRewardProcessingResult::success();
             }
         } else {
             $payload = $request->handler_payload;
 
-            $this->setUp($request->character_id, (int) $payload['monster_id']);
+            $this->setUp($request->character_id, $payload['monster_id']);
             $this->setContext($payload['context'] ?? []);
 
             if (is_null($this->character) || is_null($this->monster)) {
-                return;
+                return BattleRewardProcessingResult::success();
             }
         }
 
-        $this->battleRewardLedgerService->ensureSteps($request);
         $this->battleRewardMessageContext->start($request->id, $this->character->id, $this->character->user_id);
 
         try {
@@ -229,34 +270,53 @@ class BattleRewardService
                 }
 
                 $this->battleRewardMessageContext->setStep($step->step_name);
-                $startedAt = microtime(true);
+                $stepStartedAtNs = hrtime(true);
+                $stepResult = 'failed';
                 $step = $this->battleRewardLedgerService->startStep($step, $this->payloadForStep($request, $step));
 
                 try {
-                    $result = $this->runLedgerStep($request, $step, $includeWinterEvent);
+                    $result = $this->runLedgerStep($request, $step);
+                    $stepResult = 'completed';
 
                     if ($step->refresh()->status !== BattleRewardStepStatus::COMPLETED) {
                         $this->battleRewardLedgerService->completeStep($step, array_merge($result, [
-                            'elapsed_ms' => (int) ((microtime(true) - $startedAt) * 1000),
+                            'elapsed_ms' => intdiv(hrtime(true) - $stepStartedAtNs, 1_000_000),
                         ]));
                     }
                 } catch (Throwable $throwable) {
                     $this->battleRewardLedgerService->failStep($step, $throwable);
 
-                    throw $throwable;
+                    return BattleRewardProcessingResult::failed($throwable);
                 } finally {
+                    Log::channel('reward_processing')->info('Ledger step execution summary.', [
+                        'character_id' => $request->character_id,
+                        'request_id' => $request->id,
+                        'source_type' => $request->source_type?->value,
+                        'step_name' => $step->step_name->value,
+                        'elapsed_ms' => intdiv(hrtime(true) - $stepStartedAtNs, 1_000_000),
+                        'result' => $stepResult,
+                    ]);
+
                     $this->battleRewardMessageContext->clearStep();
                 }
             }
+
+            return BattleRewardProcessingResult::success();
         } finally {
             $this->battleRewardMessageContext->clear();
         }
     }
 
+    /**
+     * Execute the reward handling logic for a single ledger step and return its result payload.
+     *
+     * @param CharacterBattleRewardRequest $request
+     * @param CharacterBattleRewardRequestStep $step
+     * @return array
+     */
     private function runLedgerStep(
         CharacterBattleRewardRequest $request,
         CharacterBattleRewardRequestStep $step,
-        bool $includeWinterEvent,
     ): array {
         match ($step->step_name) {
             BattleRewardStepName::BUILD_REWARD_PLAN => null,
@@ -272,7 +332,7 @@ class BattleRewardService
             BattleRewardStepName::XP => $this->handleLedgerAwardingXp($step),
             BattleRewardStepName::GEM_WORLD_REWARDS => $this->handleLedgerGemWorldRewards($step),
             BattleRewardStepName::EXPLORATION_CONTEXT => $this->handleLedgerExplorationContext($request),
-            BattleRewardStepName::WINTER_EVENT => $this->handleLedgerWinterEvent($includeWinterEvent),
+            BattleRewardStepName::WINTER_EVENT => $this->handleLedgerWinterEvent(),
             BattleRewardStepName::FACTION_LOYALTY_FAME => $this->handleFactionLoyaltyFameStep($request, $step),
             BattleRewardStepName::FACTION_LOYALTY_CURRENCIES => $this->handleFactionLoyaltyCurrenciesStep($request, $step),
             BattleRewardStepName::FACTION_LOYALTY_UNIQUE_ITEM => $this->handleFactionLoyaltyUniqueItemStep($step),
@@ -281,11 +341,16 @@ class BattleRewardService
             BattleRewardStepName::MESSAGE_OUTBOX => null,
         };
 
-        $this->character = $this->character?->refresh();
-
         return ['character_level' => $this->character?->level, 'character_xp' => $this->character?->xp];
     }
 
+    /**
+     * Build the persisted step payload, seeding it on first execution and reusing it on resume.
+     *
+     * @param CharacterBattleRewardRequest $request
+     * @param CharacterBattleRewardRequestStep $step
+     * @return array
+     */
     private function payloadForStep(CharacterBattleRewardRequest $request, CharacterBattleRewardRequestStep $step): array
     {
         if ($step->step_name !== BattleRewardStepName::BUILD_REWARD_PLAN) {
@@ -319,13 +384,31 @@ class BattleRewardService
         ];
     }
 
+    /**
+     * Award the ledger-planned XP for the step, checkpointing progress as it is applied.
+     *
+     * @param CharacterBattleRewardRequestStep $step
+     * @return void
+     */
     private function handleLedgerAwardingXp(CharacterBattleRewardRequestStep $step): void
     {
         $payload = $step->payload_json ?? [];
 
         if (! isset($payload['total_xp'])) {
+            $totalXp = $this->context['total_xp'] ?? null;
+
+            if (is_null($totalXp)) {
+                $totalXp = $this->characterRewardService->setCharacter($this->character)->fetchXpForMonster($this->monster, $this->sharedContext?->resolvedAreaGemEffects());
+
+                $xpCalculationFailure = $this->characterRewardService->xpCalculationFailure();
+
+                if (! is_null($xpCalculationFailure)) {
+                    throw $xpCalculationFailure;
+                }
+            }
+
             $payload = array_merge($payload, [
-                'total_xp' => $this->context['total_xp'] ?? $this->characterRewardService->setCharacter($this->character)->fetchXpForMonster($this->monster),
+                'total_xp' => $totalXp,
                 'starting_level' => $this->character->level,
                 'starting_xp' => $this->character->xp,
                 'source_request_id' => $step->character_battle_reward_request_id,
@@ -341,7 +424,7 @@ class BattleRewardService
         }
 
         $checkpoint = $step->checkpoint_json ?? [];
-        $remainingXp = (int) ($checkpoint['remaining_xp'] ?? $payload['total_xp']);
+        $remainingXp = $checkpoint['remaining_xp'] ?? $payload['total_xp'];
 
         if (isset($this->context['total_xp'], $this->context['total_creatures']) && empty($checkpoint)) {
             $this->battleMessageHandler->handleMessageForExplorationXp(
@@ -355,7 +438,7 @@ class BattleRewardService
             ->setCharacter($this->character)
             ->distributeCheckpointedXp($remainingXp, function (int $appliedXp, int $levelsAwarded, Character $character) use ($step, $payload): void {
                 $this->battleRewardLedgerService->checkpointStep($step->refresh(), [
-                    'applied_xp' => (int) $payload['total_xp'],
+                    'applied_xp' => $payload['total_xp'],
                     'levels_awarded' => $levelsAwarded,
                     'current_level' => $character->level,
                     'current_xp' => $character->xp,
@@ -374,14 +457,14 @@ class BattleRewardService
         if (($step->request?->source_type?->value !== BattleRewardRequestSourceType::EXPLORATION->value) && ! $hasManualXpMessage) {
             $this->battleMessageHandler->handleXPMessage(
                 $this->character->user,
-                (int) $payload['total_xp'],
-                (int) $this->character->xp,
+                $payload['total_xp'],
+                $this->character->xp,
             );
         }
 
         $this->battleRewardLedgerService->checkpointStep($step->refresh(), [
-            'applied_xp' => (int) $payload['total_xp'],
-            'levels_awarded' => max(0, $this->character->refresh()->level - (int) $payload['starting_level']),
+            'applied_xp' => $payload['total_xp'],
+            'levels_awarded' => max(0, $this->character->refresh()->level - $payload['starting_level']),
             'current_level' => $this->character->level,
             'current_xp' => $this->character->xp,
             'remaining_xp' => 0,
@@ -393,6 +476,9 @@ class BattleRewardService
      * Handle the Gem World reward step. Exits immediately for any battle
      * that is not currently taking place inside a generated Gem World,
      * before loading any Gem progression/Scroll state.
+     *
+     * @param CharacterBattleRewardRequestStep $step
+     * @return void
      */
     private function handleLedgerGemWorldRewards(CharacterBattleRewardRequestStep $step): void
     {
@@ -420,6 +506,12 @@ class BattleRewardService
         $this->battleRewardLedgerService->completeStep($step->refresh(), $result);
     }
 
+    /**
+     * Plan and apply the ledger-tracked currency rewards for the step, checking for a Gold Rush.
+     *
+     * @param CharacterBattleRewardRequestStep $step
+     * @return void
+     */
     private function handleLedgerCurrencyRewards(CharacterBattleRewardRequestStep $step): void
     {
         $totalKills = isset($this->context['total_creatures']) ? $this->context['total_creatures'] : 1;
@@ -435,12 +527,18 @@ class BattleRewardService
 
         $goldBeforeReward = $this->character->gold;
 
-        $this->earnedCurrencies = $characterRewardService->applyPlannedCurrencies($payload['plan']);
+        $this->earnedCurrencies = $characterRewardService->applyPlannedCurrencies($payload['plan'], $this->sharedContext?->resolvedAreaGemEffects());
+
+        $currencyCalculationFailure = $characterRewardService->currencyCalculationFailure();
+
+        if (! is_null($currencyCalculationFailure)) {
+            throw $currencyCalculationFailure;
+        }
 
         $character = $this->character->refresh();
         $goldGained = $character->gold - $goldBeforeReward;
 
-        $this->goldRush->processPotentialGoldRush($character, $goldGained);
+        $this->goldRush->processPotentialGoldRush($character, $goldGained, false);
 
         $this->character = $character->refresh();
 
@@ -450,6 +548,12 @@ class BattleRewardService
         ]);
     }
 
+    /**
+     * Plan and apply the ledger-tracked item drops for the step.
+     *
+     * @param CharacterBattleRewardRequestStep $step
+     * @return void
+     */
     private function handleLedgerItemDrops(CharacterBattleRewardRequestStep $step): void
     {
         $totalKills = isset($this->context['total_creatures']) ? $this->context['total_creatures'] : 1;
@@ -457,7 +561,7 @@ class BattleRewardService
 
         if (! isset($payload['plan'])) {
             $lootingChance = $this->character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
-            $payload['plan'] = $this->dropCheckService->planDrops($this->character, $this->monster, $totalKills, $lootingChance);
+            $payload['plan'] = $this->dropCheckService->planDrops($this->character, $this->monster, $totalKills, $lootingChance, $this->sharedContext?->resolvedAreaGemEffects());
             $payload['planned_at'] = now()->toIso8601String();
             $step = $this->battleRewardLedgerService->updateStepPayload($step, $payload);
         }
@@ -474,6 +578,12 @@ class BattleRewardService
         ]);
     }
 
+    /**
+     * Plan and apply the ledger-tracked special Location reward for the step.
+     *
+     * @param CharacterBattleRewardRequestStep $step
+     * @return void
+     */
     private function handleLedgerSpecificLocationRewards(CharacterBattleRewardRequestStep $step): void
     {
         $payload = $step->payload_json ?? [];
@@ -485,7 +595,7 @@ class BattleRewardService
                 ->planLocationReward($this->character, $this->monster, [
                     'request_id' => $step->character_battle_reward_request_id,
                     'kill_count' => $totalKills,
-                ]);
+                ], $this->sharedContext);
 
             $payload['planned_at'] = now()->toIso8601String();
 
@@ -516,6 +626,12 @@ class BattleRewardService
         ]);
     }
 
+    /**
+     * Apply the completed Exploration reward context to the active Exploration Log, if one is present.
+     *
+     * @param CharacterBattleRewardRequest $request
+     * @return void
+     */
     private function handleLedgerExplorationContext(CharacterBattleRewardRequest $request): void
     {
         if (! isset($this->context['exploration_log_id'])) {
@@ -556,18 +672,26 @@ class BattleRewardService
         );
     }
 
-    private function handleLedgerWinterEvent(bool $includeWinterEvent): void
+    /**
+     * Dispatch the delayed Winter Event Christmas gift handler for the Character.
+     *
+     * @return void
+     */
+    private function handleLedgerWinterEvent(): void
     {
-        if (! $includeWinterEvent) {
-            return;
-        }
-
         WinterEventChristmasGiftHandler::dispatch($this->character->id)
             ->onConnection('event_battle_reward')
             ->onQueue('event_battle_reward')
             ->delay(now()->addSeconds(2));
     }
 
+    /**
+     * Send the Faction Loyalty fame progress message once for the request.
+     *
+     * @param CharacterBattleRewardRequest $request
+     * @param CharacterBattleRewardRequestStep $step
+     * @return void
+     */
     private function handleFactionLoyaltyFameStep(CharacterBattleRewardRequest $request, CharacterBattleRewardRequestStep $step): void
     {
         $hasFameMessage = CharacterBattleRewardRequestMessage::where('character_battle_reward_request_id', $request->id)
@@ -589,12 +713,19 @@ class BattleRewardService
         );
     }
 
+    /**
+     * Apply the Faction Loyalty currency reward for the request and complete the ledger step.
+     *
+     * @param CharacterBattleRewardRequest $request
+     * @param CharacterBattleRewardRequestStep $step
+     * @return void
+     */
     private function handleFactionLoyaltyCurrenciesStep(CharacterBattleRewardRequest $request, CharacterBattleRewardRequestStep $step): void
     {
         $handlerPayload = $request->handler_payload;
-        $goldAmount = (int) ($handlerPayload['gold_amount'] ?? 0);
-        $goldDustAmount = (int) ($handlerPayload['gold_dust_amount'] ?? 0);
-        $shardsAmount = (int) ($handlerPayload['shards_amount'] ?? 0);
+        $goldAmount = $handlerPayload['gold_amount'] ?? 0;
+        $goldDustAmount = $handlerPayload['gold_dust_amount'] ?? 0;
+        $shardsAmount = $handlerPayload['shards_amount'] ?? 0;
 
         $character = $this->character->refresh();
 
@@ -622,13 +753,14 @@ class BattleRewardService
             'gold_dust' => $goldDustAmount,
             'shards' => $shardsAmount,
         ]);
-
-        $this->safelyDispatchBroadcastEvent(
-            new UpdateTopBarEvent($this->character->refresh()),
-            ['character_id' => $this->character->id]
-        );
     }
 
+    /**
+     * Award the Faction Loyalty unique item reward for the step, if one has not already been applied.
+     *
+     * @param CharacterBattleRewardRequestStep $step
+     * @return void
+     */
     private function handleFactionLoyaltyUniqueItemStep(CharacterBattleRewardRequestStep $step): void
     {
         $existingResult = $step->result_json ?? [];
@@ -679,13 +811,20 @@ class BattleRewardService
         ]);
     }
 
+    /**
+     * Award the ledger-planned Faction Loyalty XP for the step, checkpointing progress as it is applied.
+     *
+     * @param CharacterBattleRewardRequest $request
+     * @param CharacterBattleRewardRequestStep $step
+     * @return void
+     */
     private function handleFactionLoyaltyXpStep(CharacterBattleRewardRequest $request, CharacterBattleRewardRequestStep $step): void
     {
         $payload = $step->payload_json ?? [];
 
         if (! isset($payload['total_xp'])) {
             $handlerPayload = $request->handler_payload;
-            $xpAmount = (int) ($handlerPayload['xp_amount'] ?? 0);
+            $xpAmount = $handlerPayload['xp_amount'] ?? 0;
 
             $payload = array_merge($payload, [
                 'total_xp' => $xpAmount > 0 ? $xpAmount : 1000,
@@ -701,13 +840,13 @@ class BattleRewardService
         }
 
         $checkpoint = $step->checkpoint_json ?? [];
-        $remainingXp = (int) ($checkpoint['remaining_xp'] ?? $payload['total_xp']);
+        $remainingXp = $checkpoint['remaining_xp'] ?? $payload['total_xp'];
 
         $this->characterRewardService
             ->setCharacter($this->character)
             ->distributeCheckpointedXp($remainingXp, function (int $appliedXp, int $levelsAwarded, Character $character) use ($step, $payload): void {
                 $this->battleRewardLedgerService->checkpointStep($step->refresh(), [
-                    'applied_xp' => (int) $payload['total_xp'],
+                    'applied_xp' => $payload['total_xp'],
                     'levels_awarded' => $levelsAwarded,
                     'current_level' => $character->level,
                     'current_xp' => $character->xp,
@@ -727,15 +866,15 @@ class BattleRewardService
         if (! $hasXpMessage) {
             $this->battleMessageHandler->handleFactionLoyaltyXp(
                 $this->character->user,
-                (int) $payload['total_xp'],
-                (int) ($handlerPayload['new_fame_level'] ?? 0),
-                (string) ($handlerPayload['npc_name'] ?? 'the NPC'),
+                $payload['total_xp'],
+                $handlerPayload['new_fame_level'] ?? 0,
+                $handlerPayload['npc_name'] ?? 'the NPC',
             );
         }
 
         $this->battleRewardLedgerService->checkpointStep($step->refresh(), [
-            'applied_xp' => (int) $payload['total_xp'],
-            'levels_awarded' => max(0, $this->character->refresh()->level - (int) $payload['starting_level']),
+            'applied_xp' => $payload['total_xp'],
+            'levels_awarded' => max(0, $this->character->refresh()->level - $payload['starting_level']),
             'current_level' => $this->character->level,
             'current_xp' => $this->character->xp,
             'remaining_xp' => 0,
@@ -743,6 +882,11 @@ class BattleRewardService
         ]);
     }
 
+    /**
+     * Capture the Character's pre-reward state used to compute Exploration Log reward deltas.
+     *
+     * @return array
+     */
     private function explorationRewardSnapshot(): array
     {
         $trainingSkill = $this->character->skills()->where('currently_training', true)->first();
@@ -765,6 +909,13 @@ class BattleRewardService
         ];
     }
 
+    /**
+     * Fold the earned currencies for this reward into the Exploration Log's before-snapshot.
+     *
+     * @param array $beforeSnapshot
+     * @param Character $character
+     * @return array
+     */
     private function explorationRewardSnapshotWithEarnedCurrencies(array $beforeSnapshot, Character $character): array
     {
         foreach ($this->earnedCurrencies as $currency => $amount) {
@@ -781,7 +932,7 @@ class BattleRewardService
     /**
      * Handle awarding XP and Skill XP
      *
-     * @throws Exception
+     * @return void
      */
     private function handleAwardingXP(): void
     {
@@ -809,7 +960,7 @@ class BattleRewardService
     /**
      * Handle awarding skill experience.
      *
-     * @throws Exception
+     * @return void
      */
     private function handleAwardSkillPoints(): void
     {
@@ -833,7 +984,7 @@ class BattleRewardService
     /**
      * Handle awarding faction points.
      *
-     * @throws Throwable
+     * @return void
      */
     private function handleFactionPoints(): void
     {
@@ -865,6 +1016,8 @@ class BattleRewardService
 
     /**
      * Handles Faction Bounties.
+     *
+     * @return void
      */
     private function handleFactionLoyaltyBounty(): void
     {
@@ -895,6 +1048,8 @@ class BattleRewardService
 
     /**
      * Send the faction loyalty update event.
+     *
+     * @return void
      */
     private function sendFactionLoyaltyUpdateEvent(): void
     {
@@ -913,7 +1068,7 @@ class BattleRewardService
     /**
      * Handle currency rewards
      *
-     * @throws Exception
+     * @return void
      */
     private function handleCurrencyRewards(): void
     {
@@ -930,13 +1085,15 @@ class BattleRewardService
         $character = $this->character->refresh();
         $goldGained = $character->gold - $goldBeforeReward;
 
-        $this->goldRush->processPotentialGoldRush($character, $goldGained);
+        $this->goldRush->processPotentialGoldRush($character, $goldGained, false);
 
         $this->character = $character->refresh();
     }
 
     /**
      * Handle specific location rewards
+     *
+     * @return void
      */
     private function handleSpecificLocationRewards(): void
     {
@@ -960,7 +1117,7 @@ class BattleRewardService
     /**
      * Process enemy drops.
      *
-     * @throws Exception
+     * @return void
      */
     private function handleItemDrops(): void
     {
@@ -1001,6 +1158,12 @@ class BattleRewardService
         $this->addDropRewardTotals($dropTotals);
     }
 
+    /**
+     * Merge item-drop reward totals, such as auto-sold gold, into the earned currencies for the request.
+     *
+     * @param array $dropRewardTotals
+     * @return void
+     */
     private function addDropRewardTotals(array $dropRewardTotals): void
     {
         $autoSoldGold = $dropRewardTotals['auto_sold_gold'] ?? 0;
@@ -1015,7 +1178,7 @@ class BattleRewardService
     /**
      * Handle weekly fight rewards, only when not exploring.
      *
-     * @throws Exception
+     * @return void
      */
     private function handleWeeklyFightRewards(): void
     {
@@ -1032,7 +1195,7 @@ class BattleRewardService
      * - Class Ranks
      * - Item Skills
      *
-     * @throws Exception
+     * @return void
      */
     private function handleSecondaryRewards(): void
     {
@@ -1042,41 +1205,31 @@ class BattleRewardService
             $totalKills = $this->context['total_creatures'];
         }
 
-        $this->secondaryRewardService->handleSecondaryRewards($this->character, $totalKills);
+        $resolvedAreaGemEffects = $this->sharedContext?->resolvedAreaGemEffects();
+        $classRankGemBonus = $resolvedAreaGemEffects?->rewardEffect(AreaGemRewardEffect::CHARACTER_CLASS_RANK_XP_BONUS);
+        $classSpecialtyGemBonus = $resolvedAreaGemEffects?->rewardEffect(AreaGemRewardEffect::CHARACTER_CLASS_SPECIALTY_XP_GAIN);
+
+        $this->secondaryRewardService->handleSecondaryRewards($this->character, $totalKills, false, $classRankGemBonus, $classSpecialtyGemBonus);
+
+        $secondaryRewardCalculationFailure = $this->secondaryRewardService->secondaryRewardCalculationFailure();
+
+        if (! is_null($secondaryRewardCalculationFailure)) {
+            throw $secondaryRewardCalculationFailure;
+        }
 
         $this->character = $this->character->refresh();
     }
 
     /**
-     * Handle event participation.
+     * Handle event participation through the Events-owned battle participation contract.
      *
-     * @throws Exception
+     * @return void
      */
     private function handleGlobalEventParticipation(): void
     {
-        $event = $this->globalEventGoalEligibilityService->eventForCharacterMap($this->character);
-
-        if (is_null($event)) {
-            return;
-        }
-
-        if ($event->type === EventType::DELUSIONAL_MEMORIES_EVENT && $event->current_event_goal_step !== GlobalEventSteps::BATTLE) {
-            return;
-        }
-
-        $globalEventGoal = $event->globalEventGoals()->latest('id')->first();
-
-        if (is_null($globalEventGoal)) {
-            return;
-        }
-
-        if (is_null($globalEventGoal->max_kills)) {
-            return;
-        }
-
         $totalKills = isset($this->context['total_creatures']) ? $this->context['total_creatures'] : 1;
 
-        $this->battleGlobalEventParticipationHandler->handleGlobalEventParticipation($this->character, $globalEventGoal, $totalKills);
+        $this->battleGlobalEventParticipation->participate($this->character->id, $totalKills);
 
         $this->character = $this->character->refresh();
     }

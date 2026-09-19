@@ -9,11 +9,12 @@ use App\Flare\Models\Map;
 use App\Flare\Models\Monster;
 use App\Game\Battle\Services\BattleDrop;
 use App\Game\Core\Items\Builders\BuildMythicItem;
-use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
+use App\Game\Gems\Progression\Contracts\CharacterAreaGemEffects;
 use App\Game\Gems\Values\AreaGemRewardEffect;
+use App\Game\Gems\Values\ResolvedAreaGemEffects;
 use App\Game\Maps\Values\LocationType;
-use Exception;
 use Facades\App\Game\Core\Chance\DropCheckCalculator;
+use Illuminate\Support\Facades\Log;
 
 class DropCheckService
 {
@@ -43,10 +44,15 @@ class DropCheckService
 
     private float $questItemDropBonus = 0.0;
 
+    /**
+     * @param BattleDrop $battleDrop
+     * @param BuildMythicItem $buildMythicItem
+     * @param CharacterAreaGemEffects $characterAreaGemEffects
+     */
     public function __construct(
         BattleDrop $battleDrop,
         BuildMythicItem $buildMythicItem,
-        private readonly CharacterAreaGemEffectService $characterAreaGemEffectService,
+        private readonly CharacterAreaGemEffects $characterAreaGemEffects,
     ) {
         $this->battleDrop = $battleDrop;
         $this->buildMythicItem = $buildMythicItem;
@@ -55,8 +61,11 @@ class DropCheckService
     /**
      * Process the drop check.
      *
-     *
-     * @throws Exception
+     * @param Character $character
+     * @param Monster $monster
+     * @param ?float $lootingChance
+     * @param bool $questItemsOnly
+     * @return array
      */
     public function process(Character $character, Monster $monster, ?float $lootingChance = null, bool $questItemsOnly = false): array
     {
@@ -72,7 +81,7 @@ class DropCheckService
             $this->gameMapBonus = $gameMap->drop_chance_bonus;
         }
 
-        $resolvedAreaGemEffects = $this->characterAreaGemEffectService->resolveForCharacter($character);
+        $resolvedAreaGemEffects = $this->characterAreaGemEffects->resolveForCharacterId($character->id);
         $this->gameMapBonus += $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::ITEM_DROP_CHANCE_INCREASE);
         $this->mythicItemDropBonus = $resolvedAreaGemEffects->rarityEffects()->mythic();
         $this->questItemDropBonus = $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::ENEMY_QUEST_ITEM_DROP_CHANCE_INCREASE);
@@ -113,9 +122,18 @@ class DropCheckService
 
     /**
      * Plan the drops for a batch of kills without persisting them.
+     *
+     * @param Character $character
+     * @param Monster $monster
+     * @param int $killCount
+     * @param ?float $lootingChance
+     * @param ?ResolvedAreaGemEffects $resolvedAreaGemEffects
+     * @return array
      */
-    public function planDrops(Character $character, Monster $monster, int $killCount = 1, ?float $lootingChance = null): array
+    public function planDrops(Character $character, Monster $monster, int $killCount = 1, ?float $lootingChance = null, ?ResolvedAreaGemEffects $resolvedAreaGemEffects = null): array
     {
+        $startedAtNs = hrtime(true);
+
         $this->gameMapBonus = 0.0;
         $this->lootingChance = $lootingChance ?? $character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
         $this->monster = $monster;
@@ -127,7 +145,7 @@ class DropCheckService
             $this->gameMapBonus = $gameMap->drop_chance_bonus;
         }
 
-        $resolvedAreaGemEffects = $this->characterAreaGemEffectService->resolveForCharacter($character);
+        $resolvedAreaGemEffects ??= $this->characterAreaGemEffects->resolveForCharacterId($character->id);
         $this->gameMapBonus += $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::ITEM_DROP_CHANCE_INCREASE);
         $this->mythicItemDropBonus = $resolvedAreaGemEffects->rarityEffects()->mythic();
         $this->questItemDropBonus = $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::ENEMY_QUEST_ITEM_DROP_CHANCE_INCREASE);
@@ -194,6 +212,14 @@ class DropCheckService
             }
         }
 
+        Log::channel('reward_processing')->info('Item drop planning summary.', [
+            'character_id' => $character->id,
+            'monster_id' => $monster->id,
+            'kill_count' => $killCount,
+            'planned_drop_count' => count($plannedDrops),
+            'elapsed_ms' => intdiv(hrtime(true) - $startedAtNs, 1_000_000),
+        ]);
+
         return [
             'kill_count' => $killCount,
             'looting_chance' => $this->lootingChance,
@@ -203,24 +229,74 @@ class DropCheckService
         ];
     }
 
+    /**
+     * Apply a previously planned set of item drops to the Character.
+     *
+     * @param Character $character
+     * @param Monster $monster
+     * @param array $plan
+     * @return array
+     */
     public function applyPlannedDrops(Character $character, Monster $monster, array $plan): array
     {
+        $startedAtNs = hrtime(true);
+
         $this->monster = $monster;
         $this->battleDrop = $this->battleDrop->setMonster($monster)
             ->setSpecialLocation(null)
-            ->setGameMapBonus((float) ($plan['game_map_bonus'] ?? 0.0))
-            ->setLootingChance((float) ($plan['looting_chance'] ?? 0.0))
+            ->setGameMapBonus($plan['game_map_bonus'] ?? 0.0)
+            ->setLootingChance($plan['looting_chance'] ?? 0.0)
             ->resetRewardTotals();
 
-        foreach ($plan['drops'] ?? [] as $drop) {
-            $this->battleDrop->applyPlannedItem($character, (int) $drop['item_id'], (bool) ($drop['is_mythic'] ?? false));
+        $drops = $plan['drops'] ?? [];
+        $itemIds = collect($drops)
+            ->pluck('item_id')
+            ->unique()
+            ->values()
+            ->all();
+
+        $items = empty($itemIds)
+            ? collect()
+            : Item::whereIn('id', $itemIds)->get()->keyBy('id');
+
+        $missingItemCount = 0;
+
+        foreach ($drops as $drop) {
+            $item = $items->get($drop['item_id']);
+
+            if (is_null($item)) {
+                $missingItemCount++;
+
+                continue;
+            }
+
+            $this->battleDrop->applyPlannedItem(
+                $character,
+                $item,
+                $drop['is_mythic'] ?? false,
+            );
         }
+
+        Log::channel('reward_processing')->info('Item drop application summary.', [
+            'character_id' => $character->id,
+            'monster_id' => $monster->id,
+            'planned_drop_count' => count($drops),
+            'loaded_unique_item_count' => $items->count(),
+            'missing_item_count' => $missingItemCount,
+            'elapsed_ms' => intdiv(hrtime(true) - $startedAtNs, 1_000_000),
+        ]);
 
         return $this->battleDrop->rewardTotals();
     }
 
     /**
      * Append a planned drop, skipping quest items already planned in this batch.
+     *
+     * @param array $plannedDrops
+     * @param array $plannedQuestItemIds
+     * @param Item $item
+     * @param string $source
+     * @return void
      */
     private function appendPlannedDrop(array &$plannedDrops, array &$plannedQuestItemIds, Item $item, string $source): void
     {
@@ -242,8 +318,9 @@ class DropCheckService
     /**
      * See if the player can have a mythic drop.
      *
-     *
-     * @throws Exception
+     * @param Character $character
+     * @param bool $useLootingChance
+     * @return void
      */
     private function handleMythicDrop(Character $character, bool $useLootingChance = false): void
     {
@@ -259,8 +336,9 @@ class DropCheckService
     /**
      * Handles the drops themselves based on chance.
      *
-     *
-     * @throws Exception
+     * @param Character $character
+     * @param bool $questItemsOnly
+     * @return void
      */
     private function handleDropChance(Character $character, bool $questItemsOnly = false): void
     {
@@ -280,6 +358,9 @@ class DropCheckService
 
     /**
      * Are we at a location with an effect (special location)?
+     *
+     * @param Map $map
+     * @return void
      */
     private function findLocationWithEffect(Map $map): void
     {
@@ -301,6 +382,12 @@ class DropCheckService
         $this->cachedLocationWithEffect = $this->locationWithEffect;
     }
 
+    /**
+     * Resolve and cache whether the Character's current Location manually gates a quest item drop.
+     *
+     * @param Map $map
+     * @return void
+     */
     private function findManualQuestItemLocation(Map $map): void
     {
         $cacheKey = $this->makeLocationWithEffectCacheKey($map);
@@ -325,6 +412,9 @@ class DropCheckService
 
     /**
      * Build a cache key for determining if we need to re-query the location effect.
+     *
+     * @param Map $map
+     * @return string
      */
     private function makeLocationWithEffectCacheKey(Map $map): string
     {
@@ -333,6 +423,9 @@ class DropCheckService
 
     /**
      * Can we get the mythic item?
+     *
+     * @param bool $useLooting
+     * @return bool
      */
     private function canHaveMythic(bool $useLooting = false): bool
     {
@@ -353,7 +446,8 @@ class DropCheckService
     /**
      * Can we have the drop?
      *
-     * @throws Exception
+     * @param Character $character
+     * @return bool
      */
     private function canHaveDrop(Character $character): bool
     {

@@ -18,5 +18,6 @@ export const trackVariantStyles = (variant: ProgressBarVariant): string => {
       ProgressBarVariant.DE_YORK,
       () => 'bg-de-york-100 dark:bg-de-york-200'
     )
+    .with(ProgressBarVariant.XP, () => 'bg-gray-300 dark:bg-gray-700')
     .otherwise(() => '');
 };

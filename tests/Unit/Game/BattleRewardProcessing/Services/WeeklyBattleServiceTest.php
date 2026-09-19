@@ -87,6 +87,7 @@ class WeeklyBattleServiceTest extends TestCase
         $handler->shouldReceive('handleMonsterFromSpecialLocation')->once()->with(Mockery::type(get_class($character)), Mockery::type(WeeklyMonsterFight::class), false);
         $service = new WeeklyBattleService($handler);
 
+        $service->claimMonsterDeath($character, $monster);
         $service->handleMonsterDeath($character, $monster);
         $service->handleMonsterDeath($character, $monster);
 
@@ -99,8 +100,10 @@ class WeeklyBattleServiceTest extends TestCase
         $monster = $this->createMonster(['only_for_location_type' => LocationType::LORDS_STRONG_HOLD->value]);
         $handler = Mockery::mock(LocationSpecialtyHandler::class);
         $handler->shouldReceive('handleMonsterFromSpecialLocation')->once();
+        $service = new WeeklyBattleService($handler);
+        $service->claimMonsterDeath($character, $monster);
 
-        (new WeeklyBattleService($handler))->handleMonsterDeath($character, $monster);
+        $service->handleMonsterDeath($character, $monster);
 
         $this->assertNotNull(WeeklyMonsterFight::where('character_id', $character->id)->first()->reward_processed_at);
     }
@@ -111,9 +114,11 @@ class WeeklyBattleServiceTest extends TestCase
         $monster = $this->createMonster(['only_for_location_type' => LocationType::LORDS_STRONG_HOLD->value]);
         $handler = Mockery::mock(LocationSpecialtyHandler::class);
         $handler->shouldReceive('handleMonsterFromSpecialLocation')->once()->andThrow(new RuntimeException('reward failed'));
+        $service = new WeeklyBattleService($handler);
+        $service->claimMonsterDeath($character, $monster);
         $this->expectException(RuntimeException::class);
 
-        (new WeeklyBattleService($handler))->handleMonsterDeath($character, $monster);
+        $service->handleMonsterDeath($character, $monster);
     }
 
     public function test_retry_after_failed_reward_processes_successfully(): void
@@ -145,9 +150,11 @@ class WeeklyBattleServiceTest extends TestCase
 
                 throw new RuntimeException('Weekly reward delivery requires four available inventory slots.');
             });
+        $service = new WeeklyBattleService($handler);
+        $service->claimMonsterDeath($character, $monster);
         $this->expectException(RuntimeException::class);
 
-        (new WeeklyBattleService($handler))->handleMonsterDeath($character, $monster);
+        $service->handleMonsterDeath($character, $monster);
     }
 
     public function test_character_death_creates_count(): void

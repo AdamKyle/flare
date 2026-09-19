@@ -19,46 +19,107 @@ use App\Game\ClassRanks\Values\ClassSpecialValue;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
 use App\Game\Core\Items\Values\ItemType;
 use App\Game\Core\Traits\ResponseBuilder;
-use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
+use App\Game\Gems\Progression\Contracts\CharacterAreaGemEffects;
 use App\Game\Gems\Values\AreaGemRewardEffect;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\ClassRanksMessageTypes;
-use Exception;
 use Illuminate\Database\Eloquent\Collection;
+use RuntimeException;
+use Throwable;
 
 class ClassRankService
 {
     use FetchEquipped, ResponseBuilder;
 
+    private ?Throwable $classRankXpCalculationFailure = null;
+
+    /**
+     * @param BattleMessageHandler $battleMessageHandler
+     * @param CharacterAreaGemEffects $characterAreaGemEffects
+     * @param ClassDetailTransformer $classDetailTransformer
+     * @param ClassMasteryDetailTransformer $classMasteryDetailTransformer
+     */
     public function __construct(
         private readonly BattleMessageHandler $battleMessageHandler,
-        private readonly CharacterAreaGemEffectService $characterAreaGemEffectService,
+        private readonly CharacterAreaGemEffects $characterAreaGemEffects,
         private readonly ClassDetailTransformer $classDetailTransformer,
         private readonly ClassMasteryDetailTransformer $classMasteryDetailTransformer,
     ) {}
 
     /**
-     * Resolve the Gem-adjusted Class Rank XP awarded per kill for the character.
+     * Return the invalid whole-XP-per-kill calculation failure recorded during the most recent
+     * Class Rank/Specialty XP operation, if one occurred, so the caller can fail the owning
+     * reward operation instead of treating a corrupted calculation as a silent or extreme XP
+     * reward.
+     *
+     * @return ?Throwable
      */
-    private function resolveClassRankXpPerKill(Character $character): int
+    public function classRankXpCalculationFailure(): ?Throwable
     {
-        $bonus = $this->characterAreaGemEffectService->resolveForCharacter($character)->rewardEffect(AreaGemRewardEffect::CHARACTER_CLASS_RANK_XP_BONUS);
-
-        return round(ClassRankValue::XP_PER_KILL * (1 + $bonus));
+        return $this->classRankXpCalculationFailure;
     }
 
     /**
-     * Resolve the Gem-adjusted Class Specialty XP awarded per kill for the character.
+     * Resolve the Gem-adjusted Class Rank XP awarded per kill for the character, or null when the
+     * calculation is invalid.
+     *
+     * @param Character $character
+     * @param ?float $preResolvedGemBonus
+     * @return ?int
      */
-    private function resolveClassSpecialtyXpPerKill(Character $character): int
+    private function resolveClassRankXpPerKill(Character $character, ?float $preResolvedGemBonus = null): ?int
     {
-        $bonus = $this->characterAreaGemEffectService->resolveForCharacter($character)->rewardEffect(AreaGemRewardEffect::CHARACTER_CLASS_SPECIALTY_XP_GAIN);
+        $bonus = $preResolvedGemBonus ?? $this->characterAreaGemEffects->resolveForCharacterId($character->id)->rewardEffect(AreaGemRewardEffect::CHARACTER_CLASS_RANK_XP_BONUS);
 
-        return round(ClassSpecialValue::XP_PER_KILL * (1 + $bonus));
+        return $this->wholeXpPerKill(ClassRankValue::XP_PER_KILL * (1 + $bonus));
+    }
+
+    /**
+     * Resolve the Gem-adjusted Class Specialty XP awarded per kill for the character, or null when
+     * the calculation is invalid.
+     *
+     * @param Character $character
+     * @param ?float $preResolvedGemBonus
+     * @return ?int
+     */
+    private function resolveClassSpecialtyXpPerKill(Character $character, ?float $preResolvedGemBonus = null): ?int
+    {
+        $bonus = $preResolvedGemBonus ?? $this->characterAreaGemEffects->resolveForCharacterId($character->id)->rewardEffect(AreaGemRewardEffect::CHARACTER_CLASS_SPECIALTY_XP_GAIN);
+
+        return $this->wholeXpPerKill(ClassSpecialValue::XP_PER_KILL * (1 + $bonus));
+    }
+
+    /**
+     * Validate and extract the genuine integer value of an already-whole Gem-adjusted XP-per-kill
+     * amount, or null when the calculation is invalid. This XP-per-kill domain never exceeds the
+     * platform integer range, so a failed validation means the calculation that produced this
+     * amount is corrupted; that failure is recorded on `classRankXpCalculationFailure()` instead of
+     * silently applying a zero, `PHP_INT_MAX`, or `PHP_INT_MIN` Class Rank/Specialty XP reward, so
+     * the caller can fail the owning reward operation.
+     *
+     * @param float $xpPerKill
+     * @return ?int
+     */
+    private function wholeXpPerKill(float $xpPerKill): ?int
+    {
+        $wholeXpPerKill = filter_var(round($xpPerKill), FILTER_VALIDATE_INT);
+
+        if ($wholeXpPerKill === false) {
+            $this->classRankXpCalculationFailure = new RuntimeException(
+                'Invalid whole Class Rank/Specialty XP-per-kill amount calculated: '.$xpPerKill.' cannot be represented as an integer.',
+            );
+
+            return null;
+        }
+
+        return $wholeXpPerKill;
     }
 
     /**
      * Get the class specials for the character.
+     *
+     * @param Character $character
+     * @return array
      */
     public function getSpecials(Character $character): array
     {
@@ -100,6 +161,9 @@ class ClassRankService
 
     /**
      * Get class ranks.
+     *
+     * @param Character $character
+     * @return array
      */
     public function getClassRanks(Character $character): array
     {
@@ -200,6 +264,10 @@ class ClassRankService
 
     /**
      * Resolve the display-only prerequisite unlock progress for a Class, or null when it has no prerequisite pair.
+     *
+     * @param GameClass $gameClass
+     * @param Collection $characterClassRanks
+     * @return ?array
      */
     private function resolveUnlockProgress(GameClass $gameClass, Collection $characterClassRanks): ?array
     {
@@ -234,7 +302,9 @@ class ClassRankService
     /**
      * Equip a class specialty
      *
-     * @throws Exception
+     * @param Character $character
+     * @param GameClassSpecial $gameClassSpecial
+     * @return array
      */
     public function equipSpecialty(Character $character, GameClassSpecial $gameClassSpecial): array
     {
@@ -288,9 +358,9 @@ class ClassRankService
     /**
      * Unequip the specialty.
      *
+     * @param Character $character
+     * @param CharacterClassSpecialtiesEquipped $classSpecialEquipped
      * @return array
-     *
-     * @throws Exception
      */
     public function unequipSpecial(Character $character, CharacterClassSpecialtiesEquipped $classSpecialEquipped)
     {
@@ -316,7 +386,10 @@ class ClassRankService
     /**
      * Swap a currently equipped Class Specialty for an accessible target one.
      *
-     * @throws Exception
+     * @param Character $character
+     * @param GameClassSpecial $target
+     * @param CharacterClassSpecialtiesEquipped $replacement
+     * @return array
      */
     public function swapSpecialty(Character $character, GameClassSpecial $target, CharacterClassSpecialtiesEquipped $replacement): array
     {
@@ -386,15 +459,24 @@ class ClassRankService
     /**
      * give xp to a class rank for the characters current class.
      *
-     * @throws Exception
+     * @param Character $character
+     * @param int $killCount
+     * @param ?float $preResolvedGemBonus
+     * @return void
      */
-    public function giveXpToClassRank(Character $character, int $killCount = 1): void
+    public function giveXpToClassRank(Character $character, int $killCount = 1, ?float $preResolvedGemBonus = null): void
     {
+        $this->classRankXpCalculationFailure = null;
+
         if ($killCount <= 0) {
             return;
         }
 
-        $xpPerKill = $this->resolveClassRankXpPerKill($character);
+        $xpPerKill = $this->resolveClassRankXpPerKill($character, $preResolvedGemBonus);
+
+        if (is_null($xpPerKill)) {
+            return;
+        }
 
         if ($killCount === 1) {
             $classRank = $character->classRanks()->where('game_class_id', $character->game_class_id)->first();
@@ -485,15 +567,22 @@ class ClassRankService
     /**
      * Give XP to equipped specials.
      *
-     * @throws Exception
+     * @param Character $character
+     * @param int $killCount
+     * @param ?float $preResolvedGemBonus
+     * @return void
      */
-    public function giveXpToEquippedClassSpecialties(Character $character, int $killCount = 1): void
+    public function giveXpToEquippedClassSpecialties(Character $character, int $killCount = 1, ?float $preResolvedGemBonus = null): void
     {
         if ($killCount <= 0) {
             return;
         }
 
-        $xpPerKill = $this->resolveClassSpecialtyXpPerKill($character);
+        $xpPerKill = $this->resolveClassSpecialtyXpPerKill($character, $preResolvedGemBonus);
+
+        if (is_null($xpPerKill)) {
+            return;
+        }
 
         if ($killCount === 1) {
             $equippedSpecials = $character->classSpecialsEquipped()->where('equipped', true)->get();
@@ -607,7 +696,9 @@ class ClassRankService
     /**
      * Give XP to all applicable weapon masteries for the current class.
      *
-     * @throws Exception
+     * @param Character $character
+     * @param int $killCount
+     * @return void
      */
     public function giveXpToMasteries(Character $character, int $killCount = 1): void
     {
@@ -770,7 +861,14 @@ class ClassRankService
         }
     }
 
-    protected function isClassLocked(Character $character, CharacterClassRank $classRank): bool
+    /**
+     * Determine whether the Class Rank is locked behind its prerequisite Class levels.
+     *
+     * @param Character $character
+     * @param CharacterClassRank $classRank
+     * @return bool
+     */
+    private function isClassLocked(Character $character, CharacterClassRank $classRank): bool
     {
         if (
             ! is_null($classRank->gameClass->primary_required_class_id) &&
@@ -790,6 +888,17 @@ class ClassRankService
         return false;
     }
 
+    /**
+     * Apply a batch of kills to a level/xp progression and return the resulting level, xp, and levels gained.
+     *
+     * @param int $currentLevel
+     * @param int $currentXp
+     * @param int $requiredXp
+     * @param int $xpPerKill
+     * @param int $killCount
+     * @param int $maxLevel
+     * @return array
+     */
     private function applyKillCountToProgression(
         int $currentLevel,
         int $currentXp,
@@ -849,6 +958,14 @@ class ClassRankService
         return [$currentLevel, $newCurrentXp, $currentLevel - $startingLevel];
     }
 
+    /**
+     * Calculate the number of kills required to reach the next XP threshold.
+     *
+     * @param int $currentXp
+     * @param int $requiredXp
+     * @param int $xpPerKill
+     * @return int
+     */
     private function killsToReachThreshold(int $currentXp, int $requiredXp, int $xpPerKill): int
     {
         if ($xpPerKill >= $requiredXp) {
@@ -861,6 +978,6 @@ class ClassRankService
 
         $remaining = $requiredXp - $currentXp;
 
-        return (int) ceil($remaining / $xpPerKill);
+        return intdiv($remaining + $xpPerKill - 1, $xpPerKill);
     }
 }

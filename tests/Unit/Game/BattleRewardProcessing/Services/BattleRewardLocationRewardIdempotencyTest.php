@@ -10,6 +10,9 @@ use App\Game\BattleRewardProcessing\Services\BattleRewardLedgerService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardMessageContext;
 use App\Game\BattleRewardProcessing\Services\BattleRewardMessageOutboxService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
+use App\Game\BattleRewardProcessing\Services\BattleRewardSharedContextService;
+use App\Game\BattleRewardProcessing\Services\BattleRewardStepPlanService;
+use App\Game\Maps\Values\LocationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -18,21 +21,23 @@ use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterBattleReward;
+use Tests\Traits\CreateLocation;
 use Tests\Traits\CreateMonster;
 
 class BattleRewardLocationRewardIdempotencyTest extends TestCase
 {
-    use CreateCharacterBattleReward, CreateMonster, MockeryPHPUnitIntegration, RefreshDatabase;
+    use CreateCharacterBattleReward, CreateLocation, CreateMonster, MockeryPHPUnitIntegration, RefreshDatabase;
 
     public function test_completed_location_reward_step_cannot_apply_twice(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $this->createLocation(['x' => 16, 'y' => 16, 'game_map_id' => $character->map->game_map_id, 'type' => LocationType::GOLD_MINES->value]);
         $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
         $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
-        resolve(BattleRewardLedgerService::class)->ensureSteps($request);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request, resolve(BattleRewardStepPlanService::class)->planBattleLike($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster)));
         $request->steps()->update(['status' => BattleRewardStepStatus::COMPLETED]);
         $battleLocationRewardService = Mockery::mock(BattleLocationRewardService::class);
         $battleLocationRewardService->shouldReceive('setContext')->never();
@@ -40,7 +45,7 @@ class BattleRewardLocationRewardIdempotencyTest extends TestCase
         $battleLocationRewardService->shouldReceive('applyPlannedLocationReward')->never();
         $this->instance(BattleLocationRewardService::class, $battleLocationRewardService);
 
-        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster));
 
         $this->assertSame(BattleRewardStepStatus::COMPLETED, $request->steps()->where('step_name', BattleRewardStepName::SPECIFIC_LOCATION_REWARDS)->firstOrFail()->status);
     }
@@ -48,12 +53,13 @@ class BattleRewardLocationRewardIdempotencyTest extends TestCase
     public function test_location_reward_plan_is_saved_before_apply(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $this->createLocation(['x' => 16, 'y' => 16, 'game_map_id' => $character->map->game_map_id, 'type' => LocationType::GOLD_MINES->value]);
         $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
         $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
-        resolve(BattleRewardLedgerService::class)->ensureSteps($request);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request, resolve(BattleRewardStepPlanService::class)->planBattleLike($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster)));
         $request->steps()->where('step_name', '!=', BattleRewardStepName::SPECIFIC_LOCATION_REWARDS)->update(['status' => BattleRewardStepStatus::COMPLETED]);
         $battleLocationRewardService = Mockery::mock(BattleLocationRewardService::class);
         $battleLocationRewardService->shouldReceive('setContext')->twice()->andReturnSelf();
@@ -74,7 +80,7 @@ class BattleRewardLocationRewardIdempotencyTest extends TestCase
             ->andReturn(['currencies' => ['gold' => 10], 'item_count' => 0, 'event_created' => false]);
         $this->instance(BattleLocationRewardService::class, $battleLocationRewardService);
 
-        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster));
 
         $step = $request->steps()->where('step_name', BattleRewardStepName::SPECIFIC_LOCATION_REWARDS)->firstOrFail();
 
@@ -85,12 +91,13 @@ class BattleRewardLocationRewardIdempotencyTest extends TestCase
     public function test_saved_location_reward_plan_is_reused_on_resume(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $this->createLocation(['x' => 16, 'y' => 16, 'game_map_id' => $character->map->game_map_id, 'type' => LocationType::GOLD_MINES->value]);
         $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
         $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
-        resolve(BattleRewardLedgerService::class)->ensureSteps($request);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request, resolve(BattleRewardStepPlanService::class)->planBattleLike($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster)));
         $request->steps()->where('step_name', '!=', BattleRewardStepName::SPECIFIC_LOCATION_REWARDS)->update(['status' => BattleRewardStepStatus::COMPLETED]);
         $request->steps()->where('step_name', BattleRewardStepName::SPECIFIC_LOCATION_REWARDS)->update([
             'status' => BattleRewardStepStatus::RESUMABLE,
@@ -117,7 +124,7 @@ class BattleRewardLocationRewardIdempotencyTest extends TestCase
             ->andReturn(['currencies' => ['gold' => 25], 'item_count' => 0, 'event_created' => false]);
         $this->instance(BattleLocationRewardService::class, $battleLocationRewardService);
 
-        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster));
 
         $this->assertSame(BattleRewardStepStatus::COMPLETED, $request->steps()->where('step_name', BattleRewardStepName::SPECIFIC_LOCATION_REWARDS)->firstOrFail()->status);
     }

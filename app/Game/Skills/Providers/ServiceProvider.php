@@ -8,7 +8,6 @@ use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\BattleRewardProcessing\Services\FactionLoyaltyRewardRequestService;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
-use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Transformers\CharacterGemSlotsTransformer;
 use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Chance\RandomNumberGenerator;
@@ -34,6 +33,7 @@ use App\Game\Skills\Services\AlchemyService;
 use App\Game\Skills\Services\CraftingService;
 use App\Game\Skills\Services\DisenchantManyService;
 use App\Game\Skills\Services\DisenchantService;
+use App\Game\Skills\Services\EnchantingAffixService;
 use App\Game\Skills\Services\EnchantingService;
 use App\Game\Skills\Services\EnchantItemService;
 use App\Game\Skills\Services\GemService;
@@ -169,10 +169,16 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
+        $this->app->bind(EnchantingAffixService::class, function ($app) {
+            return new EnchantingAffixService(
+                $app->make(CharacterStatBuilder::class),
+                $app->make(GlobalEventGoalEligibilityService::class),
+            );
+        });
+
         $this->app->bind(EnchantingService::class, function ($app) {
             return new EnchantingService(
                 $app->make(CharacterStatBuilder::class),
-                $app->make(CharacterInventoryService::class),
                 $app->make(EnchantItemService::class),
                 $app->make(RandomEnchantmentService::class),
                 $app->make(GlobalEventGoalEligibilityService::class),
@@ -180,6 +186,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(EnchantingItemTransformer::class),
                 $app->make(EventEnchantingItemTransformer::class),
                 $app->make(EnchantingAffixTransformer::class),
+                $app->make(EnchantingAffixService::class),
             );
         });
 
@@ -205,6 +212,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(SkillCheckService::class),
                 $app->make(RandomNumberGenerator::class),
                 $app->make(ChanceCalculator::class),
+                $app->make(EnchantingAffixService::class),
             );
         });
 

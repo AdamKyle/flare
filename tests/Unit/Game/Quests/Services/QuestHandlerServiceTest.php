@@ -7,6 +7,7 @@ use App\Flare\Models\CharacterBattleRewardRequest;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestPriority;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
+use App\Game\BattleRewardProcessing\Values\BattleRewardEnqueueResult;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Events\Values\EventType;
 use App\Game\Maps\Events\UpdateMap;
@@ -23,6 +24,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use RuntimeException;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateEvent;
@@ -209,6 +211,42 @@ class QuestHandlerServiceTest extends TestCase
             $request->source_id,
         );
         $this->assertSame([], $result['raid_quests']);
+    }
+
+    public function test_hand_in_quest_returns_error_result_when_the_reward_enqueue_fails(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $npc = $this->createNpc();
+
+        $quest = $this->createQuest([
+            'npc_id' => $npc->id,
+            'unlocks_skill' => false,
+            'gold_cost' => 100,
+            'gold_dust_cost' => 0,
+            'shard_cost' => 0,
+            'reward_gold' => null,
+            'reward_gold_dust' => null,
+            'reward_shards' => null,
+            'reward_xp' => null,
+        ]);
+
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        $character->update(['gold' => 200]);
+
+        $queueManager = Mockery::mock(BattleRewardProcessingQueueManager::class);
+        $queueManager->shouldReceive('enqueue')->once()->andReturn(BattleRewardEnqueueResult::failed(new RuntimeException('database is unavailable')));
+        $this->app->instance(BattleRewardProcessingQueueManager::class, $queueManager);
+
+        $result = resolve(QuestHandlerService::class)->handInQuest($character->refresh(), $quest);
+
+        $this->assertSame(422, $result['status']);
+        $this->assertSame(0, CharacterBattleRewardRequest::count());
     }
 
     public function test_hand_in_quest_response_preserves_active_raid_quests(): void

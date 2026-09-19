@@ -14,16 +14,18 @@ use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Core\Services\CharacterService;
 use App\Game\Core\Traits\SafelyBroadcastsEvents;
-use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
+use App\Game\Gems\Progression\Contracts\CharacterAreaGemEffects;
 use App\Game\Gems\Values\AreaGemRewardEffect;
+use App\Game\Gems\Values\ResolvedAreaGemEffects;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CharacterMessageTypes;
 use App\Game\Skills\Services\SkillService;
 use Closure;
-use Exception;
 use Facades\App\Game\BattleRewardProcessing\Calculators\XPCalculator;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Database\Eloquent\Collection;
+use RuntimeException;
+use Throwable;
 
 class CharacterXPService
 {
@@ -33,23 +35,53 @@ class CharacterXPService
 
     private ?Closure $heartbeatCallback = null;
 
+    private ?Throwable $xpCalculationFailure = null;
+
+    /**
+     * @param CharacterService $characterService
+     * @param SkillService $skillService
+     * @param BattleMessageHandler $battleMessageHandler
+     * @param CharacterAreaGemEffects $characterAreaGemEffects
+     */
     public function __construct(
         private readonly CharacterService $characterService,
         private readonly SkillService $skillService,
         private readonly BattleMessageHandler $battleMessageHandler,
-        private readonly CharacterAreaGemEffectService $characterAreaGemEffectService,
+        private readonly CharacterAreaGemEffects $characterAreaGemEffects,
     ) {}
 
     /**
      * Set the character.
+     *
+     * @param Character $character
+     * @return CharacterXPService
      */
     public function setCharacter(Character $character): CharacterXPService
     {
         $this->character = $character;
+        $this->xpCalculationFailure = null;
 
         return $this;
     }
 
+    /**
+     * Return the invalid whole-XP calculation failure recorded during the most recent XP
+     * operation, if one occurred, so the caller can fail the owning reward operation instead of
+     * treating a corrupted calculation as a silent or extreme XP reward.
+     *
+     * @return ?Throwable
+     */
+    public function xpCalculationFailure(): ?Throwable
+    {
+        return $this->xpCalculationFailure;
+    }
+
+    /**
+     * Register a heartbeat callback invoked during long-running XP distribution.
+     *
+     * @param ?Closure $callback
+     * @return self
+     */
     public function withHeartbeatCallback(?Closure $callback): self
     {
         $this->heartbeatCallback = $callback;
@@ -60,7 +92,8 @@ class CharacterXPService
     /**
      * Distribute the XP to the character based on the monster.
      *
-     * @throws Exception
+     * @param Monster $monster
+     * @return CharacterXPService
      */
     public function distributeCharacterXP(Monster $monster): CharacterXPService
     {
@@ -80,6 +113,9 @@ class CharacterXPService
 
     /**
      * Distribute a specific amount of XP
+     *
+     * @param int $xp
+     * @return CharacterXPService
      */
     public function distributeSpecifiedXp(int $xp): CharacterXPService
     {
@@ -100,6 +136,13 @@ class CharacterXPService
         return $this;
     }
 
+    /**
+     * Distribute XP in a single checkpointed step, invoking the callback once it is applied.
+     *
+     * @param int $xp
+     * @param ?Closure $checkpointCallback
+     * @return CharacterXPService
+     */
     public function distributeCheckpointedXp(int $xp, ?Closure $checkpointCallback = null): CharacterXPService
     {
         if (! $this->canCharacterGainXP($this->character)) {
@@ -139,6 +182,8 @@ class CharacterXPService
      * Handle possible level up.
      *
      * Takes into account XP over flow.
+     *
+     * @return void
      */
     public function handleLevelUp(): void
     {
@@ -163,6 +208,8 @@ class CharacterXPService
 
     /**
      * Get the refreshed Character
+     *
+     * @return Character
      */
     public function getCharacter(): Character
     {
@@ -171,6 +218,10 @@ class CharacterXPService
 
     /**
      * Handle character level up.
+     *
+     * @param int $leftOverXP
+     * @param bool $shouldBuildCache
+     * @return void
      */
     public function handleCharacterLevelUp(int $leftOverXP, bool $shouldBuildCache = false): void
     {
@@ -203,8 +254,12 @@ class CharacterXPService
      * - Can return 0 if the xp we would gain is 0.
      * - Takes into account skills in training
      * - Takes into account Xp Bonuses such as items (Alchemy and quest)
+     *
+     * @param Monster $monster
+     * @param ?ResolvedAreaGemEffects $resolvedAreaGemEffects
+     * @return int
      */
-    public function fetchXpForMonster(Monster $monster): int
+    public function fetchXpForMonster(Monster $monster, ?ResolvedAreaGemEffects $resolvedAreaGemEffects = null): int
     {
         if (! $this->canCharacterGainXP($this->character)) {
             $this->character = $this->normalizeCharacterMaxLevel($this->character);
@@ -212,10 +267,16 @@ class CharacterXPService
             return 0;
         }
 
+        $resolvedAreaGemEffects ??= $this->characterAreaGemEffects->resolveForCharacterId($this->character->id);
+
         $xp = XPCalculator::fetchXPFromMonster($monster, $this->character->level);
 
-        $monsterXpIncrease = $this->characterAreaGemEffectService->resolveForCharacter($this->character)->rewardEffect(AreaGemRewardEffect::MONSTER_XP_INCREASE);
-        $xp = (int) round($xp * (1 + $monsterXpIncrease));
+        $monsterXpIncrease = $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::MONSTER_XP_INCREASE);
+        $xp = $this->roundToWholeXp($xp * (1 + $monsterXpIncrease));
+
+        if (is_null($xp)) {
+            return 0;
+        }
 
         if ($this->character->level >= $monster->max_level && $this->character->user->show_monster_to_low_level_message) {
             ServerMessageHandler::sendBasicMessage($this->character->user, $monster->name.' has a max level of: '.number_format($monster->max_level).'. You are only getting 1/3rd of: '.number_format($monster->xp).' XP before all bonuses. Move down the list child.');
@@ -227,7 +288,7 @@ class CharacterXPService
             return 0;
         }
 
-        return $this->getXpWithBonuses($xp);
+        return $this->getXpWithBonuses($xp, $resolvedAreaGemEffects);
     }
 
     /**
@@ -237,8 +298,13 @@ class CharacterXPService
      *   - All quest items that ignore the caps
      *   - All quest items that do no ignore caps
      *   - Add both together to get the XP.
+     *
+     * @param Character $character
+     * @param int $xp
+     * @param ?ResolvedAreaGemEffects $resolvedAreaGemEffects
+     * @return int
      */
-    public function determineXPToAward(Character $character, int $xp): int
+    public function determineXPToAward(Character $character, int $xp, ?ResolvedAreaGemEffects $resolvedAreaGemEffects = null): int
     {
 
         if ($xp === 0) {
@@ -261,7 +327,8 @@ class CharacterXPService
         });
         $map = $character->map->gameMap;
         $mapBonus = ! is_null($map->xp_bonus) ? $map->xp_bonus : 0;
-        $gemCharacterXpBonus = $this->characterAreaGemEffectService->resolveForCharacter($character)->rewardEffect(AreaGemRewardEffect::CHARACTER_XP_BONUS);
+        $resolvedAreaGemEffects ??= $this->characterAreaGemEffects->resolveForCharacterId($character->id);
+        $gemCharacterXpBonus = $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::CHARACTER_XP_BONUS);
 
         $xpBonusIgnoreCaps = $this->getTotalXpBonus($xpBonusQuestSlots, true) + $boonBonus + $mapBonus + $gemCharacterXpBonus;
         $xpBonusWithCaps = $this->getTotalXpBonus($xpBonusQuestSlots, false);
@@ -275,6 +342,9 @@ class CharacterXPService
 
     /**
      * Can the character gain XP?
+     *
+     * @param Character $character
+     * @return bool
      */
     public function canCharacterGainXP(Character $character): bool
     {
@@ -283,6 +353,9 @@ class CharacterXPService
 
     /**
      * Is the character halfway to max?
+     *
+     * @param int $characterLevel
+     * @return bool
      */
     public function isCharacterHalfWay(int $characterLevel): bool
     {
@@ -294,6 +367,9 @@ class CharacterXPService
 
     /**
      * Are we 75% of the way to max?
+     *
+     * @param int $characterLevel
+     * @return bool
      */
     public function isCharacterThreeQuarters(int $characterLevel): bool
     {
@@ -305,6 +381,9 @@ class CharacterXPService
 
     /**
      * Are we at the last 100 levels?
+     *
+     * @param int $characterLevel
+     * @return bool
      */
     public function isCharacterAtLastLeg(int $characterLevel): bool
     {
@@ -316,6 +395,10 @@ class CharacterXPService
 
     /**
      * Handle instances where we could have multiple level ups.
+     *
+     * @param int $leftOverXP
+     * @param bool $shouldBuildCache
+     * @return void
      */
     private function handleMultipleLevelUps(int $leftOverXP, bool $shouldBuildCache = false): void
     {
@@ -357,6 +440,9 @@ class CharacterXPService
 
     /**
      * Assigns XP to the character.
+     *
+     * @param Monster $monster
+     * @return void
      */
     private function distributeXP(Monster $monster): void
     {
@@ -368,6 +454,10 @@ class CharacterXPService
         }
 
         $xp = $this->fetchXpForMonster($monster);
+
+        if (! is_null($this->xpCalculationFailure)) {
+            return;
+        }
 
         $this->character->update([
             'xp' => $this->character->xp + $xp,
@@ -383,10 +473,14 @@ class CharacterXPService
      *
      * - Applies Guide Quest XP (+10 while under level 2)
      * - Applies Addional bonuses from items and quest items.
+     *
+     * @param int $xp
+     * @param ?ResolvedAreaGemEffects $resolvedAreaGemEffects
+     * @return int
      */
-    private function getXpWithBonuses(int $xp): int
+    private function getXpWithBonuses(int $xp, ?ResolvedAreaGemEffects $resolvedAreaGemEffects = null): int
     {
-        $xp = $this->determineXPToAward($this->character, $xp);
+        $xp = $this->determineXPToAward($this->character, $xp, $resolvedAreaGemEffects);
 
         $guideEnabled = $this->character->user->guide_enabled;
         $hasNoCompletedGuideQuests = $this->character->questsCompleted()
@@ -408,6 +502,12 @@ class CharacterXPService
 
     /**
      * Get xp when we can continue leveling.
+     *
+     * @param Character $character
+     * @param int $xp
+     * @param float $xpBonusIgnoreCaps
+     * @param float $xpBonusWithCaps
+     * @return int
      */
     private function continueLevelingXpWithBonuses(Character $character, int $xp, float $xpBonusIgnoreCaps, float $xpBonusWithCaps): int
     {
@@ -430,6 +530,12 @@ class CharacterXPService
 
     /**
      * Get Xp when regular leveling.
+     *
+     * @param Character $character
+     * @param int $xp
+     * @param float $xpBonusIgnoreCaps
+     * @param float $xpBonusWithCaps
+     * @return int
      */
     private function regularLevelingXpWithBonuses(Character $character, int $xp, float $xpBonusIgnoreCaps, float $xpBonusWithCaps): int
     {
@@ -460,6 +566,12 @@ class CharacterXPService
      * - Any additional bonus.
      *
      * All of which is added to the xp.
+     *
+     * @param Character $character
+     * @param bool $ignoreCaps
+     * @param float $xpBonus
+     * @param int $xp
+     * @return float
      */
     private function getXP(Character $character, bool $ignoreCaps, float $xpBonus, int $xp): float
     {
@@ -486,6 +598,9 @@ class CharacterXPService
 
     /**
      * Find all quest items that give xp bonus.
+     *
+     * @param Character $character
+     * @return Collection
      */
     private function findAllItemsThatGiveXpBonus(Character $character): Collection
     {
@@ -498,6 +613,9 @@ class CharacterXPService
 
     /**
      * Do we have the quest item to keep leveling?
+     *
+     * @param Character $character
+     * @return bool
      */
     private function canContinueLeveling(Character $character): bool
     {
@@ -510,6 +628,10 @@ class CharacterXPService
 
     /**
      * Get the total xp bonus.
+     *
+     * @param Collection $questItems
+     * @param bool $ignoreCaps
+     * @return float
      */
     private function getTotalXpBonus(Collection $questItems, bool $ignoreCaps): float
     {
@@ -522,6 +644,9 @@ class CharacterXPService
 
     /**
      * Get the character max level.
+     *
+     * @param Character $character
+     * @return int
      */
     private function getCharacterMaxLevel(Character $character): int
     {
@@ -540,6 +665,9 @@ class CharacterXPService
 
     /**
      * Normalize character level and XP when maxed.
+     *
+     * @param Character $character
+     * @return Character
      */
     private function normalizeCharacterMaxLevel(Character $character): Character
     {
@@ -563,5 +691,30 @@ class CharacterXPService
         }
 
         return $character->refresh();
+    }
+
+    /**
+     * Round a Gem-adjusted floating XP calculation to its nearest whole XP amount, or null when
+     * the calculation is invalid. The game's XP domain never exceeds the platform integer range,
+     * so a failed validation means the calculation that produced this amount is corrupted; that
+     * failure is recorded on `xpCalculationFailure()` instead of silently applying a zero,
+     * `PHP_INT_MAX`, or `PHP_INT_MIN` XP reward, so the caller can fail the owning reward operation.
+     *
+     * @param float $xp
+     * @return ?int
+     */
+    private function roundToWholeXp(float $xp): ?int
+    {
+        $wholeXp = filter_var(round($xp), FILTER_VALIDATE_INT);
+
+        if ($wholeXp === false) {
+            $this->xpCalculationFailure = new RuntimeException(
+                'Invalid whole XP amount calculated: '.$xp.' cannot be represented as an integer.',
+            );
+
+            return null;
+        }
+
+        return $wholeXp;
     }
 }

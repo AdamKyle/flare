@@ -3,11 +3,15 @@
 namespace App\Game\Events\Providers;
 
 use App\Game\Automation\Exploration\Services\ExplorationAutomationService;
+use App\Game\Core\Items\Builders\RandomAffixGenerator;
 use App\Game\Events\Console\Commands\EndScheduledEvent;
 use App\Game\Events\Console\Commands\ProcessScheduledEvents;
 use App\Game\Events\Console\Commands\RestartGlobalEventGoal;
+use App\Game\Events\Contracts\BattleGlobalEventParticipation;
+use App\Game\Events\Contracts\WinterBattleRewardEligibility;
 use App\Game\Events\Registry\EventEnderRegistry;
 use App\Game\Events\Services\AnnouncementCleanupService;
+use App\Game\Events\Services\BattleGlobalEventParticipationService;
 use App\Game\Events\Services\CreateSurveySnapshot;
 use App\Game\Events\Services\DailyGoldDustService;
 use App\Game\Events\Services\DelusionalMemoriesEventEnderService;
@@ -19,6 +23,7 @@ use App\Game\Events\Services\FactionLoyaltyPledgeCleanupService;
 use App\Game\Events\Services\FeedbackEventEnderService;
 use App\Game\Events\Services\GlobalEventGoalCleanupService;
 use App\Game\Events\Services\GlobalEventGoalEligibilityService;
+use App\Game\Events\Services\GlobalEventGoalProgressionService;
 use App\Game\Events\Services\GlobalEventStepRotatorService;
 use App\Game\Events\Services\KingdomEventService;
 use App\Game\Events\Services\MoveCharacterAfterEventService;
@@ -29,6 +34,7 @@ use App\Game\Events\Services\ScheduleEventFinalizerService;
 use App\Game\Events\Services\WeeklyCelestialEventEnderService;
 use App\Game\Events\Services\WeeklyCurrencyEventEnderService;
 use App\Game\Events\Services\WeeklyFactionLoyaltyEnderService;
+use App\Game\Events\Services\WinterBattleRewardEligibilityService;
 use App\Game\Events\Services\WinterEventEnderService;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Maps\Services\LocationService;
@@ -177,6 +183,17 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(ScheduledEventDispatchService::class, function () {
             return new ScheduledEventDispatchService;
+        });
+
+        $this->app->bind(WinterBattleRewardEligibility::class, WinterBattleRewardEligibilityService::class);
+
+        $this->app->bind(BattleGlobalEventParticipation::class, function ($app) {
+            return new BattleGlobalEventParticipationService(
+                $app->make(RandomAffixGenerator::class),
+                $app->make(EventGoalsService::class),
+                $app->make(GlobalEventGoalEligibilityService::class),
+                $app->make(GlobalEventGoalProgressionService::class),
+            );
         });
     }
 

@@ -10,4 +10,7 @@ export default interface BaseToolTipProps {
   on_close?: () => void;
   content: string | ReactNode;
   placementDeps?: unknown[];
+  trigger?: ReactNode;
+  trigger_aria_label?: string;
+  placement?: 'auto' | 'above';
 }

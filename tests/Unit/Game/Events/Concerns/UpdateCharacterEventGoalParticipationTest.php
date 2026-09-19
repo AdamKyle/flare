@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Game\Events\Concerns;
 
-use App\Game\BattleRewardProcessing\Handlers\BattleGlobalEventParticipationHandler;
 use App\Game\Core\Items\Values\ItemSpecialtyType;
 use App\Game\Core\Items\Values\RandomAffixTier;
+use App\Game\Events\Services\BattleGlobalEventParticipationService;
 use App\Game\Events\Values\EventType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -18,14 +18,14 @@ class UpdateCharacterEventGoalParticipationTest extends TestCase
 
     private ?CharacterFactory $characterFactory;
 
-    private ?BattleGlobalEventParticipationHandler $handler;
+    private ?BattleGlobalEventParticipationService $handler;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->characterFactory = new CharacterFactory;
-        $this->handler = resolve(BattleGlobalEventParticipationHandler::class);
+        $this->handler = resolve(BattleGlobalEventParticipationService::class);
     }
 
     protected function tearDown(): void

@@ -8,6 +8,7 @@ use App\Flare\Models\CharacterGameMapGemProgression;
 use App\Flare\Models\GameLocationGemParamter;
 use App\Flare\Models\GameMapGemParamter;
 use App\Flare\Models\Gem;
+use App\Game\Gems\Progression\Contracts\CharacterAreaGemEffects;
 use App\Game\Gems\Progression\Values\GemFieldProgressionBreakdown;
 use App\Game\Gems\Progression\Values\SourceProgressionContext;
 use App\Game\Gems\Services\AreaGemEffectService;
@@ -22,7 +23,7 @@ use App\Game\Gems\Values\ResolvedAreaGemRarityEffects;
 use App\Game\Gems\Values\ResolvedAreaGemRewardEffects;
 use App\Game\Gems\Values\ResolvedAreaGemSource;
 
-class CharacterAreaGemEffectService
+class CharacterAreaGemEffectService implements CharacterAreaGemEffects
 {
     /**
      * @param AreaGemEffectService $areaGemEffectService
@@ -32,6 +33,18 @@ class CharacterAreaGemEffectService
         private readonly AreaGemEffectService $areaGemEffectService,
         private readonly GemProgressionEffectService $gemProgressionEffectService,
     ) {}
+
+    /**
+     * Resolve the Character-aware Gem effects for the Character's current
+     * Map/Location context, adjusted by global/personal Gem progression.
+     *
+     * @param int $characterId
+     * @return ResolvedAreaGemEffects
+     */
+    public function resolveForCharacterId(int $characterId): ResolvedAreaGemEffects
+    {
+        return $this->resolveForCharacter(Character::findOrFail($characterId));
+    }
 
     /**
      * Resolve the Character-aware Gem effects for the Character's current

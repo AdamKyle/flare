@@ -12,6 +12,8 @@ use App\Game\BattleRewardProcessing\Services\BattleRewardLedgerService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardMessageOutboxService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
+use App\Game\BattleRewardProcessing\Services\BattleRewardSharedContextService;
+use App\Game\BattleRewardProcessing\Services\BattleRewardStepPlanService;
 use App\Game\BattleRewardProcessing\Services\CharacterRewardService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -36,11 +38,12 @@ class BattleRewardXpCheckpointResumeTest extends TestCase
             'character_id' => $character->id,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
-        resolve(BattleRewardLedgerService::class)->ensureSteps($request);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request, resolve(BattleRewardStepPlanService::class)->planBattleLike($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster)));
         $request->steps()->where('step_name', '!=', BattleRewardStepName::XP)->update(['status' => BattleRewardStepStatus::COMPLETED]);
         $characterRewardService = Mockery::mock(CharacterRewardService::class);
         $characterRewardService->shouldReceive('setCharacter')->twice()->andReturnSelf();
         $characterRewardService->shouldReceive('fetchXpForMonster')->once()->andReturn(150);
+        $characterRewardService->shouldReceive('xpCalculationFailure')->andReturn(null);
         $characterRewardService->shouldReceive('distributeCheckpointedXp')->once()->withArgs(function (int $xp, callable $callback): bool {
             $callback($xp, 0, Character::first());
 
@@ -48,7 +51,7 @@ class BattleRewardXpCheckpointResumeTest extends TestCase
         })->andReturnSelf();
         $this->instance(CharacterRewardService::class, $characterRewardService);
 
-        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster));
 
         $step = $request->steps()->where('step_name', BattleRewardStepName::XP)->firstOrFail();
         $this->assertSame(150, $step->payload_json['total_xp']);
@@ -63,7 +66,7 @@ class BattleRewardXpCheckpointResumeTest extends TestCase
             'character_id' => $character->id,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
-        resolve(BattleRewardLedgerService::class)->ensureSteps($request);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request, resolve(BattleRewardStepPlanService::class)->planBattleLike($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster)));
         $request->steps()->where('step_name', '!=', BattleRewardStepName::XP)->update(['status' => BattleRewardStepStatus::COMPLETED]);
         $request->steps()->where('step_name', BattleRewardStepName::XP)->update([
             'payload_json' => ['total_xp' => 500, 'starting_level' => $character->level, 'starting_xp' => $character->xp],
@@ -79,7 +82,7 @@ class BattleRewardXpCheckpointResumeTest extends TestCase
         })->andReturnSelf();
         $this->instance(CharacterRewardService::class, $characterRewardService);
 
-        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster));
 
         $this->assertSame(BattleRewardStepStatus::COMPLETED, $request->steps()->where('step_name', BattleRewardStepName::XP)->firstOrFail()->status);
     }
@@ -93,7 +96,7 @@ class BattleRewardXpCheckpointResumeTest extends TestCase
             'status' => BattleRewardRequestStatus::PROCESSING,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
-        resolve(BattleRewardLedgerService::class)->ensureSteps($request);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request, resolve(BattleRewardStepPlanService::class)->planBattleLike($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster)));
         $request->steps()->where('step_name', '!=', BattleRewardStepName::XP)->update(['status' => BattleRewardStepStatus::COMPLETED]);
         $request->steps()->where('step_name', BattleRewardStepName::XP)->update([
             'status' => BattleRewardStepStatus::CHECKPOINTED,
@@ -117,7 +120,7 @@ class BattleRewardXpCheckpointResumeTest extends TestCase
             'character_id' => $character->id,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
-        resolve(BattleRewardLedgerService::class)->ensureSteps($request);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request, resolve(BattleRewardStepPlanService::class)->planBattleLike($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster)));
         $request->steps()->where('step_name', '!=', BattleRewardStepName::XP)->update(['status' => BattleRewardStepStatus::COMPLETED]);
         $request->steps()->where('step_name', BattleRewardStepName::XP)->update([
             'status' => BattleRewardStepStatus::RESUMABLE,
@@ -134,7 +137,7 @@ class BattleRewardXpCheckpointResumeTest extends TestCase
         })->andReturnSelf();
         $this->instance(CharacterRewardService::class, $characterRewardService);
 
-        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster));
 
         $this->assertSame(BattleRewardStepStatus::COMPLETED, $request->steps()->where('step_name', BattleRewardStepName::XP)->firstOrFail()->status);
     }
@@ -209,10 +212,10 @@ class BattleRewardXpCheckpointResumeTest extends TestCase
             'source_type' => BattleRewardRequestSourceType::BATTLE,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
-        resolve(BattleRewardLedgerService::class)->ensureSteps($request);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request, resolve(BattleRewardStepPlanService::class)->planBattleLike($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster)));
         $request->steps()->where('step_name', '!=', BattleRewardStepName::XP)->update(['status' => BattleRewardStepStatus::COMPLETED]);
 
-        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster));
 
         $message = CharacterBattleRewardRequestMessage::where('character_battle_reward_request_id', $request->id)
             ->where('message', 'like', 'You gained:%')
@@ -241,10 +244,10 @@ class BattleRewardXpCheckpointResumeTest extends TestCase
             'source_type' => BattleRewardRequestSourceType::BATTLE,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
-        resolve(BattleRewardLedgerService::class)->ensureSteps($request);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request, resolve(BattleRewardStepPlanService::class)->planBattleLike($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster)));
         $request->steps()->where('step_name', '!=', BattleRewardStepName::XP)->update(['status' => BattleRewardStepStatus::COMPLETED]);
 
-        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster));
 
         $this->assertSame(0, CharacterBattleRewardRequestMessage::where('character_battle_reward_request_id', $request->id)->where('message', 'like', 'You gained:%')->count());
     }
@@ -268,10 +271,10 @@ class BattleRewardXpCheckpointResumeTest extends TestCase
             'source_type' => BattleRewardRequestSourceType::BATTLE,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
-        resolve(BattleRewardLedgerService::class)->ensureSteps($request);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request, resolve(BattleRewardStepPlanService::class)->planBattleLike($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster)));
         $request->steps()->where('step_name', '!=', BattleRewardStepName::XP)->update(['status' => BattleRewardStepStatus::COMPLETED]);
 
-        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster));
 
         $request->steps()->where('step_name', BattleRewardStepName::XP)->update([
             'status' => BattleRewardStepStatus::RESUMABLE,
@@ -279,7 +282,7 @@ class BattleRewardXpCheckpointResumeTest extends TestCase
             'completed_at' => null,
         ]);
 
-        resolve(BattleRewardService::class)->processLedgerAwareRewards($request->refresh());
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request->refresh(), resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster));
 
         $this->assertSame(1, CharacterBattleRewardRequestMessage::where('character_battle_reward_request_id', $request->id)->where('step_name', BattleRewardStepName::XP)->where('message', 'like', 'You gained:%')->count());
     }
@@ -309,10 +312,10 @@ class BattleRewardXpCheckpointResumeTest extends TestCase
                 'total_xp' => 450,
             ]],
         ]);
-        resolve(BattleRewardLedgerService::class)->ensureSteps($request);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request, resolve(BattleRewardStepPlanService::class)->planBattleLike($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster)));
         $request->steps()->where('step_name', '!=', BattleRewardStepName::XP)->update(['status' => BattleRewardStepStatus::COMPLETED]);
 
-        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster));
 
         $message = CharacterBattleRewardRequestMessage::where('character_battle_reward_request_id', $request->id)
             ->where('message', 'like', 'You slaughtered:%')
@@ -343,10 +346,10 @@ class BattleRewardXpCheckpointResumeTest extends TestCase
             'source_type' => BattleRewardRequestSourceType::BATTLE,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
-        resolve(BattleRewardLedgerService::class)->ensureSteps($request);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request, resolve(BattleRewardStepPlanService::class)->planBattleLike($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster)));
         $request->steps()->where('step_name', '!=', BattleRewardStepName::XP)->update(['status' => BattleRewardStepStatus::COMPLETED]);
 
-        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster));
 
         $characterAfterFirstPass = $character->refresh();
         $levelAfterFirstPass = $characterAfterFirstPass->level;
@@ -365,7 +368,7 @@ class BattleRewardXpCheckpointResumeTest extends TestCase
             'completed_at' => null,
         ]);
 
-        resolve(BattleRewardService::class)->processLedgerAwareRewards($request->refresh());
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request->refresh(), resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster));
 
         $characterAfterResume = $character->refresh();
         $this->assertSame($levelAfterFirstPass, $characterAfterResume->level);

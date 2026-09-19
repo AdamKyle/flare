@@ -18,6 +18,7 @@ use App\Game\Automation\Values\AutomationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\MonsterFightService;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Services\CharacterRewardService;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Character\Exceptions\MissingInventoryException;
@@ -175,7 +176,7 @@ class DelveExploration implements ShouldQueue
                     return;
                 }
 
-                $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], $this->battleData);
+                $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], $this->battleData, BattleRewardRequestSourceType::AUTOMATION);
 
                 $newStatIncreaseValue = $delveAutomation->increase_enemy_strength + self::ENEMY_STRENGTH_INCREMENT;
 
