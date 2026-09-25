@@ -48,6 +48,14 @@ class AutomationRestrictionService
 
     public const INVENTORY_MANAGEMENT = 'inventory_management';
 
+    public const EQUIPMENT_MANAGEMENT = 'equipment_management';
+
+    /**
+     * Resolve the Character's current active automation, regardless of type.
+     *
+     * @param Character $character
+     * @return ?CharacterAutomation
+     */
     public function activeAutomation(Character $character): ?CharacterAutomation
     {
         return $character->currentAutomations()
@@ -57,11 +65,44 @@ class AutomationRestrictionService
             ->first();
     }
 
+    /**
+     * Resolve the Character's current active automation of the given type.
+     *
+     * @param Character $character
+     * @param string $type
+     * @return ?CharacterAutomation
+     */
+    public function activeAutomationOfType(Character $character, string $type): ?CharacterAutomation
+    {
+        return $character->currentAutomations()
+            ->where('type', $type)
+            ->where('completed_at', '>', now())
+            ->orderByDesc('started_at')
+            ->orderByDesc('id')
+            ->first();
+    }
+
+    /**
+     * Determine whether the requested action is currently blocked for the Character.
+     *
+     * @param Character $character
+     * @param string $action
+     * @param ?Location $destinationLocation
+     * @return bool
+     */
     public function isBlocked(Character $character, string $action, ?Location $destinationLocation = null): bool
     {
         return ! is_null($this->blockedContext($character, $action, $destinationLocation));
     }
 
+    /**
+     * Resolve the blocking automation context for the requested action, if any.
+     *
+     * @param Character $character
+     * @param string $action
+     * @param ?Location $destinationLocation
+     * @return ?array
+     */
     public function blockedContext(Character $character, string $action, ?Location $destinationLocation = null): ?array
     {
         $batchCrafting = $this->activeBatchCrafting($character);
@@ -91,6 +132,13 @@ class AutomationRestrictionService
         ];
     }
 
+    /**
+     * Build the player-facing message explaining why the action is blocked.
+     *
+     * @param CharacterAutomation $automation
+     * @param ?string $action
+     * @return string
+     */
     public function blockedMessage(CharacterAutomation $automation, ?string $action = null): string
     {
         $automationType = AutomationType::from($automation->type);
@@ -104,6 +152,12 @@ class AutomationRestrictionService
         return 'You cannot do that while '.$this->automationName($automation).' automation is running. Cancel it first.';
     }
 
+    /**
+     * Determine whether the given Location is a special Exploration location.
+     *
+     * @param ?Location $location
+     * @return bool
+     */
     public function isSpecialExplorationLocation(?Location $location): bool
     {
         if (is_null($location)) {
@@ -113,6 +167,14 @@ class AutomationRestrictionService
         return ! is_null($location->type);
     }
 
+    /**
+     * Determine whether the active automation blocks the requested action.
+     *
+     * @param CharacterAutomation $automation
+     * @param string $action
+     * @param ?Location $destinationLocation
+     * @return bool
+     */
     private function automationBlocksAction(CharacterAutomation $automation, string $action, ?Location $destinationLocation = null): bool
     {
         $automationType = AutomationType::from($automation->type);
@@ -131,6 +193,7 @@ class AutomationRestrictionService
                 self::PLAYER_SKILLS,
                 self::CLASS_RANKS,
                 self::REGULAR_QUESTS,
+                self::EQUIPMENT_MANAGEMENT,
             ]);
         }
 
@@ -152,12 +215,19 @@ class AutomationRestrictionService
                 self::PLAYER_SKILLS,
                 self::CLASS_RANKS,
                 self::REGULAR_QUESTS,
+                self::EQUIPMENT_MANAGEMENT,
             ]);
         }
 
         return $this->explorationBlocksAction($automation, $action, $destinationLocation);
     }
 
+    /**
+     * Resolve the Character's active Batch Crafting run, if any.
+     *
+     * @param Character $character
+     * @return ?BatchCrafting
+     */
     private function activeBatchCrafting(Character $character): ?BatchCrafting
     {
         $activeId = BatchCrafting::where('character_id', $character->id)
@@ -172,6 +242,12 @@ class AutomationRestrictionService
         return BatchCrafting::find($activeId);
     }
 
+    /**
+     * Determine whether an active Batch Crafting run blocks the requested action.
+     *
+     * @param string $action
+     * @return bool
+     */
     private function batchCraftingBlocksAction(string $action): bool
     {
         return in_array($action, [
@@ -185,6 +261,14 @@ class AutomationRestrictionService
         ]);
     }
 
+    /**
+     * Determine whether an active Exploration automation blocks the requested action.
+     *
+     * @param CharacterAutomation $automation
+     * @param string $action
+     * @param ?Location $destinationLocation
+     * @return bool
+     */
     private function explorationBlocksAction(CharacterAutomation $automation, string $action, ?Location $destinationLocation = null): bool
     {
         if (in_array($action, [
@@ -202,6 +286,7 @@ class AutomationRestrictionService
             self::PLAYER_SKILLS,
             self::CLASS_RANKS,
             self::REGULAR_QUESTS,
+            self::EQUIPMENT_MANAGEMENT,
         ])) {
             return true;
         }
@@ -223,6 +308,12 @@ class AutomationRestrictionService
         return false;
     }
 
+    /**
+     * Resolve the player-facing name for the given automation's type.
+     *
+     * @param CharacterAutomation $automation
+     * @return string
+     */
     private function automationName(CharacterAutomation $automation): string
     {
         $automationType = AutomationType::from($automation->type);

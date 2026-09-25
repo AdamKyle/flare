@@ -2,8 +2,9 @@ import clsx from 'clsx';
 import React, { ReactNode } from 'react';
 
 import CraftItemListProps from './types/craft-item-list-props';
-
-import { formatNumberWithCommas } from 'game-utils/format-number';
+import CurrencyDisplay from '../../../../../../../../reusable-components/currency/currency-display';
+import { CurrencyDisplayMode } from '../../../../../../../../reusable-components/currency/enums/currency-display-mode';
+import { CurrencyType } from '../../../../../../../../reusable-components/currency/enums/currency-type';
 
 import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
@@ -40,8 +41,13 @@ const CraftItemList = ({
             )}
           >
             <span className="block font-semibold">{item.preview.name}</span>
-            <span className="mt-1 block text-sm">
-              Cost: {formatNumberWithCommas(item.cost)} gold
+            <span className="mt-1 flex items-center gap-1 text-sm">
+              <span>Cost:</span>
+              <CurrencyDisplay
+                currency={CurrencyType.GOLD}
+                amount={item.cost}
+                display_mode={CurrencyDisplayMode.EXACT}
+              />
             </span>
             <span className="block text-xs text-gray-600 dark:text-gray-400">
               Type: {item.preview.type}

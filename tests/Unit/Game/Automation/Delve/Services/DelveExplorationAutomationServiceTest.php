@@ -71,7 +71,9 @@ class DelveExplorationAutomationServiceTest extends TestCase
 
         $this->assertSame(1, CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::DELVE->value)->count());
         $this->assertSame(1, DelveExploration::where('character_id', $character->id)->whereNull('completed_at')->count());
-        Queue::assertPushed(DelveExplorationProcessing::class);
+        Queue::assertPushed(DelveExplorationProcessing::class, function (DelveExplorationProcessing $job): bool {
+            return $job->connection === 'long_running' && $job->queue === 'delve';
+        });
     }
 
     public function test_stop_exploration_returns_error_when_character_has_no_delve_automation(): void

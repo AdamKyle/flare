@@ -17,10 +17,25 @@ class CharacterInventoryMultiController extends Controller
 {
     use ChecksAutomationRestrictions;
 
+    /**
+     * @param MultiInventoryActionService $multiInventoryActionService
+     */
     public function __construct(private readonly MultiInventoryActionService $multiInventoryActionService) {}
 
-    public function equipSelected(InventoryMultiRequest $request, Character $character)
+    /**
+     * Equip the selected inventory slots unless an automation blocks equipment management.
+     *
+     * @param InventoryMultiRequest $request
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function equipSelected(InventoryMultiRequest $request, Character $character): JsonResponse
     {
+        $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::EQUIPMENT_MANAGEMENT);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
 
         $result = $this->multiInventoryActionService->equipManyItems($character, $request->slot_ids);
 
@@ -30,6 +45,13 @@ class CharacterInventoryMultiController extends Controller
         return response()->json($result, $status);
     }
 
+    /**
+     * Move the selected inventory slots into the chosen Inventory Set.
+     *
+     * @param MoveSelectedItemsRequest $request
+     * @param Character $character
+     * @return JsonResponse
+     */
     public function moveSelected(MoveSelectedItemsRequest $request, Character $character): JsonResponse
     {
         $result = $this->multiInventoryActionService->moveManyItemsToSelectedSet($character, $request->set_id, $request->slot_ids);
@@ -40,7 +62,14 @@ class CharacterInventoryMultiController extends Controller
         return response()->json($result, $status);
     }
 
-    public function destroySelected(InventoryMultiRequest $request, Character $character)
+    /**
+     * Destroy the selected inventory slots unless an automation blocks inventory management.
+     *
+     * @param InventoryMultiRequest $request
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function destroySelected(InventoryMultiRequest $request, Character $character): JsonResponse
     {
         $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::INVENTORY_MANAGEMENT);
 
@@ -56,7 +85,14 @@ class CharacterInventoryMultiController extends Controller
         return response()->json($result, $status);
     }
 
-    public function disenchantSelected(InventoryMultiRequest $request, Character $character)
+    /**
+     * Disenchant the selected inventory slots unless an automation blocks inventory management.
+     *
+     * @param InventoryMultiRequest $request
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function disenchantSelected(InventoryMultiRequest $request, Character $character): JsonResponse
     {
         $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::INVENTORY_MANAGEMENT);
 
@@ -72,7 +108,14 @@ class CharacterInventoryMultiController extends Controller
         return response()->json($result, $status);
     }
 
-    public function sellSelected(InventoryMultiRequest $request, Character $character)
+    /**
+     * Sell the selected inventory slots unless an automation blocks inventory management.
+     *
+     * @param InventoryMultiRequest $request
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function sellSelected(InventoryMultiRequest $request, Character $character): JsonResponse
     {
         $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::INVENTORY_MANAGEMENT);
 
@@ -88,7 +131,14 @@ class CharacterInventoryMultiController extends Controller
         return response()->json($result, $status);
     }
 
-    public function sellSelectedFromSet(MoveSelectedItemsRequest $request, Character $character)
+    /**
+     * Sell the selected Inventory Set slots unless an automation blocks inventory management.
+     *
+     * @param MoveSelectedItemsRequest $request
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function sellSelectedFromSet(MoveSelectedItemsRequest $request, Character $character): JsonResponse
     {
         $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::INVENTORY_MANAGEMENT);
 
@@ -110,7 +160,14 @@ class CharacterInventoryMultiController extends Controller
         return response()->json($result, $status);
     }
 
-    public function disenchantSelectedFromSet(MoveSelectedItemsRequest $request, Character $character)
+    /**
+     * Disenchant the selected Inventory Set slots unless an automation blocks inventory management.
+     *
+     * @param MoveSelectedItemsRequest $request
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function disenchantSelectedFromSet(MoveSelectedItemsRequest $request, Character $character): JsonResponse
     {
         $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::INVENTORY_MANAGEMENT);
 
@@ -132,6 +189,13 @@ class CharacterInventoryMultiController extends Controller
         return response()->json($result, $status);
     }
 
+    /**
+     * Destroy the selected Inventory Set slots unless an automation blocks inventory management.
+     *
+     * @param MoveSelectedItemsRequest $request
+     * @param Character $character
+     * @return JsonResponse
+     */
     public function destroySelectedFromSet(MoveSelectedItemsRequest $request, Character $character): JsonResponse
     {
         $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::INVENTORY_MANAGEMENT);
@@ -154,6 +218,13 @@ class CharacterInventoryMultiController extends Controller
         return response()->json($result, $status);
     }
 
+    /**
+     * Destroy every crafted item in an Inventory Set unless an automation blocks inventory management.
+     *
+     * @param DestroyAllFromSetRequest $request
+     * @param Character $character
+     * @return JsonResponse
+     */
     public function destroyAllFromSet(DestroyAllFromSetRequest $request, Character $character): JsonResponse
     {
         $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::INVENTORY_MANAGEMENT);
@@ -176,6 +247,13 @@ class CharacterInventoryMultiController extends Controller
         return response()->json($result, $status);
     }
 
+    /**
+     * Sell every crafted item in an Inventory Set unless an automation blocks inventory management.
+     *
+     * @param DestroyAllFromSetRequest $request
+     * @param Character $character
+     * @return JsonResponse
+     */
     public function sellAllFromSet(DestroyAllFromSetRequest $request, Character $character): JsonResponse
     {
         $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::INVENTORY_MANAGEMENT);
@@ -198,6 +276,13 @@ class CharacterInventoryMultiController extends Controller
         return response()->json($result, $status);
     }
 
+    /**
+     * Disenchant every crafted item in an Inventory Set unless an automation blocks inventory management.
+     *
+     * @param DestroyAllFromSetRequest $request
+     * @param Character $character
+     * @return JsonResponse
+     */
     public function disenchantAllFromSet(DestroyAllFromSetRequest $request, Character $character): JsonResponse
     {
         $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::INVENTORY_MANAGEMENT);

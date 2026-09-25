@@ -8,6 +8,7 @@ use App\Flare\Models\Session;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Exploration\Jobs\Exploration;
 use App\Game\Automation\Exploration\Services\ExplorationCreatureCountCalculator;
+use App\Game\Automation\Exploration\Values\ExplorationPhase;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\MonsterFightService;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
@@ -215,6 +216,7 @@ class ExplorationTest extends TestCase
 
         $this->assertSame(1, $log->fights);
         $this->assertSame($monster->name, $log->summary['monster']['name']);
+        $this->assertSame(ExplorationPhase::ENDED->value, $log->summary['phase']);
     }
 
     public function test_handle_cancels_automation_when_fight_setup_data_is_malformed(): void
@@ -1303,6 +1305,71 @@ class ExplorationTest extends TestCase
         Exploration::dispatch($character, $automation->id, AttackType::ATTACK->value, 3);
 
         $this->assertNotNull(CharacterAutomation::find($automation->id));
+    }
+
+    public function test_handle_records_processing_rewards_phase_when_a_rescheduled_round_enqueues_its_rewards(): void
+    {
+        Event::fake();
+        config(['queue.connections.long_running.driver' => 'null']);
+        $this->instance(CharacterRewardService::class, Mockery::mock(CharacterRewardService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('setCharacter')->andReturnSelf();
+            $mock->shouldReceive('fetchXpForMonster')->andReturn(10);
+        }));
+
+        $this->instance(SkillService::class, Mockery::mock(SkillService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('setSkillInTraining')->andReturnSelf();
+            $mock->shouldReceive('getXpForSkillIntraining')->andReturn(5);
+        }));
+
+        $this->instance(ExplorationCreatureCountCalculator::class, Mockery::mock(ExplorationCreatureCountCalculator::class, function (MockInterface $mock) {
+            $mock->shouldReceive('calculate')->andReturn(1);
+        }));
+
+        $this->instance(FactionHandler::class, Mockery::mock(FactionHandler::class, function (MockInterface $mock) {
+            $mock->shouldReceive('getFactionPointsPerKill')->andReturn(0);
+        }));
+
+        $character = $this->character->getCharacter();
+        $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+
+        $automation = $this->createCharacterAutomation([
+            'character_id' => $character->id,
+            'monster_id' => $monster->id,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackType::ATTACK->value,
+        ]);
+
+        $log = $this->createExplorationLog([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'character_automation_id' => $automation->id,
+            'ended_at' => null,
+            'summary' => ['phase' => ExplorationPhase::WAITING->value],
+        ]);
+
+        $this->instance(MonsterFightService::class, Mockery::mock(MonsterFightService::class, function (MockInterface $mock) use ($monster) {
+            $mock->shouldReceive('setupMonster')->andReturn([
+                'health' => ['current_character_health' => 10, 'current_monster_health' => 0],
+            ]);
+            $mock->shouldReceive('fightMonster')->andReturn([
+                'health' => ['current_character_health' => 10, 'current_monster_health' => 0],
+            ]);
+            $mock->shouldReceive('getMonster')->andReturn($monster);
+        }));
+
+        $this->instance(BattleEventHandler::class, Mockery::mock(BattleEventHandler::class, function (MockInterface $mock) use ($character, $monster, $log) {
+            $mock->shouldReceive('processMonsterDeath')->once()->with(
+                $character->id,
+                $monster->id,
+                Mockery::on(fn (array $context): bool => $log->fresh()->summary['phase'] === ExplorationPhase::PROCESSING_REWARDS->value),
+                BattleRewardRequestSourceType::EXPLORATION,
+            );
+        }));
+
+        Exploration::dispatch($character, $automation->id, AttackType::ATTACK->value, 3);
+
+        $this->assertSame(ExplorationPhase::PROCESSING_REWARDS->value, $log->fresh()->summary['phase']);
     }
 
     public function test_handle_failure_returns_early_when_automation_already_deleted(): void

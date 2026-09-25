@@ -2,8 +2,14 @@ import React, { ReactNode } from 'react';
 
 import { InventoryItemTypes } from '../../../components/character-sheet/partials/character-inventory/enums/inventory-item-types';
 import ReadOnlyItemCard from '../../../components/side-peeks/components/items/read-only-item-card';
+import CurrencyDisplay from '../../currency/currency-display';
+import { CurrencyDisplayMode } from '../../currency/enums/currency-display-mode';
+import { CurrencyType } from '../../currency/enums/currency-type';
 import FactualLink from '../../quest-item/partials/factual-link';
+import QuestCurrencyRow from '../types/quest-currency-row';
 import QuestDetailProps from '../types/quest-detail-props';
+
+import { formatNumberWithCommas } from 'game-utils/format-number';
 
 import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
@@ -46,16 +52,54 @@ const QuestRewardsSection = ({
     );
   };
 
-  const currencyRows: { label: string; value: number }[] = [
-    { label: 'Gold', value: rewards.gold ?? 0 },
-    { label: 'Gold Dust', value: rewards.gold_dust ?? 0 },
-    { label: 'Shards', value: rewards.shards ?? 0 },
-    { label: 'XP', value: rewards.xp ?? 0 },
+  const currencyRows: QuestCurrencyRow[] = [
+    { label: 'Gold', currency: CurrencyType.GOLD, value: rewards.gold ?? 0 },
+    {
+      label: 'Gold Dust',
+      currency: CurrencyType.GOLD_DUST,
+      value: rewards.gold_dust ?? 0,
+    },
+    {
+      label: 'Shards',
+      currency: CurrencyType.SHARDS,
+      value: rewards.shards ?? 0,
+    },
   ].filter((row) => row.value !== 0);
+
+  const xpReward = rewards.xp ?? 0;
+  const hasXpReward = xpReward !== 0;
+
+  const renderCurrencyRow = (row: QuestCurrencyRow): ReactNode => (
+    <React.Fragment key={row.label}>
+      <Dt>{row.label}</Dt>
+      <Dd>
+        <CurrencyDisplay
+          currency={row.currency}
+          amount={row.value}
+          display_mode={CurrencyDisplayMode.EXACT}
+          show_label={false}
+        />
+      </Dd>
+    </React.Fragment>
+  );
+
+  const renderXpReward = (): ReactNode => {
+    if (!hasXpReward) {
+      return null;
+    }
+
+    return (
+      <>
+        <Dt>XP</Dt>
+        <Dd>{formatNumberWithCommas(xpReward)}</Dd>
+      </>
+    );
+  };
 
   const hasRows =
     Boolean(rewards.item) ||
     currencyRows.length > 0 ||
+    hasXpReward ||
     Boolean(rewards.skill) ||
     Boolean(rewards.feature) ||
     Boolean(rewards.passive);
@@ -70,6 +114,7 @@ const QuestRewardsSection = ({
   const hasSimpleRows =
     (Boolean(rewards.item) && !isRewardQuestItem) ||
     currencyRows.length > 0 ||
+    hasXpReward ||
     Boolean(rewards.skill) ||
     Boolean(rewards.feature) ||
     Boolean(rewards.passive);
@@ -93,12 +138,8 @@ const QuestRewardsSection = ({
               <Dd>{renderRewardItem()}</Dd>
             </>
           )}
-          {currencyRows.map((row) => (
-            <React.Fragment key={row.label}>
-              <Dt>{row.label}</Dt>
-              <Dd>{row.value}</Dd>
-            </React.Fragment>
-          ))}
+          {currencyRows.map(renderCurrencyRow)}
+          {renderXpReward()}
           {rewards.skill && (
             <>
               <Dt>Unlocks Skill</Dt>

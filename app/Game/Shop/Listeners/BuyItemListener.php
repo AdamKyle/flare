@@ -8,26 +8,16 @@ use App\Game\Shop\Events\BuyItemEvent;
 
 class BuyItemListener
 {
-    public function handle(BuyItemEvent $event)
+    /**
+     * Broadcast the character's updated currencies and inventory count after a completed Shop purchase.
+     *
+     * @param BuyItemEvent $event
+     * @return void
+     */
+    public function handle(BuyItemEvent $event): void
     {
-        $cost = $event->item->cost;
+        event(new UpdateCharacterCurrenciesEvent($event->character));
 
-        if ($event->character->classType()->isMerchant()) {
-            $cost = floor($cost - $cost * 0.25);
-        }
-
-        $event->character->gold = $event->character->gold - $cost;
-        $event->character->save();
-
-        $event->character->inventory->slots()->create([
-            'inventory_id' => $event->character->inventory->id,
-            'item_id' => $event->item->id,
-        ]);
-
-        $character = $event->character->refresh();
-
-        event(new UpdateCharacterCurrenciesEvent($character));
-
-        event(new UpdateCharacterInventoryCountEvent($character));
+        event(new UpdateCharacterInventoryCountEvent($event->character));
     }
 }

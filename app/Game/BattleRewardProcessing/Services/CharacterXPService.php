@@ -10,10 +10,11 @@ use App\Flare\Models\Monster;
 use App\Game\Battle\Values\MaxLevel;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Character\Concerns\Boons;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Core\Services\CharacterService;
 use App\Game\Core\Traits\SafelyBroadcastsEvents;
+use App\Game\Core\Values\LevelUpValue;
 use App\Game\Gems\Progression\Contracts\CharacterAreaGemEffects;
 use App\Game\Gems\Values\AreaGemRewardEffect;
 use App\Game\Gems\Values\ResolvedAreaGemEffects;
@@ -24,12 +25,13 @@ use Closure;
 use Facades\App\Game\BattleRewardProcessing\Calculators\XPCalculator;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 use RuntimeException;
 use Throwable;
 
 class CharacterXPService
 {
-    use SafelyBroadcastsEvents;
+    use Boons, SafelyBroadcastsEvents;
 
     private Character $character;
 
@@ -37,14 +39,18 @@ class CharacterXPService
 
     private ?Throwable $xpCalculationFailure = null;
 
+    private array $checkpointedProgression = [];
+
     /**
      * @param CharacterService $characterService
+     * @param LevelUpValue $levelUpValue
      * @param SkillService $skillService
      * @param BattleMessageHandler $battleMessageHandler
      * @param CharacterAreaGemEffects $characterAreaGemEffects
      */
     public function __construct(
         private readonly CharacterService $characterService,
+        private readonly LevelUpValue $levelUpValue,
         private readonly SkillService $skillService,
         private readonly BattleMessageHandler $battleMessageHandler,
         private readonly CharacterAreaGemEffects $characterAreaGemEffects,
@@ -60,6 +66,7 @@ class CharacterXPService
     {
         $this->character = $character;
         $this->xpCalculationFailure = null;
+        $this->checkpointedProgression = [];
 
         return $this;
     }
@@ -101,13 +108,6 @@ class CharacterXPService
 
         $this->handleLevelUp();
 
-        if (! $this->character->isLoggedIn()) {
-            $this->safelyDispatchBroadcastEvent(
-                new UpdateTopBarEvent($this->character->refresh()),
-                ['character_id' => $this->character->id]
-            );
-        }
-
         return $this;
     }
 
@@ -137,7 +137,17 @@ class CharacterXPService
     }
 
     /**
-     * Distribute XP in a single checkpointed step, invoking the callback once it is applied.
+     * Return the ordered level, XP, and XP-next snapshots produced by the most recent checkpointed XP distribution, one per level up trigger.
+     *
+     * @return array
+     */
+    public function checkpointedProgression(): array
+    {
+        return $this->checkpointedProgression;
+    }
+
+    /**
+     * Apply XP and every resulting level up to the Character with one write, invoking the checkpoint callback once inside the same transaction.
      *
      * @param int $xp
      * @param ?Closure $checkpointCallback
@@ -145,34 +155,16 @@ class CharacterXPService
      */
     public function distributeCheckpointedXp(int $xp, ?Closure $checkpointCallback = null): CharacterXPService
     {
-        if (! $this->canCharacterGainXP($this->character)) {
-            $this->character = $this->normalizeCharacterMaxLevel($this->character);
+        $this->checkpointedProgression = [];
 
-            if (! is_null($checkpointCallback)) {
-                $checkpointCallback($xp, 0, $this->character);
-            }
+        DB::transaction(fn () => $this->applyCheckpointedXp($xp, $checkpointCallback));
 
-            return $this;
+        if (! is_null($this->heartbeatCallback)) {
+            ($this->heartbeatCallback)();
         }
 
-        $this->character->update([
-            'xp' => $this->character->xp + $xp,
-        ]);
-
-        $this->character = $this->character->refresh();
-
-        if (! is_null($checkpointCallback)) {
-            $checkpointCallback($xp, 0, $this->character);
-        }
-
-        $startingLevel = $this->character->level;
-
-        $this->handleLevelUp();
-
-        $this->character = $this->character->refresh();
-
-        if (! is_null($checkpointCallback)) {
-            $checkpointCallback($xp, max(0, $this->character->level - $startingLevel), $this->character);
+        if ($this->checkpointedProgression !== []) {
+            CharacterAttackTypesCacheBuilder::dispatch($this->character);
         }
 
         return $this;
@@ -391,6 +383,121 @@ class CharacterXPService
         $maxLevel = MaxLevelConfiguration::first()->max_level;
 
         return $characterLevel >= $lastLeg && $characterLevel < $maxLevel;
+    }
+
+    /**
+     * Apply the XP to the locked Character row and persist every resulting level up in one Character write, then invoke the checkpoint callback.
+     *
+     * @param int $xp
+     * @param ?Closure $checkpointCallback
+     * @return void
+     */
+    private function applyCheckpointedXp(int $xp, ?Closure $checkpointCallback): void
+    {
+        $character = Character::query()->whereKey($this->character->id)->lockForUpdate()->firstOrFail();
+
+        if (! $this->canCharacterGainXP($character)) {
+            $this->character = $this->normalizeCharacterMaxLevel($character);
+
+            $this->invokeCheckpointCallback($checkpointCallback, $xp, 0);
+
+            return;
+        }
+
+        $startingLevel = $character->level;
+        $leveledCharacter = $this->levelUpInMemory($character, $xp);
+
+        $character->update($leveledCharacter->getDirty());
+
+        $this->character = $character->refresh();
+
+        $this->invokeCheckpointCallback($checkpointCallback, $xp, max(0, $this->character->level - $startingLevel));
+    }
+
+    /**
+     * Add the XP to an in-memory copy of the Character and apply every level up trigger it pays for, recording one progression snapshot per trigger.
+     *
+     * @param Character $character
+     * @param int $xp
+     * @return Character
+     */
+    private function levelUpInMemory(Character $character, int $xp): Character
+    {
+        $maxLevel = $this->getCharacterMaxLevel($character);
+        $levelsPerTrigger = $this->gainsAdditionalLevelOnLevelUp($character) ? $this->additionalLevelsToGain($character) : 1;
+
+        $leveledCharacter = clone $character;
+        $leveledCharacter->xp = $character->xp + $xp;
+
+        while ($leveledCharacter->level < $maxLevel && $leveledCharacter->xp >= $leveledCharacter->xp_next) {
+            $this->applyLevelUpTrigger($leveledCharacter, $maxLevel, $levelsPerTrigger);
+        }
+
+        return $leveledCharacter;
+    }
+
+    /**
+     * Apply one level up trigger to the in-memory Character and record its progression snapshot.
+     *
+     * @param Character $leveledCharacter
+     * @param int $maxLevel
+     * @param int $levelsPerTrigger
+     * @return void
+     */
+    private function applyLevelUpTrigger(Character $leveledCharacter, int $maxLevel, int $levelsPerTrigger): void
+    {
+        $levelUpValues = $this->levelUpValue->createValueObjectForResolvedRules(
+            $leveledCharacter,
+            $leveledCharacter->xp - $leveledCharacter->xp_next,
+            $maxLevel,
+            $levelsPerTrigger,
+        );
+
+        $levelUpValues['xp_next'] = $this->xpRequiredAfterLevel($levelUpValues['level'], $leveledCharacter->xp_penalty);
+
+        // The per-level path re-read these from decimal(12,4) columns after every level up, so round each trigger to the stored precision.
+        $levelUpValues['base_stat_mod'] = round($levelUpValues['base_stat_mod'], 4);
+        $levelUpValues['base_damage_stat_mod'] = round($levelUpValues['base_damage_stat_mod'], 4);
+
+        $leveledCharacter->fill($levelUpValues);
+
+        $this->checkpointedProgression[] = [
+            'level' => $leveledCharacter->level,
+            'xp' => $leveledCharacter->xp,
+            'xp_next' => $leveledCharacter->xp_next,
+        ];
+    }
+
+    /**
+     * Return the penalised XP required to leave the given level, matching the value the Character row stores after a level up.
+     *
+     * @param int $level
+     * @param ?float $xpPenalty
+     * @return float
+     */
+    private function xpRequiredAfterLevel(int $level, ?float $xpPenalty): float
+    {
+        $nextLevelXp = $this->characterService->getXPForNextLevel($level + 1);
+
+        // The xp_next bigint column rounds the penalised requirement when it is written, so round here to keep in-memory comparisons identical to the stored value.
+        return round($nextLevelXp + $nextLevelXp * $xpPenalty);
+    }
+
+    /**
+     * Invoke the checkpoint callback, when one was supplied, with the applied XP, levels awarded, Character, and progression timeline.
+     *
+     * @param ?Closure $checkpointCallback
+     * @param int $appliedXp
+     * @param int $levelsAwarded
+     * @return void
+     */
+    private function invokeCheckpointCallback(?Closure $checkpointCallback, int $appliedXp, int $levelsAwarded): void
+    {
+        if (is_null($checkpointCallback)) {
+            return;
+        }
+
+        $checkpointCallback($appliedXp, $levelsAwarded, $this->character, $this->checkpointedProgression);
     }
 
     /**

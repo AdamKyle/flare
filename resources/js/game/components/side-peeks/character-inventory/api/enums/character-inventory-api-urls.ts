@@ -22,4 +22,9 @@ export enum CharacterInventoryApiUrls {
   CHARACTER_INVENTORY_DISENCHANT_ITEM = '/character/{character}/inventory/disenchant-item',
 
   CHARACTER_MOVE_ITEM_TO_SET = '/character/{character}/inventory/move-to-set',
+
+  CHARACTER_EQUIP_SET = '/character/{character}/inventory-set/equip/{inventorySet}',
+  CHARACTER_UNEQUIP = '/character/{character}/inventory/unequip',
+  CHARACTER_EMPTY_SET = '/character/{character}/inventory-set/{inventorySet}/remove-all',
+  CHARACTER_REMOVE_FROM_SET = '/character/{character}/inventory-set/remove',
 }

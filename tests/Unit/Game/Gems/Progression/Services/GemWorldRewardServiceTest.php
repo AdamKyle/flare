@@ -3,6 +3,7 @@
 namespace Tests\Unit\Game\Gems\Progression\Services;
 
 use App\Flare\Models\AlchemyBagSlot;
+use App\Flare\Models\CharacterBattleRewardRequestMessage;
 use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Gems\Progression\Events\GemProfileProgressionUpdateBroadcastEvent;
@@ -12,6 +13,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Mockery;
 use Mockery\MockInterface;
+use RuntimeException;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\GemProgression\GemWorldRewardTestFactory;
 use Tests\TestCase;
@@ -44,7 +46,8 @@ class GemWorldRewardServiceTest extends TestCase
 
         $result = $this->gemWorldRewardTestFactory->buildService()->applyToLedgerStep($step, $character, ['xp' => 100, 'gold' => 10], 1, []);
 
-        $this->assertFalse($result['applied']);
+        $this->assertTrue($result->successful());
+        $this->assertFalse($result->result()['applied']);
     }
 
     public function test_map_gem_world_awards_global_and_personal_progression_xp(): void
@@ -77,7 +80,11 @@ class GemWorldRewardServiceTest extends TestCase
 
         $result = $this->gemWorldRewardTestFactory->buildService()->applyToLedgerStep($step, $graph->character, ['xp' => 100, 'gold' => 10], 1, []);
 
-        $this->assertTrue($result['applied']);
+        $this->assertTrue($result->successful());
+
+        $payload = $result->result();
+
+        $this->assertTrue($payload['applied']);
 
         $this->assertDatabaseHas('character_game_map_gem_progressions', [
             'character_id' => $graph->character->id,
@@ -88,6 +95,29 @@ class GemWorldRewardServiceTest extends TestCase
 
         Event::assertDispatched(GemProgressionUpdateBroadcastEvent::class);
         Event::assertDispatched(GemProfileProgressionUpdateBroadcastEvent::class);
+    }
+
+    public function test_numeric_calculation_failure_returns_an_unsuccessful_result_and_applies_no_progression(): void
+    {
+        $graph = $this->gemWorldRewardTestFactory->buildGeneratedMapGemWorldCharacter();
+        $step = $this->createCharacterBattleRewardRequestStep(['character_id' => $graph->character->id]);
+
+        $result = $this->gemWorldRewardTestFactory->buildService()->applyToLedgerStep($step, $graph->character, ['xp' => PHP_FLOAT_MAX, 'gold' => 10], 1, []);
+
+        $this->assertFalse($result->successful());
+        $this->assertInstanceOf(RuntimeException::class, $result->failure());
+        $this->assertNull($result->result());
+
+        $this->assertDatabaseMissing('game_map_gem_progressions', [
+            'game_map_gem_paramter_id' => $graph->mapProfile->id,
+        ]);
+
+        $this->assertDatabaseMissing('character_game_map_gem_progressions', [
+            'character_id' => $graph->character->id,
+            'game_map_gem_paramter_id' => $graph->mapProfile->id,
+        ]);
+
+        $this->assertFalse($step->fresh()->checkpoint_json['xp_applied'] ?? false);
     }
 
     public function test_location_gem_world_awards_its_exact_location_profile_progression(): void
@@ -299,6 +329,99 @@ class GemWorldRewardServiceTest extends TestCase
         ]);
 
         $this->assertSame(1, AlchemyBagSlot::where('alchemy_bag_id', $graph->character->alchemyBag->id)->count());
+
+        $this->assertSame(1, CharacterBattleRewardRequestMessage::where('message', 'You contributed 5 XP towards Global Gem Progression.')->count());
+        $this->assertSame(1, CharacterBattleRewardRequestMessage::where('message', 'You gained 10 Personal Gem Progression XP.')->count());
+    }
+
+    public function test_global_gem_progression_xp_message_stored_when_enabled(): void
+    {
+        $graph = $this->gemWorldRewardTestFactory->buildGeneratedMapGemWorldCharacter();
+        $step = $this->createCharacterBattleRewardRequestStep(['character_id' => $graph->character->id]);
+
+        $this->gemWorldRewardTestFactory->buildService()->applyToLedgerStep($step, $graph->character, ['xp' => 100, 'gold' => 10], 1, []);
+
+        $this->assertDatabaseHas('character_battle_reward_request_messages', [
+            'character_battle_reward_request_id' => $step->character_battle_reward_request_id,
+            'message' => 'You contributed 5 XP towards Global Gem Progression.',
+        ]);
+    }
+
+    public function test_global_gem_progression_xp_still_applies_but_no_message_stored_when_disabled(): void
+    {
+        $graph = $this->gemWorldRewardTestFactory->buildGeneratedMapGemWorldCharacter();
+        $graph->character->user->update(['show_global_gem_progression_xp_messages' => false]);
+
+        $step = $this->createCharacterBattleRewardRequestStep(['character_id' => $graph->character->id]);
+
+        $this->gemWorldRewardTestFactory->buildService()->applyToLedgerStep($step, $graph->character, ['xp' => 100, 'gold' => 10], 1, []);
+
+        $this->assertDatabaseHas('game_map_gem_progressions', [
+            'game_map_gem_paramter_id' => $graph->mapProfile->id,
+            'xp' => 5,
+        ]);
+
+        $this->assertDatabaseMissing('character_battle_reward_request_messages', [
+            'character_battle_reward_request_id' => $step->character_battle_reward_request_id,
+            'message' => 'You contributed 5 XP towards Global Gem Progression.',
+        ]);
+    }
+
+    public function test_personal_gem_progression_xp_message_stored_when_enabled(): void
+    {
+        $graph = $this->gemWorldRewardTestFactory->buildGeneratedMapGemWorldCharacter();
+        $step = $this->createCharacterBattleRewardRequestStep(['character_id' => $graph->character->id]);
+
+        $this->gemWorldRewardTestFactory->buildService()->applyToLedgerStep($step, $graph->character, ['xp' => 100, 'gold' => 10], 1, []);
+
+        $this->assertDatabaseHas('character_battle_reward_request_messages', [
+            'character_battle_reward_request_id' => $step->character_battle_reward_request_id,
+            'message' => 'You gained 10 Personal Gem Progression XP.',
+        ]);
+    }
+
+    public function test_personal_gem_progression_xp_still_applies_but_no_message_stored_when_disabled(): void
+    {
+        $graph = $this->gemWorldRewardTestFactory->buildGeneratedMapGemWorldCharacter();
+        $graph->character->user->update(['show_personal_gem_progression_xp_messages' => false]);
+
+        $step = $this->createCharacterBattleRewardRequestStep(['character_id' => $graph->character->id]);
+
+        $this->gemWorldRewardTestFactory->buildService()->applyToLedgerStep($step, $graph->character, ['xp' => 100, 'gold' => 10], 1, []);
+
+        $this->assertDatabaseHas('character_game_map_gem_progressions', [
+            'character_id' => $graph->character->id,
+            'game_map_gem_paramter_id' => $graph->mapProfile->id,
+            'xp' => 10,
+        ]);
+
+        $this->assertDatabaseMissing('character_battle_reward_request_messages', [
+            'character_battle_reward_request_id' => $step->character_battle_reward_request_id,
+            'message' => 'You gained 10 Personal Gem Progression XP.',
+        ]);
+    }
+
+    public function test_no_progression_message_when_applied_xp_is_zero_even_with_preference_enabled(): void
+    {
+        $graph = $this->gemWorldRewardTestFactory->buildGeneratedMapGemWorldCharacter();
+
+        $this->createCharacterGameMapGemProgression([
+            'character_id' => $graph->character->id,
+            'game_map_gem_paramter_id' => $graph->mapProfile->id,
+            'level' => 1000,
+            'xp' => 0,
+        ]);
+
+        $step = $this->createCharacterBattleRewardRequestStep(['character_id' => $graph->character->id]);
+
+        $this->gemWorldRewardTestFactory->buildService()->applyToLedgerStep($step, $graph->character, ['xp' => 100, 'gold' => 10], 1, []);
+
+        $this->assertDatabaseHas('character_battle_reward_request_messages', [
+            'character_battle_reward_request_id' => $step->character_battle_reward_request_id,
+            'message' => 'You contributed 5 XP towards Global Gem Progression.',
+        ]);
+
+        $this->assertSame(1, CharacterBattleRewardRequestMessage::where('character_battle_reward_request_id', $step->character_battle_reward_request_id)->count());
     }
 
     public function test_currency_scroll_only_affects_its_selected_currency(): void

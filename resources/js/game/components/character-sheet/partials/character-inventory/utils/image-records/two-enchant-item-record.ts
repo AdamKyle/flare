@@ -32,6 +32,7 @@ export const twoEnchantItemRecord: Partial<
   [InventoryItemTypes.SCRATCH_AWL]: `${EquipmentImagePaths.TWO_ENCHANT_ITEMS}/scratch-awl-two-enchants.png`,
   [InventoryItemTypes.WAND]: `${EquipmentImagePaths.TWO_ENCHANT_ITEMS}/wand-two-enchants.png`,
   [InventoryItemTypes.CENSOR]: `${EquipmentImagePaths.TWO_ENCHANT_ITEMS}/censor-two-enchants.png`,
+  [InventoryItemTypes.CENSER]: `${EquipmentImagePaths.TWO_ENCHANT_ITEMS}/censor-two-enchants.png`,
   [InventoryItemTypes.SPELL_HEALING]: `${EquipmentImagePaths.TWO_ENCHANT_ITEMS}/spell-healing-two-enchants.png`,
   [InventoryItemTypes.SPELL_DAMAGE]: `${EquipmentImagePaths.TWO_ENCHANT_ITEMS}/spell-damage-two-enchants.png`,
   [InventoryItemTypes.RING]: `${EquipmentImagePaths.TWO_ENCHANT_ITEMS}/ring-two-enchants.png`,

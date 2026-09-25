@@ -1,7 +1,7 @@
 import clsx from 'clsx';
-import { capitalize } from 'lodash';
-import React, { useMemo, useState } from 'react';
+import React, { ReactNode, useState } from 'react';
 
+import { UNSUPPORTED_EQUIPMENT_MESSAGE } from './constants/unsupported-equipment-message';
 import { ItemBaseTypes } from './enums/item-base-type';
 import { ItemPositions } from './enums/item-positions';
 import EquipItemActionProps from './types/equip-item-action-props';
@@ -9,17 +9,25 @@ import { getItemPositions } from './utils/get-item-position';
 import { getType } from './utils/get-type';
 import { isTwoHandedType } from './utils/item-comparison';
 import {
+  resolveItemPositionLabel,
+  resolveItemTypeLabel,
+} from './utils/resolve-item-labels';
+import { ItemComparisonRow } from '../../api-definitions/items/item-comparison-details';
+import {
   armourPositions,
   InventoryItemTypes,
 } from '../../components/character-sheet/partials/character-inventory/enums/inventory-item-types';
 import { planeTextItemColors } from '../../components/character-sheet/partials/character-inventory/styles/backpack-item-styles';
-import { formatNumberWithCommas } from '../../util/format-number';
+import CurrencyDisplay from '../currency/currency-display';
+import { CurrencyDisplayMode } from '../currency/enums/currency-display-mode';
+import { CurrencyType } from '../currency/enums/currency-type';
 
 import ActionBoxBase from 'ui/action-boxes/action-box-base';
 import { ActionBoxVariant } from 'ui/action-boxes/enums/action-box-varient';
+import { Alert } from 'ui/alerts/alert';
+import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import IconButton from 'ui/buttons/icon-button';
-import LinkButton from 'ui/buttons/link-button';
 
 const EquipItemActions = ({
   comparison_details,
@@ -30,13 +38,8 @@ const EquipItemActions = ({
   const [equippedPosition, setEquippedPosition] =
     useState<ItemPositions | null>(null);
 
-  const itemToEquip = useMemo(() => {
-    if (comparison_details.details.length <= 0) {
-      return comparison_details.item_to_equip;
-    }
-
-    return comparison_details.details[0].item_to_equip;
-  }, [comparison_details]);
+  const itemToEquip = comparison_details.item_to_equip;
+  const comparisonRows = comparison_details.details;
 
   const baseType = getType(itemToEquip, armourPositions);
 
@@ -61,32 +64,32 @@ const EquipItemActions = ({
     return null;
   };
 
+  const resolveReplacementSlotId = (position: ItemPositions): number | null => {
+    const foundComparison = comparisonRows.find(
+      (detail) => detail.position === position
+    );
+
+    if (foundComparison) {
+      return foundComparison.equipped_item.slot_id;
+    }
+
+    return itemToEquip.slot_id;
+  };
+
   const handleConfirmation = (position: ItemPositions) => {
-    setEquippedPosition(position);
+    const slotId = resolveReplacementSlotId(position);
 
-    const foundComparison = comparison_details.details.find((detail) => {
-      return detail.position === position;
-    });
-
-    if (!foundComparison && !itemToEquip) {
+    if (slotId === null) {
       return;
     }
 
-    let slotId = itemToEquip.slot_id;
-
-    if (foundComparison) {
-      slotId = foundComparison.equipped_item.slot_id;
-    }
-
-    if (!slotId) {
-      slotId = 0;
-    }
+    setEquippedPosition(position);
 
     on_confirm_action({
       position,
       slot_id: slotId,
       equip_type: itemToEquip.type,
-      item_id_to_buy: itemToEquip.item_id,
+      item_id: itemToEquip.item_id,
     });
   };
 
@@ -130,26 +133,25 @@ const EquipItemActions = ({
     );
   };
 
-  const renderHeader = () => {
-    if (!comparison_details) {
-      return null;
-    }
-
-    return (
-      <div className="mb-2 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <h4 className="font-bold text-gray-800 dark:text-gray-300">
-            Equip Item Options
-          </h4>
-        </div>
-
-        {renderHeaderClose()}
+  const renderHeader = () => (
+    <div className="mb-2 flex items-center justify-between">
+      <div className="flex items-center gap-2">
+        <h4 className="font-bold text-gray-800 dark:text-gray-300">
+          Equip Item Options
+        </h4>
       </div>
-    );
-  };
+
+      {renderHeaderClose()}
+    </div>
+  );
 
   const renderDualSlotActions = () => {
-    if (baseType === ItemBaseTypes.Armour) {
+    if (
+      baseType === ItemBaseTypes.Armour ||
+      baseType === ItemBaseTypes.Trinket ||
+      baseType === ItemBaseTypes.Artifact ||
+      baseType === null
+    ) {
       return null;
     }
 
@@ -161,35 +163,41 @@ const EquipItemActions = ({
 
     const positions = getItemPositions(itemToEquip);
 
-    if (!positions) {
+    if (positions?.length !== 2) {
       return null;
     }
+
+    const [primarySlotPosition, secondarySlotPosition] = positions;
 
     return (
       <div className="grid grid-cols-2 items-stretch gap-2">
         <IconButton
           disabled={is_processing}
-          on_click={() => handleConfirmation(positions[0] as ItemPositions)}
+          on_click={() => handleConfirmation(primarySlotPosition)}
           label={labels[0]}
           variant={ButtonVariant.SUCCESS}
-          additional_css={`w-full justify-center`}
-          icon={renderLoadingIcon(positions[0] as ItemPositions)}
+          additional_css="w-full justify-center"
+          icon={renderLoadingIcon(primarySlotPosition)}
         />
 
         <IconButton
           disabled={is_processing}
-          on_click={() => handleConfirmation(positions[1] as ItemPositions)}
+          on_click={() => handleConfirmation(secondarySlotPosition)}
           label={labels[1]}
           variant={ButtonVariant.SUCCESS}
-          additional_css={`w-full justify-center`}
-          icon={renderLoadingIcon(positions[1] as ItemPositions)}
+          additional_css="w-full justify-center"
+          icon={renderLoadingIcon(secondarySlotPosition)}
         />
       </div>
     );
   };
 
-  const renderArmourAction = () => {
-    if (baseType !== ItemBaseTypes.Armour) {
+  const renderSingleSlotAction = () => {
+    if (
+      baseType !== ItemBaseTypes.Armour &&
+      baseType !== ItemBaseTypes.Trinket &&
+      baseType !== ItemBaseTypes.Artifact
+    ) {
       return null;
     }
 
@@ -197,22 +205,24 @@ const EquipItemActions = ({
       return null;
     }
 
-    const label = `Replace Equipped: ${capitalize(String(itemToEquip.type).replace('-', ' '))}`;
+    const label = `Replace Equipped: ${resolveItemTypeLabel(itemToEquip.type)}`;
 
     const positions = getItemPositions(itemToEquip);
 
-    if (!positions) {
+    if (positions?.length !== 1) {
       return null;
     }
+
+    const [position] = positions;
 
     return (
       <div className="flex justify-center">
         <IconButton
           disabled={is_processing}
-          on_click={() => handleConfirmation(positions[0] as ItemPositions)}
+          on_click={() => handleConfirmation(position)}
           label={label}
           variant={ButtonVariant.SUCCESS}
-          icon={renderLoadingIcon(positions[0] as ItemPositions)}
+          icon={renderLoadingIcon(position)}
         />
       </div>
     );
@@ -224,25 +234,48 @@ const EquipItemActions = ({
     }
 
     return (
-      <div className="mt-4">
-        <span className="text-mango-tango-500 dark:text-mango-tango-500">
-          <strong>Cost of replacement</strong>
-        </span>
-        : {formatNumberWithCommas(itemToEquip.cost)}
+      <div className="mt-4 flex flex-wrap items-center gap-1">
+        <strong className="text-mango-tango-600 dark:text-mango-tango-400">
+          Cost of replacement:
+        </strong>
+        <CurrencyDisplay
+          currency={CurrencyType.GOLD}
+          amount={itemToEquip.cost}
+          display_mode={CurrencyDisplayMode.EXACT}
+        />
       </div>
     );
   };
 
+  const renderTwoHandedNote = (type: InventoryItemTypes): ReactNode => {
+    if (!isTwoHandedType(type)) {
+      return null;
+    }
+
+    return ' and is two handed';
+  };
+
+  const renderEquippedItem = (detail: ItemComparisonRow): ReactNode => (
+    <li key={`${detail.position}-${detail.equipped_item.slot_id}`}>
+      <span
+        className={clsx(planeTextItemColors(detail.equipped_item), 'font-bold')}
+      >
+        {detail.equipped_item.name}
+      </span>
+      . Type: <strong>{resolveItemTypeLabel(detail.equipped_item.type)}</strong>
+      {renderTwoHandedNote(detail.equipped_item.type)} and is equipped in:{' '}
+      <strong>{resolveItemPositionLabel(detail.position)}</strong>
+    </li>
+  );
+
   const renderEquipSummary = () => {
-    if (!Array.isArray(comparison_details) || comparison_details.length === 0) {
+    if (comparisonRows.length === 0) {
       return null;
     }
 
     const isSingleLine = isTwoHanded || baseType === ItemBaseTypes.Armour;
 
-    const itemsToShow = isSingleLine
-      ? [comparison_details[0]]
-      : comparison_details;
+    const itemsToShow = isSingleLine ? [comparisonRows[0]] : comparisonRows;
 
     return (
       <div className="text-gray-800 dark:text-gray-300">
@@ -258,36 +291,21 @@ const EquipItemActions = ({
             Attack and Cast or Cast and Attack. Attack and Cast will use the
             weapon in your left hand while Cast and Attack will use the weapon
             in your right hand. You can learn more{' '}
-            <LinkButton
-              label={'here'}
-              variant={ButtonVariant.PRIMARY}
-              is_external
-              on_click={() => {}}
-            />
+            <a
+              href="/information/combat"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-danube-700 focus:ring-danube-500 dark:text-danube-300 font-semibold underline focus:ring-2 focus:outline-none"
+            >
+              about combat
+              <span className="sr-only"> (opens in a new tab)</span>
+            </a>
+            .
           </p>
         </div>
 
         <ul className="list-disc pl-5">
-          {itemsToShow.map((detail, index) => {
-            const equipped = detail.equipped_item;
-
-            const equippedColor = planeTextItemColors(equipped);
-
-            const isEquippedTwoHanded = isTwoHandedType(equipped.type);
-
-            return (
-              <li key={`${detail.position}-${index}`}>
-                <span className={clsx(equippedColor, 'font-bold')}>
-                  {equipped.name}
-                </span>
-                . Type:{' '}
-                <strong>{capitalize(equipped.type.replace('-', ' '))}</strong>{' '}
-                {isEquippedTwoHanded ? ' and is two handed ' : ' '} and is
-                equipped in:{' '}
-                <strong>{capitalize(detail.position.replace('-', ' '))}</strong>
-              </li>
-            );
-          })}
+          {itemsToShow.map(renderEquippedItem)}
         </ul>
 
         {renderCostOfReplacement()}
@@ -297,11 +315,26 @@ const EquipItemActions = ({
 
   const renderEquipItemDetails = () => {
     if (baseType === ItemBaseTypes.Armour) {
-      return renderArmourAction();
+      return renderSingleSlotAction();
+    }
+
+    if (
+      baseType === ItemBaseTypes.Trinket ||
+      baseType === ItemBaseTypes.Artifact
+    ) {
+      return renderSingleSlotAction();
     }
 
     return renderDualSlotActions();
   };
+
+  if (baseType === null) {
+    return (
+      <Alert variant={AlertVariant.DANGER}>
+        {UNSUPPORTED_EQUIPMENT_MESSAGE}
+      </Alert>
+    );
+  }
 
   return (
     <ActionBoxBase

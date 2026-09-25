@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import UsePlayerGameMapDetailDefinition from './definitions/use-player-game-map-detail-definition';
-import GameMapFactualDefinition from '../../types/game-map-factual-definition';
+import PlayerGameMapDetailDefinition from '../../types/player-game-map-detail-definition';
 import { PlayerGameMapDetailApiUrls } from '../enums/player-game-map-detail-api-urls';
 
 export const usePlayerGameMapDetail = (
@@ -12,7 +12,9 @@ export const usePlayerGameMapDetail = (
 ): UsePlayerGameMapDetailDefinition => {
   const { apiHandler, getUrl } = useApiHandler();
 
-  const [gameMap, setGameMap] = useState<GameMapFactualDefinition | null>(null);
+  const [gameMap, setGameMap] = useState<PlayerGameMapDetailDefinition | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<AxiosErrorDefinition | null>(null);
   const [refreshToken, setRefreshToken] = useState(0);
@@ -33,7 +35,7 @@ export const usePlayerGameMapDetail = (
 
     try {
       const result = await apiHandler.get<
-        GameMapFactualDefinition,
+        PlayerGameMapDetailDefinition,
         Record<string, never>
       >(getUrl(PlayerGameMapDetailApiUrls.DETAIL, { gameMap: gameMapId }), {
         signal: controller.signal,

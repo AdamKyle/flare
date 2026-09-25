@@ -6,108 +6,114 @@ import AnnouncementMessageDefinition from '../../../api-definitions/chat/annouce
 import ChatType, {
   ChatMessageType,
 } from '../../../api-definitions/chat/chat-message-definition';
+import SendPrivateChatMessageRequest from '../api/hooks/definitions/send-private-chat-message-request';
+import { parsePrivateMessageCommand } from '../utils/parse-private-message-command';
+
+const buildLocalSystemChat = (
+  message: string,
+  type: ChatMessageType
+): ChatType => ({
+  color: '',
+  map_name: '',
+  character_name: '',
+  message,
+  x: 0,
+  y: 0,
+  type,
+  hide_location: true,
+  user_id: 0,
+  custom_class: '',
+  is_chat_bold: false,
+  is_chat_italic: false,
+  name_tag: '',
+  created_at: null,
+});
 
 const useChatActions = (
   params: UseChatActionsParamsDefinition
 ): UseChatActionsDefinition => {
-  const { chatMessages, setRequestParams } = params;
+  const {
+    chatMessages,
+    prependChatMessage,
+    replaceChatMessages,
+    setRequestParams,
+    sendPrivateMessage,
+  } = params;
 
-  const [localChats, setLocalChats] = useState<ChatType[]>([]);
   const [initialAnnouncements, setInitialAnnouncements] = useState<
     AnnouncementMessageDefinition[]
   >([]);
 
-  const setInitialChatHistory = useCallback((history: ChatType[]): void => {
-    setLocalChats(history);
-  }, []);
-
-  const buildLocalSystemChat = (
-    message: string,
-    type: ChatMessageType
-  ): ChatType => ({
-    color: '',
-    map_name: '',
-    character_name: '',
-    message,
-    x: 0,
-    y: 0,
-    type,
-    hide_location: true,
-    user_id: 0,
-    custom_class: '',
-    is_chat_bold: false,
-    is_chat_italic: false,
-    name_tag: '',
-  });
-
   const pushSilencedMessage = useCallback((): void => {
-    setLocalChats((previous) => {
-      const next = buildLocalSystemChat(
+    prependChatMessage(
+      buildLocalSystemChat(
         "You child, have been chatting up a storm. Slow down. I'll let you know whe you can talk again ...",
         'error-message'
+      )
+    );
+  }, [prependChatMessage]);
+
+  const pushPrivateMessageSent = useCallback(
+    (request: SendPrivateChatMessageRequest): void => {
+      prependChatMessage(
+        buildLocalSystemChat(
+          `Sent to ${request.user_name}: ${request.message}`,
+          'private-message-sent'
+        )
       );
+    },
+    [prependChatMessage]
+  );
 
-      const updated = [next, ...previous];
+  const pushErrorMessage = useCallback(
+    (message: string): void => {
+      prependChatMessage(buildLocalSystemChat(message, 'error-message'));
+    },
+    [prependChatMessage]
+  );
 
-      if (updated.length > 1000) {
-        return updated.slice(0, 500);
+  const sendPrivate = useCallback(
+    async (request: SendPrivateChatMessageRequest): Promise<void> => {
+      const delivered = await sendPrivateMessage(request);
+
+      if (!delivered) {
+        return;
       }
 
-      return updated;
-    });
-  }, []);
-
-  const pushPrivateMessageSent = useCallback((messageData: string[]): void => {
-    setLocalChats((previous) => {
-      const next = buildLocalSystemChat(
-        `Sent to ${messageData[1]}: ${messageData[2]}`,
-        'private-message-sent'
-      );
-
-      const updated = [next, ...previous];
-
-      if (updated.length > 1000) {
-        return updated.slice(0, 500);
-      }
-
-      return updated;
-    });
-  }, []);
-
-  const pushErrorMessage = useCallback((message: string): void => {
-    setLocalChats((previous) => {
-      const next = buildLocalSystemChat(message, 'error-message');
-
-      const updated = [next, ...previous];
-
-      if (updated.length > 1000) {
-        return updated.slice(0, 500);
-      }
-
-      return updated;
-    });
-  }, []);
+      pushPrivateMessageSent(request);
+    },
+    [pushPrivateMessageSent, sendPrivateMessage]
+  );
 
   const onSend = useCallback(
     (text: string): void => {
-      setRequestParams({ message: text });
+      const privateMessageRequest = parsePrivateMessageCommand(text);
+
+      if (privateMessageRequest === null) {
+        setRequestParams({ message: text });
+
+        return;
+      }
+
+      sendPrivate(privateMessageRequest).catch(() => {
+        pushErrorMessage('Unable to send the private message.');
+      });
     },
-    [setRequestParams]
+    [pushErrorMessage, sendPrivate, setRequestParams]
   );
 
   const combinedChat = useMemo(() => {
     return {
-      chat: [...localChats, ...chatMessages],
+      chat: chatMessages,
       announcements: initialAnnouncements,
     };
-  }, [localChats, chatMessages, initialAnnouncements]);
+  }, [chatMessages, initialAnnouncements]);
 
   return {
     combinedChat,
     setInitialAnnouncements,
-    setInitialChatHistory,
+    setInitialChatHistory: replaceChatMessages,
     pushSilencedMessage,
-    pushPrivateMessageSent,
     pushErrorMessage,
     onSend,
   };

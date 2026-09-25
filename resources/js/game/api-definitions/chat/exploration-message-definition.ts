@@ -1,6 +1,7 @@
 export default interface ExplorationMessageDefinition {
-  id: number;
+  messageId: string;
   message: string;
-  make_italic: boolean;
-  is_reward: boolean;
+  makeItalic: boolean;
+  isReward: boolean;
+  timeStamp: string;
 }

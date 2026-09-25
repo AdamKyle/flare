@@ -1,32 +1,18 @@
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
-import { formatDistanceToNowStrict, parse } from 'date-fns';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { ReactNode, useId, useState } from 'react';
 
-import {
-  FILTER_LABELS,
-  FILTER_OPTIONS,
-} from './constants/market-history-filter-constants';
-import MarketHistoryChartPointDefinition from './definitions/market-history-chart-point-definition';
-import MarketHistoryRowDefinition from './definitions/market-history-row-definition';
 import ListItemOnMarketProps from './types/list-item-on-market-props';
-import { MarketHistoryForTypeFilters } from '../../components/market/api/enums/market-history-for-type-filters';
-import { useGetMarketHistoryForType } from '../../components/market/api/hooks/use-get-market-history-for-type';
-import { UseListItemOnMarket } from '../../components/market/api/hooks/use-list-item-on-market';
+import { useListItemOnMarket } from '../../components/market/api/hooks/use-list-item-on-market';
+import CurrencyDisplay from '../currency/currency-display';
+import { CurrencyDisplayMode } from '../currency/enums/currency-display-mode';
+import { CurrencyType } from '../currency/enums/currency-type';
+import MarketHistoryChart from '../market/market-history-chart';
+import MarketPriceField from '../market/market-price-field';
+import { validateMarketListingPrice } from '../market/utils/validate-market-listing-price';
 
-import { formatNumberWithCommas } from 'game-utils/format-number';
-
-import DropDownButton from 'ui/buttons/drop-down-button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
-import IconButton from 'ui/buttons/icon-button';
 import LinkButton from 'ui/buttons/link-button';
-import LineChartColor from 'ui/charts/line-chart/enums/line-chart-color';
-import LineChartXAxisType from 'ui/charts/line-chart/enums/line-chart-x-axis-type';
-import LineChartYAxisType from 'ui/charts/line-chart/enums/line-chart-y-axis-type';
-import LineChart from 'ui/charts/line-chart/line-chart';
-import Input from 'ui/input/input';
-import InfiniteLoader from 'ui/loading-bar/infinite-loader';
-
-const MAX_LISTING_PRICE = 2000000000000;
+import LoadingButton from 'ui/buttons/loading-button';
 
 const ListItemOnMarket = ({
   type,
@@ -36,300 +22,107 @@ const ListItemOnMarket = ({
   character_id,
   min_list_price,
 }: ListItemOnMarketProps) => {
-  const { setRequestParams, error, data, loading } =
-    useGetMarketHistoryForType();
+  const priceFieldId = useId();
 
   const {
+    list_item: listItem,
     error: listItemError,
     loading: listItemLoading,
-    setRequestParams: setListItemRequestParams,
-  } = UseListItemOnMarket();
+  } = useListItemOnMarket({ character_id });
 
-  const [selectedFilter, setSelectedFilter] =
-    useState<MarketHistoryForTypeFilters | null>(null);
+  const [priceInput, setPriceInput] = useState(
+    min_list_price > 0 ? `${min_list_price}` : ''
+  );
 
-  const [listingPrice, setListingPrice] = useState(min_list_price);
-  const [inputError, setInputError] = useState<string | null>(null);
+  const priceValidation = validateMarketListingPrice(priceInput);
+  const inputError = priceInput === '' ? null : priceValidation.error;
 
-  const dropdownLabel = selectedFilter ? FILTER_LABELS[selectedFilter] : 'All';
-
-  const itemTypeLabel = useMemo(() => {
-    return type
-      .split('_')
-      .map((word) => {
-        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-      })
-      .join(' ');
-  }, [type]);
-
-  const chartData = useMemo((): MarketHistoryChartPointDefinition[] => {
-    const resolvedRows = (data ?? []) as MarketHistoryRowDefinition[];
-
-    return resolvedRows
-      .map((row) => {
-        const soldWhen = parse(
-          row.sold_when,
-          'yyyy-MM-dd HH:mm:ss',
-          new Date()
-        );
-
-        return {
-          soldWhenTimestamp: soldWhen.getTime(),
-          cost: row.cost,
-          affixName: row.affix_name,
-        };
-      })
-      .sort((firstPoint, secondPoint) => {
-        return firstPoint.soldWhenTimestamp - secondPoint.soldWhenTimestamp;
-      });
-  }, [data]);
-
-  const resolvedListingPriceNumber = useMemo(() => {
-    const parsedValue = Number(listingPrice);
-
-    if (!Number.isFinite(parsedValue)) {
-      return null;
-    }
-
-    return parsedValue;
-  }, [listingPrice]);
-
-  const isListDisabled = useMemo(() => {
-    if (inputError) {
-      return true;
-    }
-
-    if (resolvedListingPriceNumber === null) {
-      return true;
-    }
-
-    return resolvedListingPriceNumber <= 0;
-  }, [inputError, resolvedListingPriceNumber]);
-
-  const handleLoadMarketHistoryForFilter = (
-    nextFilter: MarketHistoryForTypeFilters | null
-  ) => {
-    setSelectedFilter(nextFilter);
-
-    setRequestParams({
-      type: type,
-      filter: nextFilter,
-    });
-  };
-
-  useEffect(() => {
-    handleLoadMarketHistoryForFilter(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [type]);
-
-  const handleApplyFilter = (filter: MarketHistoryForTypeFilters) => {
-    handleLoadMarketHistoryForFilter(filter);
-  };
-
-  const handleClearFilters = () => {
-    handleLoadMarketHistoryForFilter(null);
-  };
-
-  const handleChangeInput = (nextValue: string) => {
-    const parsedValue = parseInt(nextValue) || 0;
-
-    if (!Number.isFinite(parsedValue)) {
-      setListingPrice(0);
-      setInputError('Please enter a valid number.');
+  const handleListItem = async () => {
+    if (priceValidation.price === null) {
       return;
     }
 
-    if (parsedValue > MAX_LISTING_PRICE) {
-      setInputError('Max price is 2,000,000,000,000 gold.');
+    const result = await listItem(slot_id, priceValidation.price);
+
+    if (!result) {
       return;
     }
 
-    setInputError(null);
+    on_action(result.message);
   };
 
-  const handleClickPrimaryButton = () => {
-    setListItemRequestParams({
-      character_id: character_id,
-      slot_id: slot_id,
-      list_for: listingPrice,
-      on_success: on_action,
-    });
-  };
-
-  const handleClickDangerButton = () => {
-    on_close();
-  };
-
-  const handleClickClearFilterButton = () => {
-    handleClearFilters();
-  };
-
-  const filterDropDownData = {
-    dropdown_label: dropdownLabel,
-    items: FILTER_OPTIONS.map((filter) => {
-      return {
-        label: FILTER_LABELS[filter],
-        value: filter,
-        aria_label: FILTER_LABELS[filter],
-      };
-    }),
-  };
-
-  const renderChart = () => {
-    return (
-      <LineChart<MarketHistoryChartPointDefinition>
-        data={chartData}
-        x_data_key="soldWhenTimestamp"
-        x_label="Sale Time"
-        x_axis_type={LineChartXAxisType.TIME}
-        x_formatter={(value) =>
-          formatDistanceToNowStrict(new Date(value), { addSuffix: true })
-        }
-        y_axes={[
-          {
-            key: 'price',
-            type: LineChartYAxisType.NUMBER,
-            visible: true,
-            start_at_zero: false,
-            value_formatter: formatNumberWithCommas,
-          },
-        ]}
-        lines={[
-          {
-            data_key: 'cost',
-            label: 'Sale Price',
-            color: LineChartColor.DANUBE,
-            y_axis_key: 'price',
-            value_formatter: (value) => `${formatNumberWithCommas(value)} gold`,
-            show_points: true,
-          },
-        ]}
-        accessibility_label="Market history line chart showing sale prices over time."
-        show_legend={false}
-        empty_state={
-          <div className="py-10 text-center text-sm text-gray-600 italic dark:text-gray-400">
-            No market history data available for this period.
-          </div>
-        }
-        footer={
-          <p className="mt-2 text-center text-xs text-gray-600 italic dark:text-gray-400">
-            This chart represents the last 90 days and how much the item of type{' '}
-            {itemTypeLabel} has sold for over that period of time
-          </p>
-        }
-      />
-    );
-  };
-
-  const renderListingError = () => {
-    if (!inputError) {
+  const renderMinimumPrice = (): ReactNode => {
+    if (min_list_price <= 0) {
       return null;
     }
 
     return (
-      <p className="mt-1 text-xs text-red-600 dark:text-red-400">
-        {inputError}
+      <p className="flex flex-wrap items-center gap-1 text-sm text-gray-700 dark:text-gray-300">
+        <span>Minimum listing price:</span>
+        <CurrencyDisplay
+          currency={CurrencyType.GOLD}
+          amount={min_list_price}
+          display_mode={CurrencyDisplayMode.EXACT}
+        />
       </p>
     );
   };
 
-  const renderListLoadingIcon = () => {
-    if (!listItemLoading) {
-      return null;
-    }
-
-    return <i className="fas fa-spinner fa-spin" aria-hidden="true"></i>;
-  };
-
-  const renderListingApiError = () => {
+  const renderListingApiError = (): ReactNode => {
     if (!listItemError) {
       return null;
     }
 
-    return (
-      <div className={'my-4'}>
-        <ApiErrorAlert apiError={listItemError.message} />
-      </div>
-    );
+    return <ApiErrorAlert apiError={listItemError.message} />;
   };
 
-  if (loading) {
-    return <InfiniteLoader />;
-  }
-
-  if (error) {
-    return <ApiErrorAlert apiError={error.message} />;
-  }
-
   return (
-    <div className="container flex flex-col gap-3">
+    <div className="flex flex-col gap-3">
       <div className="flex flex-col gap-1">
         <div className="flex items-start justify-between gap-2">
-          <h2 className="text-theme-xl text-mango-tango-600 dark:text-mango-tango-300 font-semibold">
+          <h2 className="text-mango-tango-600 dark:text-mango-tango-300 text-xl font-semibold">
             List on the market
           </h2>
 
           <LinkButton
             label="Close"
             variant={ButtonVariant.DANGER}
-            on_click={handleClickDangerButton}
-            disabled={false}
-            aria_label="clode"
-            is_external={false}
+            on_click={on_close}
+            aria_label="Close"
             additional_css="whitespace-nowrap"
           />
         </div>
 
         <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
-          List your item on the market to make more gold then if you were to
+          List your item on the market to make more gold than if you were to
           sell it to the shop. This is great for unique items, mythical items,
           cosmic items and high end enchanted items as well as alchemy items.
         </p>
       </div>
 
-      <div className="flex w-full items-center justify-end gap-2">
-        <LinkButton
-          label="Clear Filter"
-          variant={ButtonVariant.DANGER}
-          on_click={handleClickClearFilterButton}
-          disabled={selectedFilter === null}
-          aria_label="Clear filter"
-          is_external={false}
-          additional_css="whitespace-nowrap"
-        />
-
-        <DropDownButton
-          data={filterDropDownData}
-          on_select={handleApplyFilter}
-          disabled={FILTER_OPTIONS.length === 0}
-        />
-      </div>
-
-      {renderChart()}
+      <MarketHistoryChart item_type={type} />
 
       {renderListingApiError()}
+      {renderMinimumPrice()}
 
-      <div className="mt-1 flex w-full items-start gap-2">
-        <div className="w-full">
-          <Input
-            on_change={handleChangeInput}
-            clearable
-            place_holder="Enter a price..."
-            disabled={false}
-            value={listingPrice.toString()}
-          />
-          {renderListingError()}
-        </div>
+      <MarketPriceField
+        id={priceFieldId}
+        label="Listing price in Gold"
+        value={priceInput}
+        error={inputError}
+        disabled={listItemLoading}
+        on_change={setPriceInput}
+      />
 
-        <IconButton
-          disabled={isListDisabled || listItemLoading}
-          on_click={handleClickPrimaryButton}
-          label="List"
-          variant={ButtonVariant.PRIMARY}
-          additional_css="whitespace-nowrap"
-          icon={renderListLoadingIcon()}
-        />
-      </div>
+      <LoadingButton
+        label="List"
+        loading_label="Listing..."
+        variant={ButtonVariant.PRIMARY}
+        on_click={() => void handleListItem()}
+        is_loading={listItemLoading}
+        disabled={priceValidation.price === null}
+        aria_label="List item on the market"
+      />
     </div>
   );
 };

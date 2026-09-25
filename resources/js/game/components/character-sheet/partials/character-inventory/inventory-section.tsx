@@ -8,6 +8,7 @@ import { useOpenCharacterBackpack } from './hooks/use-open-character-backpack';
 import { useOpenCharacterGemBag } from './hooks/use-open-character-gem-bag';
 import { useOpenCharacterSets } from './hooks/use-open-character-sets';
 import { useOpenCharacterUsableInventory } from './hooks/use-open-character-usable-inventory';
+import { useOpenEquippedItemDetails } from './hooks/use-open-equipped-item-details';
 import InventorySectionProps from './types/inventory-section-props';
 import { inventoryIconButtons } from './utils/inventory-icon-buttons';
 
@@ -25,18 +26,25 @@ import Separator from 'ui/separator/separator';
 const InventorySection = ({
   character_id,
 }: InventorySectionProps): ReactNode => {
+  const { data, loading, error, refetch } = useCharacterEquippedItemsApi({
+    url: CharacterEquippedApiUrls.CHARACTER_EQUIPPED,
+    urlParams: {
+      character: character_id,
+    },
+  });
+
   const { openBackpack } = useOpenCharacterBackpack();
   const { openUsableInventory } = useOpenCharacterUsableInventory({
     character_id,
   });
   const { openGemBag } = useOpenCharacterGemBag({ character_id });
-  const { openSets } = useOpenCharacterSets({ character_id });
-
-  const { data, loading, error } = useCharacterEquippedItemsApi({
-    url: CharacterEquippedApiUrls.CHARACTER_EQUIPPED,
-    urlParams: {
-      character: character_id,
-    },
+  const { openSets } = useOpenCharacterSets({
+    character_id,
+    on_equipment_changed: refetch,
+  });
+  const { openEquippedItemDetails } = useOpenEquippedItemDetails({
+    character_id,
+    on_equipment_changed: refetch,
   });
 
   if (error) {
@@ -67,7 +75,10 @@ const InventorySection = ({
       />
 
       <div className="flex justify-center">
-        <EquippedSlots equipped_items={data.equipped_items} />
+        <EquippedSlots
+          equipped_items={data.equipped_items}
+          on_open_item_details={openEquippedItemDetails}
+        />
       </div>
 
       <div className={'mx-auto w-full md:w-3/5'}>

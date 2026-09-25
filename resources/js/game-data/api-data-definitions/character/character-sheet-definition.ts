@@ -1,5 +1,7 @@
 import ActiveBoonDefinition from '../../../game/components/actions/partials/floating-cards/crafting-section/sections/alchemy/active-boons/api/definitions/active-boon-definition';
 
+import ActiveAutomationDefinition from 'game-data/api-data-definitions/character/active-automation-definition';
+import CurrencyLimitsDefinition from 'game-data/api-data-definitions/character/currency-limits-definition';
 import ElementalAtonementDefinition from 'game-data/api-data-definitions/character/elemental-atonement-definition';
 import GemProgressionSummaryDefinition from 'game-data/api-data-definitions/character/gem-progression-summary-definition';
 import InventoryCountDefinition from 'game-data/api-data-definitions/character/inventory-counts-definition';
@@ -52,6 +54,7 @@ export default interface CharacterSheetDefinition {
   shards: number;
   copper_coins: number;
   gold_bars: number;
+  currency_limits: CurrencyLimitsDefinition;
   map_name: string;
   inventory_count: InventoryCountDefinition;
   resistance_info: ResistanceInfoDefinition;
@@ -66,12 +69,16 @@ export default interface CharacterSheetDefinition {
   is_silenced?: boolean | null;
   can_talk_again_at?: string | null;
   view_port?: number;
+  show_intro_page?: boolean;
   is_automation_running?: boolean;
   can_attack?: boolean;
   can_attack_again_at?: number;
   can_craft?: boolean;
   can_craft_again_at?: number;
   is_faction_loyalty_automation_running?: boolean;
+  is_delve_running?: boolean;
+  active_automation?: ActiveAutomationDefinition | null;
+  automation_completed_at?: number;
   is_alchemy_locked?: boolean;
   can_use_work_bench?: boolean;
   can_access_queen?: boolean;

@@ -1,8 +1,9 @@
 import React, { ReactNode } from 'react';
 
 import QueenCostSummaryProps from './types/queen-cost-summary-props';
-
-import { formatNumberWithCommas } from 'game-utils/format-number';
+import CurrencyDisplay from '../../../../../../../../reusable-components/currency/currency-display';
+import { CurrencyDisplayMode } from '../../../../../../../../reusable-components/currency/enums/currency-display-mode';
+import { CurrencyType } from '../../../../../../../../reusable-components/currency/enums/currency-type';
 
 const QueenCostSummary = ({
   goldDust,
@@ -10,9 +11,23 @@ const QueenCostSummary = ({
 }: QueenCostSummaryProps): ReactNode => (
   <dl className="grid grid-cols-2 gap-2 rounded-md border border-gray-300 p-3 dark:border-gray-700">
     <dt>Gold Dust</dt>
-    <dd>{formatNumberWithCommas(goldDust)}</dd>
+    <dd>
+      <CurrencyDisplay
+        currency={CurrencyType.GOLD_DUST}
+        amount={goldDust}
+        display_mode={CurrencyDisplayMode.EXACT}
+        show_label={false}
+      />
+    </dd>
     <dt>Shards</dt>
-    <dd>{formatNumberWithCommas(shards)}</dd>
+    <dd>
+      <CurrencyDisplay
+        currency={CurrencyType.SHARDS}
+        amount={shards}
+        display_mode={CurrencyDisplayMode.EXACT}
+        show_label={false}
+      />
+    </dd>
   </dl>
 );
 

@@ -11,6 +11,8 @@ use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
+use Tests\Traits\CreateGameMapGemParamter;
+use Tests\Traits\CreateGem;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateKingdom;
 use Tests\Traits\CreateLocation;
@@ -18,13 +20,42 @@ use Tests\Traits\CreateMonster;
 
 class MapControllerTest extends TestCase
 {
-    use CreateGameMap, CreateItem, CreateKingdom, CreateLocation, CreateMonster, RefreshDatabase;
+    use CreateGameMap, CreateGameMapGemParamter, CreateGem, CreateItem, CreateKingdom, CreateLocation, CreateMonster, RefreshDatabase;
 
     protected function tearDown(): void
     {
         Mockery::close();
 
         parent::tearDown();
+    }
+
+    public function test_game_map_details_include_the_rolled_map_gem_context(): void
+    {
+        $gameMap = $this->createGameMap(['name' => 'Surface']);
+        $mapGemParamter = $this->createGameMapGemParamter(['game_map_id' => $gameMap->id, 'name' => 'Fiery']);
+        $mapGem = $this->createMapGeneratedGem($mapGemParamter, ['enemy_strength_increase' => 0.4]);
+        $mapGemParamter->update(['rolled_gem_id' => $mapGem->id]);
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $response = $this->actingAs($character->user)->getJson('/api/map/details/'.$gameMap->id);
+
+        $response->assertOk();
+        $this->assertSame('map', $response->json('gem_context.type'));
+        $this->assertSame('map_gem', $response->json('gem_context.sources.0.type'));
+        $this->assertSame($mapGem->id, $response->json('gem_context.sources.0.rolled_gem.id'));
+    }
+
+    public function test_game_map_details_have_no_gem_context_when_the_map_has_no_rolled_gem(): void
+    {
+        $gameMap = $this->createGameMap(['name' => 'Surface']);
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $response = $this->actingAs($character->user)->getJson('/api/map/details/'.$gameMap->id);
+
+        $response->assertOk();
+        $this->assertNull($response->json('gem_context'));
     }
 
     public function test_map_information_returns_complete_top_level_shape(): void

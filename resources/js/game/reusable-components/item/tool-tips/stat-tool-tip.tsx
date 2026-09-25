@@ -71,7 +71,6 @@ const StatToolTip = (props: StatToolTipProps) => {
       on_open={on_open}
       on_close={on_close}
       content={getMessage()}
-      placementDeps={[label, value]}
     />
   );
 };

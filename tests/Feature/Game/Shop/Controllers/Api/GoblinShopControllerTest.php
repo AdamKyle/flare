@@ -53,12 +53,31 @@ class GoblinShopControllerTest extends TestCase
             ->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->postJson('/api/goblin-shop/buy-item/'.$character->id.'/'.$item->id);
+            ->postJson('/api/goblin-shop/buy-item/'.$character->id.'/'.$item->id, ['amount' => 1]);
 
         $jsonData = json_decode($response->getContent(), true);
 
         $response->assertOk();
         $this->assertStringStartsWith('Purchased:', $jsonData['message']);
+        $this->assertSame(500, $jsonData['character_gold_bars']);
+        $this->assertArrayHasKey('inventory_count', $jsonData['inventory_count']);
         $this->assertSame(500, $character->refresh()->kingdoms->first()->gold_bars);
+    }
+
+    public function test_purchase_item_rejects_a_non_positive_amount(): void
+    {
+        $item = $this->createItem(['gold_bars_cost' => 500, 'type' => 'shield']);
+
+        $character = $this->character
+            ->kingdomManagement()
+            ->assignKingdom(['gold_bars' => 1000])
+            ->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->postJson('/api/goblin-shop/buy-item/'.$character->id.'/'.$item->id, ['amount' => 0]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['amount' => 'You must buy at least one.']);
+        $this->assertSame(1000, $character->refresh()->kingdoms->first()->gold_bars);
     }
 }

@@ -73,6 +73,7 @@ const TrinketryFlow = (): ReactNode => {
   const renderItemSelection = (): ReactNode => (
     <TrinketSelection
       items={itemsApi.items}
+      loadedItems={itemsApi.loadedItems}
       selectedItemId={selectedItem?.id ?? null}
       loading={itemsApi.loading}
       isLoadingMore={itemsApi.isLoadingMore}

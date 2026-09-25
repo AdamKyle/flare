@@ -37,6 +37,98 @@ class BattleRewardMessageOutboxServiceTest extends TestCase
         );
     }
 
+    public function test_store_messages_bulk_stores_ordered_unemitted_rows(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $request = $this->createCharacterBattleRewardRequest(['character_id' => $character->id]);
+
+        resolve(BattleRewardMessageOutboxService::class)->storeMessages(
+            $request->id,
+            $character->id,
+            $character->user_id,
+            BattleRewardStepName::XP->value,
+            [
+                ['message' => 'You are now level: 2!'],
+                ['message' => 'You are now level: 3!'],
+                ['message' => 'You are now level: 4!'],
+            ],
+        );
+
+        $storedMessages = CharacterBattleRewardRequestMessage::where('character_battle_reward_request_id', $request->id)
+            ->orderBy('id')
+            ->get();
+
+        $this->assertSame(
+            ['You are now level: 2!', 'You are now level: 3!', 'You are now level: 4!'],
+            $storedMessages->pluck('message')->all(),
+        );
+        $this->assertSame(3, $storedMessages->where('step_name', BattleRewardStepName::XP)->whereNull('emitted_at')->count());
+    }
+
+    public function test_store_messages_stores_nothing_for_an_empty_message_list(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $request = $this->createCharacterBattleRewardRequest(['character_id' => $character->id]);
+
+        resolve(BattleRewardMessageOutboxService::class)->storeMessages(
+            $request->id,
+            $character->id,
+            $character->user_id,
+            BattleRewardStepName::XP->value,
+            [],
+        );
+
+        $this->assertSame(0, CharacterBattleRewardRequestMessage::where('character_battle_reward_request_id', $request->id)->count());
+    }
+
+    public function test_emit_unemitted_messages_invokes_before_emit_immediately_before_each_unemitted_message_is_dispatched(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $request = $this->createCharacterBattleRewardRequest(['character_id' => $character->id]);
+        $this->createCharacterBattleRewardRequestMessage([
+            'character_battle_reward_request_id' => $request->id,
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'step_name' => BattleRewardStepName::XP,
+            'message' => 'already emitted',
+            'emitted_at' => now()->subSeconds(5),
+        ]);
+        $this->createCharacterBattleRewardRequestMessage([
+            'character_battle_reward_request_id' => $request->id,
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'step_name' => BattleRewardStepName::XP,
+            'message' => 'first pending',
+            'emitted_at' => null,
+        ]);
+        $this->createCharacterBattleRewardRequestMessage([
+            'character_battle_reward_request_id' => $request->id,
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'step_name' => BattleRewardStepName::XP,
+            'message' => 'second pending',
+            'emitted_at' => null,
+        ]);
+        $timeline = [];
+        Event::listen(ServerMessageEvent::class, function (ServerMessageEvent $event) use (&$timeline): void {
+            $timeline[] = 'dispatched: '.$event->message;
+        });
+
+        resolve(BattleRewardMessageOutboxService::class)->emitUnemittedMessages(
+            $request,
+            function (CharacterBattleRewardRequestMessage $message) use (&$timeline): void {
+                $timeline[] = 'before: '.$message->message;
+            },
+        );
+
+        $this->assertSame([
+            'before: first pending',
+            'dispatched: first pending',
+            'before: second pending',
+            'dispatched: second pending',
+        ], $timeline);
+    }
+
     public function test_emit_unemitted_messages_emits_and_marks_emitted(): void
     {
         Event::fake();

@@ -2,16 +2,17 @@
 
 namespace Tests\Unit\Game\Skills\Services;
 
-use App\Flare\Models\ItemSkill;
 use App\Game\Skills\Services\ItemSkillService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
+use Tests\Traits\CreateItemSkill;
+use Tests\Traits\CreateItemSkillProgression;
 
 class ItemSkillServiceTest extends TestCase
 {
-    use CreateItem, RefreshDatabase;
+    use CreateItem, CreateItemSkill, CreateItemSkillProgression, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -23,7 +24,7 @@ class ItemSkillServiceTest extends TestCase
 
         $this->character = (new CharacterFactory)->createBaseCharacter();
 
-        $this->itemSkillService = resolve(ItemSkillService::class);
+        $this->itemSkillService = new ItemSkillService;
     }
 
     protected function tearDown(): void
@@ -72,7 +73,7 @@ class ItemSkillServiceTest extends TestCase
     {
         $item = $this->createItem(['type' => 'artifact']);
 
-        $itemSkill = ItemSkill::create([
+        $itemSkill = $this->createItemSkill([
             'name' => 'parent',
             'description' => 'sample',
             'base_damage_mod' => 0.10,
@@ -80,7 +81,7 @@ class ItemSkillServiceTest extends TestCase
             'total_kills_needed' => 100,
         ]);
 
-        $item->itemSkillProgressions()->create([
+        $this->createItemSkillProgression([
             'item_id' => $item->id,
             'item_skill_id' => $itemSkill->id,
             'current_level' => 0,
@@ -88,7 +89,7 @@ class ItemSkillServiceTest extends TestCase
             'is_training' => false,
         ]);
 
-        $character = $this->character->inventoryManagement()->giveItem($item, true, 'left-hand')->getCharacter();
+        $character = $this->character->inventoryManagement()->giveItem($item, true, 'artifact')->getCharacter();
 
         $result = $this->itemSkillService->trainSkill($character, $item->id, 0);
 
@@ -99,7 +100,7 @@ class ItemSkillServiceTest extends TestCase
     public function test_cannot_stop_training_skill_when_there_is_no_progression_data()
     {
 
-        $itemSkill = ItemSkill::create([
+        $itemSkill = $this->createItemSkill([
             'name' => 'parent',
             'description' => 'sample',
             'base_damage_mod' => 0.10,
@@ -109,7 +110,7 @@ class ItemSkillServiceTest extends TestCase
 
         $item = $this->createItem(['type' => 'artifact', 'item_skill_id' => $itemSkill->id]);
 
-        $character = $this->character->inventoryManagement()->giveItem($item, true, 'left-hand')->getCharacter();
+        $character = $this->character->inventoryManagement()->giveItem($item, true, 'artifact')->getCharacter();
 
         $result = $this->itemSkillService->stopTrainingSkill($character, $item->id, 0);
 
@@ -121,7 +122,7 @@ class ItemSkillServiceTest extends TestCase
     {
         $item = $this->createItem(['type' => 'artifact']);
 
-        ItemSkill::create([
+        $this->createItemSkill([
             'name' => 'parent',
             'description' => 'sample',
             'base_damage_mod' => 0.10,
@@ -129,7 +130,7 @@ class ItemSkillServiceTest extends TestCase
             'total_kills_needed' => 100,
         ]);
 
-        $character = $this->character->inventoryManagement()->giveItem($item, true, 'left-hand')->getCharacter();
+        $character = $this->character->inventoryManagement()->giveItem($item, true, 'artifact')->getCharacter();
 
         $result = $this->itemSkillService->trainSkill($character, $item->id, 0);
 
@@ -140,7 +141,7 @@ class ItemSkillServiceTest extends TestCase
     public function test_cannot_train_skill_when_parent_is_not_trained()
     {
 
-        $itemSkill = ItemSkill::create([
+        $itemSkill = $this->createItemSkill([
             'name' => 'parent 2',
             'description' => 'sample',
             'base_damage_mod' => 0.10,
@@ -148,7 +149,7 @@ class ItemSkillServiceTest extends TestCase
             'total_kills_needed' => 100,
         ]);
 
-        $childItemSkill = ItemSkill::create([
+        $childItemSkill = $this->createItemSkill([
             'name' => 'child 2',
             'description' => 'sample',
             'base_damage_mod' => 0.10,
@@ -160,7 +161,7 @@ class ItemSkillServiceTest extends TestCase
 
         $item = $this->createItem(['name' => 'Test Item With Skill', 'type' => 'artifact', 'item_skill_id' => $itemSkill->id]);
 
-        $item->itemSkillProgressions()->create([
+        $this->createItemSkillProgression([
             'item_id' => $item->id,
             'item_skill_id' => $itemSkill->id,
             'current_level' => 0,
@@ -170,7 +171,7 @@ class ItemSkillServiceTest extends TestCase
 
         $item = $item->refresh();
 
-        $childItemSkillProgression = $item->itemSkillProgressions()->create([
+        $childItemSkillProgression = $this->createItemSkillProgression([
             'item_id' => $item->id,
             'item_skill_id' => $childItemSkill->id,
             'current_level' => 0,
@@ -191,7 +192,7 @@ class ItemSkillServiceTest extends TestCase
     public function test_can_train_child_skill()
     {
 
-        $itemSkill = ItemSkill::create([
+        $itemSkill = $this->createItemSkill([
             'name' => 'parent',
             'description' => 'sample',
             'base_damage_mod' => 0.10,
@@ -199,7 +200,7 @@ class ItemSkillServiceTest extends TestCase
             'total_kills_needed' => 100,
         ]);
 
-        $childItemSkill = ItemSkill::create([
+        $childItemSkill = $this->createItemSkill([
             'name' => 'child',
             'description' => 'sample',
             'base_damage_mod' => 0.10,
@@ -211,7 +212,7 @@ class ItemSkillServiceTest extends TestCase
 
         $item = $this->createItem(['type' => 'artifact', 'item_skill_id' => $itemSkill->id]);
 
-        $item->itemSkillProgressions()->create([
+        $this->createItemSkillProgression([
             'item_id' => $item->id,
             'item_skill_id' => $itemSkill->id,
             'current_level' => 5,
@@ -219,7 +220,7 @@ class ItemSkillServiceTest extends TestCase
             'is_training' => false,
         ]);
 
-        $childItemSkillProgression = $item->itemSkillProgressions()->create([
+        $childItemSkillProgression = $this->createItemSkillProgression([
             'item_id' => $item->id,
             'item_skill_id' => $childItemSkill->id,
             'current_level' => 0,
@@ -229,7 +230,7 @@ class ItemSkillServiceTest extends TestCase
 
         $item = $item->refresh();
 
-        $character = $this->character->inventoryManagement()->giveItem($item, true, 'left-hand')->getCharacter();
+        $character = $this->character->inventoryManagement()->giveItem($item, true, 'artifact')->getCharacter();
 
         $result = $this->itemSkillService->trainSkill($character, $item->id, $childItemSkillProgression->id);
 
@@ -240,7 +241,7 @@ class ItemSkillServiceTest extends TestCase
     public function test_start_training_the_skill_on_the_item()
     {
 
-        $itemSkill = ItemSkill::create([
+        $itemSkill = $this->createItemSkill([
             'name' => 'test',
             'description' => 'sample',
             'base_damage_mod' => 0.10,
@@ -252,7 +253,7 @@ class ItemSkillServiceTest extends TestCase
 
         $item = $item->refresh();
 
-        $itemSkillProgression = $item->itemSkillProgressions()->create([
+        $itemSkillProgression = $this->createItemSkillProgression([
             'item_id' => $item->id,
             'item_skill_id' => $itemSkill->id,
             'current_level' => 0,
@@ -262,7 +263,7 @@ class ItemSkillServiceTest extends TestCase
 
         $item = $item->refresh();
 
-        $character = $this->character->inventoryManagement()->giveItem($item, true, 'left-hand')->getCharacter();
+        $character = $this->character->inventoryManagement()->giveItem($item, true, 'artifact')->getCharacter();
 
         $result = $this->itemSkillService->trainSkill($character, $item->id, $itemSkillProgression->id);
 
@@ -276,7 +277,7 @@ class ItemSkillServiceTest extends TestCase
     public function test_stop_training_the_skill_on_the_item()
     {
 
-        $itemSkill = ItemSkill::create([
+        $itemSkill = $this->createItemSkill([
             'name' => 'test',
             'description' => 'sample',
             'base_damage_mod' => 0.10,
@@ -288,7 +289,7 @@ class ItemSkillServiceTest extends TestCase
 
         $item = $item->refresh();
 
-        $itemSkillProgression = $item->itemSkillProgressions()->create([
+        $itemSkillProgression = $this->createItemSkillProgression([
             'item_id' => $item->id,
             'item_skill_id' => $itemSkill->id,
             'current_level' => 0,
@@ -298,7 +299,7 @@ class ItemSkillServiceTest extends TestCase
 
         $item = $item->refresh();
 
-        $character = $this->character->inventoryManagement()->giveItem($item, true, 'left-hand')->getCharacter();
+        $character = $this->character->inventoryManagement()->giveItem($item, true, 'artifact')->getCharacter();
 
         $result = $this->itemSkillService->stopTrainingSkill($character, $item->id, $itemSkillProgression->id);
 
@@ -312,7 +313,7 @@ class ItemSkillServiceTest extends TestCase
     public function test_start_training_of_parent_skill_when_training_parent_skill()
     {
 
-        $itemSkill = ItemSkill::create([
+        $itemSkill = $this->createItemSkill([
             'name' => 'parent',
             'description' => 'sample',
             'base_damage_mod' => 0.10,
@@ -320,7 +321,7 @@ class ItemSkillServiceTest extends TestCase
             'total_kills_needed' => 100,
         ]);
 
-        $childItemSkill = ItemSkill::create([
+        $childItemSkill = $this->createItemSkill([
             'name' => 'child',
             'description' => 'sample',
             'base_damage_mod' => 0.10,
@@ -332,7 +333,7 @@ class ItemSkillServiceTest extends TestCase
 
         $item = $this->createItem(['type' => 'artifact', 'item_skill_id' => $itemSkill->id]);
 
-        $parentItemSkillProgression = $item->itemSkillProgressions()->create([
+        $parentItemSkillProgression = $this->createItemSkillProgression([
             'item_id' => $item->id,
             'item_skill_id' => $itemSkill->id,
             'current_level' => 5,
@@ -340,7 +341,7 @@ class ItemSkillServiceTest extends TestCase
             'is_training' => false,
         ]);
 
-        $childItemSkillProgression = $item->itemSkillProgressions()->create([
+        $childItemSkillProgression = $this->createItemSkillProgression([
             'item_id' => $item->id,
             'item_skill_id' => $childItemSkill->id,
             'current_level' => 0,
@@ -350,7 +351,7 @@ class ItemSkillServiceTest extends TestCase
 
         $item = $item->refresh();
 
-        $character = $this->character->inventoryManagement()->giveItem($item, true, 'left-hand')->getCharacter();
+        $character = $this->character->inventoryManagement()->giveItem($item, true, 'artifact')->getCharacter();
 
         $result = $this->itemSkillService->trainSkill($character, $item->id, $parentItemSkillProgression->id);
 
@@ -360,5 +361,24 @@ class ItemSkillServiceTest extends TestCase
         $childItemSkillProgression = $childItemSkillProgression->refresh();
 
         $this->assertFalse($childItemSkillProgression->is_training);
+    }
+
+    public function test_child_skill_cannot_use_parent_progression_from_another_artifact(): void
+    {
+        $parentSkill = $this->createItemSkill(['name' => 'parent', 'max_level' => 10]);
+        $childSkill = $this->createItemSkill(['name' => 'child', 'max_level' => 10, 'parent_id' => $parentSkill->id, 'parent_level_needed' => 4]);
+        $artifactA = $this->createItem(['type' => 'artifact', 'item_skill_id' => $parentSkill->id]);
+        $this->createItemSkillProgression(['item_id' => $artifactA->id, 'item_skill_id' => $parentSkill->id, 'current_level' => 5]);
+        $this->createItemSkillProgression(['item_id' => $artifactA->id, 'item_skill_id' => $childSkill->id]);
+        $artifactB = $this->createItem(['type' => 'artifact', 'item_skill_id' => $parentSkill->id]);
+        $this->createItemSkillProgression(['item_id' => $artifactB->id, 'item_skill_id' => $parentSkill->id, 'current_level' => 1]);
+        $childProgressionB = $this->createItemSkillProgression(['item_id' => $artifactB->id, 'item_skill_id' => $childSkill->id]);
+        $character = $this->character->inventoryManagement()->giveItem($artifactA)->giveItem($artifactB, true, 'artifact')->getCharacter();
+
+        $result = $this->itemSkillService->trainSkill($character, $artifactB->id, $childProgressionB->id);
+
+        $this->assertSame(422, $result['status']);
+        $this->assertSame('You must train the parent skill first.', $result['message']);
+        $this->assertFalse($childProgressionB->fresh()->is_training);
     }
 }

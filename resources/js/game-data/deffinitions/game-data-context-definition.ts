@@ -10,5 +10,6 @@ export default interface GameDataContextDefinition {
   updateCharacter: (character: Partial<CharacterSheetDefinition>) => void;
   listenForMonsterUpdates: () => void;
   markAnnouncementsSeen: () => void;
+  clearExplorationOutput: () => void;
   characterId: number;
 }

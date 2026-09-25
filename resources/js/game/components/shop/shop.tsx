@@ -10,7 +10,9 @@ import ShopProps from './types/shop-props';
 import { buildShopItemTypeSelection } from './utils/build-shop-item-type-selection';
 import { useCustomContext } from '../../../utils/hooks/use-custom-context';
 import { EquippableItemWithBase } from '../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
-import { formatNumberWithCommas } from '../../util/format-number';
+import CurrencyDisplay from '../../reusable-components/currency/currency-display';
+import { CurrencyDisplayMode } from '../../reusable-components/currency/enums/currency-display-mode';
+import { CurrencyType } from '../../reusable-components/currency/enums/currency-type';
 
 import CharacterSheetDefinition from 'game-data/api-data-definitions/character/character-sheet-definition';
 
@@ -165,10 +167,10 @@ const Shop = ({ close_shop }: ShopProps) => {
 
     return (
       <InfiniteRow handle_scroll={handleScroll} additional_css="max-h-[500px]">
-        {data.map((item, index) => (
+        {data.map((item) => (
           <ShopCard
-            key={`${item.item_id}-${index}`}
-            row_key={`${item.item_id}-${index}`}
+            key={item.item_id}
+            row_key={`${item.item_id}`}
             item={item}
             view_item={handleViewItem}
             compare_item={handleCompareItem}
@@ -187,13 +189,15 @@ const Shop = ({ close_shop }: ShopProps) => {
     }
 
     return (
-      <p className="mb-4 text-gray-800 dark:text-gray-300">
-        <strong>
-          <span className="text-marigold-600 dark:text-mango-tango-400">
-            Your Gold:
-          </span>
-        </strong>{' '}
-        {formatNumberWithCommas(character.gold)}
+      <p className="mb-4 flex items-center gap-2 text-gray-800 dark:text-gray-300">
+        <strong>Your Gold:</strong>
+        <CurrencyDisplay
+          currency={CurrencyType.GOLD}
+          amount={character.gold}
+          display_mode={CurrencyDisplayMode.BALANCE}
+          label="Your Gold"
+          show_label={false}
+        />
       </p>
     );
   };

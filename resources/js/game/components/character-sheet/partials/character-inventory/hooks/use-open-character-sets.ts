@@ -17,6 +17,7 @@ export const useOpenCharacterSets = (
         is_open: true,
         title: 'Inventory Sets',
         character_id: props.character_id,
+        on_equipment_changed: props.on_equipment_changed,
         allow_clicking_outside: true,
       }
     );

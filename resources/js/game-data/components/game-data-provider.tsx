@@ -3,9 +3,11 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { GameDataContext } from '../game-data-context';
 import GameDataProviderProps from './types/game-data-provider-props';
 import AnnouncementMessageDefinition from '../../game/api-definitions/chat/annoucement-message-definition';
+import ExplorationOutputResponseDefinition from '../../game/components/actions/partials/monster-section/exploration/types/exploration-output-response-definition';
 import CharacterSheetDefinition from '../api-data-definitions/character/character-sheet-definition';
 import GameDataDefinition from '../deffinitions/game-data-definition';
 
+import UseBattleRewardProgressionUpdateStreamResponse from 'game-data/hooks/definitions/use-battle-reward-progression-update-stream-response';
 import UseCharacterBoonsUpdateStreamResponse from 'game-data/hooks/definitions/use-character-boons-update-stream-response';
 import UseCharacterReviveStreamResponse from 'game-data/hooks/definitions/use-character-revive-stream-response';
 import UseCharacterStatusStreamResponse from 'game-data/hooks/definitions/use-character-status-stream-response';
@@ -14,7 +16,9 @@ import UseGemProgressionUpdateStreamResponse from 'game-data/hooks/definitions/u
 import UseLocationBasedCraftingOptionsStreamResponse from 'game-data/hooks/definitions/use-location-based-crafting-options-stream-response';
 import UseMonsterUpdateStreamResponse from 'game-data/hooks/definitions/use-monster-update-stream-response';
 import { useAnnouncementUpdates } from 'game-data/hooks/use-announcement-updates';
+import { useBattleRewardProgressionUpdates } from 'game-data/hooks/use-battle-reward-progression-updates';
 import useCharacterUpdates from 'game-data/hooks/use-character-updates';
+import { useExplorationOutputUpdates } from 'game-data/hooks/use-exploration-output-updates';
 import useMonsterUpdates from 'game-data/hooks/use-monster-updates';
 
 const GameDataProvider = (props: GameDataProviderProps) => {
@@ -77,6 +81,12 @@ const GameDataProvider = (props: GameDataProviderProps) => {
       is_dead: data.characterStatuses.is_dead,
       can_attack: data.characterStatuses.can_attack,
       can_attack_again_at: data.characterStatuses.can_attack_again_at,
+      is_automation_running: data.characterStatuses.is_automation_running,
+      is_faction_loyalty_automation_running:
+        data.characterStatuses.is_faction_loyalty_automation_running,
+      is_delve_running: data.characterStatuses.is_delve_running,
+      active_automation: data.characterStatuses.active_automation,
+      automation_completed_at: data.characterStatuses.automation_completed_at,
     });
   };
 
@@ -182,6 +192,67 @@ const GameDataProvider = (props: GameDataProviderProps) => {
     });
   };
 
+  const handleOnExplorationOutputUpdate = (
+    data: ExplorationOutputResponseDefinition
+  ): void => {
+    setGameData((prev): GameDataDefinition | null => {
+      if (!prev) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        explorationOutput: data,
+      };
+    });
+  };
+
+  const clearExplorationOutput = useCallback((): void => {
+    setGameData((prev): GameDataDefinition | null => {
+      if (!prev) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        explorationOutput: null,
+      };
+    });
+  }, []);
+
+  const handleOnBattleRewardProgressionUpdate = (
+    data: UseBattleRewardProgressionUpdateStreamResponse
+  ): void => {
+    if (data.complete) {
+      setGameData((prev): GameDataDefinition | null => {
+        if (!prev) {
+          return prev;
+        }
+
+        return { ...prev, battleRewardProgression: null };
+      });
+
+      return;
+    }
+
+    const { level, xp, xpNext } = data;
+
+    if (level === null || xp === null || xpNext === null) {
+      return;
+    }
+
+    setGameData((prev): GameDataDefinition | null => {
+      if (!prev) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        battleRewardProgression: { level, xp, xp_next: xpNext },
+      };
+    });
+  };
+
   const userIdForWire = useMemo(() => {
     const userId = gameData?.character?.user_id;
 
@@ -223,6 +294,24 @@ const GameDataProvider = (props: GameDataProviderProps) => {
     onEvent: handleUpdateAnnouncements,
   });
 
+  const {
+    listening: explorationOutputListening,
+    start: startExplorationOutputUpdates,
+    renderWire: renderExplorationOutputWire,
+  } = useExplorationOutputUpdates({
+    userId: userIdForWire,
+    onEvent: handleOnExplorationOutputUpdate,
+  });
+
+  const {
+    listening: battleRewardProgressionListening,
+    start: startBattleRewardProgressionUpdates,
+    renderWire: renderBattleRewardProgressionWire,
+  } = useBattleRewardProgressionUpdates({
+    userId: userIdForWire,
+    onEvent: handleOnBattleRewardProgressionUpdate,
+  });
+
   useEffect(() => {
     if (announcementUpdateListening) {
       return;
@@ -239,6 +328,30 @@ const GameDataProvider = (props: GameDataProviderProps) => {
     startCharacterUpdates();
   }, [characterUpdatesListening, startCharacterUpdates]);
 
+  useEffect(() => {
+    if (explorationOutputListening || userIdForWire <= 0) {
+      return;
+    }
+
+    startExplorationOutputUpdates();
+  }, [
+    explorationOutputListening,
+    startExplorationOutputUpdates,
+    userIdForWire,
+  ]);
+
+  useEffect(() => {
+    if (battleRewardProgressionListening || userIdForWire <= 0) {
+      return;
+    }
+
+    startBattleRewardProgressionUpdates();
+  }, [
+    battleRewardProgressionListening,
+    startBattleRewardProgressionUpdates,
+    userIdForWire,
+  ]);
+
   const listenForMonsterUpdates = useCallback(() => {
     if (!monsterListening) {
       startMonsterUpdates();
@@ -254,11 +367,14 @@ const GameDataProvider = (props: GameDataProviderProps) => {
         updateCharacter,
         listenForMonsterUpdates,
         markAnnouncementsSeen,
+        clearExplorationOutput,
       }}
     >
       {renderMonsterUpdatesWire()}
       {renderCharacterUpdateWire()}
       {renderAnnouncementUpdateWire()}
+      {renderExplorationOutputWire()}
+      {renderBattleRewardProgressionWire()}
       {props.children}
     </GameDataContext.Provider>
   );

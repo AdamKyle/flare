@@ -9,9 +9,11 @@ import GemBagProps from './types/gem-bag-props';
 import BaseGemDetails from '../../../../api-definitions/items/base-gem-details';
 import { useInfiniteScroll } from '../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
+import InventoryStackBody from '../components/inventory-stack-body';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 
+import { StackedCardContentMode } from 'ui/cards/enums/stacked-card-content-mode';
 import StackedCard from 'ui/cards/stacked-card';
 import Input from 'ui/input/input';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
@@ -37,9 +39,14 @@ const GemBag = ({ character_id, initial_gem }: GemBagProps) => {
 
   const debouncedSetSearchText = useMemo(
     () => debounce((value: string) => setSearchText(value), 300),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [setSearchText]
   );
+
+  useEffect(() => {
+    return () => {
+      debouncedSetSearchText.cancel();
+    };
+  }, [debouncedSetSearchText]);
 
   const onSearch = (value: string) => {
     debouncedSetSearchText(value.trim());
@@ -85,14 +92,20 @@ const GemBag = ({ character_id, initial_gem }: GemBagProps) => {
     }
 
     return (
-      <StackedCard on_close={handleCloseGemView}>
-        <GemDetails gem={gemToView} />
+      <StackedCard
+        on_close={handleCloseGemView}
+        aria_label="Gem Details"
+        content_mode={StackedCardContentMode.FULL_BLEED}
+      >
+        <InventoryStackBody>
+          <GemDetails gem={gemToView} />
+        </InventoryStackBody>
       </StackedCard>
     );
   };
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
+    <div className="relative flex h-full flex-col overflow-hidden">
       <div className="px-4 pt-2">
         <Input on_change={onSearch} place_holder={'Search gems'} clearable />
       </div>

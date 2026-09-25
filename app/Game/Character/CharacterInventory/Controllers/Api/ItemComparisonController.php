@@ -18,12 +18,21 @@ use Illuminate\Http\JsonResponse;
 
 class ItemComparisonController extends Controller
 {
+    private const UNSUPPORTED_EQUIPMENT_MESSAGE = 'Unable to determine how this item can be equipped. Please report this as a bug.';
+
     public function __construct(
         private readonly ComparisonService $comparisonService,
         private readonly CharacterInventoryService $characterInventoryService,
         private readonly CharacterGemBagService $gemBagService,
     ) {}
 
+    /**
+     * Compare an owned inventory item with equipped gear.
+     *
+     * @param ComparisonValidation $request The validated comparison request.
+     * @param Character $character The character performing the comparison.
+     * @return JsonResponse The comparison response.
+     */
     public function compareItem(ComparisonValidation $request, Character $character): JsonResponse
     {
         $inventory = Inventory::where('character_id', $character->id)->first();
@@ -33,17 +42,22 @@ class ItemComparisonController extends Controller
             return response()->json(['message' => 'Item not found in your inventory.'], 422);
         }
 
-        $type = $request->item_to_equip_type ?? $itemToEquip->item->type;
+        $data = $this->comparisonService->buildComparisonData($character, $itemToEquip);
 
-        if ($type === 'spell-healing' || $type === 'spell-damage') {
-            $type = 'spell';
+        if (is_null($data)) {
+            return response()->json(['message' => self::UNSUPPORTED_EQUIPMENT_MESSAGE], 422);
         }
-
-        $data = $this->comparisonService->buildComparisonData($character, $itemToEquip, $type);
 
         return response()->json($data);
     }
 
+    /**
+     * Compare an item referenced from chat.
+     *
+     * @param ComparisonFromChatValidate $request The validated chat comparison request.
+     * @param Character $character The character performing the comparison.
+     * @return JsonResponse The comparison response.
+     */
     public function compareItemFromChat(ComparisonFromChatValidate $request, Character $character): JsonResponse
     {
         if ($request->source === 'alchemy_bag') {
@@ -108,13 +122,11 @@ class ItemComparisonController extends Controller
             return response()->json(['message' => 'Item is no longer in your inventory.'], 404);
         }
 
-        $type = $itemToEquip->item->type;
+        $data = $this->comparisonService->buildComparisonData($character, $itemToEquip);
 
-        if ($type === 'spell-healing' || $type === 'spell-damage') {
-            $type = 'spell';
+        if (is_null($data)) {
+            return response()->json(['message' => self::UNSUPPORTED_EQUIPMENT_MESSAGE], 422);
         }
-
-        $data = $this->comparisonService->buildComparisonData($character, $itemToEquip, $type);
 
         return response()->json([
             'comparison_data' => $data,

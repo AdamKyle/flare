@@ -34,6 +34,7 @@ class BattleRewardLiveUpdateService
             'gold_dust' => $character->gold_dust,
             'shards' => $character->shards,
             'copper_coins' => $character->copper_coins,
+            'gold_bars' => $character->kingdoms->sum('gold_bars'),
         ];
 
         $this->safelyDispatchBroadcastEvent(

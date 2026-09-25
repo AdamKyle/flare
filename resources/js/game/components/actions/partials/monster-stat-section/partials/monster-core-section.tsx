@@ -1,5 +1,8 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 
+import CurrencyDisplay from '../../../../../reusable-components/currency/currency-display';
+import { CurrencyDisplayMode } from '../../../../../reusable-components/currency/enums/currency-display-mode';
+import { CurrencyType } from '../../../../../reusable-components/currency/enums/currency-type';
 import MonsterSectionProps from '../types/partials/monster-section-props';
 import { getLocationTypeName } from '../util/get-location-type-name';
 
@@ -62,28 +65,41 @@ const MonsterCoreSection = (props: MonsterSectionProps) => {
     );
   };
 
+  const renderConjurationCost = (
+    currency: CurrencyType,
+    cost: number | null
+  ): ReactNode => {
+    if (cost === null) {
+      return '—';
+    }
+
+    return (
+      <CurrencyDisplay
+        currency={currency}
+        amount={cost}
+        display_mode={CurrencyDisplayMode.EXACT}
+        show_label={false}
+      />
+    );
+  };
+
   const renderCelestialCosts = () => {
     if (!monster.is_celestial_entity) {
       return null;
     }
 
-    const goldCost =
-      typeof monster.gold_cost === 'number'
-        ? formatNumberWithCommas(monster.gold_cost)
-        : '—';
-
-    const goldDustCost =
-      typeof monster.gold_dust_cost === 'number'
-        ? formatNumberWithCommas(monster.gold_dust_cost)
-        : '—';
-
     return (
       <>
         <Dt>{renderLabel('Conjuration Cost (Gold)')}</Dt>
-        <Dd>{goldCost}</Dd>
+        <Dd>{renderConjurationCost(CurrencyType.GOLD, monster.gold_cost)}</Dd>
 
         <Dt>{renderLabel('Conjuration Cost (Gold Dust)')}</Dt>
-        <Dd>{goldDustCost}</Dd>
+        <Dd>
+          {renderConjurationCost(
+            CurrencyType.GOLD_DUST,
+            monster.gold_dust_cost
+          )}
+        </Dd>
       </>
     );
   };

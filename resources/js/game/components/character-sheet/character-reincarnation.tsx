@@ -1,7 +1,11 @@
 import React, { ReactNode } from 'react';
 
 import CharacterReincarnationProps from './types/character-reincarnation-props';
-import { formatNumberWithCommas } from '../../util/format-number';
+import CurrencyDisplay from '../../reusable-components/currency/currency-display';
+import { CurrencyDisplayMode } from '../../reusable-components/currency/enums/currency-display-mode';
+import { CurrencyType } from '../../reusable-components/currency/enums/currency-type';
+
+import { formatNumberWithCommas } from 'game-utils/format-number';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
@@ -46,8 +50,13 @@ const CharacterReincarnation = ({
       <div>
         <Alert variant={AlertVariant.INFO}>
           <p className={'my-2'}>
-            You must be max level (5,000) to reincarnate and have 50,000 Copper
-            Coins.
+            You must be max level (5,000) to reincarnate and have{' '}
+            <CurrencyDisplay
+              currency={CurrencyType.COPPER_COINS}
+              amount={50000}
+              display_mode={CurrencyDisplayMode.EXACT}
+            />
+            .
           </p>
           <p className={'my-2'}>
             Reincarnation sets your level back to level 1. You keep all your

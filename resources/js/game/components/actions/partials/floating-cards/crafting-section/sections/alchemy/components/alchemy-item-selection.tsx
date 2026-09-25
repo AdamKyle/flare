@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 
+import AlchemyItemOption from './alchemy-item-option';
 import AlchemyItemSelectionProps from './types/alchemy-item-selection-props';
 
 import Dropdown from 'ui/drop-down/drop-down';
@@ -7,6 +8,7 @@ import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 
 const AlchemyItemSelection = ({
   items,
+  loadedItems,
   selectedItemId,
   loading,
   isLoadingMore,
@@ -22,6 +24,16 @@ const AlchemyItemSelection = ({
 
   const handleSelect = (option: DropdownItem): void => {
     onSelect(Number(option.value));
+  };
+
+  const renderOption = (option: DropdownItem): ReactNode => {
+    const alchemyItem = loadedItems.find((item) => item.id === option.value);
+
+    if (!alchemyItem) {
+      return option.label;
+    }
+
+    return <AlchemyItemOption item={alchemyItem} />;
   };
 
   return (
@@ -46,6 +58,7 @@ const AlchemyItemSelection = ({
         on_end_reached={onEndReached}
         empty_message="No Alchemy items are available."
         disabled={loading}
+        render_item_content={renderOption}
       />
     </div>
   );

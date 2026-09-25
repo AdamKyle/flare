@@ -10,7 +10,6 @@ export enum EventType {
   THE_OLD_CHURCH = 6,
   DELUSIONAL_MEMORIES_EVENT = 7,
   WEEKLY_FACTION_LOYALTY_EVENT = 8,
-  FEEDBACK_EVENT = 9,
 }
 
 const EVENT_TYPE_VALUES: EventType[] = [
@@ -23,7 +22,6 @@ const EVENT_TYPE_VALUES: EventType[] = [
   EventType.THE_OLD_CHURCH,
   EventType.DELUSIONAL_MEMORIES_EVENT,
   EventType.WEEKLY_FACTION_LOYALTY_EVENT,
-  EventType.FEEDBACK_EVENT,
 ];
 
 /**
@@ -50,5 +48,4 @@ export const getEventTypeName = (eventType: EventType): string =>
       EventType.WEEKLY_FACTION_LOYALTY_EVENT,
       () => 'Weekly Faction Loyalty Event'
     )
-    .with(EventType.FEEDBACK_EVENT, () => "Tlessa's Feedback Event")
     .otherwise(() => 'Unknown Event Name');

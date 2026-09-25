@@ -27,7 +27,6 @@ use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Items\Values\RandomAffixTier;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\SkillService;
-use App\Game\Tops\Services\BroadcastTopsUpdateService;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -79,8 +78,6 @@ class DelveExploration implements ShouldQueue
 
     private array $lastFightData = [];
 
-    private BroadcastTopsUpdateService $broadcastTopsUpdateService;
-
     /**
      * @param int $characterId The character id delving.
      * @param int $locationId The Delve location id.
@@ -108,7 +105,6 @@ class DelveExploration implements ShouldQueue
      * @param CharacterCacheData $characterCacheData The character cache data service.
      * @param CharacterRewardService $characterRewardService The character reward service.
      * @param SkillService $skillService The skill service.
-     * @param BroadcastTopsUpdateService $broadcastTopsUpdateService The tops broadcast service.
      * @return void This method does not return a value.
      */
     public function handle(
@@ -117,7 +113,6 @@ class DelveExploration implements ShouldQueue
         CharacterCacheData $characterCacheData,
         CharacterRewardService $characterRewardService,
         SkillService $skillService,
-        BroadcastTopsUpdateService $broadcastTopsUpdateService,
     ): void {
 
         $this->characterRewardService = $characterRewardService;
@@ -125,8 +120,6 @@ class DelveExploration implements ShouldQueue
         $this->skillService = $skillService;
 
         $this->monsterFightService = $monsterFightService;
-
-        $this->broadcastTopsUpdateService = $broadcastTopsUpdateService;
 
         if (is_null($this->character)) {
             return;
@@ -198,7 +191,7 @@ class DelveExploration implements ShouldQueue
 
                 $params['selected_monster_id'] = $this->monster?->id ?? $delveAutomation->monster_id;
 
-                DelveExploration::dispatch($this->character->id, $this->location->id, $this->automationId, $this->delveAutomationId, $params, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onConnection('long_running')->onQueue('default_long');
+                DelveExploration::dispatch($this->character->id, $this->location->id, $this->automationId, $this->delveAutomationId, $params, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onConnection('long_running')->onQueue('delve');
 
                 return;
             }
@@ -664,7 +657,6 @@ class DelveExploration implements ShouldQueue
         ]);
         event(new DelveMonitoringUpdated($this->character->id));
         event(new DelveStatusUpdated($this->character->user->id));
-        $this->broadcastTopsUpdateService->broadcastDelveCurrentMonth();
     }
 
     /**

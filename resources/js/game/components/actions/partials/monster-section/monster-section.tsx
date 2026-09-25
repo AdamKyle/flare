@@ -5,6 +5,7 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 
@@ -12,6 +13,8 @@ import { useAttackMonster } from './api/hooks/use-attack-monster';
 import { AttackType } from './enums/attack-type';
 import { BattleType } from './enums/battle-type';
 import MonsterImageProgression from './enums/monster-images';
+import { useExplorationStatus } from './exploration/api/hooks/use-exploration-status';
+import ExplorationSection from './exploration/components/exploration-section';
 import MonsterExplorationConfiguration from './monster-exploration-configuration';
 import MonsterSectionProps from './types/monster-section-props';
 import { getImageTierByIndex } from './util/monster-image-tier';
@@ -25,10 +28,13 @@ import HealthBar from '../../components/fight-section/health-bar';
 import HealthBarContainer from '../../components/fight-section/health-bar-container';
 import MonsterTopSection from '../../components/fight-section/monster-top-section';
 
+import { AutomationType } from 'game-data/api-data-definitions/character/automation-type';
 import MonsterDefinition from 'game-data/api-data-definitions/monsters/monster-definition';
 import { GameDataError } from 'game-data/components/game-data-error';
 import { useGameData } from 'game-data/hooks/use-game-data';
 
+import { Alert } from 'ui/alerts/alert';
+import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Button from 'ui/buttons/button';
 import { ButtonGradientVarient } from 'ui/buttons/enums/button-gradient-variant';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
@@ -56,6 +62,39 @@ const MonsterSection = ({
   const [monsterToFight, setMonsterToFight] = useState<number | null>(null);
   const [showExplorationConfiguration, setShowExplorationConfiguration] =
     useState(false);
+
+  const characterId = gameData?.character?.id ?? 0;
+  const activeAutomation = gameData?.character?.active_automation ?? null;
+
+  const {
+    data: explorationStatus,
+    loading: explorationStatusLoading,
+    error: explorationStatusError,
+    refetch: refetchExplorationStatus,
+  } = useExplorationStatus(characterId);
+
+  const hasExplorationOutput =
+    !isNil(explorationStatus) && !isNil(explorationStatus.type);
+  const hasActiveExplorationAutomationWithoutOutput =
+    !explorationStatusLoading &&
+    !hasExplorationOutput &&
+    activeAutomation?.type === AutomationType.EXPLORING;
+  const showFullExplorationPanel =
+    hasExplorationOutput || hasActiveExplorationAutomationWithoutOutput;
+
+  const explorationRegionRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (hasExplorationOutput && showExplorationConfiguration) {
+      setShowExplorationConfiguration(false);
+    }
+  }, [hasExplorationOutput, showExplorationConfiguration]);
+
+  useEffect(() => {
+    if (showFullExplorationPanel) {
+      explorationRegionRef.current?.focus({ preventScroll: true });
+    }
+  }, [showFullExplorationPanel]);
 
   const monsters = useMemo(
     () => (Array.isArray(gameData?.monsters) ? gameData.monsters : []),
@@ -164,6 +203,25 @@ const MonsterSection = ({
     return <GameDataError />;
   }
 
+  if (explorationStatusLoading && isNil(explorationStatus)) {
+    return (
+      <div role="status" aria-live="polite">
+        <InfiniteLoaderRoseDanube />
+        <p className="sr-only">Loading Exploration status...</p>
+      </div>
+    );
+  }
+
+  if (
+    explorationStatusError &&
+    isNil(explorationStatus) &&
+    !hasActiveExplorationAutomationWithoutOutput
+  ) {
+    return (
+      <Alert variant={AlertVariant.DANGER}>{explorationStatusError}</Alert>
+    );
+  }
+
   const handleSetupExploration = () => {
     setShowExplorationConfiguration(true);
   };
@@ -204,8 +262,11 @@ const MonsterSection = ({
     if (showExplorationConfiguration) {
       return (
         <MonsterExplorationConfiguration
-          character_id={gameData?.character?.id || 0}
+          character_id={characterId}
+          selected_monster_id={selectedMonster?.id ?? null}
+          active_automation={activeAutomation}
           on_close={handleCloseExplorationConfiguration}
+          on_started={refetchExplorationStatus}
         />
       );
     }
@@ -360,6 +421,22 @@ const MonsterSection = ({
       </>
     );
   };
+
+  if (showFullExplorationPanel && !isCharacterDead) {
+    return (
+      <div
+        ref={explorationRegionRef}
+        tabIndex={-1}
+        className="focus:outline-none"
+      >
+        <ExplorationSection
+          character_id={characterId}
+          status={explorationStatus}
+          on_refetch={refetchExplorationStatus}
+        />
+      </div>
+    );
+  }
 
   return (
     <>

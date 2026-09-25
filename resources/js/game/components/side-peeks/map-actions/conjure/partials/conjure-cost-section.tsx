@@ -1,8 +1,9 @@
 import React from 'react';
 
 import ConjureCostSectionProps from './types/conjure-cost-section-props';
-
-import { formatNumberWithCommas } from 'game-utils/format-number';
+import CurrencyDisplay from '../../../../../reusable-components/currency/currency-display';
+import { CurrencyDisplayMode } from '../../../../../reusable-components/currency/enums/currency-display-mode';
+import { CurrencyType } from '../../../../../reusable-components/currency/enums/currency-type';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
@@ -40,10 +41,24 @@ const ConjureCostSection = ({
 
       <Dl>
         <Dt>Gold Cost:</Dt>
-        <Dd>{formatNumberWithCommas(gold_cost)}</Dd>
+        <Dd>
+          <CurrencyDisplay
+            currency={CurrencyType.GOLD}
+            amount={gold_cost}
+            display_mode={CurrencyDisplayMode.EXACT}
+            show_label={false}
+          />
+        </Dd>
 
         <Dt>Gold Dust Cost:</Dt>
-        <Dd>{formatNumberWithCommas(gold_dust_cost)}</Dd>
+        <Dd>
+          <CurrencyDisplay
+            currency={CurrencyType.GOLD_DUST}
+            amount={gold_dust_cost}
+            display_mode={CurrencyDisplayMode.EXACT}
+            show_label={false}
+          />
+        </Dd>
       </Dl>
 
       {renderCannotAfford()}

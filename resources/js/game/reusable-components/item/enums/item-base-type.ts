@@ -3,4 +3,6 @@ export const ItemBaseTypes = {
   Spell: 'Spell',
   Ring: 'Ring',
   Weapon: 'Weapon',
+  Trinket: 'Trinket',
+  Artifact: 'Artifact',
 } as const;

@@ -30,9 +30,7 @@ class EnchantingAffixService
     ) {}
 
     /**
-     * Fetches the affixes for a character.
-     *
-     * Only returns that which the player has the skill level and intelligence for.
+     * Resolve the Character's available affixes and eligible enchanting inventory/event items.
      *
      * @param Character $character
      * @param bool $ignoreTrinkets

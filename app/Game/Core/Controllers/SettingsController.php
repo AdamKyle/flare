@@ -28,10 +28,10 @@ class SettingsController extends Controller
     /**
      * Display the Settings page for the authenticated User.
      *
-     * @param User $user Authenticated User whose Settings page is being displayed.
+     * @param User $user
      * @return View
      */
-    public function index(User $user)
+    public function index(User $user): View
     {
 
         $canUseCosmeticText = $user->character->questsCompleted->where('quest.unlocks_feature', FeatureType::COSMETIC_TEXT->value)->count() > 0;
@@ -54,11 +54,11 @@ class SettingsController extends Controller
     /**
      * Update the authenticated User's chat message display preferences.
      *
-     * @param Request $request Request containing chat-setting changes.
-     * @param User $user Authenticated User being updated.
+     * @param Request $request
+     * @param User $user
      * @return RedirectResponse
      */
-    public function chatSettings(Request $request, User $user)
+    public function chatSettings(Request $request, User $user): RedirectResponse
     {
 
         $user->update([
@@ -79,6 +79,8 @@ class SettingsController extends Controller
             'show_gold_dust_per_kill' => $request->has('show_gold_dust_per_kill') ? $request->show_gold_dust_per_kill : false,
             'show_shards_per_kill' => $request->has('show_shards_per_kill') ? $request->show_shards_per_kill : false,
             'show_copper_coins_per_kill' => $request->has('show_copper_coins_per_kill') ? $request->show_copper_coins_per_kill : false,
+            'show_global_gem_progression_xp_messages' => $request->has('show_global_gem_progression_xp_messages') ? $request->show_global_gem_progression_xp_messages : false,
+            'show_personal_gem_progression_xp_messages' => $request->has('show_personal_gem_progression_xp_messages') ? $request->show_personal_gem_progression_xp_messages : false,
             'show_faction_point_message' => $request->has('show_faction_point_message') ? $request->show_faction_point_message : false,
         ]);
 
@@ -88,11 +90,11 @@ class SettingsController extends Controller
     /**
      * Update the authenticated User's auto-disenchant preferences.
      *
-     * @param Request $request Request containing auto-disenchant setting changes.
-     * @param User $user Authenticated User being updated.
+     * @param Request $request
+     * @param User $user
      * @return RedirectResponse
      */
-    public function autoDisenchantSettings(Request $request, User $user)
+    public function autoDisenchantSettings(Request $request, User $user): RedirectResponse
     {
         if (filter_var($request->auto_disenchant, FILTER_VALIDATE_BOOLEAN) === false) {
             $request->merge([
@@ -116,11 +118,11 @@ class SettingsController extends Controller
     /**
      * Update the authenticated User's attack type pop-over preference.
      *
-     * @param Request $request Request containing the attack type pop-over setting change.
-     * @param User $user Authenticated User being updated.
+     * @param Request $request
+     * @param User $user
      * @return RedirectResponse
      */
-    public function disableAttackTypePopOvers(Request $request, User $user)
+    public function disableAttackTypePopOvers(Request $request, User $user): RedirectResponse
     {
 
         $user->update([
@@ -135,11 +137,11 @@ class SettingsController extends Controller
     /**
      * Update the authenticated User's Character name.
      *
-     * @param Request $request Request containing the new Character name.
-     * @param User $user Authenticated User being updated.
+     * @param Request $request
+     * @param User $user
      * @return RedirectResponse
      */
-    public function characterSettings(Request $request, User $user)
+    public function characterSettings(Request $request, User $user): RedirectResponse
     {
         $request->validate([
             'name' => 'required|string|max:15|min:5|unique:characters|regex:/^[a-zA-Z0-9]+$/',
@@ -155,11 +157,11 @@ class SettingsController extends Controller
     /**
      * Update the authenticated User's guide enabled preference.
      *
-     * @param Request $request Request containing the guide-enabled setting change.
-     * @param User $user Authenticated User being updated.
+     * @param Request $request
+     * @param User $user
      * @return RedirectResponse
      */
-    public function guideSettings(Request $request, User $user)
+    public function guideSettings(Request $request, User $user): RedirectResponse
     {
 
         if (filter_var($request->guide_enabled, FILTER_VALIDATE_BOOLEAN)) {
@@ -176,11 +178,11 @@ class SettingsController extends Controller
     /**
      * Update the authenticated User's cosmetic chat text options.
      *
-     * @param CosmeticTextRequest $request Request containing cosmetic text options.
-     * @param User $user Authenticated User being updated.
+     * @param CosmeticTextRequest $request
+     * @param User $user
      * @return RedirectResponse
      */
-    public function cosmeticText(CosmeticTextRequest $request, User $user)
+    public function cosmeticText(CosmeticTextRequest $request, User $user): RedirectResponse
     {
 
         if ($user->character->questsCompleted->where('quest.unlocks_feature', FeatureType::COSMETIC_TEXT->value)->count() <= 0) {
@@ -199,11 +201,11 @@ class SettingsController extends Controller
     /**
      * Update the authenticated User's cosmetic name tag option.
      *
-     * @param NameTagRequest $request Request containing the nametag setting.
-     * @param User $user Authenticated User being updated.
+     * @param NameTagRequest $request
+     * @param User $user
      * @return RedirectResponse
      */
-    public function cosmeticNametag(NameTagRequest $request, User $user)
+    public function cosmeticNametag(NameTagRequest $request, User $user): RedirectResponse
     {
 
         if ($user->character->questsCompleted->where('quest.unlocks_feature', FeatureType::COSMETIC_NAME_TAGS->value)->count() <= 0) {
@@ -228,11 +230,11 @@ class SettingsController extends Controller
     /**
      * Update the authenticated User's Character Race via the cosmetic Race changer.
      *
-     * @param RaceChangerRequest $request Request containing the Race selection.
-     * @param User $user Authenticated User whose Character Race is changed.
+     * @param RaceChangerRequest $request
+     * @param User $user
      * @return RedirectResponse
      */
-    public function cosmeticRaceChanger(RaceChangerRequest $request, User $user)
+    public function cosmeticRaceChanger(RaceChangerRequest $request, User $user): RedirectResponse
     {
 
         if ($user->character->questsCompleted->where('quest.unlocks_feature', FeatureType::COSMETIC_RACE_CHANGER->value)->count() <= 0) {

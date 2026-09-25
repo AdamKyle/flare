@@ -1,10 +1,14 @@
 import React, { ReactNode } from 'react';
 
+import CurrencyDisplay from '../../currency/currency-display';
+import { CurrencyDisplayMode } from '../../currency/enums/currency-display-mode';
+import { CurrencyType } from '../../currency/enums/currency-type';
+import MonsterDetailProps from '../types/monster-detail-props';
+
 import {
   formatNumberWithCommas,
   formatPercent,
-} from '../../../util/format-number';
-import MonsterDetailProps from '../types/monster-detail-props';
+} from 'game-utils/format-number';
 
 import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
@@ -20,6 +24,26 @@ const MonsterRewardsSection = ({ monster }: MonsterDetailProps): ReactNode => {
     return null;
   }
 
+  const renderGoldReward = (): ReactNode => {
+    if (identity.gold <= 0) {
+      return null;
+    }
+
+    return (
+      <>
+        <Dt>Gold</Dt>
+        <Dd>
+          <CurrencyDisplay
+            currency={CurrencyType.GOLD}
+            amount={identity.gold}
+            display_mode={CurrencyDisplayMode.EXACT}
+            show_label={false}
+          />
+        </Dd>
+      </>
+    );
+  };
+
   return (
     <div>
       <h2 className="text-marigold-700 dark:text-marigold-500 mb-2 text-base font-semibold">
@@ -32,12 +56,7 @@ const MonsterRewardsSection = ({ monster }: MonsterDetailProps): ReactNode => {
             <Dd>{formatNumberWithCommas(identity.xp)}</Dd>
           </>
         )}
-        {identity.gold > 0 && (
-          <>
-            <Dt>Gold</Dt>
-            <Dd>{formatNumberWithCommas(identity.gold)}</Dd>
-          </>
-        )}
+        {renderGoldReward()}
         {identity.drop_check > 0 && (
           <>
             <Dt>Drop Check</Dt>

@@ -1,5 +1,6 @@
 import { BaseItemDetails } from './base-item-details';
 import { EquippableItemWithBase } from './equippable-item-definitions/base-equippable-item-definition';
+import { InventoryItemTypes } from '../../components/character-sheet/partials/character-inventory/enums/inventory-item-types';
 
 export interface SkillSummaryAdjustment {
   skill_name: string;
@@ -49,7 +50,17 @@ export interface ItemComparisonRow {
   item_to_equip: BaseItemDetails;
 }
 
-export interface ItemComparison {
+export interface ComparisonItemToEquip {
+  item_id: number;
+  name: string;
+  type: InventoryItemTypes;
+  cost: number;
+  slot_id: number | null;
+}
+
+export interface ItemComparison<
+  TItemToEquip extends ComparisonItemToEquip = ComparisonItemToEquip,
+> {
   details: ItemComparisonRow[];
-  item_to_equip: EquippableItemWithBase;
+  item_to_equip: TItemToEquip;
 }

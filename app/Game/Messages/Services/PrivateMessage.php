@@ -14,58 +14,71 @@ use Carbon\Carbon;
 class PrivateMessage
 {
     /**
-     * Send a private message.
+     * Deliver a private message to an online Character or an NPC and report whether it was delivered.
      *
-     * - Can send a private message to a character.
-     * - Can send a message to a NPC.
-     *
-     * Will get back a server message telling the player they do not exist.
+     * @param string $userName
+     * @param string $message
+     * @return bool
      */
-    public function sendPrivateMessage(string $userName, string $message): void
+    public function sendPrivateMessage(string $userName, string $message): bool
     {
-
+        $user = auth()->user();
         $character = $this->getCharacterForSendingTo($userName);
 
         if (! is_null($character)) {
-            $this->sendMessageToCharacter($character, $message);
-
-            return;
+            return $this->sendMessageToCharacter($user, $character, $message);
         }
 
         $npc = $this->getNPCForSendingTo($userName);
-        $user = auth()->user();
 
         if (! is_null($npc)) {
             event(new NPCMessageEvent($user, $this->buildNPCMessage($npc), $npc->name));
 
-            return;
+            return true;
         }
 
         event(new ServerMessageEvent($user, 'No Character or NPC exists for: '.$userName));
+
+        return false;
     }
 
     /**
-     * Get character for the message.
+     * Find the Character the message is addressed to.
+     *
+     * @param string $userName
+     * @return ?Character
      */
-    protected function getCharacterForSendingTo(string $userName): ?Character
+    private function getCharacterForSendingTo(string $userName): ?Character
     {
         return Character::where('name', $userName)->first();
     }
 
     /**
-     * Get NPC for the message.
+     * Find the NPC the message is addressed to.
+     *
+     * @param string $userName
+     * @return ?Npc
      */
-    protected function getNPCForSendingTo(string $userName): ?Npc
+    private function getNPCForSendingTo(string $userName): ?Npc
     {
         return Npc::where('name', $userName)->first();
     }
 
     /**
-     * Send a message to the character.
+     * Persist and broadcast the message to the Character when they are online.
+     *
+     * @param User $user
+     * @param Character $character
+     * @param string $message
+     * @return bool
      */
-    protected function sendMessageToCharacter(Character $character, string $message): void
+    private function sendMessageToCharacter(User $user, Character $character, string $message): bool
     {
-        $user = auth()->user();
+        if (! $character->isLoggedIn()) {
+            event(new ServerMessageEvent($user, 'This character is not online, your message was not delivered.'));
+
+            return false;
+        }
 
         $user->messages()->create([
             'from_user' => $user->id,
@@ -76,20 +89,26 @@ class PrivateMessage
         broadcast(new PrivateMessageEvent($user->refresh(), $character->user, $message));
 
         broadcast(new UpdateAdminChatEvent($this->getAdminUser()));
+
+        return true;
     }
 
     /**
-     * Build the NPC Message.
+     * Build the NPC's reply to a private message.
+     *
+     * @param Npc $npc
+     * @return string
      */
-    protected function buildNPCMessage(Npc $npc): string
+    private function buildNPCMessage(Npc $npc): string
     {
         return 'My name is: '.$npc->real_name.'. '.$this->getNPCTypeMessage($npc);
     }
 
     /**
-     * Build NPC message for type.
+     * Resolve the NPC reply text for the NPC's type.
      *
-     * Returns a default message if the NPC does not exist.
+     * @param Npc $npc
+     * @return string
      */
     private function getNPCTypeMessage(Npc $npc): string
     {
@@ -132,13 +151,15 @@ class PrivateMessage
     }
 
     /**
-     * Get the admin user.
+     * Find the Admin user who receives admin chat updates.
+     *
+     * @return User
      */
-    protected function getAdminUser(): User
+    private function getAdminUser(): User
     {
         return User::with('roles')
-            ->whereHas('roles', function ($q) {
-                $q->where('name', 'Admin');
+            ->whereHas('roles', function ($query) {
+                $query->where('name', 'Admin');
             })->first();
     }
 }

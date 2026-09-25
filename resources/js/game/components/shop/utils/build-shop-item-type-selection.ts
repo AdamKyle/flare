@@ -12,7 +12,7 @@ const shopTypes = [
   InventoryItemTypes.CLAW,
   InventoryItemTypes.SWORD,
   InventoryItemTypes.STAVE,
-  InventoryItemTypes.CENSOR,
+  InventoryItemTypes.CENSER,
   InventoryItemTypes.SCRATCH_AWL,
   InventoryItemTypes.DAGGER,
   InventoryItemTypes.RING,

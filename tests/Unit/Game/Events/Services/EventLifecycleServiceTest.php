@@ -7,11 +7,13 @@ use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\Location;
 use App\Flare\Models\RaidBoss;
 use App\Game\Events\Jobs\InitiateWeeklyCelestialSpawnEvent;
-use App\Game\Events\Services\EventLifecycleService;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\ScheduledEventStatus;
 use App\Game\Maps\Values\MapName;
+use App\Game\Quests\Events\UpdateRaidQuests;
+use ErrorException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event as EventFacade;
 use RuntimeException;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
@@ -40,7 +42,7 @@ class EventLifecycleServiceTest extends TestCase
             'scheduled_event_id' => $scheduledEvent->id,
         ]);
 
-        resolve(EventLifecycleService::class)->cancel($scheduledEvent);
+        $this->artisan('end:scheduled-event', ['eventId' => $scheduledEvent->id])->assertExitCode(0);
 
         $this->assertEquals(0, Event::where('scheduled_event_id', $scheduledEvent->id)->count());
         $this->assertEquals(ScheduledEventStatus::CANCELLED, $scheduledEvent->fresh()->status);
@@ -53,7 +55,7 @@ class EventLifecycleServiceTest extends TestCase
             'status' => ScheduledEventStatus::QUEUED,
         ]);
 
-        resolve(EventLifecycleService::class)->cancel($scheduledEvent);
+        $this->artisan('end:scheduled-event', ['eventId' => $scheduledEvent->id])->assertExitCode(0);
 
         $scheduledEvent = $scheduledEvent->fresh();
 
@@ -92,7 +94,7 @@ class EventLifecycleServiceTest extends TestCase
             'scheduled_event_id' => $scheduledEventTwo->id,
         ]);
 
-        resolve(EventLifecycleService::class)->cancel($scheduledEventTwo);
+        $this->artisan('end:scheduled-event', ['eventId' => $scheduledEventTwo->id])->assertExitCode(0);
 
         $this->assertEquals(0, Event::where('id', $eventTwo->id)->count());
         $this->assertEquals(ScheduledEventStatus::RUNNING, $scheduledEventOne->fresh()->status);
@@ -120,7 +122,7 @@ class EventLifecycleServiceTest extends TestCase
 
         $this->expectException(RuntimeException::class);
 
-        resolve(EventLifecycleService::class)->cancel($scheduledEvent);
+        $this->artisan('end:scheduled-event', ['eventId' => $scheduledEvent->id])->run();
     }
 
     public function test_one_different_map_raid_cancellation_leaves_other_raid_active(): void
@@ -154,7 +156,7 @@ class EventLifecycleServiceTest extends TestCase
             'status' => ScheduledEventStatus::QUEUED,
         ]);
 
-        resolve(EventLifecycleService::class)->cancel($scheduleOne);
+        $this->artisan('end:scheduled-event', ['eventId' => $scheduleOne->id])->assertExitCode(0);
 
         $this->assertEquals(ScheduledEventStatus::CANCELLED, $scheduleOne->fresh()->status);
         $this->assertEquals(ScheduledEventStatus::QUEUED, $scheduleTwo->fresh()->status);
@@ -183,10 +185,52 @@ class EventLifecycleServiceTest extends TestCase
             'status' => ScheduledEventStatus::QUEUED,
         ]);
 
-        resolve(EventLifecycleService::class)->cancel($child);
+        $this->artisan('end:scheduled-event', ['eventId' => $child->id])->assertExitCode(0);
 
         $this->assertEquals(ScheduledEventStatus::CANCELLED, $child->fresh()->status);
         $this->assertEquals(ScheduledEventStatus::RUNNING, $parent->fresh()->status);
+    }
+
+    public function test_raid_teardown_broadcasts_raid_quests_after_the_runtime_raid_event_is_removed(): void
+    {
+        $gameMap = $this->createGameMap();
+        $location = $this->createLocation(['game_map_id' => $gameMap->id]);
+        $raid = $this->createRaid([
+            'raid_boss_id' => $this->createMonster()->id,
+            'raid_boss_location_id' => $location->id,
+            'corrupted_location_ids' => [],
+        ]);
+
+        $scheduledEvent = $this->createScheduledEvent([
+            'event_type' => EventType::RAID_EVENT,
+            'raid_id' => $raid->id,
+            'status' => ScheduledEventStatus::RUNNING,
+            'currently_running' => true,
+        ]);
+
+        Event::create([
+            'type' => EventType::RAID_EVENT,
+            'raid_id' => $raid->id,
+            'scheduled_event_id' => $scheduledEvent->id,
+            'started_at' => now()->subMinutes(5),
+            'ends_at' => now()->addMinutes(5),
+        ]);
+
+        $broadcasts = [];
+
+        EventFacade::listen(UpdateRaidQuests::class, function (UpdateRaidQuests $update) use (&$broadcasts) {
+            $broadcasts[] = [
+                'raid_event_exists' => Event::whereNotNull('raid_id')->exists(),
+                'raid_quests' => $update->raidQuests,
+            ];
+        });
+
+        $this->artisan('end:scheduled-event', ['eventId' => $scheduledEvent->id])->assertExitCode(0);
+
+        $finalBroadcast = end($broadcasts);
+
+        $this->assertFalse($finalBroadcast['raid_event_exists']);
+        $this->assertSame([], $finalBroadcast['raid_quests']);
     }
 
     public function test_natural_end_marks_completed_not_cancelled(): void
@@ -204,7 +248,7 @@ class EventLifecycleServiceTest extends TestCase
             'scheduled_event_id' => $scheduledEvent->id,
         ]);
 
-        resolve(EventLifecycleService::class)->completeNaturallyExpired();
+        $this->artisan('end:scheduled-event')->assertExitCode(0);
 
         $scheduledEvent = $scheduledEvent->fresh();
 
@@ -227,7 +271,7 @@ class EventLifecycleServiceTest extends TestCase
             'scheduled_event_id' => $scheduledEvent->id,
         ]);
 
-        resolve(EventLifecycleService::class)->cancel($scheduledEvent);
+        $this->artisan('end:scheduled-event', ['eventId' => $scheduledEvent->id])->assertExitCode(0);
 
         $scheduledEvent = $scheduledEvent->fresh();
 
@@ -254,7 +298,7 @@ class EventLifecycleServiceTest extends TestCase
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
         ]);
 
-        resolve(EventLifecycleService::class)->cancel($scheduledEvent);
+        $this->artisan('end:scheduled-event', ['eventId' => $scheduledEvent->id])->assertExitCode(0);
 
         $this->assertEquals(1, GlobalEventGoal::where('id', $unrelatedGoal->id)->count());
     }
@@ -318,7 +362,7 @@ class EventLifecycleServiceTest extends TestCase
             'ends_at' => now()->addMinutes(5),
         ]);
 
-        resolve(EventLifecycleService::class)->cancel($parent);
+        $this->artisan('end:scheduled-event', ['eventId' => $parent->id])->assertExitCode(0);
 
         $this->assertEquals(ScheduledEventStatus::CANCELLED, $child->fresh()->status);
         $this->assertEquals(ScheduledEventStatus::CANCELLED, $parent->fresh()->status);
@@ -376,7 +420,7 @@ class EventLifecycleServiceTest extends TestCase
             'ends_at' => now()->addMinutes(5),
         ]);
 
-        resolve(EventLifecycleService::class)->cancel($parent);
+        $this->artisan('end:scheduled-event', ['eventId' => $parent->id])->assertExitCode(0);
 
         $this->assertEquals(ScheduledEventStatus::CANCELLED, $child->fresh()->status);
         $this->assertEquals(ScheduledEventStatus::CANCELLED, $parent->fresh()->status);
@@ -468,7 +512,7 @@ class EventLifecycleServiceTest extends TestCase
             'ends_at' => now()->addMinutes(5),
         ]);
 
-        resolve(EventLifecycleService::class)->cancel($parentOne);
+        $this->artisan('end:scheduled-event', ['eventId' => $parentOne->id])->assertExitCode(0);
 
         $this->assertEquals(ScheduledEventStatus::CANCELLED, $childOne->fresh()->status);
         $this->assertEquals(ScheduledEventStatus::RUNNING, $childTwo->fresh()->status);
@@ -527,7 +571,7 @@ class EventLifecycleServiceTest extends TestCase
             'end_date' => now()->addMinutes(10),
         ]);
 
-        resolve(EventLifecycleService::class)->cancel($parent);
+        $this->artisan('end:scheduled-event', ['eventId' => $parent->id])->assertExitCode(0);
 
         $this->assertEquals(1, RaidBoss::where('id', $raidBoss->id)->count());
         $this->assertTrue(Location::find($location->id)->is_corrupted);
@@ -563,7 +607,7 @@ class EventLifecycleServiceTest extends TestCase
             'end_date' => now()->addMinutes(10),
         ]);
 
-        resolve(EventLifecycleService::class)->cancel($parent);
+        $this->artisan('end:scheduled-event', ['eventId' => $parent->id])->assertExitCode(0);
 
         $futureChild = $futureChild->fresh();
 
@@ -600,7 +644,7 @@ class EventLifecycleServiceTest extends TestCase
             'end_date' => now()->subMinutes(15),
         ]);
 
-        resolve(EventLifecycleService::class)->cancel($parent);
+        $this->artisan('end:scheduled-event', ['eventId' => $parent->id])->assertExitCode(0);
 
         $this->assertEquals(ScheduledEventStatus::COMPLETED, $completedChild->fresh()->status);
     }
@@ -635,7 +679,7 @@ class EventLifecycleServiceTest extends TestCase
             'cancelled_at' => now()->subMinutes(15),
         ]);
 
-        resolve(EventLifecycleService::class)->cancel($parent);
+        $this->artisan('end:scheduled-event', ['eventId' => $parent->id])->assertExitCode(0);
 
         $this->assertEquals(ScheduledEventStatus::CANCELLED, $cancelledChild->fresh()->status);
         $this->assertEquals($cancelledChild->cancelled_at->timestamp, $cancelledChild->fresh()->cancelled_at->timestamp);
@@ -670,7 +714,7 @@ class EventLifecycleServiceTest extends TestCase
             'end_date' => now()->subMinutes(15),
         ]);
 
-        resolve(EventLifecycleService::class)->cancel($parent);
+        $this->artisan('end:scheduled-event', ['eventId' => $parent->id])->assertExitCode(0);
 
         $this->assertEquals(ScheduledEventStatus::FAILED, $failedChild->fresh()->status);
     }
@@ -719,10 +763,10 @@ class EventLifecycleServiceTest extends TestCase
 
         $child->update(['raid_id' => null]);
 
-        $this->expectException(\ErrorException::class);
+        $this->expectException(ErrorException::class);
         $this->expectExceptionMessage('Attempt to read property "name" on null');
 
-        resolve(EventLifecycleService::class)->cancel($parent);
+        $this->artisan('end:scheduled-event', ['eventId' => $parent->id])->run();
     }
 
     public function test_cancelling_one_winter_instance_does_not_end_concurrent_delusional_instance(): void
@@ -760,7 +804,7 @@ class EventLifecycleServiceTest extends TestCase
             'ends_at' => now()->addMinutes(5),
         ]);
 
-        resolve(EventLifecycleService::class)->cancel($winterParent);
+        $this->artisan('end:scheduled-event', ['eventId' => $winterParent->id])->assertExitCode(0);
 
         $this->assertEquals(ScheduledEventStatus::CANCELLED, $winterParent->fresh()->status);
         $this->assertEquals(ScheduledEventStatus::RUNNING, $delusionalParent->fresh()->status);
@@ -815,7 +859,7 @@ class EventLifecycleServiceTest extends TestCase
             'event_type' => EventType::WEEKLY_CELESTIALS,
         ]);
 
-        resolve(EventLifecycleService::class)->cancel($parent);
+        $this->artisan('end:scheduled-event', ['eventId' => $parent->id])->assertExitCode(0);
 
         $this->assertEquals(1, GlobalEventGoal::where('id', $unrelatedGoal->id)->count());
     }

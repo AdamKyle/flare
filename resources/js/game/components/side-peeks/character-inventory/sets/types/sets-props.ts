@@ -5,4 +5,5 @@ export default interface SetsProps extends SidePeekProps {
   initial_search_text?: string;
   initial_set_id?: number;
   initial_set_name?: string;
+  on_equipment_changed?: () => void;
 }

@@ -31,7 +31,7 @@ export const isSetEquippable = (setItems: UseGetSetEquippabilityResponse[]) => {
 
   const weaponTypes = [
     InventoryItemTypes.BOW,
-    InventoryItemTypes.CENSOR,
+    InventoryItemTypes.CENSER,
     InventoryItemTypes.CLAW,
     InventoryItemTypes.DAGGER,
     InventoryItemTypes.FAN,

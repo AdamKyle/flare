@@ -1,15 +1,18 @@
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import { AnimatePresence } from 'framer-motion';
 import { isNil } from 'lodash';
-import React, { Fragment, ReactNode, useState } from 'react';
+import React, { ReactNode, useState } from 'react';
 
 import { planeTextItemColors } from '../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
+import InventoryStackBody from '../components/inventory-stack-body';
+import { useEquipmentManagementRestriction } from '../hooks/use-equipment-management-restriction';
 import { useGetInventoryItemDetails } from './api/hooks/use-get-inventory-item-details';
 import { useProcessItemAction } from './api/hooks/use-process-item-action';
 import AttachedAffixDetails from './attached-affix/attached-affix-details';
 import AttachedHolyStacks from './attached-holy-stacks/attached-holy-stacks';
 import InventoryItemActionButton from './inventory-item-action-button';
+import ItemSkillTreeManager from './item-skills/item-skill-tree-manager';
 import EquipItem from './partials/equip/equip-item';
 import AffixesSection from './partials/item-view/affixes-section';
 import AmbushCounterSection from './partials/item-view/ambush-and-counter-section';
@@ -21,15 +24,19 @@ import ItemMetaSection from './partials/item-view/item-meta-tsx';
 import StatsSection from './partials/item-view/stats-section';
 import MoveToSet from './partials/move-to-set/move-to-set';
 import InventoryItemProps from './types/inventory-item-props';
-import { EquippableItemWithBase } from '../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
+import { EquippableItemDetailsDefinition } from '../../../../api-definitions/items/equippable-item-definitions/equippable-item-details-definition';
 import { ItemActions } from '../../../../reusable-components/item/enums/item-actions';
 import ItemAction from '../../../../reusable-components/item/item-action';
 import ListItemOnMarket from '../../../../reusable-components/item/list-item-on-market';
+import { InventoryItemTypes } from '../../../character-sheet/partials/character-inventory/enums/inventory-item-types';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 
+import { Alert } from 'ui/alerts/alert';
+import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
+import { StackedCardContentMode } from 'ui/cards/enums/stacked-card-content-mode';
 import StackedCard from 'ui/cards/stacked-card';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 import Separator from 'ui/separator/separator';
@@ -38,16 +45,18 @@ const InventoryItem = ({
   slot_id,
   character_id,
   on_action,
+  show_actions = true,
 }: InventoryItemProps) => {
   const [itemAffixToView, setItemAffixToView] = useState<number | null>(null);
   const [shouldViewHolyStacks, setShouldViewHolyStacks] = useState(false);
   const [viewingEquip, setViewingEquip] = useState(false);
   const [listItem, setListItem] = useState(false);
   const [moveItem, setMoveItem] = useState(false);
+  const [viewingItemSkills, setViewingItemSkills] = useState(false);
   const [selectedItemAction, setSelectedItemAction] =
     useState<ItemActions | null>(null);
 
-  const { error, loading, data } = useGetInventoryItemDetails({
+  const { error, loading, data, refetch } = useGetInventoryItemDetails({
     character_id,
     slot_id,
     url: CharacterInventoryApiUrls.CHARACTER_INVENTORY_ITEM,
@@ -59,6 +68,11 @@ const InventoryItem = ({
     setRequestData,
     resetError,
   } = useProcessItemAction();
+
+  const {
+    is_restricted: isEquipmentRestricted,
+    restriction_message: equipmentRestrictionMessage,
+  } = useEquipmentManagementRestriction();
 
   if (loading) {
     return (
@@ -80,7 +94,15 @@ const InventoryItem = ({
     );
   }
 
-  const item = data as EquippableItemWithBase;
+  if (!('item_skills' in data)) {
+    return (
+      <div className="px-4">
+        <GameDataError />
+      </div>
+    );
+  }
+
+  const item: EquippableItemDetailsDefinition = data;
 
   const handleClickItemAffix = (affixId?: number) => {
     if (!affixId) {
@@ -145,13 +167,19 @@ const InventoryItem = ({
     }
 
     return (
-      <StackedCard on_close={handleCloseViewEquip}>
-        <EquipItem
-          character_id={character_id}
-          slot_id={item.slot_id}
-          item_to_equip_type={item.type}
-          on_equip={on_action}
-        />
+      <StackedCard
+        on_close={handleCloseViewEquip}
+        aria_label="Equip Item"
+        content_mode={StackedCardContentMode.FULL_BLEED}
+      >
+        <InventoryStackBody>
+          <EquipItem
+            character_id={character_id}
+            slot_id={item.slot_id}
+            item_to_equip_type={item.type}
+            on_equip={on_action}
+          />
+        </InventoryStackBody>
       </StackedCard>
     );
   };
@@ -162,12 +190,20 @@ const InventoryItem = ({
     }
 
     return (
-      <StackedCard on_close={handleCloseMoveToSet}>
-        <MoveToSet
-          character_id={character_id}
-          item_slot_id={item.slot_id}
-          on_action={on_action}
-        />
+      <StackedCard
+        on_close={handleCloseMoveToSet}
+        aria_label="Move To Set"
+        content_mode={StackedCardContentMode.FULL_BLEED}
+      >
+        <InventoryStackBody>
+          <div className="px-4">
+            <MoveToSet
+              character_id={character_id}
+              item_slot_id={item.slot_id}
+              on_action={on_action}
+            />
+          </div>
+        </InventoryStackBody>
       </StackedCard>
     );
   };
@@ -187,13 +223,21 @@ const InventoryItem = ({
       itemAffix = item?.item_prefix;
     }
 
-    if (itemAffix) {
-      return (
-        <StackedCard on_close={handleCloseItemAffixView}>
-          <AttachedAffixDetails affix={itemAffix} />
-        </StackedCard>
-      );
+    if (!itemAffix) {
+      return null;
     }
+
+    return (
+      <StackedCard
+        on_close={handleCloseItemAffixView}
+        aria_label="Affix Details"
+        content_mode={StackedCardContentMode.FULL_BLEED}
+      >
+        <InventoryStackBody>
+          <AttachedAffixDetails affix={itemAffix} />
+        </InventoryStackBody>
+      </StackedCard>
+    );
   };
 
   const renderAttachedHolyStacksView = () => {
@@ -202,9 +246,41 @@ const InventoryItem = ({
     }
 
     return (
-      <StackedCard on_close={() => setShouldViewHolyStacks(false)}>
-        <AttachedHolyStacks stacks={item.applied_stacks} />
+      <StackedCard
+        on_close={() => setShouldViewHolyStacks(false)}
+        aria_label="Holy Stack Details"
+        content_mode={StackedCardContentMode.FULL_BLEED}
+      >
+        <InventoryStackBody>
+          <AttachedHolyStacks stacks={item.applied_stacks} />
+        </InventoryStackBody>
       </StackedCard>
+    );
+  };
+
+  const renderActions = () => {
+    if (!show_actions) {
+      return null;
+    }
+
+    return (
+      <>
+        {renderEquipmentRestriction()}
+        {renderActionSection()}
+        <Separator />
+      </>
+    );
+  };
+
+  const renderEquipmentRestriction = () => {
+    if (equipmentRestrictionMessage === null) {
+      return null;
+    }
+
+    return (
+      <Alert variant={AlertVariant.WARNING}>
+        {equipmentRestrictionMessage}
+      </Alert>
     );
   };
 
@@ -251,6 +327,7 @@ const InventoryItem = ({
             on_click={handleViewEquip}
             label="Equip Item"
             variant={ButtonVariant.SUCCESS}
+            disabled={isEquipmentRestricted}
           />
         </div>
 
@@ -271,7 +348,7 @@ const InventoryItem = ({
   const ac = Number(item.raw_ac ?? item.base_ac ?? 0);
   const healing = Number(item.raw_healing ?? item.base_healing ?? 0);
 
-  const sectionsRaw: ReactNode[] = [
+  const sections: ReactNode[] = [
     <AffixesSection
       key="affixes"
       prefix={item.item_prefix}
@@ -307,7 +384,32 @@ const InventoryItem = ({
     />,
   ];
 
-  const sections = sectionsRaw.filter(Boolean) as ReactNode[];
+  const canViewItemSkills =
+    item.type === InventoryItemTypes.ARTIFACT &&
+    item.item_skills.length > 0 &&
+    item.item_skill_progressions.length > 0;
+
+  const renderItemSkillTree = (): ReactNode => {
+    if (!viewingItemSkills || !canViewItemSkills) {
+      return null;
+    }
+
+    return (
+      <StackedCard
+        on_close={() => setViewingItemSkills(false)}
+        aria_label="Ancestral Skill Tree"
+        content_mode={StackedCardContentMode.FULL_BLEED}
+      >
+        <InventoryStackBody>
+          <ItemSkillTreeManager
+            character_id={character_id}
+            item={item}
+            refetch={refetch}
+          />
+        </InventoryStackBody>
+      </StackedCard>
+    );
+  };
 
   return (
     <>
@@ -319,13 +421,20 @@ const InventoryItem = ({
           titleClassName={planeTextItemColors(item)}
         />
         <Separator />
-        {renderActionSection()}
-        <Separator />
+        {renderActions()}
 
         <div className="space-y-4">
-          {sections.map((section, index) => (
-            <Fragment key={index}>{section}</Fragment>
-          ))}
+          {sections}
+          {canViewItemSkills ? (
+            <div className="flex justify-center pt-2">
+              <Button
+                on_click={() => setViewingItemSkills(true)}
+                label="View Ancestral Skill Tree"
+                aria_label="Ancestral Skill Tree"
+                variant={ButtonVariant.PRIMARY}
+              />
+            </div>
+          ) : null}
         </div>
       </div>
       <AnimatePresence mode="wait">{renderEquipItem()}</AnimatePresence>
@@ -334,6 +443,7 @@ const InventoryItem = ({
       <AnimatePresence mode="wait">
         {renderAttachedHolyStacksView()}
       </AnimatePresence>
+      <AnimatePresence mode="wait">{renderItemSkillTree()}</AnimatePresence>
     </>
   );
 };

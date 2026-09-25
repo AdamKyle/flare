@@ -1,5 +1,8 @@
 import React, { ReactNode } from 'react';
 
+import CurrencyDisplay from '../../../../../../../../../reusable-components/currency/currency-display';
+import { CurrencyDisplayMode } from '../../../../../../../../../reusable-components/currency/enums/currency-display-mode';
+import { CurrencyType } from '../../../../../../../../../reusable-components/currency/enums/currency-type';
 import BatchCraftingDetailSection from '../batch-crafting-detail-section';
 import BatchCraftingOutcomeChart from '../batch-crafting-outcome-chart';
 import BatchCraftingRunningSectionProps from './types/batch-crafting-running-section-props';
@@ -116,9 +119,23 @@ const CraftEventRunningSection = ({
           </dt>
           <dd>{(event?.crafting_xp_gained ?? 0).toLocaleString()}</dd>
           <dt className="text-gray-600 dark:text-gray-400">Gold Spent</dt>
-          <dd>{batch.gold_spent.toLocaleString()}</dd>
+          <dd>
+            <CurrencyDisplay
+              currency={CurrencyType.GOLD}
+              amount={batch.gold_spent}
+              display_mode={CurrencyDisplayMode.EXACT}
+              show_label={false}
+            />
+          </dd>
           <dt className="text-gray-600 dark:text-gray-400">Gold Left</dt>
-          <dd>{batch.gold_left.toLocaleString()}</dd>
+          <dd>
+            <CurrencyDisplay
+              currency={CurrencyType.GOLD}
+              amount={batch.gold_left}
+              display_mode={CurrencyDisplayMode.BALANCE}
+              show_label={false}
+            />
+          </dd>
         </dl>
       </BatchCraftingDetailSection>
 

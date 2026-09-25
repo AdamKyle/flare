@@ -6,6 +6,7 @@ import BindCharacterSheet from './character-bindings/bind-character-sheet';
 import BindCharacterStatDetails from './character-bindings/bind-character-stat-details';
 import BindDonationsSection from './donations-bindings/bind-donations-section';
 import BindGuideQuestsSection from './guide-quest-bindings/bind-guide-quests-section';
+import BindMarket from './market-bindings/bind-market';
 import BindMonsterStatSection from './monster-bindings/bind-monster-stat-section';
 import BindQuestLog from './quest-bindings/bind-quest-log';
 import BindGoblinShop from './shop-bindings/bind-goblin-shop';
@@ -14,6 +15,7 @@ import BindShop from './shop-bindings/bind-shop';
 export const gameScreenBindings = [
   BindCharacterSheet,
   BindShop,
+  BindMarket,
   BindGoblinShop,
   BindCharacterInventory,
   BindCharacterStatDetails,

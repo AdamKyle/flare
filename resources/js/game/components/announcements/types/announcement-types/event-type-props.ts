@@ -1,5 +1,9 @@
-import AnnouncementMessageDefinition from '../../../../api-definitions/chat/annoucement-message-definition';
+import AnnouncementMessageDefinition, {
+  EventTypeDefinition,
+} from '../../../../api-definitions/chat/annoucement-message-definition';
 
 export default interface EventTypeProps {
-  announcement: AnnouncementMessageDefinition;
+  announcement: AnnouncementMessageDefinition & {
+    event: EventTypeDefinition;
+  };
 }

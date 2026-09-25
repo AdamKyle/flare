@@ -6,7 +6,10 @@ import GemEffectRow from '../../components/gem-effect-row';
 import { GemFieldProgressionBreakdownDefinition } from '../api/definitions/gem-progression-status-definition';
 import { resolveGemProgressionFieldLabel } from '../utils/gem-progression-field-label';
 
-import { formatPercent } from 'game-utils/format-number';
+import {
+  formatNumberWithCommas,
+  formatPercent,
+} from 'game-utils/format-number';
 
 import { ProgressBarVariant } from 'ui/progress/enums/progress-bar-variant';
 import ProgressBar from 'ui/progress/progress-bar';
@@ -69,8 +72,8 @@ const PersonalProgressInfoScreen = ({
           variant={ProgressBarVariant.PRIMARY}
           value_label={
             atCap
-              ? `Level ${personal.level} (Max)`
-              : `Level ${personal.level} — ${personal.xp}/${personal.next_level_xp} XP`
+              ? `Level ${formatNumberWithCommas(personal.level)} (Max)`
+              : `Level ${formatNumberWithCommas(personal.level)} — ${formatNumberWithCommas(personal.xp)} / ${formatNumberWithCommas(personal.next_level_xp)} XP`
           }
         />
       </div>

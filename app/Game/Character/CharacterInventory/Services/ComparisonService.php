@@ -16,42 +16,52 @@ use League\Fractal\Resource\Item as FractalItem;
 
 class ComparisonService
 {
-    private ValidEquipPositionsValue $validEquipPositionsValue;
-
-    private CharacterInventoryService $characterInventoryService;
-
-    private EquipItemService $equipItemService;
-
-    private ItemAtonements $itemAtonements;
-
+    /**
+     * @param ValidEquipPositionsValue $validEquipPositionsValue
+     * @param CharacterInventoryService $characterInventoryService
+     * @param EquipItemService $equipItemService
+     * @param ItemAtonements $itemAtonements
+     * @param Manager $manager
+     * @param EquippableItemTransformer $equippableItemTransformer
+     * @param UsableItemTransformer $usableItemTransformer
+     */
     public function __construct(
-        ValidEquipPositionsValue $validEquipPositionsValue,
-        CharacterInventoryService $characterInventoryService,
-        EquipItemService $equipItemService,
-        ItemAtonements $itemAtonements,
-    ) {
-        $this->validEquipPositionsValue = $validEquipPositionsValue;
-        $this->characterInventoryService = $characterInventoryService;
-        $this->equipItemService = $equipItemService;
-        $this->itemAtonements = $itemAtonements;
-    }
+        private readonly ValidEquipPositionsValue $validEquipPositionsValue,
+        private readonly CharacterInventoryService $characterInventoryService,
+        private readonly EquipItemService $equipItemService,
+        private readonly ItemAtonements $itemAtonements,
+        private readonly Manager $manager,
+        private readonly EquippableItemTransformer $equippableItemTransformer,
+        private readonly UsableItemTransformer $usableItemTransformer,
+    ) {}
 
-    public function buildComparisonData(Character $character, InventorySlot $itemToEquip, string $type): array
+    /**
+     * Build comparison data for an owned inventory item.
+     *
+     * @param Character $character
+     * @param InventorySlot $itemToEquip
+     * @return array|null
+     */
+    public function buildComparisonData(Character $character, InventorySlot $itemToEquip): ?array
     {
         $service = $this->characterInventoryService->setCharacter($character)
             ->setInventorySlot($itemToEquip)
             ->setPositions($this->validEquipPositionsValue->getPositions($itemToEquip->item))
             ->setInventory();
 
+        $normalizedType = $service->getType($itemToEquip->item);
+
+        if (is_null($normalizedType)) {
+            return null;
+        }
+
         $inventory = $service->inventory();
 
         $viewData = [
             'details' => [],
             'atonement' => $this->itemAtonements->getAtonements($itemToEquip->item, $inventory),
-            'itemToEquip' => $itemToEquip->item->type === 'alchemy'
-                ? $this->buildUsableItemDetails($itemToEquip)
-                : $this->buildItemDetails($itemToEquip),
-            'type' => $service->getType($itemToEquip->item),
+            'itemToEquip' => $this->buildItemDetails($itemToEquip),
+            'type' => $normalizedType,
             'slotId' => $itemToEquip->id,
             'characterId' => $character->id,
             'bowEquipped' => $this->hasTypeEquipped($character, 'bow'),
@@ -72,7 +82,7 @@ class ComparisonService
                 'details' => $this->equipItemService->getItemStats($itemToEquip->item, $inventory, $character),
                 'atonement' => $this->itemAtonements->getAtonements($itemToEquip->item, $inventory),
                 'itemToEquip' => $this->buildItemDetails($itemToEquip),
-                'type' => $service->getType($itemToEquip->item),
+                'type' => $normalizedType,
                 'slotId' => $itemToEquip->id,
                 'slotPosition' => $itemToEquip->position,
                 'characterId' => $character->id,
@@ -87,10 +97,16 @@ class ComparisonService
         return $viewData;
     }
 
+    /**
+     * Build comparison data for an Alchemy Bag item.
+     *
+     * @param Character $character
+     * @param AlchemyBagSlot $slot
+     * @return array
+     */
     public function buildAlchemyBagComparisonData(Character $character, AlchemyBagSlot $slot): array
     {
-        $item = new FractalItem($slot->item, new UsableItemTransformer);
-        $item = (new Manager)->createData($item)->toArray()['data'];
+        $item = $this->manager->createData(new FractalItem($slot->item, $this->usableItemTransformer))->toArray()['data'];
         $item['slot_id'] = $slot->id;
 
         return [
@@ -108,10 +124,16 @@ class ComparisonService
         ];
     }
 
+    /**
+     * Build comparison data for an Inventory Set item.
+     *
+     * @param Character $character
+     * @param SetSlot $slot
+     * @return array
+     */
     public function buildSetSlotComparisonData(Character $character, SetSlot $slot): array
     {
-        $item = new FractalItem($slot, new EquippableItemTransformer);
-        $item = (new Manager)->createData($item)->toArray()['data'];
+        $item = $this->manager->createData(new FractalItem($slot, $this->equippableItemTransformer))->toArray()['data'];
         $item['slot_id'] = $slot->id;
 
         return [
@@ -129,19 +151,38 @@ class ComparisonService
         ];
     }
 
-    public function buildShopData(Character $character, Item $item, ?string $type = null)
+    /**
+     * Build equipped-item comparison details and the catalog identity for a Shop item.
+     *
+     * @param Character $character
+     * @param Item $item
+     * @return array
+     */
+    public function buildShopData(Character $character, Item $item): array
     {
         $service = $this->characterInventoryService->setCharacter($character)
             ->setPositions($this->validEquipPositionsValue->getPositions($item))
             ->setInventory();
 
-        $inventory = $service->inventory();
-
         return [
-            'details' => $this->equipItemService->getItemStats($item, $inventory, $character),
+            'details' => $this->equipItemService->getItemStats($item, $service->inventory(), $character),
+            'item_to_equip' => [
+                'item_id' => $item->id,
+                'name' => $item->affix_name,
+                'type' => $item->type,
+                'cost' => $item->cost,
+                'slot_id' => null,
+            ],
         ];
     }
 
+    /**
+     * Determine whether the character has an item type equipped.
+     *
+     * @param Character $character
+     * @param string $type
+     * @return bool
+     */
     public function hasTypeEquipped(Character $character, string $type): bool
     {
         return $character->getInformation()->fetchInventory()->filter(function ($slot) use ($type) {
@@ -149,24 +190,17 @@ class ComparisonService
         })->isNotEmpty();
     }
 
-    protected function buildItemDetails(InventorySlot $slot): array
+    /**
+     * Transform an inventory slot into equippable item details including its affix name.
+     *
+     * @param InventorySlot $slot
+     * @return array
+     */
+    private function buildItemDetails(InventorySlot $slot): array
     {
-        return $this->transformSlotWithEquippableTransformer($slot);
-    }
+        $data = $this->manager->createData(new FractalItem($slot, $this->equippableItemTransformer))->toArray()['data'];
 
-    protected function buildUsableItemDetails(InventorySlot $slot): array
-    {
-        return $this->transformSlotWithEquippableTransformer($slot);
-    }
-
-    private function transformSlotWithEquippableTransformer(InventorySlot $slot): array
-    {
-        $resource = new FractalItem($slot, new EquippableItemTransformer());
-        $data = (new Manager)->createData($resource)->toArray()['data'];
-
-        if (! array_key_exists('affix_name', $data)) {
-            $data['affix_name'] = $slot->item->affix_name;
-        }
+        $data['affix_name'] = $slot->item->affix_name;
 
         return $data;
     }

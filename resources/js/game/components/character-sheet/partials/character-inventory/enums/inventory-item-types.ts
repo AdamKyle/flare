@@ -16,8 +16,9 @@ export enum InventoryItemTypes {
   GLOVES = 'gloves',
   WAND = 'wand',
   CENSOR = 'censor',
+  CENSER = 'censer',
   CLAW = 'claw',
-  SWORD = 'Sword',
+  SWORD = 'sword',
   RING = 'ring',
   DAGGER = 'dagger',
   SPELL_HEALING = 'spell-healing',
@@ -39,21 +40,28 @@ export const armourPositions = [
   InventoryItemTypes.SLEEVES,
 ];
 
-export const handBasedItems = [
-  InventoryItemTypes.SWORD,
-  InventoryItemTypes.SHIELD,
+export const weaponTypes: InventoryItemTypes[] = [
+  InventoryItemTypes.STAVE,
+  InventoryItemTypes.BOW,
+  InventoryItemTypes.DAGGER,
+  InventoryItemTypes.SCRATCH_AWL,
+  InventoryItemTypes.MACE,
+  InventoryItemTypes.HAMMER,
   InventoryItemTypes.GUN,
   InventoryItemTypes.FAN,
+  InventoryItemTypes.WAND,
+  InventoryItemTypes.CENSER,
+  InventoryItemTypes.CLAW,
+  InventoryItemTypes.SWORD,
+  InventoryItemTypes.SHIELD,
+];
+
+export const nonArmourEquippableItems: InventoryItemTypes[] = [
+  ...weaponTypes,
   InventoryItemTypes.RING,
   InventoryItemTypes.SPELL_DAMAGE,
   InventoryItemTypes.SPELL_HEALING,
-  InventoryItemTypes.HAMMER,
-  InventoryItemTypes.WAND,
   InventoryItemTypes.CENSOR,
-  InventoryItemTypes.CLAW,
-  InventoryItemTypes.SCRATCH_AWL,
-  InventoryItemTypes.STAVE,
-  InventoryItemTypes.MACE,
-  InventoryItemTypes.DAGGER,
   InventoryItemTypes.TRINKET,
+  InventoryItemTypes.ARTIFACT,
 ];

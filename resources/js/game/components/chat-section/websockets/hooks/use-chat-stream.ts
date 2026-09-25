@@ -13,7 +13,8 @@ export const useChatStream = ({
 
   const { serverMessages } = useServerMessages({ user_id: userId });
   const { explorationMessages } = useExplorationMessages({ user_id: userId });
-  const { chatMessages } = useChatMessages({ user_id: userId });
+  const { chatMessages, prependChatMessage, replaceChatMessages } =
+    useChatMessages({ user_id: userId });
 
   const [ready, setReady] = useState(false);
 
@@ -26,8 +27,17 @@ export const useChatStream = ({
       server: serverMessages,
       exploration: explorationMessages,
       chatMessages,
+      prependChatMessage,
+      replaceChatMessages,
       ready,
     }),
-    [serverMessages, explorationMessages, chatMessages, ready]
+    [
+      serverMessages,
+      explorationMessages,
+      chatMessages,
+      prependChatMessage,
+      replaceChatMessages,
+      ready,
+    ]
   );
 };

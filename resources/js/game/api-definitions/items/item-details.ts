@@ -1,4 +1,6 @@
 import ItemAffixDefinition from './equippable-item-definitions/item-affix-definition';
+import ItemSkillDefinition from './item-skill-definition';
+import ItemSkillProgressionDefinition from './item-skill-progression-definition';
 
 export default interface ItemDetails {
   id: number;
@@ -75,8 +77,8 @@ export default interface ItemDetails {
   sockets: unknown[];
   socket_amount: number;
   item_atonements: ItemAtonements;
-  item_skills: unknown[];
-  item_skill_progressions: unknown[];
+  item_skills: ItemSkillDefinition[];
+  item_skill_progressions: ItemSkillProgressionDefinition[];
 }
 
 export interface ItemAtonements {

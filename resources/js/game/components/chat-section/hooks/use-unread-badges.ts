@@ -6,12 +6,17 @@ import UseUnreadBadgesParamsDefinition from './definitions/use-unread-badges-par
 const useUnreadBadges = ({
   serverCount,
   serverIndex,
+  explorationCount,
+  explorationIndex,
   initialActiveIndex = 0,
 }: UseUnreadBadgesParamsDefinition): UseUnreadBadgesDefinition => {
   const [activeTabIndex, setActiveTabIndex] =
     useState<number>(initialActiveIndex);
   const [unreadServer, setUnreadServer] = useState<boolean>(false);
   const [lastSeenServerCount, setLastSeenServerCount] = useState<number>(0);
+  const [unreadExploration, setUnreadExploration] = useState<boolean>(false);
+  const [lastSeenExplorationCount, setLastSeenExplorationCount] =
+    useState<number>(0);
 
   useEffect(() => {
     if (activeTabIndex === serverIndex) {
@@ -25,6 +30,23 @@ const useUnreadBadges = ({
     }
   }, [activeTabIndex, serverIndex, serverCount, lastSeenServerCount]);
 
+  useEffect(() => {
+    if (activeTabIndex === explorationIndex) {
+      setLastSeenExplorationCount(explorationCount);
+
+      setUnreadExploration(false);
+    } else {
+      if (explorationCount > lastSeenExplorationCount) {
+        setUnreadExploration(true);
+      }
+    }
+  }, [
+    activeTabIndex,
+    explorationIndex,
+    explorationCount,
+    lastSeenExplorationCount,
+  ]);
+
   const handleActiveIndexChange = (index: number): void => {
     setActiveTabIndex(index);
 
@@ -33,10 +55,17 @@ const useUnreadBadges = ({
 
       setUnreadServer(false);
     }
+
+    if (index === explorationIndex) {
+      setLastSeenExplorationCount(explorationCount);
+
+      setUnreadExploration(false);
+    }
   };
 
   return {
     unreadServer,
+    unreadExploration,
     activeTabIndex,
     handleActiveIndexChange,
   };

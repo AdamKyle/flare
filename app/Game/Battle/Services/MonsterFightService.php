@@ -16,16 +16,31 @@ use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Values\LocationType;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Support\Facades\Cache;
-use Psr\SimpleCache\InvalidArgumentException;
 
 class MonsterFightService
 {
     use ChecksAutomationRestrictions, ResponseBuilder;
 
-    public function __construct(private readonly MonsterPlayerFight $monsterPlayerFight, private readonly BattleEventHandler $battleEventHandler, private readonly WeeklyBattleService $weeklyBattleService) {}
+    /**
+     * @param MonsterPlayerFight $monsterPlayerFight
+     * @param BattleEventHandler $battleEventHandler
+     * @param WeeklyBattleService $weeklyBattleService
+     */
+    public function __construct(
+        private readonly MonsterPlayerFight $monsterPlayerFight,
+        private readonly BattleEventHandler $battleEventHandler,
+        private readonly WeeklyBattleService $weeklyBattleService,
+    ) {}
 
     /**
-     * @throws InvalidArgumentException
+     * Set up a new manual, delve, or preserved Monster fight for the Character and return the fight state payload.
+     *
+     * @param Character $character
+     * @param array $params
+     * @param bool $returnData
+     * @param bool $isDelve
+     * @param bool $preserveCharacterSheetCache
+     * @return array
      */
     public function setupMonster(Character $character, array $params, bool $returnData = false, bool $isDelve = false, bool $preserveCharacterSheetCache = false): array
     {
@@ -54,20 +69,7 @@ class MonsterFightService
         $data['health']['current_monster_health'] = max($data['health']['current_monster_health'], 0);
 
         if ($data['health']['current_monster_health'] <= 0) {
-
-            if (! $returnData) {
-                $this->battleEventHandler->processMonsterDeath($character->id, $data['monster']['id']);
-
-                event(new AttackTimeOutEvent($character));
-            }
-
-            Cache::put('monster-fight-'.$character->id, $data, 900);
-
-            if ($returnData) {
-                return $data;
-            }
-
-            return $this->successResult($data);
+            return $this->handleMonsterDefeatedDuringSetup($character, $data, $returnData);
         }
 
         if ($data['health']['current_character_health'] <= 0) {
@@ -85,6 +87,36 @@ class MonsterFightService
         return $this->successResult($data);
     }
 
+    /**
+     * Handle the defeated Monster's death event and cached fight state for a Monster fight set up during this request.
+     *
+     * @param Character $character
+     * @param array $data
+     * @param bool $returnData
+     * @return array
+     */
+    private function handleMonsterDefeatedDuringSetup(Character $character, array $data, bool $returnData): array
+    {
+        if (! $returnData) {
+            $this->battleEventHandler->processMonsterDeath($character->id, $data['monster']['id']);
+
+            event(new AttackTimeOutEvent($character));
+        }
+
+        Cache::put('monster-fight-'.$character->id, $data, 900);
+
+        if ($returnData) {
+            return $data;
+        }
+
+        return $this->successResult($data);
+    }
+
+    /**
+     * Return the Monster currently cached for the active Monster fight, or null when no fight is cached.
+     *
+     * @return ?Monster
+     */
     public function getMonster(): ?Monster
     {
 
@@ -96,7 +128,13 @@ class MonsterFightService
     }
 
     /**
-     * @throws InvalidArgumentException
+     * Resolve one manual attack against the Character's current cached Monster fight and return the updated fight state.
+     *
+     * @param Character $character
+     * @param string $attackType
+     * @param bool $onlyOnce
+     * @param bool $returnData
+     * @return array
      */
     public function fightMonster(Character $character, string $attackType, bool $onlyOnce = true, bool $returnData = false): array
     {
@@ -181,11 +219,18 @@ class MonsterFightService
         event(new ServerMessageEvent($character->user, 'You have defeated: '.$cache['monster']['name'].'.'));
 
         Cache::delete('monster-fight-'.$character->id);
-        BattleAttackHandler::dispatch($character->id, $this->monsterPlayerFight->getMonster()['id'])->onQueue('battle_reward_processing')->onConnection('battle_reward_processing')->delay(now()->addSeconds(2));
+        BattleAttackHandler::dispatch($character->id, $this->monsterPlayerFight->getMonster()['id'])->onQueue('battle_reward_processing')->onConnection('battle_reward_processing');
 
         return $this->successResult($cache);
     }
 
+    /**
+     * Determine whether the Character is currently at the location required by the given Monster.
+     *
+     * @param Character $character
+     * @param int $monsterId
+     * @return bool
+     */
     public function isAtMonstersLocation(Character $character, int $monsterId): bool
     {
         $monster = Monster::find($monsterId);
@@ -194,22 +239,23 @@ class MonsterFightService
             return false;
         }
 
-        if (! is_null($monster->only_for_location_type)) {
-            $location = Location::where('type', $monster->only_for_location_type)->where(
-                'game_map_id',
-                $character->map->game_map_id
-            )->where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->first();
-
-            if (is_null($location)) {
-                return false;
-            }
+        if (is_null($monster->only_for_location_type)) {
+            return true;
         }
 
-        return true;
+        $location = Location::where('type', $monster->only_for_location_type)->where(
+            'game_map_id',
+            $character->map->game_map_id
+        )->where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->first();
+
+        return ! is_null($location);
     }
 
     /**
-     * Are we at a delve location?
+     * Determine whether the Character is currently at a delve location.
+     *
+     * @param Character $character
+     * @return bool
      */
     public function isAtDelveLocation(Character $character): bool
     {
@@ -220,6 +266,13 @@ class MonsterFightService
             ->exists();
     }
 
+    /**
+     * Determine whether the Character is still eligible to fight the given Monster this week.
+     *
+     * @param Character $character
+     * @param int $monsterId
+     * @return bool
+     */
     public function isMonsterAlreadyDefeatedThisWeek(Character $character, int $monsterId): bool
     {
         $monster = Monster::find($monsterId);
@@ -231,6 +284,14 @@ class MonsterFightService
         return $this->weeklyBattleService->canFightMonster($character, $monster);
     }
 
+    /**
+     * Resolve the cached delve Monster context for the given fight params when the fight is a delve encounter.
+     *
+     * @param Character $character
+     * @param array $params
+     * @param bool $isDelve
+     * @return array
+     */
     private function fetchPossibleDelveMonsterId(Character $character, array $params, bool $isDelve): array
     {
 

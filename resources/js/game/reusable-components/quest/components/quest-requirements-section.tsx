@@ -1,8 +1,12 @@
 import React, { ReactNode } from 'react';
 
 import ReadOnlyItemCard from '../../../components/side-peeks/components/items/read-only-item-card';
+import CurrencyDisplay from '../../currency/currency-display';
+import { CurrencyDisplayMode } from '../../currency/enums/currency-display-mode';
+import { CurrencyType } from '../../currency/enums/currency-type';
 import FactualLink from '../../quest-item/partials/factual-link';
 import { QuestRelatedItemDefinition } from '../api/definitions/quest-detail-definition';
+import QuestCurrencyRow from '../types/quest-currency-row';
 import QuestDetailProps from '../types/quest-detail-props';
 
 import Dd from 'ui/dl/dd';
@@ -28,12 +32,42 @@ const QuestRequirementsSection = ({
     />
   );
 
-  const currencyRows: { label: string; value: number }[] = [
-    { label: 'Gold', value: requirements.currencies.gold ?? 0 },
-    { label: 'Gold Dust', value: requirements.currencies.gold_dust ?? 0 },
-    { label: 'Shards', value: requirements.currencies.shards ?? 0 },
-    { label: 'Copper Coins', value: requirements.currencies.copper_coins ?? 0 },
+  const currencyRows: QuestCurrencyRow[] = [
+    {
+      label: 'Gold',
+      currency: CurrencyType.GOLD,
+      value: requirements.currencies.gold ?? 0,
+    },
+    {
+      label: 'Gold Dust',
+      currency: CurrencyType.GOLD_DUST,
+      value: requirements.currencies.gold_dust ?? 0,
+    },
+    {
+      label: 'Shards',
+      currency: CurrencyType.SHARDS,
+      value: requirements.currencies.shards ?? 0,
+    },
+    {
+      label: 'Copper Coins',
+      currency: CurrencyType.COPPER_COINS,
+      value: requirements.currencies.copper_coins ?? 0,
+    },
   ].filter((row) => row.value !== 0);
+
+  const renderCurrencyRow = (row: QuestCurrencyRow): ReactNode => (
+    <React.Fragment key={row.label}>
+      <Dt>{row.label}</Dt>
+      <Dd>
+        <CurrencyDisplay
+          currency={row.currency}
+          amount={row.value}
+          display_mode={CurrencyDisplayMode.EXACT}
+          show_label={false}
+        />
+      </Dd>
+    </React.Fragment>
+  );
 
   const hasRows =
     Boolean(requirements.primary_item) ||
@@ -127,12 +161,7 @@ const QuestRequirementsSection = ({
               </Dd>
             </>
           )}
-          {currencyRows.map((row) => (
-            <React.Fragment key={row.label}>
-              <Dt>{row.label}</Dt>
-              <Dd>{row.value}</Dd>
-            </React.Fragment>
-          ))}
+          {currencyRows.map(renderCurrencyRow)}
         </Dl>
       )}
     </div>

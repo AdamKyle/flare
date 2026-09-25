@@ -1,96 +1,102 @@
+import { useActivityTimeout } from 'api-handler/hooks/use-activity-timeout';
 import { useApiHandler } from 'api-handler/hooks/use-api-handler';
-import { AxiosError, AxiosRequestConfig } from 'axios';
+import { resolveApiErrorMessage } from 'api-handler/utils/resolve-api-error-message';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import UsePurchaseAndReplaceApiDefinition from './definitions/use-purchase-and-replace-api-definition';
-import UsePurchaseAndReplaceApiRequestDefinition from './definitions/use-purchase-and-replace-api-request-definition';
-import { ShopApiUrls } from '../enums/shop-api-urls';
 import UsePurchaseAndReplaceApiParams from './definitions/use-purchase-and-replace-api-params';
+import UsePurchaseAndReplaceApiRequestDefinition from './definitions/use-purchase-and-replace-api-request-definition';
 import UsePurchaseAndReplaceApiResponseDefinition from './definitions/use-purchase-and-replace-api-response-definition';
+import { ShopApiUrls } from '../enums/shop-api-urls';
 
-export const usePurchaseAndReplaceApi = (
-  params: UsePurchaseAndReplaceApiParams
-): UsePurchaseAndReplaceApiDefinition => {
+export const usePurchaseAndReplaceApi = ({
+  character_id,
+  on_success,
+}: UsePurchaseAndReplaceApiParams): UsePurchaseAndReplaceApiDefinition => {
   const { apiHandler, getUrl } = useApiHandler();
+  const { handleInactivity } = useActivityTimeout();
 
   const [error, setError] =
     useState<UsePurchaseAndReplaceApiDefinition['error']>(null);
   const [loading, setLoading] = useState(false);
-  const [requestParams, setRequestParams] =
-    useState<UsePurchaseAndReplaceApiRequestDefinition>({
-      position: null,
-      slot_id: 0,
-      item_id_to_buy: 0,
-      equip_type: null,
-    });
 
-  const url = getUrl(ShopApiUrls.BUY_AND_REPLACE, {
-    character: params.character_id,
-  });
-
-  // `params.on_success` is recreated by the caller on every render. Reading it
-  // through a ref keeps `purchaseAndReplaceItem` stable across renders
-  // (avoiding a re-purchase loop from the effect below) while still calling
-  // the latest callback instead of a stale closure.
-  const onSuccessRef = useRef(params.on_success);
+  const isSubmittingRef = useRef(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    onSuccessRef.current = params.on_success;
-  }, [params.on_success]);
+    return () => {
+      const activeController = abortControllerRef.current;
 
-  const purchaseAndReplaceItem = useCallback(async () => {
-    if (requestParams.slot_id === 0) {
-      return null;
-    }
+      abortControllerRef.current = null;
+      activeController?.abort();
+    };
+  }, []);
 
-    setLoading(true);
-    setError(null);
-
-    try {
-      const result = await apiHandler.post<
-        UsePurchaseAndReplaceApiResponseDefinition,
-        AxiosRequestConfig<UsePurchaseAndReplaceApiResponseDefinition>,
-        UsePurchaseAndReplaceApiRequestDefinition
-      >(url, {
-        item_id_to_buy: requestParams.item_id_to_buy,
-        slot_id: requestParams.slot_id,
-        position: requestParams.position,
-        equip_type: requestParams.equip_type,
-      });
-
-      if (!result?.inventory_count) {
-        setError({ message: 'Received a malformed purchase response.' });
-        setLoading(false);
-
-        return;
+  const mutate = useCallback(
+    async (
+      request: UsePurchaseAndReplaceApiRequestDefinition
+    ): Promise<UsePurchaseAndReplaceApiResponseDefinition | null> => {
+      if (isSubmittingRef.current || character_id <= 0) {
+        return null;
       }
 
-      onSuccessRef.current(result.message, {
-        gold: result.gold,
-        inventory_count: result.inventory_count,
-      });
+      isSubmittingRef.current = true;
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
 
-      setLoading(false);
-    } catch (err) {
-      if (err instanceof AxiosError) {
-        setError(err.response?.data || null);
+      setLoading(true);
+      setError(null);
+
+      try {
+        const result = await apiHandler.post<
+          UsePurchaseAndReplaceApiResponseDefinition,
+          AxiosRequestConfig<UsePurchaseAndReplaceApiResponseDefinition>,
+          UsePurchaseAndReplaceApiRequestDefinition
+        >(
+          getUrl(ShopApiUrls.BUY_AND_REPLACE, { character: character_id }),
+          request,
+          { signal: controller.signal }
+        );
+
+        on_success(result.message, {
+          gold: result.gold,
+          inventory_count: result.inventory_count,
+        });
+
+        return result;
+      } catch (requestError) {
+        if (axios.isCancel(requestError)) {
+          return null;
+        }
+
+        setError({
+          message: resolveApiErrorMessage(
+            requestError,
+            'Unable to purchase and replace this item.'
+          ),
+        });
+
+        if (requestError instanceof AxiosError) {
+          handleInactivity({ response: requestError, setError });
+        }
+
+        return null;
+      } finally {
+        isSubmittingRef.current = false;
+
+        if (abortControllerRef.current === controller) {
+          abortControllerRef.current = null;
+          setLoading(false);
+        }
       }
-    } finally {
-      setLoading(false);
-    }
-  }, [apiHandler, url, requestParams]);
-
-  useEffect(() => {
-    if (params.character_id <= 0) {
-      return;
-    }
-
-    purchaseAndReplaceItem().catch(() => {});
-  }, [purchaseAndReplaceItem, requestParams, params.character_id]);
+    },
+    [apiHandler, getUrl, handleInactivity, character_id, on_success]
+  );
 
   return {
     error,
     loading,
-    setRequestParams,
+    mutate,
   };
 };

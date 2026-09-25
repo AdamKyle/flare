@@ -1,11 +1,10 @@
 import clsx from 'clsx';
 import React from 'react';
 
-import { formatNumberWithCommas } from '../../../util/format-number';
-import { backpackItemTextColors } from '../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
+import GoblinShopPurchaseForm from './goblin-shop-purchase-form';
+import { planeTextItemColors } from '../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
 import GoblinShopCardProps from '../types/goblin-shop-card-props';
 
-import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import LinkButton from 'ui/buttons/link-button';
 
@@ -13,8 +12,9 @@ const GoblinShopCard = ({
   item,
   view_item,
   action_disabled,
+  gold_bars,
 }: GoblinShopCardProps) => {
-  const itemColor = backpackItemTextColors(item);
+  const itemColor = planeTextItemColors(item);
 
   return (
     <>
@@ -37,17 +37,11 @@ const GoblinShopCard = ({
       <p className="mt-2 text-gray-700 dark:text-gray-300">
         {item.description}
       </p>
-      <p className="mt-1 font-medium text-yellow-600 dark:text-yellow-400">
-        Cost: {formatNumberWithCommas(item.gold_bars_cost ?? 0)} g
-      </p>
-      <div className="mt-4 flex flex-wrap gap-2">
-        <Button
-          on_click={() => {}}
-          label="Buy"
-          variant={ButtonVariant.PRIMARY}
-          disabled={action_disabled}
-        />
-      </div>
+      <GoblinShopPurchaseForm
+        item={item}
+        gold_bars={gold_bars}
+        purchase_disabled={action_disabled}
+      />
     </>
   );
 };

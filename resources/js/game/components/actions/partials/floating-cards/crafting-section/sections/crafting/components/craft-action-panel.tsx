@@ -1,10 +1,11 @@
 import React, { ReactNode } from 'react';
 
 import CraftActionPanelProps from './types/craft-action-panel-props';
+import CurrencyDisplay from '../../../../../../../../reusable-components/currency/currency-display';
+import { CurrencyDisplayMode } from '../../../../../../../../reusable-components/currency/enums/currency-display-mode';
+import { CurrencyType } from '../../../../../../../../reusable-components/currency/enums/currency-type';
 import CraftingActionPreview from '../../../shared/components/crafting-action-preview';
 import CraftingItemPreview from '../../../shared/components/crafting-item-preview';
-
-import { formatNumberWithCommas } from 'game-utils/format-number';
 
 const CraftActionPanel = ({
   selectedItem,
@@ -33,8 +34,13 @@ const CraftActionPanel = ({
       title="Item preview"
       status={isCraftSuccessful ? 'success' : 'default'}
     >
-      <p className="text-xs text-gray-500 dark:text-gray-400">
-        Cost: {formatNumberWithCommas(selectedItem.cost)} gold
+      <p className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+        <span>Cost:</span>
+        <CurrencyDisplay
+          currency={CurrencyType.GOLD}
+          amount={selectedItem.cost}
+          display_mode={CurrencyDisplayMode.EXACT}
+        />
       </p>
       <p className="text-xs text-gray-500 dark:text-gray-400">
         Skill Level Required: {selectedItem.skill_level_required} &bull; Trivial

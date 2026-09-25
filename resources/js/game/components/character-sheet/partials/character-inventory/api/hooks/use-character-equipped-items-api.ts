@@ -45,14 +45,21 @@ const useCharacterEquippedItemsApi = (
     }
   }, [apiHandler, url]);
 
-  useEffect(() => {
-    fetchCharacterEquippedItems().catch(console.error);
+  const refetch = useCallback((): void => {
+    fetchCharacterEquippedItems().catch(() => {
+      setError({ message: 'Unable to load your equipped items.' });
+    });
   }, [fetchCharacterEquippedItems]);
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   return {
     data,
     error,
     loading,
+    refetch,
   };
 };
 

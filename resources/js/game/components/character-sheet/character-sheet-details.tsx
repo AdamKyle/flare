@@ -6,11 +6,15 @@ import { StatTypes } from './enums/stat-types';
 import { useManageAttackDetailsBreakdown } from './hooks/use-manage-attack-details-breakdown';
 import { useManageStatDetailsBreakdown } from './hooks/use-manage-stat-details-breakdown';
 import CharacterSheetDetailsProps from './types/character-sheet-details-props';
+import CurrencyDisplay from '../../reusable-components/currency/currency-display';
+import { CurrencyDisplayMode } from '../../reusable-components/currency/enums/currency-display-mode';
+import { CurrencyType } from '../../reusable-components/currency/enums/currency-type';
+import XpBar from '../actions/components/character-details/xp-bar';
+
 import {
   formatNumberWithCommas,
   shortenNumber,
-} from '../../util/format-number';
-import XpBar from '../actions/components/character-details/xp-bar';
+} from 'game-utils/format-number';
 
 import Button from 'ui/buttons/button';
 import ProgressButton from 'ui/buttons/button-progress';
@@ -55,13 +59,41 @@ const CharacterSheetDetails = (
         <div>
           <Dl>
             <Dt>Gold:</Dt>
-            <Dd>{formatNumberWithCommas(characterData.gold)}</Dd>
+            <Dd>
+              <CurrencyDisplay
+                currency={CurrencyType.GOLD}
+                amount={characterData.gold}
+                display_mode={CurrencyDisplayMode.BALANCE}
+                show_label={false}
+              />
+            </Dd>
             <Dt>Gold Dust:</Dt>
-            <Dd>{formatNumberWithCommas(characterData.gold_dust)}</Dd>
+            <Dd>
+              <CurrencyDisplay
+                currency={CurrencyType.GOLD_DUST}
+                amount={characterData.gold_dust}
+                display_mode={CurrencyDisplayMode.BALANCE}
+                show_label={false}
+              />
+            </Dd>
             <Dt>Shards:</Dt>
-            <Dd>{formatNumberWithCommas(characterData.shards)}</Dd>
+            <Dd>
+              <CurrencyDisplay
+                currency={CurrencyType.SHARDS}
+                amount={characterData.shards}
+                display_mode={CurrencyDisplayMode.BALANCE}
+                show_label={false}
+              />
+            </Dd>
             <Dt>Copper Coins:</Dt>
-            <Dd>{formatNumberWithCommas(characterData.copper_coins)}</Dd>
+            <Dd>
+              <CurrencyDisplay
+                currency={CurrencyType.COPPER_COINS}
+                amount={characterData.copper_coins}
+                display_mode={CurrencyDisplayMode.BALANCE}
+                show_label={false}
+              />
+            </Dd>
           </Dl>
         </div>
         <div>

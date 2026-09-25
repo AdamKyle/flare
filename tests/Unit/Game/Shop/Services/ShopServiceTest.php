@@ -2,12 +2,35 @@
 
 namespace Tests\Unit\Game\Shop\Services;
 
-use App\Game\Character\CharacterInventory\Exceptions\EquipItemException;
+use App\Flare\Pagination\Pagination;
+use App\Flare\Transformers\Serializer\PlainDataSerializer;
+use App\Game\Character\CharacterAttack\Transformers\CharacterAttackTransformer;
+use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
+use App\Game\Character\CharacterInventory\Services\EquipItemService;
+use App\Game\Character\CharacterInventory\Services\InventorySetService;
+use App\Game\Character\CharacterInventory\Transformers\CharacterInventoryCountTransformer;
+use App\Game\Character\CharacterInventory\Transformers\InventorySetOptionTransformer;
+use App\Game\Character\CharacterInventory\Transformers\InventoryTransformer;
+use App\Game\Character\CharacterInventory\Validations\SetHandsValidation;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\PhpRandomNumberGenerator;
 use App\Game\Core\Currency\Services\CurrencyLimit;
+use App\Game\Core\Items\Enricher\EquippableEnricher;
+use App\Game\Core\Items\Enricher\ItemEnricherFactory;
+use App\Game\Core\Items\Transformers\Api\UsableItemTransformer as ApiUsableItemTransformer;
+use App\Game\Core\Items\Transformers\EquippableItemTransformer;
+use App\Game\Core\Items\Transformers\ItemTransformer;
+use App\Game\Core\Items\Transformers\QuestItemTransformer;
+use App\Game\Core\Items\Transformers\UsableItemTransformer;
 use App\Game\Shop\Events\BuyItemEvent;
 use App\Game\Shop\Services\ShopService;
+use App\Game\Skills\Services\DisenchantService;
+use App\Game\Skills\Services\MassDisenchantService;
+use App\Game\Skills\Services\SkillCheckService;
+use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use League\Fractal\Manager;
 use Mockery;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -32,7 +55,42 @@ class ShopServiceTest extends TestCase
                 'class_bonus' => 0.01,
             ]), 5
         )->givePlayerLocation();
-        $this->shopService = resolve(ShopService::class);
+
+        $manager = new Manager;
+        $randomNumberGenerator = new PhpRandomNumberGenerator;
+        $equippableItemTransformer = new EquippableItemTransformer;
+        $questItemTransformer = new QuestItemTransformer;
+        $inventorySetService = new InventorySetService(new SetHandsValidation);
+
+        $itemEnricherFactory = new ItemEnricherFactory(
+            new EquippableEnricher,
+            $equippableItemTransformer,
+            new UsableItemTransformer,
+            $questItemTransformer,
+            new PlainDataSerializer,
+            $manager,
+        );
+
+        $this->shopService = new ShopService(
+            new EquipItemService($manager, new CharacterAttackTransformer, $inventorySetService),
+            new CharacterInventoryService(
+                $itemEnricherFactory,
+                $equippableItemTransformer,
+                $questItemTransformer,
+                new ApiUsableItemTransformer,
+                new InventoryTransformer($itemEnricherFactory),
+                $inventorySetService,
+                new MassDisenchantService(new SkillCheckService($randomNumberGenerator), $randomNumberGenerator, new ChanceCalculator($randomNumberGenerator)),
+                Mockery::mock(UpdateCharacterSkillsService::class),
+                Mockery::mock(DisenchantService::class),
+                new Pagination($manager),
+                $manager,
+                new InventorySetOptionTransformer,
+            ),
+            new CharacterInventoryCountTransformer,
+            new ItemTransformer($itemEnricherFactory),
+            new Pagination($manager),
+        );
     }
 
     protected function tearDown(): void
@@ -108,7 +166,7 @@ class ShopServiceTest extends TestCase
 
         $character->update(['gold' => 100000]);
 
-        $this->shopService->buyAndReplace($shield, $character->refresh(), [
+        $result = $this->shopService->purchaseAndReplace($character->refresh(), $shield, [
             'position' => 'left-hand',
             'slot_id' => $equippedSlot->id,
         ]);
@@ -119,23 +177,24 @@ class ShopServiceTest extends TestCase
             return $slot->item_id === $shield->id && $slot->equipped;
         })->first();
 
+        $this->assertSame(200, $result['status']);
         $this->assertLessThan(100000, $character->gold);
         $this->assertNotNull($inventorySlot);
     }
 
     public function test_buy_multiple_items()
     {
-        $shield = $this->createItem(['type' => 'shield']);
+        $shield = $this->createItem(['type' => 'shield', 'cost' => 1000]);
 
         $character = $this->character->getCharacter();
 
-        $character->update(['gold' => 100000]);
+        $character->update(['gold' => 100000, 'inventory_max' => 75]);
 
-        $this->shopService->buyMultipleItems($character, $shield, 1000, 75);
+        $this->shopService->purchaseMultiple($character->refresh(), $shield, 75);
 
         $character = $character->refresh();
 
-        $this->assertLessThan(100000, $character->gold);
+        $this->assertSame(25000, $character->gold);
         $this->assertCount(75, $character->inventory->slots->toArray());
     }
 
@@ -156,7 +215,7 @@ class ShopServiceTest extends TestCase
         $this->assertGreaterThan(0, $character->gold);
     }
 
-    public function test_buy_and_replace_with_another_unique_item_throws(): void
+    public function test_buy_and_replace_with_another_unique_item_is_rejected(): void
     {
         $existingUniquePrefix = $this->createItemAffix(['type' => 'prefix', 'randomly_generated' => true]);
         $existingUniqueItem = $this->createItem(['type' => 'shield', 'item_prefix_id' => $existingUniquePrefix->id]);
@@ -175,13 +234,14 @@ class ShopServiceTest extends TestCase
         $character->update(['gold' => 50000]);
         $character = $character->refresh();
 
-        $this->expectException(EquipItemException::class);
-        $this->expectExceptionMessage('Cannot equip another unique.');
-
-        $this->shopService->buyAndReplace($newUniqueShield, $character, [
+        $result = $this->shopService->purchaseAndReplace($character, $newUniqueShield, [
             'position' => 'left-hand',
             'slot_id' => $equippedSlot->id,
         ]);
+
+        $this->assertSame(422, $result['status']);
+        $this->assertSame('Could not complete purchase.', $result['message']);
+        $this->assertSame(50000, $character->refresh()->gold);
     }
 
     public function test_get_items_for_shop_returns_standard_paginated_shape()
@@ -336,60 +396,89 @@ class ShopServiceTest extends TestCase
         $this->assertSame(CurrencyLimit::MAX_GOLD, $character->refresh()->gold);
     }
 
-    public function test_buy_multiple_items_does_nothing_when_amount_is_less_than_one()
+    public function test_buy_multiple_items_rejects_more_items_than_the_inventory_can_hold()
     {
-        $shield = $this->createItem(['type' => 'shield']);
+        $shield = $this->createItem(['type' => 'shield', 'cost' => 100]);
         $character = $this->character->getCharacter();
-        $character->update(['gold' => 1000]);
+        $character->update(['gold' => 1000, 'inventory_max' => 1]);
 
-        $this->shopService->buyMultipleItems($character, $shield, 500, 0);
+        $result = $this->shopService->purchaseMultiple($character->refresh(), $shield, 2);
 
-        $character = $character->refresh();
-
-        $this->assertSame(1000, $character->gold);
-        $this->assertCount(0, $character->inventory->slots()->where('item_id', $shield->id)->get());
+        $this->assertSame('You cannot purchase more then you have inventory space.', $result['message']);
+        $this->assertSame(1000, $character->refresh()->gold);
     }
 
-    public function test_buy_and_replace_does_nothing_when_replacement_slot_does_not_exist()
+    public function test_buy_and_replace_rejects_a_replacement_slot_that_does_not_exist()
     {
         $shield = $this->createItem(['type' => 'shield']);
         $character = $this->character->getCharacter();
         $character->update(['gold' => 100000]);
 
-        $this->shopService->buyAndReplace($shield, $character->refresh(), [
+        $result = $this->shopService->purchaseAndReplace($character->refresh(), $shield, [
             'position' => 'left-hand',
             'slot_id' => 999999,
         ]);
 
         $character = $character->refresh();
 
+        $this->assertSame('The equipped item you chose to replace could not be found.', $result['message']);
         $this->assertCount(0, $character->inventory->slots()->where('item_id', $shield->id)->get());
     }
 
-    public function test_buy_and_replace_does_not_equip_when_purchased_item_slot_is_not_created()
+    public function test_purchase_item_charges_gold_and_adds_the_item_to_the_inventory()
     {
-        Event::fake([BuyItemEvent::class]);
+        $shield = $this->createItem(['type' => 'shield', 'cost' => 1000]);
+        $character = $this->character->getCharacter();
+        $character->update(['gold' => 5000]);
 
-        $existingShield = $this->createItem(['type' => 'shield']);
-        $newShield = $this->createItem(['type' => 'shield']);
-
-        $character = $this->character->inventoryManagement()
-            ->giveItem($existingShield, true, 'left-hand')
-            ->getCharacter();
-
-        $equippedSlot = $character->inventory->slots->firstWhere('item_id', $existingShield->id);
-
-        $character->update(['gold' => 100000]);
-
-        $this->shopService->buyAndReplace($newShield, $character->refresh(), [
-            'position' => 'left-hand',
-            'slot_id' => $equippedSlot->id,
-        ]);
+        $result = $this->shopService->purchaseItem($character->refresh(), $shield);
 
         $character = $character->refresh();
 
-        $this->assertNotNull($character->inventory->slots->firstWhere('item_id', $existingShield->id));
-        $this->assertNull($character->inventory->slots->firstWhere('item_id', $newShield->id));
+        $this->assertSame(200, $result['status']);
+        $this->assertSame(4000, $character->gold);
+        $this->assertNotNull($character->inventory->slots->firstWhere('item_id', $shield->id));
+    }
+
+    public function test_purchase_item_charges_a_merchant_the_discounted_price()
+    {
+        $shield = $this->createItem(['type' => 'shield', 'cost' => 10]);
+        $merchant = (new CharacterFactory)->createBaseCharacter([], ['name' => 'Merchant'])->givePlayerLocation()->getCharacter();
+        $merchant->update(['gold' => 10]);
+
+        $this->shopService->purchaseItem($merchant->refresh(), $shield);
+
+        $this->assertSame(3, $merchant->refresh()->gold);
+    }
+
+    public function test_purchase_item_announces_the_purchase_after_the_character_is_charged()
+    {
+        Event::fake([BuyItemEvent::class]);
+
+        $shield = $this->createItem(['type' => 'shield', 'cost' => 1000]);
+        $character = $this->character->getCharacter();
+        $character->update(['gold' => 5000]);
+
+        $this->shopService->purchaseItem($character->refresh(), $shield);
+
+        Event::assertDispatched(BuyItemEvent::class, function (BuyItemEvent $event) use ($shield): bool {
+            return $event->character->gold === 4000
+                && $event->character->inventory->slots()->where('item_id', $shield->id)->exists();
+        });
+    }
+
+    public function test_purchase_item_the_character_cannot_afford_is_not_announced()
+    {
+        Event::fake([BuyItemEvent::class]);
+
+        $shield = $this->createItem(['type' => 'shield', 'cost' => 1000]);
+        $character = $this->character->getCharacter();
+        $character->update(['gold' => 500]);
+
+        $result = $this->shopService->purchaseItem($character->refresh(), $shield);
+
+        $this->assertSame('You do not have enough gold.', $result['message']);
+        Event::assertNotDispatched(BuyItemEvent::class);
     }
 
     public function test_auto_sell_item_updates_gold_when_under_max_gold()

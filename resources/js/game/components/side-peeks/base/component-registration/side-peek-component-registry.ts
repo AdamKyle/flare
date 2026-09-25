@@ -76,8 +76,12 @@ import AdminQuestDetailSidePeek from '../../../../../admin/quests/components/sid
 import AdminQuestDetailSidePeekProps from '../../../../../admin/quests/components/side-peeks/types/admin-quest-detail-side-peek-props';
 import RaceImportSidePeek from '../../../../../admin/races/components/side-peeks/race-import-side-peek';
 import RaceImportSidePeekProps from '../../../../../admin/races/components/side-peeks/types/race-import-side-peek-props';
+import ActivitySidePeek from '../../activity/activity-side-peek';
+import ActivitySidePeekProps from '../../activity/types/activity-side-peek-props';
 import BackPack from '../../character-inventory/backpack/backpack';
 import BackpackProps from '../../character-inventory/backpack/types/backpack-props';
+import EquippedItemDetails from '../../character-inventory/equipped-item/equipped-item-details';
+import EquippedItemDetailsProps from '../../character-inventory/equipped-item/types/equipped-item-details-props';
 import GemBag from '../../character-inventory/gem-bag/gem-bag';
 import GemBagProps from '../../character-inventory/gem-bag/types/gem-bag-props';
 import Sets from '../../character-inventory/sets/sets';
@@ -134,18 +138,27 @@ export const SidePeekComponentRegistry: {
   [SidePeekComponentRegistrationEnum.BACKPACK]: {
     component: BackPack,
     props: {} as BackpackProps,
+    content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
   },
   [SidePeekComponentRegistrationEnum.GEM_BAG]: {
     component: GemBag,
     props: {} as GemBagProps,
+    content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
   },
   [SidePeekComponentRegistrationEnum.USABLE_ITEMS]: {
     component: UsableItems,
     props: {} as UsableItemsProps,
+    content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
   },
   [SidePeekComponentRegistrationEnum.SETS]: {
     component: Sets,
     props: {} as SetsProps,
+    content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
+  },
+  [SidePeekComponentRegistrationEnum.EQUIPPED_ITEM_DETAILS]: {
+    component: EquippedItemDetails,
+    props: {} as EquippedItemDetailsProps,
+    content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
   },
   [SidePeekComponentRegistrationEnum.MAP_ACTIONS_TELEPORT]: {
     component: Teleport,
@@ -209,6 +222,10 @@ export const SidePeekComponentRegistry: {
   [SidePeekComponentRegistrationEnum.ITEM_DETAILS]: {
     component: ItemDetails,
     props: {} as ItemDetailsProps,
+  },
+  [SidePeekComponentRegistrationEnum.ACTIVITY]: {
+    component: ActivitySidePeek,
+    props: {} as ActivitySidePeekProps,
   },
   [SidePeekComponentRegistrationEnum.CLASS_DETAIL]: {
     component: ClassDetailSidePeek,

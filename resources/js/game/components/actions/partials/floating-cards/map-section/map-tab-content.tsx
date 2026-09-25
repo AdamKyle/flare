@@ -134,11 +134,12 @@ const MapTabContent = ({
           disabled={!isViewLocationEnabled}
         />
       </div>
-      <div className="my-2 flex flex-col justify-center gap-2 p-2 md:flex-row">
+      <div className="my-2 w-full p-2">
         <Button
           on_click={onOpenKingdoms}
           label={'My Kingdoms'}
           variant={ButtonVariant.PRIMARY}
+          additional_css={'w-full'}
           disabled={!isKingdomsEnabled}
           aria_label={
             isKingdomsEnabled

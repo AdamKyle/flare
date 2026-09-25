@@ -10,6 +10,7 @@ use App\Game\Maps\Values\MapName;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\Setup\Character\CharacterSheetBaseInfoTransformerFactory;
 use Tests\Setup\FactionLoyalty\FactionLoyaltyFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterAutomation;
@@ -32,7 +33,7 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter();
-        $this->transformer = resolve(CharacterSheetBaseInfoTransformer::class);
+        $this->transformer = (new CharacterSheetBaseInfoTransformerFactory)->build();
     }
 
     protected function tearDown(): void
@@ -98,6 +99,26 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
         $this->assertSame(120, $data['can_craft_again_at']);
     }
 
+    public function test_show_intro_page_reflects_the_users_current_flag(): void
+    {
+        $character = $this->character->givePlayerLocation()->getCharacter();
+
+        $data = $this->transformer->transform($character->refresh());
+
+        $this->assertTrue($data['show_intro_page']);
+    }
+
+    public function test_show_intro_page_is_false_once_the_user_has_turned_it_off(): void
+    {
+        $character = $this->character->givePlayerLocation()->getCharacter();
+
+        $character->user()->update(['show_intro_page' => false]);
+
+        $data = $this->transformer->transform($character->refresh());
+
+        $this->assertFalse($data['show_intro_page']);
+    }
+
     public function test_active_exploration_automation_is_reported_with_its_name_and_timer(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
@@ -150,6 +171,29 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
 
         $this->assertSame('Faction Loyalty', $data['active_automation']['name']);
         $this->assertTrue($data['is_faction_loyalty_automation_running']);
+    }
+
+    public function test_active_automation_reports_the_newest_active_automation_when_multiple_exist(): void
+    {
+        $character = $this->character->givePlayerLocation()->getCharacter();
+
+        $this->createCharacterAutomation([
+            'character_id' => $character->id,
+            'type' => AutomationType::EXPLORING->value,
+            'started_at' => now()->subMinutes(10),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $this->createCharacterAutomation([
+            'character_id' => $character->id,
+            'type' => AutomationType::DELVE->value,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $data = $this->transformer->transform($character->refresh());
+
+        $this->assertSame('Delve', $data['active_automation']['name']);
     }
 
     public function test_no_active_automation_reports_zero_time_left_and_a_null_active_automation(): void

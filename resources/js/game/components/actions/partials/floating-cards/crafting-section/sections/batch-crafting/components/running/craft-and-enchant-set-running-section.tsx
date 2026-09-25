@@ -1,6 +1,9 @@
 import React, { ReactNode } from 'react';
 
 import BatchCraftingRunningSectionProps from './types/batch-crafting-running-section-props';
+import CurrencyDisplay from '../../../../../../../../../reusable-components/currency/currency-display';
+import { CurrencyDisplayMode } from '../../../../../../../../../reusable-components/currency/enums/currency-display-mode';
+import { CurrencyType } from '../../../../../../../../../reusable-components/currency/enums/currency-type';
 import { BatchCraftingOutputDestination } from '../../enums/batch-crafting-output-destination';
 import { BatchCraftingStatus } from '../../enums/batch-crafting-status';
 import { CraftAndEnchantSetPhase } from '../../enums/craft-and-enchant-set-phase';
@@ -149,11 +152,32 @@ const CraftAndEnchantSetRunningSection = ({
           <dt className="text-gray-600 dark:text-gray-400">Failed</dt>
           <dd>{batch.failed_count}</dd>
           <dt className="text-gray-600 dark:text-gray-400">Gold Spent</dt>
-          <dd>{batch.gold_spent.toLocaleString()}</dd>
+          <dd>
+            <CurrencyDisplay
+              currency={CurrencyType.GOLD}
+              amount={batch.gold_spent}
+              display_mode={CurrencyDisplayMode.EXACT}
+              show_label={false}
+            />
+          </dd>
           <dt className="text-gray-600 dark:text-gray-400">Gold Gained</dt>
-          <dd>{batch.gold_gained.toLocaleString()}</dd>
+          <dd>
+            <CurrencyDisplay
+              currency={CurrencyType.GOLD}
+              amount={batch.gold_gained}
+              display_mode={CurrencyDisplayMode.EXACT}
+              show_label={false}
+            />
+          </dd>
           <dt className="text-gray-600 dark:text-gray-400">Gold Left</dt>
-          <dd>{batch.gold_left.toLocaleString()}</dd>
+          <dd>
+            <CurrencyDisplay
+              currency={CurrencyType.GOLD}
+              amount={batch.gold_left}
+              display_mode={CurrencyDisplayMode.BALANCE}
+              show_label={false}
+            />
+          </dd>
         </dl>
       </BatchCraftingDetailSection>
 

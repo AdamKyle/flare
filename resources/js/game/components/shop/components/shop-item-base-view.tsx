@@ -1,8 +1,11 @@
 import React from 'react';
 
-import { EquippableItemWithBase } from '../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
+import CurrencyDisplay from '../../../reusable-components/currency/currency-display';
+import { CurrencyDisplayMode } from '../../../reusable-components/currency/enums/currency-display-mode';
+import { CurrencyType } from '../../../reusable-components/currency/enums/currency-type';
 import StatToolTip from '../../../reusable-components/item/tool-tips/stat-tool-tip';
 import { getCraftingLabelForType } from '../../../reusable-components/item/utils/item-view';
+import ShopItemBaseViewProps from '../types/shop-item-base-view-props';
 
 import { formatNumberWithCommas } from 'game-utils/format-number';
 
@@ -10,10 +13,6 @@ import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
 import Separator from 'ui/separator/separator';
-
-type ShopItemBaseViewProps = {
-  item: EquippableItemWithBase;
-};
 
 const ShopItemBaseView = ({ item }: ShopItemBaseViewProps) => {
   const craftingLabel = getCraftingLabelForType(item.type);
@@ -27,9 +26,12 @@ const ShopItemBaseView = ({ item }: ShopItemBaseViewProps) => {
       <Dl>
         <Dt>Cost</Dt>
         <Dd>
-          <span className="font-medium">
-            {formatNumberWithCommas(item.cost)} gold
-          </span>
+          <CurrencyDisplay
+            currency={CurrencyType.GOLD}
+            amount={item.cost}
+            display_mode={CurrencyDisplayMode.EXACT}
+            additional_css="font-medium"
+          />
         </Dd>
       </Dl>
       <Separator />

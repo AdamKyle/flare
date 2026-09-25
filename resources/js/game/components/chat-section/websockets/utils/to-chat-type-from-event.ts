@@ -1,14 +1,13 @@
 import ChatType from '../../../../api-definitions/chat/chat-message-definition';
+import { ChatSenderNames } from '../../enums/chat-sender-names';
 import { EventMessageTypes } from '../enums/event-message-types';
 import EventPayload from '../hooks/definitions/event-payload-definition';
 import { GlobalMessagePayloadDefinition } from '../hooks/definitions/global-message-payload-definition';
 import { NpcMessagePayloadDefinition } from '../hooks/definitions/npc-message-payload-definition';
 import { PrivateMessagePayloadDefinition } from '../hooks/definitions/private-message-payload-definition';
 
-const CREATOR_NAME = 'The Creator';
-
 export const toChatTypeFromPublicMessage = (event: EventPayload): ChatType => {
-  const isCreatorMessage = event.name === CREATOR_NAME;
+  const isCreatorMessage = event.name === ChatSenderNames.CREATOR;
 
   return {
     color: event.message.color,
@@ -24,6 +23,7 @@ export const toChatTypeFromPublicMessage = (event: EventPayload): ChatType => {
     is_chat_bold: event.message.is_chat_bold,
     is_chat_italic: event.message.is_chat_italic,
     name_tag: event.nameTag,
+    created_at: event.message.created_at,
   };
 };
 
@@ -43,6 +43,7 @@ export const toChatTypeFromNpcMessage = (
   is_chat_bold: false,
   is_chat_italic: false,
   name_tag: null,
+  created_at: null,
 });
 
 export const toChatTypeFromPrivateMessage = (
@@ -61,6 +62,7 @@ export const toChatTypeFromPrivateMessage = (
   is_chat_bold: false,
   is_chat_italic: false,
   name_tag: null,
+  created_at: null,
 });
 
 export const toChatTypeFromGlobalMessage = (
@@ -79,4 +81,5 @@ export const toChatTypeFromGlobalMessage = (
   is_chat_bold: false,
   is_chat_italic: false,
   name_tag: null,
+  created_at: null,
 });

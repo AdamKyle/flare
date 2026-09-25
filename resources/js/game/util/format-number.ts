@@ -55,6 +55,40 @@ export const shortenNumber = (value: number): string => {
 };
 
 /**
+ * Shortens a non-negative whole number the same way as {@link shortenNumber},
+ * but truncates to one decimal place instead of rounding, so a compact value
+ * never reads higher than the real amount (1,999,999 → `1.9 M`, not `2 M`).
+ *
+ * @example
+ * truncateCompactNumber(6_799);             // "6.7 k"
+ * @example
+ * truncateCompactNumber(1_050_000);         // "1 M"
+ * @example
+ * truncateCompactNumber(1_961_951_913_134); // "1.9 T"
+ */
+export const truncateCompactNumber = (value: number): string => {
+  const wholeValue = Math.floor(value);
+
+  if (wholeValue < 1000) {
+    return wholeValue.toString();
+  }
+
+  const suffixes: Suffix[] = ['', 'k', 'M', 'B', 'T', 'Q'];
+  let tier = 0;
+
+  while (tier < suffixes.length - 1 && wholeValue >= 1000 ** (tier + 1)) {
+    tier += 1;
+  }
+
+  const tenths = Math.floor(wholeValue / (1000 ** tier / 10));
+  const whole = Math.floor(tenths / 10);
+  const decimal = tenths % 10;
+  const formatted = decimal === 0 ? `${whole}` : `${whole}.${decimal}`;
+
+  return `${formatted} ${suffixes[tier]}`;
+};
+
+/**
  * Formats a number using US thousands separators.
  *
  * Values below 1,000 are returned as a plain string without commas.
@@ -78,7 +112,7 @@ export const formatNumberWithCommas = (value: number): string => {
 };
 
 /**
- * Formats a proportion as a percentage with two decimal places.
+ * Formats a proportion as a comma-grouped percentage with two decimal places.
  *
  * Pass values like `0.55` to represent `55%`.
  * Negative values are supported.
@@ -92,9 +126,16 @@ export const formatNumberWithCommas = (value: number): string => {
  * formatPercent(1);     // "100.00%"
  * @example
  * formatPercent(-0.1);  // "-10.00%"
+ * @example
+ * formatPercent(20);    // "2,000.00%"
  */
 export const formatPercent = (value: number): string => {
-  return `${(Number(value) * 100).toFixed(2)}%`;
+  const percentage = Number(value) * 100;
+
+  return `${percentage.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}%`;
 };
 
 /**
@@ -126,6 +167,18 @@ export const formatSignedPercent = (value: number): string => {
 
   return `${sign}${pct}%`;
 };
+
+/**
+ * Whether a proportion renders as `0.00%` under {@link formatSignedPercent}'s
+ * two-decimal precision, even when the underlying value is a tiny non-zero.
+ *
+ * @example
+ * isDisplayedAsZeroPercent(0.00001); // true
+ * @example
+ * isDisplayedAsZeroPercent(0.0001);  // false ("+0.01%")
+ */
+export const isDisplayedAsZeroPercent = (value: number): boolean =>
+  Math.abs(value * 100).toFixed(2) === '0.00';
 
 /**
  * Formats an integer with an explicit `+` or `-` sign and thousands separators.

@@ -2,7 +2,9 @@ import clsx from 'clsx';
 import React from 'react';
 
 import TeleportSectionProps from './types/teleport-section-props';
-import { formatNumberWithCommas } from '../../../../util/format-number';
+import CurrencyDisplay from '../../../../reusable-components/currency/currency-display';
+import { CurrencyDisplayMode } from '../../../../reusable-components/currency/enums/currency-display-mode';
+import { CurrencyType } from '../../../../reusable-components/currency/enums/currency-type';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
@@ -25,7 +27,13 @@ const TeleportSection = ({
           Your Gold:
         </span>
         <span className="font-mono text-gray-900 dark:text-gray-100">
-          {formatNumberWithCommas(character_gold)}
+          <CurrencyDisplay
+            currency={CurrencyType.GOLD}
+            amount={character_gold}
+            display_mode={CurrencyDisplayMode.BALANCE}
+            label="Your Gold"
+            show_label={false}
+          />
         </span>
       </div>
       <div className="flex justify-between">
@@ -37,10 +45,14 @@ const TeleportSection = ({
             'font-mono',
             can_afford_to_teleport
               ? 'text-emerald-600 dark:text-emerald-500'
-              : 'text-rose-600 hover:text-rose-500'
+              : 'text-rose-600 dark:text-rose-500'
           )}
         >
-          {formatNumberWithCommas(cost_of_teleport)}
+          <CurrencyDisplay
+            currency={CurrencyType.GOLD}
+            amount={cost_of_teleport}
+            display_mode={CurrencyDisplayMode.EXACT}
+          />
         </span>
       </div>
       <div className="flex justify-between">

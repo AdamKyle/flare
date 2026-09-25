@@ -1,9 +1,9 @@
 import { AxiosErrorDefinition } from 'api-handler/definitions/axios-error-definition';
 
-import GameMapFactualDefinition from '../../../types/game-map-factual-definition';
+import PlayerGameMapDetailDefinition from '../../../types/player-game-map-detail-definition';
 
 export default interface UsePlayerGameMapDetailDefinition {
-  game_map: GameMapFactualDefinition | null;
+  game_map: PlayerGameMapDetailDefinition | null;
   loading: boolean;
   error: AxiosErrorDefinition | null;
   refresh: () => void;

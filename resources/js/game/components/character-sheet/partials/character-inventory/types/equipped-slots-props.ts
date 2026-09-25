@@ -2,4 +2,5 @@ import BaseInventoryItemDefinition from '../../../../side-peeks/character-invent
 
 export default interface EquippedSlotsProps {
   equipped_items: BaseInventoryItemDefinition[];
+  on_open_item_details: (equippedItem: BaseInventoryItemDefinition) => void;
 }

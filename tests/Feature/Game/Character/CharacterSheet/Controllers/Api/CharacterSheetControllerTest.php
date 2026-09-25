@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Game\Character\CharacterSheet\Controllers\Api;
 
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Items\Values\ItemType;
 use App\Game\Events\Values\EventType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -56,6 +57,21 @@ class CharacterSheetControllerTest extends TestCase
         $jsonData = json_decode($response->getContent(), true);
 
         $this->assertGreaterThan(0, $jsonData['data']['healing_amount']);
+    }
+
+    public function test_character_sheet_returns_the_maximum_amount_of_each_currency()
+    {
+        $character = $this->character->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/character-sheet/'.$character->id);
+
+        $this->assertSame([
+            'gold' => CurrencyLimit::MAX_GOLD,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
+            'copper_coins' => CurrencyLimit::MAX_COPPER,
+        ], json_decode($response->getContent(), true)['data']['currency_limits']);
     }
 
     public function test_character_sheet_returns_complete_contract_with_numeric_values_and_nested_resources()

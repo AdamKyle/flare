@@ -3,20 +3,11 @@ import { isNil } from 'lodash';
 import React, { ReactNode } from 'react';
 
 import GemWorldActionsProps from './types/gem-world-actions-props';
-import GemWorldSourceDefinition from '../../../../../reusable-components/gems/api/definitions/gem-world-source-definition';
 import GemWorldEntryDefinition from '../../../../map-section/api/definitions/gem-world-entry-definition';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import LoadingButton from 'ui/buttons/loading-button';
-
-const describeGemSources = (sources: GemWorldSourceDefinition[]): string =>
-  sources
-    .map(
-      (source) =>
-        `${source.type === 'map_gem' ? 'Map Gem' : 'Location Gem'}: ${source.profile_name}`
-    )
-    .join(' · ');
 
 const GemWorldActions = ({
   status,
@@ -31,41 +22,27 @@ const GemWorldActions = ({
   on_open_gem_progress_history: onOpenGemProgressHistory,
   on_open_all_active_gem_scrolls: onOpenAllActiveGemScrolls,
 }: GemWorldActionsProps): ReactNode => {
-  const renderGemEntrySourceText = (
-    entry: GemWorldEntryDefinition
-  ): ReactNode => {
-    const matchingSource = entry.context.sources.find(
-      (source) => source.type === entry.type
-    );
-
-    if (!matchingSource) {
+  const renderExitError = (): ReactNode => {
+    if (isNil(exitError)) {
       return null;
     }
 
-    return (
-      <div className="text-sm text-gray-700 dark:text-gray-300">
-        {describeGemSources([matchingSource])}
-      </div>
-    );
+    return <ApiErrorAlert apiError={exitError} />;
   };
 
   const renderInsideSection = (): ReactNode => {
-    const currentContext = status?.current_context;
-
-    if (isNil(currentContext)) {
+    if (isNil(status?.current_context)) {
       return null;
     }
 
     return (
       <div className="my-2 flex flex-col gap-2 p-2">
-        <div className="text-sm text-gray-700 dark:text-gray-300">
-          Gem World: {currentContext.label}
-        </div>
-        <div className="flex flex-col justify-center gap-2 md:flex-row">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <Button
             on_click={onViewEffects}
             label={'View Gem Effects'}
             variant={ButtonVariant.PRIMARY}
+            additional_css={'w-full'}
           />
           <LoadingButton
             on_click={() => onExit()}
@@ -74,16 +51,16 @@ const GemWorldActions = ({
             variant={ButtonVariant.DANGER}
             is_loading={exiting}
             disabled={!canMove}
+            additional_css={'w-full'}
           />
         </div>
-        {!isNil(exitError) && <ApiErrorAlert apiError={exitError} />}
+        {renderExitError()}
       </div>
     );
   };
 
   const renderEntrySection = (entry: GemWorldEntryDefinition): ReactNode => (
-    <div className="my-2 flex flex-col gap-2 p-2">
-      {renderGemEntrySourceText(entry)}
+    <div className="my-2 p-2">
       <Button
         on_click={onEnter}
         label={entry.label}
@@ -95,17 +72,12 @@ const GemWorldActions = ({
   );
 
   const renderCurrentEffectsSection = (): ReactNode => {
-    const currentContext = status?.current_context;
-
-    if (isNil(currentContext)) {
+    if (isNil(status?.current_context)) {
       return null;
     }
 
     return (
-      <div className="my-2 flex flex-col gap-2 p-2">
-        <div className="text-sm text-gray-700 dark:text-gray-300">
-          {describeGemSources(currentContext.sources)}
-        </div>
+      <div className="my-2 p-2">
         <Button
           on_click={onViewEffects}
           label={'View Gem Effects'}
@@ -160,16 +132,18 @@ const GemWorldActions = ({
   };
 
   const renderGlobalBrowserActions = (): ReactNode => (
-    <div className="my-2 flex flex-col justify-center gap-2 p-2 md:flex-row">
+    <div className="my-2 grid grid-cols-1 gap-2 p-2 sm:grid-cols-2">
       <Button
         on_click={onOpenGemProgressHistory}
         label={'Gem Progress History'}
         variant={ButtonVariant.PRIMARY}
+        additional_css={'w-full'}
       />
       <Button
         on_click={onOpenAllActiveGemScrolls}
         label={'All Active Gem Scrolls'}
         variant={ButtonVariant.PRIMARY}
+        additional_css={'w-full'}
       />
     </div>
   );

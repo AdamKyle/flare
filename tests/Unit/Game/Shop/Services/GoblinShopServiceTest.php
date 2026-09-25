@@ -4,8 +4,12 @@ namespace Tests\Unit\Game\Shop\Services;
 
 use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\InventorySlot;
+use App\Flare\Pagination\Pagination;
+use App\Game\Character\CharacterInventory\Transformers\CharacterInventoryCountTransformer;
+use App\Game\Core\Items\Transformers\Api\UsableItemTransformer;
 use App\Game\Shop\Services\GoblinShopService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use League\Fractal\Manager;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateAlchemyBagSlot;
@@ -31,7 +35,11 @@ class GoblinShopServiceTest extends TestCase
             ->assignKingdom(['gold_bars' => 1000])
             ->getCharacterFactory();
 
-        $this->shopService = resolve(GoblinShopService::class);
+        $this->shopService = new GoblinShopService(
+            new Pagination(new Manager),
+            new UsableItemTransformer,
+            new CharacterInventoryCountTransformer,
+        );
     }
 
     protected function tearDown(): void
@@ -48,7 +56,7 @@ class GoblinShopServiceTest extends TestCase
 
         $character = $this->character->getCharacter();
 
-        $this->shopService->buyItem($character, $item, $character->kingdoms()->get());
+        $this->shopService->buyItem($character, $item, 1);
 
         $character = $character->refresh();
 
@@ -66,7 +74,7 @@ class GoblinShopServiceTest extends TestCase
 
         $character = $this->character->getCharacter();
 
-        $this->shopService->buyItem($character, $item, $character->kingdoms()->get());
+        $this->shopService->buyItem($character, $item, 1);
 
         $character = $character->refresh();
 
@@ -92,7 +100,7 @@ class GoblinShopServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->shopService->buyItem($character, $item, $character->kingdoms()->get());
+        $this->shopService->buyItem($character, $item, 1);
 
         $character = $character->refresh();
 
@@ -112,25 +120,25 @@ class GoblinShopServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->shopService->buyItem($character, $item, $character->kingdoms()->get());
+        $this->shopService->buyItem($character, $item, 1);
 
         $character = $character->refresh();
 
         $item = $this->createItem(['gold_bars_cost' => 500]);
 
-        $this->shopService->buyItem($character, $item, $character->kingdoms()->get());
+        $this->shopService->buyItem($character, $item, 1);
 
         $character = $character->refresh();
 
         $item = $this->createItem(['gold_bars_cost' => 250]);
 
-        $this->shopService->buyItem($character, $item, $character->kingdoms()->get());
+        $this->shopService->buyItem($character, $item, 1);
 
         $character = $character->refresh();
 
         $item = $this->createItem(['gold_bars_cost' => 100]);
 
-        $this->shopService->buyItem($character, $item, $character->kingdoms()->get());
+        $this->shopService->buyItem($character, $item, 1);
 
         $character = $character->refresh();
 
@@ -145,13 +153,13 @@ class GoblinShopServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->shopService->buyItem($character, $item, $character->kingdoms()->get());
+        $this->shopService->buyItem($character, $item, 1);
 
         $character = $character->refresh();
 
         $item = $this->createItem(['gold_bars_cost' => 1000]);
 
-        $this->shopService->buyItem($character, $item, $character->kingdoms()->get());
+        $this->shopService->buyItem($character, $item, 1);
 
         $character = $character->refresh();
 
@@ -174,7 +182,7 @@ class GoblinShopServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->shopService->buyItem($character, $item, $character->kingdoms()->get());
+        $this->shopService->buyItem($character, $item, 1);
 
         $character = $character->refresh();
 
@@ -203,7 +211,7 @@ class GoblinShopServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->shopService->buyItem($character, $item, $character->kingdoms()->get());
+        $this->shopService->buyItem($character, $item, 1);
 
         $character = $character->refresh();
 
@@ -215,13 +223,56 @@ class GoblinShopServiceTest extends TestCase
         $this->assertEquals(400, $character->kingdoms->sum('gold_bars'));
     }
 
+    public function test_buy_item_buys_the_requested_amount_and_charges_the_total_gold_bars(): void
+    {
+        $item = $this->createItem(['type' => 'alchemy', 'gold_bars_cost' => 100]);
+
+        $character = $this->character->getCharacter();
+
+        $result = $this->shopService->buyItem($character, $item, 3);
+
+        $character = $character->refresh();
+
+        $this->assertSame(200, $result['status']);
+        $this->assertSame(2700, $result['character_gold_bars']);
+        $this->assertEquals(2700, $character->kingdoms->sum('gold_bars'));
+        $this->assertEquals(3, AlchemyBagSlot::where('item_id', $item->id)->value('amount'));
+    }
+
+    public function test_buy_item_rejects_an_amount_the_character_cannot_afford(): void
+    {
+        $item = $this->createItem(['type' => 'alchemy', 'gold_bars_cost' => 2000]);
+
+        $character = $this->character->getCharacter();
+
+        $result = $this->shopService->buyItem($character, $item, 2);
+
+        $this->assertSame(422, $result['status']);
+        $this->assertSame('Not enough gold bars. Go slay monsters to stock your treasury.', $result['message']);
+        $this->assertEquals(3000, $character->refresh()->kingdoms->sum('gold_bars'));
+        $this->assertNull(AlchemyBagSlot::where('item_id', $item->id)->first());
+    }
+
+    public function test_buy_item_rejects_more_non_alchemy_items_than_the_inventory_can_hold(): void
+    {
+        $item = $this->createItem(['gold_bars_cost' => 10]);
+
+        $character = $this->character->getCharacter();
+        $character->update(['inventory_max' => 1]);
+
+        $result = $this->shopService->buyItem($character->refresh(), $item, 2);
+
+        $this->assertSame('Your inventory is full. Cannot buy that many items.', $result['message']);
+        $this->assertEquals(3000, $character->refresh()->kingdoms->sum('gold_bars'));
+    }
+
     public function test_alchemy_item_purchase_writes_to_alchemy_bag_slot(): void
     {
         $item = $this->createItem(['type' => 'alchemy', 'gold_bars_cost' => 100]);
 
         $character = $this->character->getCharacter();
 
-        $this->shopService->buyItem($character, $item, $character->kingdoms()->get());
+        $this->shopService->buyItem($character, $item, 1);
 
         $alchemyBag = $character->refresh()->alchemyBag;
 
@@ -236,8 +287,8 @@ class GoblinShopServiceTest extends TestCase
 
         $character = $this->character->getCharacter();
 
-        $this->shopService->buyItem($character, $item, $character->kingdoms()->get());
-        $this->shopService->buyItem($character->refresh(), $item, $character->refresh()->kingdoms()->get());
+        $this->shopService->buyItem($character, $item, 1);
+        $this->shopService->buyItem($character->refresh(), $item, 1);
 
         $alchemyBag = $character->refresh()->alchemyBag;
 
@@ -251,7 +302,7 @@ class GoblinShopServiceTest extends TestCase
 
         $character = $this->character->getCharacter();
 
-        $this->shopService->buyItem($character, $item, $character->kingdoms()->get());
+        $this->shopService->buyItem($character, $item, 1);
 
         $character = $character->refresh();
 
@@ -294,7 +345,7 @@ class GoblinShopServiceTest extends TestCase
 
         $character = $this->character->getCharacter();
 
-        $this->shopService->buyItem($character, $item, $character->kingdoms()->get());
+        $this->shopService->buyItem($character, $item, 1);
 
         $slot = InventorySlot::where('item_id', $item->id)
             ->where('inventory_id', $character->inventory->id)
@@ -320,7 +371,7 @@ class GoblinShopServiceTest extends TestCase
             'amount' => 4,
         ]);
 
-        $this->shopService->buyItem($character->refresh(), $item, $character->refresh()->kingdoms()->get());
+        $this->shopService->buyItem($character->refresh(), $item, 1);
 
         $this->assertEquals(5, AlchemyBagSlot::where('alchemy_bag_id', $character->refresh()->alchemyBag->id)->sum('amount'));
     }
@@ -341,9 +392,11 @@ class GoblinShopServiceTest extends TestCase
             'amount' => 5,
         ]);
 
-        $this->shopService->buyItem($character->refresh(), $item, $character->refresh()->kingdoms()->get());
+        $result = $this->shopService->buyItem($character->refresh(), $item, 1);
 
+        $this->assertSame('Your alchemy bag cannot hold that many more items.', $result['message']);
         $this->assertEquals(5, AlchemyBagSlot::where('alchemy_bag_id', $character->refresh()->alchemyBag->id)->sum('amount'));
+        $this->assertEquals(3000, $character->refresh()->kingdoms->sum('gold_bars'));
     }
 
     public function test_alchemy_purchase_fails_when_stacking_existing_row_would_exceed_limit(): void
@@ -362,7 +415,7 @@ class GoblinShopServiceTest extends TestCase
             'amount' => 5,
         ]);
 
-        $this->shopService->buyItem($character->refresh(), $item, $character->refresh()->kingdoms()->get());
+        $this->shopService->buyItem($character->refresh(), $item, 1);
 
         $this->assertEquals(5, AlchemyBagSlot::where('alchemy_bag_id', $character->refresh()->alchemyBag->id)
             ->where('item_id', $item->id)

@@ -1,8 +1,9 @@
 import React, { ReactNode } from 'react';
 
 import HolyOilCostSummaryProps from './types/holy-oil-cost-summary-props';
-
-import { formatNumberWithCommas } from 'game-utils/format-number';
+import CurrencyDisplay from '../../../../../../../../reusable-components/currency/currency-display';
+import { CurrencyDisplayMode } from '../../../../../../../../reusable-components/currency/enums/currency-display-mode';
+import { CurrencyType } from '../../../../../../../../reusable-components/currency/enums/currency-type';
 
 const HolyOilCostSummary = ({
   currentStacks,
@@ -25,7 +26,14 @@ const HolyOilCostSummary = ({
     {goldDustCost !== null && (
       <>
         <dt>Gold Dust cost</dt>
-        <dd>{formatNumberWithCommas(goldDustCost)}</dd>
+        <dd>
+          <CurrencyDisplay
+            currency={CurrencyType.GOLD_DUST}
+            amount={goldDustCost}
+            display_mode={CurrencyDisplayMode.EXACT}
+            show_label={false}
+          />
+        </dd>
       </>
     )}
 

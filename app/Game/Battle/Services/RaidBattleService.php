@@ -17,6 +17,8 @@ use App\Game\Battle\Services\Concerns\HandleCachedRaidCritterHealth;
 use App\Game\BattleRewardProcessing\Jobs\BattleAttackHandler;
 use App\Game\BattleRewardProcessing\Jobs\RaidBossRewardHandler;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Monsters\Services\BuildMonsterCacheService;
 use Exception;
@@ -27,34 +29,33 @@ class RaidBattleService
 {
     use HandleCachedRaidCritterHealth, ResponseBuilder;
 
-    private BuildMonster $buildMonster;
-
-    private CharacterCacheData $characterCacheData;
-
-    private MonsterPlayerFight $monsterPlayerFight;
-
-    private BuildMonsterCacheService $buildMonsterCacheService;
-
-    private BattleEventHandler $battleEventHandler;
-
     private int $raidBossCurrentHealth;
 
+    /**
+     * @param BuildMonster $buildMonster
+     * @param CharacterCacheData $characterCacheData
+     * @param MonsterPlayerFight $monsterPlayerFight
+     * @param BuildMonsterCacheService $buildMonsterCacheService
+     * @param BattleEventHandler $battleEventHandler
+     * @param ChanceCalculator $chanceCalculator
+     * @param RandomNumberGenerator $randomNumberGenerator
+     */
     public function __construct(
-        BuildMonster $buildMonster,
-        CharacterCacheData $characterCacheData,
-        MonsterPlayerFight $monsterPlayerFight,
-        BuildMonsterCacheService $buildMonsterCacheService,
-        BattleEventHandler $battleEventHandler,
-    ) {
-        $this->buildMonster = $buildMonster;
-        $this->characterCacheData = $characterCacheData;
-        $this->monsterPlayerFight = $monsterPlayerFight;
-        $this->buildMonsterCacheService = $buildMonsterCacheService;
-        $this->battleEventHandler = $battleEventHandler;
-    }
+        private readonly BuildMonster $buildMonster,
+        private readonly CharacterCacheData $characterCacheData,
+        private readonly MonsterPlayerFight $monsterPlayerFight,
+        private readonly BuildMonsterCacheService $buildMonsterCacheService,
+        private readonly BattleEventHandler $battleEventHandler,
+        private readonly ChanceCalculator $chanceCalculator,
+        private readonly RandomNumberGenerator $randomNumberGenerator,
+    ) {}
 
     /**
-     * Set up the boss battle.
+     * Set up the raid boss battle's current fight state, initializing its health when not already set up.
+     *
+     * @param Character $character
+     * @param RaidBoss $raidBoss
+     * @return array
      */
     public function setUpRaidBossBattle(Character $character, RaidBoss $raidBoss): array
     {
@@ -99,8 +100,11 @@ class RaidBattleService
         ]);
     }
 
-    /**doAttack
-     * Set the current health for the raid battle service.
+    /**
+     * Set the current raid boss health this service instance will fight against.
+     *
+     * @param int $raidBossCurrentHealth
+     * @return RaidBattleService
      */
     public function setRaidBossHealth(int $raidBossCurrentHealth): RaidBattleService
     {
@@ -110,7 +114,11 @@ class RaidBattleService
     }
 
     /**
-     * Set up the raid critter monster.
+     * Set up a new raid critter Monster fight and return its fight state.
+     *
+     * @param Character $character
+     * @param Monster $monster
+     * @return array
      */
     public function setUpRaidCritterMonster(Character $character, Monster $monster): array
     {
@@ -139,7 +147,13 @@ class RaidBattleService
     }
 
     /**
-     * Fight either the raid boss or the raid critter.
+     * Resolve one Character attack against the raid boss or raid critter and return the updated fight state.
+     *
+     * @param Character $character
+     * @param int $monsterId
+     * @param string $attackType
+     * @param bool $isRaidBoss
+     * @return array
      */
     public function fightRaidMonster(Character $character, int $monsterId, string $attackType, bool $isRaidBoss = false): array
     {
@@ -196,6 +210,14 @@ class RaidBattleService
         return $this->successResult($resultData);
     }
 
+    /**
+     * Handle the Character's death mid-fight: sync the raid boss health and mark the Character defeated.
+     *
+     * @param Character $character
+     * @param ServerMonster $serverMonster
+     * @param array $fightData
+     * @return array
+     */
     private function handleCharacterDeath(Character $character, ServerMonster $serverMonster, array $fightData): array
     {
         $resultData = $this->buildBaseResultData();
@@ -215,6 +237,13 @@ class RaidBattleService
         return $this->successResult($resultData);
     }
 
+    /**
+     * Handle the Monster's death: sync the raid boss health, then dispatch the owning reward handler.
+     *
+     * @param Character $character
+     * @param ServerMonster $serverMonster
+     * @return array
+     */
     private function handleMonsterDeath(Character $character, ServerMonster $serverMonster): array
     {
         $resultData = $this->buildBaseResultData();
@@ -244,9 +273,11 @@ class RaidBattleService
     }
 
     /**
-     * Build Base result data.
+     * Build the base fight result data from the current MonsterPlayerFight state.
+     *
+     * @return array
      */
-    protected function buildBaseResultData(): array
+    private function buildBaseResultData(): array
     {
         return [
             'character_current_health' => $this->monsterPlayerFight->getCharacterHealth(),
@@ -256,9 +287,17 @@ class RaidBattleService
     }
 
     /**
-     * Get the fight data for the raid critter.
+     * Get the fight data for the raid boss or raid critter, refreshing the raid boss's persisted state when needed.
+     *
+     * @param Character $character
+     * @param ServerMonster $serverMonster
+     * @param int $monsterId
+     * @param array $monster
+     * @param string $attackType
+     * @param bool $isRaidBoss
+     * @return array
      */
-    protected function getFightData(Character $character, ServerMonster $serverMonster, int $monsterId, array $monster, string $attackType, bool $isRaidBoss): array
+    private function getFightData(Character $character, ServerMonster $serverMonster, int $monsterId, array $monster, string $attackType, bool $isRaidBoss): array
     {
         if (! $isRaidBoss && $this->hasCachedHealth($character->id, $monsterId)) {
             $fightData = $this->getCachedFightData($character->id, $monsterId);
@@ -272,7 +311,8 @@ class RaidBattleService
         if ($isRaidBoss) {
             $raidBoss = $this->findCurrentRaidBoss($character, $monsterId);
 
-            $fightData['monster'] = resolve(ServerMonster::class)->setMonster($raidBoss->raid_boss_deatils)
+            $fightData['monster'] = (new ServerMonster($this->chanceCalculator, $this->randomNumberGenerator))
+                ->setMonster($raidBoss->raid_boss_deatils)
                 ->setHealth($raidBoss->boss_current_hp);
             $fightData['health']['current_monster_health'] = $raidBoss->boss_current_hp;
         }
@@ -281,11 +321,16 @@ class RaidBattleService
     }
 
     /**
-     * Process the pre attack.
+     * Process the pre-attack outcome for an ambush, handling an already-decided Character or Monster death.
      *
-     * This could mean the character is deasd, the monster is dead.
+     * @param Character $character
+     * @param array $health
+     * @param array $messages
+     * @param int $monsterId
+     * @param bool $isRaidBoss
+     * @return array
      */
-    protected function handlePreAttack(Character $character, array $health, array $messages, int $monsterId, bool $isRaidBoss = false): array
+    private function handlePreAttack(Character $character, array $health, array $messages, int $monsterId, bool $isRaidBoss = false): array
     {
         if ($health['current_character_health'] <= 0) {
             $health['current_character_health'] = 0;
@@ -322,8 +367,7 @@ class RaidBattleService
             if (is_null($raid)) {
                 BattleAttackHandler::dispatch($character->id, $this->monsterPlayerFight->getMonster()['id'])
                     ->onQueue('battle_reward_processing')
-                    ->onConnection('battle_reward_processing')
-                    ->delay(now()->addSeconds(2));
+                    ->onConnection('battle_reward_processing');
 
                 return $this->successResult([
                     'character_current_health' => $health['current_character_health'],
@@ -348,9 +392,13 @@ class RaidBattleService
     }
 
     /**
-     * Update the raid bosses health.
+     * Update the raid boss's persisted health to the lower of its current or newly calculated health.
+     *
+     * @param RaidBoss $raidBoss
+     * @param int $newHealth
+     * @return void
      */
-    protected function updateRaidBossHealth(RaidBoss $raidBoss, int $newHealth): void
+    private function updateRaidBossHealth(RaidBoss $raidBoss, int $newHealth): void
     {
         $raidBoss->update([
             // always get the latest and greates new health when updating.
@@ -363,9 +411,15 @@ class RaidBattleService
     }
 
     /**
-     * Handle the raid boss health, assuming we are a raid monster.
+     * Sync the current raid boss health and participation record when this fight is against a raid boss.
+     *
+     * @param Character $character
+     * @param int $monsterId
+     * @param bool $shouldUpdateHealth
+     * @param array $health
+     * @return void
      */
-    protected function handleRaidBossHealth(Character $character, int $monsterId, bool $shouldUpdateHealth, array $health = []): void
+    private function handleRaidBossHealth(Character $character, int $monsterId, bool $shouldUpdateHealth, array $health = []): void
     {
         if (! $shouldUpdateHealth) {
             return;
@@ -387,7 +441,12 @@ class RaidBattleService
     }
 
     /**
-     * Update raid Participation info.
+     * Update or create the Character's raid boss participation record for the damage just dealt.
+     *
+     * @param Character $character
+     * @param RaidBoss $raidBoss
+     * @param int $oldHealth
+     * @return void
      */
     private function updateRaidParticipation(Character $character, RaidBoss $raidBoss, int $oldHealth): void
     {
@@ -443,9 +502,11 @@ class RaidBattleService
     }
 
     /**
-     * Build the server monster.
+     * Build the server-authoritative Monster for the given raid Monster id from the cached raid Monster list.
      *
-     * @throws Exception
+     * @param Character $character
+     * @param int $monsterId
+     * @return ServerMonster
      */
     private function buildServerMonster(Character $character, int $monsterId): ServerMonster
     {
@@ -481,7 +542,10 @@ class RaidBattleService
     }
 
     /**
-     * Is the raid boss set up?
+     * Determine whether the raid boss's health has already been initialized.
+     *
+     * @param RaidBoss $raidBoss
+     * @return bool
      */
     private function isRaidBossSetup(RaidBoss $raidBoss): bool
     {
@@ -489,6 +553,13 @@ class RaidBattleService
         return ! is_null($raidBoss->boss_max_hp) && ! is_null($raidBoss->boss_current_hp);
     }
 
+    /**
+     * Resolve the active raid boss at the Character's current location for the given Monster id, or null when none is active.
+     *
+     * @param Character $character
+     * @param int $monsterId
+     * @return ?RaidBoss
+     */
     private function findCurrentRaidBoss(Character $character, int $monsterId): ?RaidBoss
     {
         $location = Location::where('game_map_id', $character->map->game_map_id)

@@ -3,7 +3,9 @@
 namespace Tests\Feature\Game\Automation\Exploration\Controllers\Api;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\Monster;
+use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Values\AutomationType;
 use App\Game\Core\Combat\Values\AttackType;
 use App\Game\Maps\Values\LocationType;
@@ -64,11 +66,25 @@ class ExplorationControllerTest extends TestCase
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
+        $explorationMessage = $jsonData['exploration_message'];
 
         $this->assertEquals(
             'Exploration has started. Check the exploration tab (beside server messages) for update. The tab will every 1 minutes, rewards are handed to you or disenchanted automatically.',
             $jsonData['message']
         );
+        $this->assertNotEmpty($explorationMessage['messageId']);
+        $this->assertStringStartsWith('The exploration will begin in 1 minute.', $explorationMessage['message']);
+        $this->assertFalse($explorationMessage['makeItalic']);
+        $this->assertFalse($explorationMessage['isReward']);
+        $this->assertNotEmpty($explorationMessage['timeStamp']);
+
+        Event::assertDispatched(AutomationLogUpdate::class, function (AutomationLogUpdate $event) use ($explorationMessage): bool {
+            return $event->messageId === $explorationMessage['messageId']
+                && $event->message === $explorationMessage['message']
+                && $event->timeStamp === $explorationMessage['timeStamp']
+                && $event->makeItalic === $explorationMessage['makeItalic']
+                && $event->isReward === $explorationMessage['isReward'];
+        });
     }
 
     public function test_stop_stops_exploration(): void
@@ -145,6 +161,59 @@ class ExplorationControllerTest extends TestCase
 
         $this->assertEquals(422, $response->getStatusCode());
         $this->assertEquals('You cannot do that while Exploration automation is running. Cancel it first.', $jsonData['message']);
+    }
+
+    public function test_begin_returns422_when_selected_monster_id_is_missing(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $response = $this->actingAs($this->character->user)
+            ->call('POST', '/api/automation/'.$this->character->id.'/start', [
+                '_token' => csrf_token(),
+                'auto_attack_length' => 1,
+                'move_down_the_list_every' => 10,
+                'attack_type' => AttackType::ATTACK->value,
+            ], [], [], ['HTTP_ACCEPT' => 'application/json']);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertNull(
+            CharacterAutomation::where('character_id', $this->character->id)
+                ->where('type', AutomationType::EXPLORING->value)
+                ->first()
+        );
+    }
+
+    public function test_begin_returns422_when_selected_monster_is_not_eligible_for_the_current_location(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $ineligibleMonster = (new MonsterFactory)
+            ->buildMonster()
+            ->updateMonster([
+                'is_raid_monster' => true,
+            ])
+            ->getMonster();
+
+        $response = $this->actingAs($this->character->user)
+            ->call('POST', '/api/automation/'.$this->character->id.'/start', [
+                '_token' => csrf_token(),
+                'auto_attack_length' => 1,
+                'move_down_the_list_every' => 10,
+                'selected_monster_id' => $ineligibleMonster->id,
+                'attack_type' => AttackType::ATTACK->value,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('That monster is not available to explore at your current location. Please select another monster.', $jsonData['message']);
+        $this->assertNull(
+            CharacterAutomation::where('character_id', $this->character->id)
+                ->where('type', AutomationType::EXPLORING->value)
+                ->first()
+        );
     }
 
     public function test_begin_returns422_when_character_is_on_blocked_location(): void

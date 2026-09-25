@@ -6,7 +6,7 @@ export default interface MessagesProps {
   chat: ChatType[];
   set_tab_to_updated: (key: string) => void;
   push_silenced_message: () => void;
-  push_private_message_sent: (messageData: string[]) => void;
   push_error_message: (message: string) => void;
   on_send: (text: string) => void;
+  can_start_private_message?: boolean;
 }

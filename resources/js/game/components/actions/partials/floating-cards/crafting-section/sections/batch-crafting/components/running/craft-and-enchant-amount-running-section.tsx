@@ -1,5 +1,8 @@
 import React, { ReactNode } from 'react';
 
+import CurrencyDisplay from '../../../../../../../../../reusable-components/currency/currency-display';
+import { CurrencyDisplayMode } from '../../../../../../../../../reusable-components/currency/enums/currency-display-mode';
+import { CurrencyType } from '../../../../../../../../../reusable-components/currency/enums/currency-type';
 import { BatchCraftingStatus } from '../../enums/batch-crafting-status';
 import { useOpenBatchCraftedItem } from '../../hooks/use-open-batch-crafted-item';
 import { getBatchCraftedItemLinkLabel } from '../../utils/get-batch-crafted-item-link-label';
@@ -51,6 +54,23 @@ const CraftAndEnchantAmountRunningSection = ({
     return <p className="font-semibold">{batch.current_item_name}</p>;
   };
 
+  const renderListingPrice = () => {
+    if (batch.listing_price === null) {
+      return null;
+    }
+
+    return (
+      <p className="flex items-center gap-1 text-sm">
+        <span className="text-gray-600 dark:text-gray-400">Listing Price:</span>
+        <CurrencyDisplay
+          currency={CurrencyType.GOLD}
+          amount={batch.listing_price}
+          display_mode={CurrencyDisplayMode.EXACT}
+        />
+      </p>
+    );
+  };
+
   return (
     <div className="space-y-3">
       <BatchCraftingDetailSection title="Progress">
@@ -83,14 +103,7 @@ const CraftAndEnchantAmountRunningSection = ({
           gold_left={batch.gold_left}
         />
 
-        {batch.listing_price !== null && (
-          <p className="text-sm">
-            <span className="text-gray-600 dark:text-gray-400">
-              Listing Price:
-            </span>{' '}
-            {batch.listing_price.toLocaleString()} Gold
-          </p>
-        )}
+        {renderListingPrice()}
       </BatchCraftingDetailSection>
 
       <BatchCraftingDetailSection title="Activity">

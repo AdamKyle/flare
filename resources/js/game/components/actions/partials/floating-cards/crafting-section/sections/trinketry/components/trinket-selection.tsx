@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 
+import TrinketOption from './trinket-option';
 import TrinketSelectionProps from './types/trinket-selection-props';
 
 import Dropdown from 'ui/drop-down/drop-down';
@@ -7,6 +8,7 @@ import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 
 const TrinketSelection = ({
   items,
+  loadedItems,
   selectedItemId,
   loading,
   isLoadingMore,
@@ -22,6 +24,16 @@ const TrinketSelection = ({
 
   const handleSelect = (option: DropdownItem): void => {
     onSelect(Number(option.value));
+  };
+
+  const renderOption = (option: DropdownItem): ReactNode => {
+    const trinket = loadedItems.find((item) => item.id === option.value);
+
+    if (!trinket) {
+      return option.label;
+    }
+
+    return <TrinketOption item={trinket} />;
   };
 
   return (
@@ -46,6 +58,7 @@ const TrinketSelection = ({
         on_end_reached={onEndReached}
         empty_message="No Trinkets are available."
         disabled={loading}
+        render_item_content={renderOption}
       />
     </div>
   );

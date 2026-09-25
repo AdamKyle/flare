@@ -30,13 +30,15 @@ use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyUpdate;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Gems\Progression\Services\GemWorldRewardService;
 use App\Game\Gems\Values\AreaGemRewardEffect;
+use App\Game\Messages\Builders\ServerMessageBuilder;
+use App\Game\Messages\Types\CharacterMessageTypes;
 use App\Game\Messages\Types\CurrenciesMessageTypes;
 use App\Game\Monsters\Services\MonsterListService;
 use App\Game\Skills\Services\SkillService;
-use App\Game\Tops\Services\BroadcastTopsUpdateService;
 use Closure;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Support\Facades\Log;
+use RuntimeException;
 use Throwable;
 
 class BattleRewardService
@@ -69,9 +71,10 @@ class BattleRewardService
      * @param BattleRewardLedgerService $battleRewardLedgerService
      * @param BattleRewardMessageContext $battleRewardMessageContext
      * @param RandomAffixGenerator $randomAffixGenerator
-     * @param BroadcastTopsUpdateService $broadcastTopsUpdateService
      * @param GemWorldRewardService $gemWorldRewardService
      * @param MonsterListService $monsterListService
+     * @param BattleRewardMessageOutboxService $battleRewardMessageOutboxService
+     * @param ServerMessageBuilder $serverMessageBuilder
      */
     public function __construct(
         private readonly BattleMessageHandler $battleMessageHandler,
@@ -89,9 +92,10 @@ class BattleRewardService
         private readonly BattleRewardLedgerService $battleRewardLedgerService,
         private readonly BattleRewardMessageContext $battleRewardMessageContext,
         private readonly RandomAffixGenerator $randomAffixGenerator,
-        private readonly BroadcastTopsUpdateService $broadcastTopsUpdateService,
         private readonly GemWorldRewardService $gemWorldRewardService,
         private readonly MonsterListService $monsterListService,
+        private readonly BattleRewardMessageOutboxService $battleRewardMessageOutboxService,
+        private readonly ServerMessageBuilder $serverMessageBuilder,
     ) {}
 
     /**
@@ -385,91 +389,218 @@ class BattleRewardService
     }
 
     /**
-     * Award the ledger-planned XP for the step, checkpointing progress as it is applied.
+     * Award the ledger-planned XP for the step once, persisting the Character, its XP checkpoint, and its level up messages together.
      *
      * @param CharacterBattleRewardRequestStep $step
      * @return void
      */
     private function handleLedgerAwardingXp(CharacterBattleRewardRequestStep $step): void
     {
+        $step = $this->planLedgerXp($step);
+        $payload = $step->payload_json;
+
+        $this->sendExplorationXpMessage($step, $payload['total_xp']);
+
+        $this->applyUnappliedCheckpointedXp($step, $payload);
+
+        $this->character = $this->character->refresh();
+
+        $this->sendManualXpMessage($step, $payload['total_xp']);
+
+        $this->writeFinalXpCheckpoint($step, $payload);
+    }
+
+    /**
+     * Persist the XP step's planned award before it is applied, calculating it from the Monster when the reward context does not supply it.
+     *
+     * @param CharacterBattleRewardRequestStep $step
+     * @return CharacterBattleRewardRequestStep
+     */
+    private function planLedgerXp(CharacterBattleRewardRequestStep $step): CharacterBattleRewardRequestStep
+    {
         $payload = $step->payload_json ?? [];
 
-        if (! isset($payload['total_xp'])) {
-            $totalXp = $this->context['total_xp'] ?? null;
-
-            if (is_null($totalXp)) {
-                $totalXp = $this->characterRewardService->setCharacter($this->character)->fetchXpForMonster($this->monster, $this->sharedContext?->resolvedAreaGemEffects());
-
-                $xpCalculationFailure = $this->characterRewardService->xpCalculationFailure();
-
-                if (! is_null($xpCalculationFailure)) {
-                    throw $xpCalculationFailure;
-                }
-            }
-
-            $payload = array_merge($payload, [
-                'total_xp' => $totalXp,
-                'starting_level' => $this->character->level,
-                'starting_xp' => $this->character->xp,
-                'source_request_id' => $step->character_battle_reward_request_id,
-                'source_type' => $step->request?->source_type?->value,
-                'source_id' => $step->request?->source_id,
-                'max_level_context' => [
-                    'current_level' => $this->character->level,
-                ],
-                'planned_at' => now()->toIso8601String(),
-            ]);
-
-            $step = $this->battleRewardLedgerService->updateStepPayload($step, $payload);
+        if (isset($payload['total_xp'])) {
+            return $step;
         }
 
-        $checkpoint = $step->checkpoint_json ?? [];
-        $remainingXp = $checkpoint['remaining_xp'] ?? $payload['total_xp'];
+        $totalXp = $this->context['total_xp'] ?? null;
 
-        if (isset($this->context['total_xp'], $this->context['total_creatures']) && empty($checkpoint)) {
-            $this->battleMessageHandler->handleMessageForExplorationXp(
-                $this->character->user,
-                $this->context['total_creatures'],
-                $payload['total_xp'],
-            );
+        if (is_null($totalXp)) {
+            $totalXp = $this->characterRewardService->setCharacter($this->character)->fetchXpForMonster($this->monster, $this->sharedContext?->resolvedAreaGemEffects());
+
+            $xpCalculationFailure = $this->characterRewardService->xpCalculationFailure();
+
+            if (! is_null($xpCalculationFailure)) {
+                throw $xpCalculationFailure;
+            }
+        }
+
+        return $this->battleRewardLedgerService->updateStepPayload($step, array_merge($payload, [
+            'total_xp' => $totalXp,
+            'starting_level' => $this->character->level,
+            'starting_xp' => $this->character->xp,
+            'source_request_id' => $step->character_battle_reward_request_id,
+            'source_type' => $step->request?->source_type?->value,
+            'source_id' => $step->request?->source_id,
+            'max_level_context' => [
+                'current_level' => $this->character->level,
+            ],
+            'planned_at' => now()->toIso8601String(),
+        ]));
+    }
+
+    /**
+     * Apply the step's remaining XP unless its checkpoint proves the XP was already applied.
+     *
+     * @param CharacterBattleRewardRequestStep $step
+     * @param array $payload
+     * @return void
+     */
+    private function applyUnappliedCheckpointedXp(CharacterBattleRewardRequestStep $step, array $payload): void
+    {
+        $checkpoint = $step->checkpoint_json ?? [];
+
+        if (($checkpoint['remaining_xp'] ?? null) === 0) {
+            return;
         }
 
         $this->characterRewardService
             ->setCharacter($this->character)
-            ->distributeCheckpointedXp($remainingXp, function (int $appliedXp, int $levelsAwarded, Character $character) use ($step, $payload): void {
-                $this->battleRewardLedgerService->checkpointStep($step->refresh(), [
-                    'applied_xp' => $payload['total_xp'],
-                    'levels_awarded' => $levelsAwarded,
-                    'current_level' => $character->level,
-                    'current_xp' => $character->xp,
-                    'remaining_xp' => 0,
-                    'last_checkpoint_at' => now()->toIso8601String(),
-                ]);
-            });
+            ->distributeCheckpointedXp($checkpoint['remaining_xp'] ?? $payload['total_xp'], $this->xpCheckpointCallback($step, $payload));
+    }
 
-        $this->character = $this->character->refresh();
+    /**
+     * Build the callback that checkpoints the applied XP with its ordered progression and stores one level up message per trigger, inside the XP transaction.
+     *
+     * @param CharacterBattleRewardRequestStep $step
+     * @param array $payload
+     * @return Closure
+     */
+    private function xpCheckpointCallback(CharacterBattleRewardRequestStep $step, array $payload): Closure
+    {
+        return function (int $appliedXp, int $levelsAwarded, Character $character, array $progression) use ($step, $payload): void {
+            $this->battleRewardLedgerService->checkpointStep($step->refresh(), [
+                'applied_xp' => $payload['total_xp'],
+                'levels_awarded' => $levelsAwarded,
+                'current_level' => $character->level,
+                'current_xp' => $character->xp,
+                'remaining_xp' => 0,
+                'last_checkpoint_at' => now()->toIso8601String(),
+                'progression' => $progression,
+            ]);
 
-        $hasManualXpMessage = CharacterBattleRewardRequestMessage::where('character_battle_reward_request_id', $step->character_battle_reward_request_id)
-            ->where('step_name', BattleRewardStepName::XP)
-            ->where('message', 'like', 'You gained:%')
-            ->exists();
+            $this->storeLevelUpMessages($step, $character, $progression);
+        };
+    }
 
-        if (($step->request?->source_type?->value !== BattleRewardRequestSourceType::EXPLORATION->value) && ! $hasManualXpMessage) {
-            $this->battleMessageHandler->handleXPMessage(
-                $this->character->user,
-                $payload['total_xp'],
-                $this->character->xp,
-            );
+    /**
+     * Store the ordered level up messages for the progression snapshots in the step's durable outbox.
+     *
+     * @param CharacterBattleRewardRequestStep $step
+     * @param Character $character
+     * @param array $progression
+     * @return void
+     */
+    private function storeLevelUpMessages(CharacterBattleRewardRequestStep $step, Character $character, array $progression): void
+    {
+        if ($progression === []) {
+            return;
         }
 
-        $this->battleRewardLedgerService->checkpointStep($step->refresh(), [
+        $this->battleRewardMessageOutboxService->storeMessages(
+            $step->character_battle_reward_request_id,
+            $character->id,
+            $character->user_id,
+            $step->step_name->value,
+            array_map(fn (array $snapshot): array => [
+                'message' => $this->serverMessageBuilder->buildWithAdditionalInformation(CharacterMessageTypes::LEVEL_UP, $snapshot['level']),
+            ], $progression),
+        );
+    }
+
+    /**
+     * Send the Exploration aggregate XP message once for the request.
+     *
+     * @param CharacterBattleRewardRequestStep $step
+     * @param int $totalXp
+     * @return void
+     */
+    private function sendExplorationXpMessage(CharacterBattleRewardRequestStep $step, int $totalXp): void
+    {
+        if (! isset($this->context['total_xp'], $this->context['total_creatures'])) {
+            return;
+        }
+
+        if ($this->hasStoredXpMessage($step, 'You slaughtered:%')) {
+            return;
+        }
+
+        $this->battleMessageHandler->handleMessageForExplorationXp(
+            $this->character->user,
+            $this->context['total_creatures'],
+            $totalXp,
+        );
+    }
+
+    /**
+     * Send the per-kill XP message once for a non-Exploration request.
+     *
+     * @param CharacterBattleRewardRequestStep $step
+     * @param int $totalXp
+     * @return void
+     */
+    private function sendManualXpMessage(CharacterBattleRewardRequestStep $step, int $totalXp): void
+    {
+        if ($step->request?->source_type === BattleRewardRequestSourceType::EXPLORATION) {
+            return;
+        }
+
+        if ($this->hasStoredXpMessage($step, 'You gained:%')) {
+            return;
+        }
+
+        $this->battleMessageHandler->handleXPMessage(
+            $this->character->user,
+            $totalXp,
+            $this->character->xp,
+        );
+    }
+
+    /**
+     * Determine whether the request already stored an XP step message matching the pattern.
+     *
+     * @param CharacterBattleRewardRequestStep $step
+     * @param string $messagePattern
+     * @return bool
+     */
+    private function hasStoredXpMessage(CharacterBattleRewardRequestStep $step, string $messagePattern): bool
+    {
+        return CharacterBattleRewardRequestMessage::where('character_battle_reward_request_id', $step->character_battle_reward_request_id)
+            ->where('step_name', BattleRewardStepName::XP)
+            ->where('message', 'like', $messagePattern)
+            ->exists();
+    }
+
+    /**
+     * Write the step's final XP checkpoint from the current Character, keeping the progression timeline recorded when the XP was applied.
+     *
+     * @param CharacterBattleRewardRequestStep $step
+     * @param array $payload
+     * @return void
+     */
+    private function writeFinalXpCheckpoint(CharacterBattleRewardRequestStep $step, array $payload): void
+    {
+        $step = $step->refresh();
+
+        $this->battleRewardLedgerService->checkpointStep($step, array_merge($step->checkpoint_json ?? [], [
             'applied_xp' => $payload['total_xp'],
-            'levels_awarded' => max(0, $this->character->refresh()->level - $payload['starting_level']),
+            'levels_awarded' => max(0, $this->character->level - $payload['starting_level']),
             'current_level' => $this->character->level,
             'current_xp' => $this->character->xp,
             'remaining_xp' => 0,
             'last_checkpoint_at' => now()->toIso8601String(),
-        ]);
+        ]));
     }
 
     /**
@@ -499,7 +630,21 @@ class BattleRewardService
             return;
         }
 
-        $result = $this->gemWorldRewardService->applyToLedgerStep($step, $this->character, $effectiveMonster, $totalKills, $this->earnedCurrencies);
+        $applicationResult = $this->gemWorldRewardService->applyToLedgerStep(
+            $step,
+            $this->character,
+            $effectiveMonster,
+            $totalKills,
+            $this->earnedCurrencies,
+        );
+
+        if (! $applicationResult->successful()) {
+            throw $applicationResult->failure() ?? new RuntimeException(
+                'Gem World reward processing failed without a recorded failure for request '.$step->character_battle_reward_request_id.'.',
+            );
+        }
+
+        $result = $applicationResult->result() ?? [];
 
         $this->character = $this->character->refresh();
 
@@ -839,21 +984,7 @@ class BattleRewardService
             $step = $this->battleRewardLedgerService->updateStepPayload($step, $payload);
         }
 
-        $checkpoint = $step->checkpoint_json ?? [];
-        $remainingXp = $checkpoint['remaining_xp'] ?? $payload['total_xp'];
-
-        $this->characterRewardService
-            ->setCharacter($this->character)
-            ->distributeCheckpointedXp($remainingXp, function (int $appliedXp, int $levelsAwarded, Character $character) use ($step, $payload): void {
-                $this->battleRewardLedgerService->checkpointStep($step->refresh(), [
-                    'applied_xp' => $payload['total_xp'],
-                    'levels_awarded' => $levelsAwarded,
-                    'current_level' => $character->level,
-                    'current_xp' => $character->xp,
-                    'remaining_xp' => 0,
-                    'last_checkpoint_at' => now()->toIso8601String(),
-                ]);
-            });
+        $this->applyUnappliedCheckpointedXp($step, $payload);
 
         $this->character = $this->character->refresh();
 
@@ -872,14 +1003,7 @@ class BattleRewardService
             );
         }
 
-        $this->battleRewardLedgerService->checkpointStep($step->refresh(), [
-            'applied_xp' => $payload['total_xp'],
-            'levels_awarded' => max(0, $this->character->refresh()->level - $payload['starting_level']),
-            'current_level' => $this->character->level,
-            'current_xp' => $this->character->xp,
-            'remaining_xp' => 0,
-            'last_checkpoint_at' => now()->toIso8601String(),
-        ]);
+        $this->writeFinalXpCheckpoint($step, $payload);
     }
 
     /**
@@ -1061,8 +1185,6 @@ class BattleRewardService
             new FactionLoyaltyUpdate($this->character->user, $this->factionLoyaltyService->getLoyaltyInfoForPlane($this->character)),
             ['character_id' => $this->character->id]
         );
-
-        $this->broadcastTopsUpdateService->broadcastFactionLoyaltyCurrentMonth();
     }
 
     /**

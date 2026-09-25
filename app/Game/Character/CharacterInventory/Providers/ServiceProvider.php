@@ -9,7 +9,6 @@ use App\Game\Character\CharacterInventory\Builders\EquipManyBuilder;
 use App\Game\Character\CharacterInventory\Services\BatchCraftingSetService;
 use App\Game\Character\CharacterInventory\Services\CharacterGemBagService;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
-use App\Game\Character\CharacterInventory\Services\ComparisonService;
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
 use App\Game\Character\CharacterInventory\Services\InventorySetService;
 use App\Game\Character\CharacterInventory\Services\MultiInventoryActionService;
@@ -23,8 +22,6 @@ use App\Game\Core\Items\Enricher\ItemEnricherFactory;
 use App\Game\Core\Items\Transformers\Api\UsableItemTransformer;
 use App\Game\Core\Items\Transformers\EquippableItemTransformer;
 use App\Game\Core\Items\Transformers\QuestItemTransformer;
-use App\Game\Core\Values\ValidEquipPositionsValue;
-use App\Game\Gems\Services\ItemAtonements;
 use App\Game\Shop\Services\ShopService;
 use App\Game\Skills\Services\DisenchantManyService;
 use App\Game\Skills\Services\DisenchantService;
@@ -79,15 +76,6 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(Pagination::class),
                 $app->make(Manager::class),
                 $app->make(InventorySetOptionTransformer::class)
-            );
-        });
-
-        $this->app->bind(ComparisonService::class, function ($app) {
-            return new ComparisonService(
-                $app->make(ValidEquipPositionsValue::class),
-                $app->make(CharacterInventoryService::class),
-                $app->make(EquipItemService::class),
-                $app->make(ItemAtonements::class),
             );
         });
 

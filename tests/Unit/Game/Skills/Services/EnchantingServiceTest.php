@@ -7,21 +7,57 @@ use App\Flare\Models\GlobalEventCraftingInventorySlot;
 use App\Flare\Models\GlobalEventParticipation;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
+use App\Flare\Pagination\Pagination;
+use App\Flare\Transformers\Serializer\PlainDataSerializer;
+use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ClassRanksWeaponMasteriesBuilder;
+use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\DamageBuilder;
+use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\DefenceBuilder;
+use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ElementalAtonement;
+use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HealingBuilder;
+use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HolyBuilder;
+use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ReductionsBuilder;
+use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
+use App\Game\Character\CharacterInventory\Transformers\CharacterGemsTransformer;
 use App\Game\Character\Values\CharacterClass;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Core\Combat\Values\ElementAttackData;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
+use App\Game\Core\Items\Builders\AffixAttributeBuilder;
+use App\Game\Core\Items\Builders\RandomAffixGenerator;
+use App\Game\Core\Items\Enricher\EquippableEnricher;
+use App\Game\Core\Items\Enricher\ItemEnricherFactory;
+use App\Game\Core\Items\Transformers\CraftingItemPreviewTransformer;
+use App\Game\Core\Items\Transformers\EquippableItemTransformer;
+use App\Game\Core\Items\Transformers\QuestItemTransformer;
+use App\Game\Core\Items\Transformers\UsableItemTransformer;
 use App\Game\Core\Items\Values\ItemSpecialtyType;
+use App\Game\Events\Services\EventGoalsService;
+use App\Game\Events\Services\GlobalEventGoalEligibilityService;
+use App\Game\Events\Services\GlobalEventGoalProgressionService;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Events\Values\ScheduledEventStatus;
+use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
+use App\Game\Gems\Progression\Services\GemProgressionEffectService;
+use App\Game\Gems\Services\AreaGemEffectService;
+use App\Game\Gems\Services\GemComparison;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CraftingMessageTypes;
+use App\Game\Npcs\Actions\QueenOfHearts\Services\RandomEnchantmentService;
+use App\Game\Skills\Handlers\HandleUpdatingEnchantingGlobalEventGoal;
+use App\Game\Skills\Services\EnchantingAffixService;
 use App\Game\Skills\Services\EnchantingService;
 use App\Game\Skills\Services\EnchantItemService;
 use App\Game\Skills\Services\SkillCheckService;
+use App\Game\Skills\Transformers\EnchantingAffixTransformer;
+use App\Game\Skills\Transformers\EnchantingItemTransformer;
+use App\Game\Skills\Transformers\EventEnchantingItemTransformer;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use League\Fractal\Manager;
 use Mockery;
 use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
@@ -42,11 +78,8 @@ class EnchantingServiceTest extends TestCase
     use CreateClass,
         CreateEvent,
         CreateGameMap,
-        CreateGameMap,
         CreateGameSkill,
         CreateGlobalCraftingInventory,
-        CreateGlobalCraftingInventory,
-        CreateGlobalCraftingInventorySlot,
         CreateGlobalCraftingInventorySlot,
         CreateGlobalEventGoal,
         CreateItem,
@@ -57,6 +90,24 @@ class EnchantingServiceTest extends TestCase
     private ?CharacterFactory $character;
 
     private ?EnchantingService $enchantingService;
+
+    private ?CharacterStatBuilder $characterStatBuilder;
+
+    private ?GlobalEventGoalEligibilityService $globalEventGoalEligibilityService;
+
+    private ?HandleUpdatingEnchantingGlobalEventGoal $handleUpdatingEnchantingGlobalEventGoal;
+
+    private ?RandomEnchantmentService $randomEnchantmentService;
+
+    private ?Pagination $pagination;
+
+    private ?EnchantingItemTransformer $enchantingItemTransformer;
+
+    private ?EventEnchantingItemTransformer $eventEnchantingItemTransformer;
+
+    private ?EnchantingAffixTransformer $enchantingAffixTransformer;
+
+    private ?EnchantingAffixService $enchantingAffixService;
 
     private ?Item $itemToEnchant;
 
@@ -79,7 +130,78 @@ class EnchantingServiceTest extends TestCase
             $this->enchantingSkill
         )->givePlayerLocation();
 
-        $this->enchantingService = resolve(EnchantingService::class);
+        $randomNumberGenerator = Mockery::mock(RandomNumberGenerator::class);
+        $randomNumberGenerator->shouldReceive('numberBetween')->andReturnUsing(
+            fn (int $minimum, int $maximum): int => intdiv($minimum + $maximum, 2)
+        );
+
+        $chanceCalculator = new ChanceCalculator($randomNumberGenerator);
+
+        $this->characterStatBuilder = new CharacterStatBuilder(
+            new DefenceBuilder(),
+            new DamageBuilder(new ClassRanksWeaponMasteriesBuilder()),
+            new HealingBuilder(new ClassRanksWeaponMasteriesBuilder()),
+            new HolyBuilder(),
+            new ReductionsBuilder(),
+            new ElementalAtonement(
+                new GemComparison(new CharacterGemsTransformer(), new PlainDataSerializer(), new Manager()),
+                new ElementAttackData(),
+            ),
+            new CharacterAreaGemEffectService(new AreaGemEffectService(), new GemProgressionEffectService()),
+        );
+
+        $this->globalEventGoalEligibilityService = new GlobalEventGoalEligibilityService();
+
+        $eventGoalsService = new EventGoalsService($this->globalEventGoalEligibilityService);
+        $globalEventGoalProgressionService = new GlobalEventGoalProgressionService($eventGoalsService);
+        $randomAffixGenerator = new RandomAffixGenerator(new AffixAttributeBuilder($randomNumberGenerator, $chanceCalculator));
+
+        $this->handleUpdatingEnchantingGlobalEventGoal = new HandleUpdatingEnchantingGlobalEventGoal(
+            $randomAffixGenerator,
+            $eventGoalsService,
+            $globalEventGoalProgressionService,
+            $this->globalEventGoalEligibilityService,
+        );
+
+        $this->randomEnchantmentService = new RandomEnchantmentService($randomAffixGenerator, $chanceCalculator);
+
+        $this->pagination = new Pagination(new Manager());
+
+        $itemEnricherFactory = new ItemEnricherFactory(
+            new EquippableEnricher(),
+            new EquippableItemTransformer(),
+            new UsableItemTransformer(),
+            new QuestItemTransformer(),
+            new PlainDataSerializer(),
+            new Manager(),
+        );
+        $craftingItemPreviewTransformer = new CraftingItemPreviewTransformer($itemEnricherFactory);
+
+        $this->enchantingItemTransformer = new EnchantingItemTransformer($craftingItemPreviewTransformer);
+        $this->eventEnchantingItemTransformer = new EventEnchantingItemTransformer($craftingItemPreviewTransformer);
+        $this->enchantingAffixTransformer = new EnchantingAffixTransformer();
+
+        $this->enchantingAffixService = new EnchantingAffixService(
+            $this->characterStatBuilder,
+            $this->globalEventGoalEligibilityService,
+        );
+
+        $enchantItemService = new EnchantItemService(
+            new SkillCheckService($randomNumberGenerator),
+            $this->handleUpdatingEnchantingGlobalEventGoal,
+        );
+
+        $this->enchantingService = new EnchantingService(
+            $this->characterStatBuilder,
+            $enchantItemService,
+            $this->randomEnchantmentService,
+            $this->globalEventGoalEligibilityService,
+            $this->pagination,
+            $this->enchantingItemTransformer,
+            $this->eventEnchantingItemTransformer,
+            $this->enchantingAffixTransformer,
+            $this->enchantingAffixService,
+        );
 
         $this->itemToEnchant = $this->createItem([
             'cost' => 1000,
@@ -115,6 +237,15 @@ class EnchantingServiceTest extends TestCase
         $this->character = null;
         $this->enchantingSkill = null;
         $this->enchantingService = null;
+        $this->characterStatBuilder = null;
+        $this->globalEventGoalEligibilityService = null;
+        $this->handleUpdatingEnchantingGlobalEventGoal = null;
+        $this->randomEnchantmentService = null;
+        $this->pagination = null;
+        $this->enchantingItemTransformer = null;
+        $this->eventEnchantingItemTransformer = null;
+        $this->enchantingAffixTransformer = null;
+        $this->enchantingAffixService = null;
         $this->suffix = null;
         $this->itemToEnchant = null;
     }
@@ -258,7 +389,7 @@ class EnchantingServiceTest extends TestCase
         $this->assertEquals(0, $character->gold);
 
         Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation(CraftingMessageTypes::TO_HARD_TO_CRAFT);
+            return $event->message === new ServerMessageBuilder()->buildWithAdditionalInformation(CraftingMessageTypes::TO_HARD_TO_CRAFT);
         });
     }
 
@@ -288,7 +419,7 @@ class EnchantingServiceTest extends TestCase
         $this->assertEquals(0, $character->gold);
 
         Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation(CraftingMessageTypes::INT_TO_LOW_ENCHANTING);
+            return $event->message === new ServerMessageBuilder()->buildWithAdditionalInformation(CraftingMessageTypes::INT_TO_LOW_ENCHANTING);
         });
     }
 
@@ -317,7 +448,7 @@ class EnchantingServiceTest extends TestCase
         $this->assertEquals(0, $character->gold);
 
         Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation(CraftingMessageTypes::TO_EASY_TO_CRAFT);
+            return $event->message === new ServerMessageBuilder()->buildWithAdditionalInformation(CraftingMessageTypes::TO_EASY_TO_CRAFT);
         });
     }
 
@@ -326,12 +457,9 @@ class EnchantingServiceTest extends TestCase
 
         Event::fake();
 
-        $this->instance(
-            EnchantItemService::class,
-            Mockery::mock(EnchantItemService::class, function (MockInterface $mock) {
-                $mock->makePartial()->shouldReceive('attachAffix')->once()->andReturn(true);
-            })
-        );
+        $enchantItemService = Mockery::mock(EnchantItemService::class, function (MockInterface $mock) {
+            $mock->makePartial()->shouldReceive('attachAffix')->once()->andReturn(true);
+        });
 
         $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
 
@@ -339,7 +467,17 @@ class EnchantingServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $enchantingService = resolve(EnchantingService::class);
+        $enchantingService = new EnchantingService(
+            $this->characterStatBuilder,
+            $enchantItemService,
+            $this->randomEnchantmentService,
+            $this->globalEventGoalEligibilityService,
+            $this->pagination,
+            $this->enchantingItemTransformer,
+            $this->eventEnchantingItemTransformer,
+            $this->enchantingAffixTransformer,
+            $this->enchantingAffixService,
+        );
 
         $slot = $character->inventory->slots->first();
 
@@ -362,15 +500,22 @@ class EnchantingServiceTest extends TestCase
 
         Event::fake();
 
-        $this->instance(
-            SkillCheckService::class,
-            Mockery::mock(SkillCheckService::class, function (MockInterface $mock) {
-                $mock->shouldReceive('getDCCheck')->once()->andReturn(1);
-                $mock->shouldReceive('characterRoll')->once()->andReturn(100);
-            })
-        );
+        $skillCheckService = Mockery::mock(SkillCheckService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('getDCCheck')->once()->andReturn(1);
+            $mock->shouldReceive('characterRoll')->once()->andReturn(100);
+        });
 
-        $enchantingService = $this->app->make(EnchantingService::class);
+        $enchantingService = new EnchantingService(
+            $this->characterStatBuilder,
+            new EnchantItemService($skillCheckService, $this->handleUpdatingEnchantingGlobalEventGoal),
+            $this->randomEnchantmentService,
+            $this->globalEventGoalEligibilityService,
+            $this->pagination,
+            $this->enchantingItemTransformer,
+            $this->eventEnchantingItemTransformer,
+            $this->enchantingAffixTransformer,
+            $this->enchantingAffixService,
+        );
 
         $schedule = $this->createScheduledEvent(['event_type' => EventType::DELUSIONAL_MEMORIES_EVENT, 'status' => ScheduledEventStatus::RUNNING, 'currently_running' => true]);
         $event = $this->createEvent([
@@ -428,12 +573,9 @@ class EnchantingServiceTest extends TestCase
 
         Event::fake();
 
-        $this->instance(
-            EnchantItemService::class,
-            Mockery::mock(EnchantItemService::class, function (MockInterface $mock) {
-                $mock->makePartial()->shouldReceive('attachAffix')->once()->andReturn(false);
-            })
-        );
+        $enchantItemService = Mockery::mock(EnchantItemService::class, function (MockInterface $mock) {
+            $mock->makePartial()->shouldReceive('attachAffix')->once()->andReturn(false);
+        });
 
         $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
 
@@ -441,7 +583,17 @@ class EnchantingServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $enchantingService = resolve(EnchantingService::class);
+        $enchantingService = new EnchantingService(
+            $this->characterStatBuilder,
+            $enchantItemService,
+            $this->randomEnchantmentService,
+            $this->globalEventGoalEligibilityService,
+            $this->pagination,
+            $this->enchantingItemTransformer,
+            $this->eventEnchantingItemTransformer,
+            $this->enchantingAffixTransformer,
+            $this->enchantingAffixService,
+        );
 
         $slot = $character->inventory->slots->first();
 
@@ -465,12 +617,9 @@ class EnchantingServiceTest extends TestCase
     {
         Event::fake();
 
-        $this->instance(
-            EnchantItemService::class,
-            Mockery::mock(EnchantItemService::class, function (MockInterface $mock) {
-                $mock->makePartial()->shouldReceive('attachAffix')->once()->andReturn(false);
-            })
-        );
+        $enchantItemService = Mockery::mock(EnchantItemService::class, function (MockInterface $mock) {
+            $mock->makePartial()->shouldReceive('attachAffix')->once()->andReturn(false);
+        });
 
         $character = $this->character->getCharacter();
 
@@ -482,7 +631,17 @@ class EnchantingServiceTest extends TestCase
         $inventory = $this->createGlobalCraftingInventory(['character_id' => $character->id, 'global_event_goal_id' => $goal->id]);
         $slot = $this->createGlobalCraftingInventorySlot(['global_event_crafting_inventory_id' => $inventory->id, 'item_id' => $this->itemToEnchant->id]);
 
-        $enchantingService = resolve(EnchantingService::class);
+        $enchantingService = new EnchantingService(
+            $this->characterStatBuilder,
+            $enchantItemService,
+            $this->randomEnchantmentService,
+            $this->globalEventGoalEligibilityService,
+            $this->pagination,
+            $this->enchantingItemTransformer,
+            $this->eventEnchantingItemTransformer,
+            $this->enchantingAffixTransformer,
+            $this->enchantingAffixService,
+        );
 
         $enchantingService->enchant($character, [
             'affix_ids' => [$this->prefix->id],
@@ -497,12 +656,9 @@ class EnchantingServiceTest extends TestCase
     {
         Event::fake();
 
-        $this->instance(
-            EnchantItemService::class,
-            Mockery::mock(EnchantItemService::class, function (MockInterface $mock) {
-                $mock->makePartial()->shouldReceive('attachAffix')->once()->andReturn(false);
-            })
-        );
+        $enchantItemService = Mockery::mock(EnchantItemService::class, function (MockInterface $mock) {
+            $mock->makePartial()->shouldReceive('attachAffix')->once()->andReturn(false);
+        });
 
         $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
 
@@ -512,7 +668,17 @@ class EnchantingServiceTest extends TestCase
 
         $slot = $character->inventory->slots->first();
 
-        $enchantingService = resolve(EnchantingService::class);
+        $enchantingService = new EnchantingService(
+            $this->characterStatBuilder,
+            $enchantItemService,
+            $this->randomEnchantmentService,
+            $this->globalEventGoalEligibilityService,
+            $this->pagination,
+            $this->enchantingItemTransformer,
+            $this->eventEnchantingItemTransformer,
+            $this->enchantingAffixTransformer,
+            $this->enchantingAffixService,
+        );
 
         $enchantingService->enchant($character, [
             'affix_ids' => [$this->prefix->id],

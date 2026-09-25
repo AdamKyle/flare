@@ -21,4 +21,5 @@ export default interface ChatType {
   is_chat_bold: boolean;
   is_chat_italic: boolean;
   name_tag: string | null;
+  created_at: string | null;
 }

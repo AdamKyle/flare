@@ -9,7 +9,6 @@ export default interface UseChatActionsDefinition {
   setInitialAnnouncements: (data: AnnouncementMessageDefinition[]) => void;
   setInitialChatHistory: (history: ChatType[]) => void;
   pushSilencedMessage: () => void;
-  pushPrivateMessageSent: (messageData: string[]) => void;
   pushErrorMessage: (message: string) => void;
   onSend: (text: string) => void;
 }

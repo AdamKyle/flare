@@ -4,6 +4,9 @@ import React, { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import BatchCraftingOutputSummary from './batch-crafting-output-summary';
 import CraftSetHandSelector from './craft-set-hand-selector';
 import CraftSetPositionSelector from './craft-set-position-selector';
+import CurrencyDisplay from '../../../../../../../../reusable-components/currency/currency-display';
+import { CurrencyDisplayMode } from '../../../../../../../../reusable-components/currency/enums/currency-display-mode';
+import { CurrencyType } from '../../../../../../../../reusable-components/currency/enums/currency-type';
 import { useCraftSetPreview } from '../api/hooks/use-craft-set-preview';
 import { useCraftSetRecommendation } from '../api/hooks/use-craft-set-recommendation';
 import { useStartBatchCrafting } from '../api/hooks/use-start-batch-crafting';
@@ -178,9 +181,21 @@ const CraftSetForm = ({ output_selection }: CraftSetScreenProps): ReactNode => {
           {preview.included_position_count} / {preview.total_position_count}
         </dd>
         <dt className="text-gray-600 dark:text-gray-400">Total Cost</dt>
-        <dd>{preview.total_cost.toLocaleString()} Gold</dd>
+        <dd>
+          <CurrencyDisplay
+            currency={CurrencyType.GOLD}
+            amount={preview.total_cost}
+            display_mode={CurrencyDisplayMode.EXACT}
+          />
+        </dd>
         <dt className="text-gray-600 dark:text-gray-400">Available Gold</dt>
-        <dd>{preview.available_gold.toLocaleString()} Gold</dd>
+        <dd>
+          <CurrencyDisplay
+            currency={CurrencyType.GOLD}
+            amount={preview.available_gold}
+            display_mode={CurrencyDisplayMode.BALANCE}
+          />
+        </dd>
         {preview.blockers.map((blocker) => (
           <dd key={blocker} className="col-span-2">
             <Alert variant={AlertVariant.DANGER}>{blocker}</Alert>

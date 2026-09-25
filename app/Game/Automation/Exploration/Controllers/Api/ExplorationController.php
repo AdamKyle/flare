@@ -10,6 +10,7 @@ use App\Game\Automation\Exploration\Services\ExplorationAutomationService;
 use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Core\Combat\Values\AttackType;
 use App\Game\Maps\Values\LocationType;
+use App\Game\Monsters\Services\MonsterListService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 
@@ -17,27 +18,27 @@ class ExplorationController extends Controller
 {
     use ChecksAutomationRestrictions;
 
-    private ExplorationAutomationService $explorationAutomationService;
-
     /**
-     * @param ExplorationAutomationService $explorationAutomationService The Exploration automation service.
+     * @param ExplorationAutomationService $explorationAutomationService
+     * @param MonsterListService $monsterListService
      */
-    public function __construct(ExplorationAutomationService $explorationAutomationService)
-    {
-        $this->explorationAutomationService = $explorationAutomationService;
-    }
+    public function __construct(
+        private readonly ExplorationAutomationService $explorationAutomationService,
+        private readonly MonsterListService $monsterListService,
+    ) {}
 
     /**
      * Start Exploration automation for the character with the validated request options.
      *
-     * @param ExplorationRequest $request The validated Exploration start request.
-     * @param Character $character The character starting Exploration.
-     * @return JsonResponse The start confirmation or validation error response.
+     * @param ExplorationRequest $request
+     * @param Character $character
+     * @return JsonResponse
      */
     public function begin(ExplorationRequest $request, Character $character): JsonResponse
     {
         $params = $request->all();
         $params['attack_type'] = empty($params['attack_type']) ? AttackType::ATTACK->value : $params['attack_type'];
+        $params['selected_monster_id'] = $request->integer('selected_monster_id');
 
         if (! AttackType::attackTypeExists($params['attack_type'])) {
             return response()->json([
@@ -69,26 +70,44 @@ class ExplorationController extends Controller
             ], 422);
         }
 
-        $this->explorationAutomationService->beginAutomation($character, $params);
+        $selectedMonster = $this->monsterListService->getMonsterForFight($character, $params['selected_monster_id']);
+
+        if (is_null($selectedMonster)) {
+            return response()->json([
+                'message' => 'That monster is not available to explore at your current location. Please select another monster.',
+            ], 422);
+        }
+
+        $result = $this->explorationAutomationService->beginAutomation($character, $params);
+
+        $status = $result['status'];
+        unset($result['status']);
+
+        if ($status !== 200) {
+            return response()->json($result, $status);
+        }
 
         $timeDelay = $this->explorationAutomationService->getTimeDelay();
 
         return response()->json([
             'message' => 'Exploration has started. Check the exploration tab (beside server messages) for update. The tab will every '.$timeDelay.' minutes, rewards are handed to you or disenchanted automatically.',
+            'exploration_message' => $result['exploration_message'],
         ]);
     }
 
     /**
      * Stop the character's active Exploration automation.
      *
-     * @param Character $character The character stopping Exploration.
-     * @return JsonResponse Empty confirmation response.
+     * @param Character $character
+     * @return JsonResponse
      */
     public function stop(Character $character): JsonResponse
     {
+        $result = $this->explorationAutomationService->stopExploration($character);
 
-        $this->explorationAutomationService->stopExploration($character);
+        $status = $result['status'];
+        unset($result['status']);
 
-        return response()->json();
+        return response()->json($result, $status);
     }
 }

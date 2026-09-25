@@ -89,7 +89,6 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapAdminLocationGemsWebRoutes();
         $this->mapQuestRoutes();
         $this->mapGuideQuestsRoutes();
-        $this->mapGameMarketRoutes();
         $this->mapCharacterPassiveSkillsRoutes();
         $this->mapGameCoreRoutes();
         $this->mapGamblingRoutes();
@@ -682,18 +681,6 @@ class RouteServiceProvider extends ServiceProvider
         Route::middleware('web')
             ->namespace('App\Game\Core\Controllers')
             ->group(base_path('routes/game/web.php'));
-    }
-
-    /**
-     * Define the Market web routes.
-     *
-     * @return void
-     */
-    protected function mapGameMarketRoutes()
-    {
-        Route::middleware('web')
-            ->namespace('App\Game\Market\Controllers')
-            ->group(base_path('routes/game/market-board/web.php'));
     }
 
     /**

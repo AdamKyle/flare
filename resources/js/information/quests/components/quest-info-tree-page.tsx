@@ -123,12 +123,14 @@ const QuestInfoTreePage = (): ReactNode => {
 
   return (
     <div>
-      <QuestBrowseControls
-        id="quest-info-plane-filter"
-        game_maps={gameMapItems}
-        selected_game_map_id={gameMapId}
-        on_select_game_map={setGameMapId}
-      />
+      <div className="mb-4">
+        <QuestBrowseControls
+          id="quest-info-plane-filter"
+          game_maps={gameMapItems}
+          selected_game_map_id={gameMapId}
+          on_select_game_map={setGameMapId}
+        />
+      </div>
 
       {renderContent()}
     </div>

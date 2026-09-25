@@ -15,4 +15,5 @@ export default interface UseCharacterEquippedApiDefinition {
   data: CharacterEquippedDefinition | null;
   error: AxiosErrorDefinition | null;
   loading: boolean;
+  refetch: () => void;
 }

@@ -3,15 +3,16 @@ import React, { useEffect } from 'react';
 
 import { useFetchChatHistory } from './api/hooks/use-fetch-chat-history';
 import { useSendChatMessage } from './api/hooks/use-send-chat-message';
+import { useSendPrivateChatMessage } from './api/hooks/use-send-private-chat-message';
 import Chat from './chat';
 import ExplorationMessages from './components/exploration-messages/exploration-messages';
 import ServerMessages from './components/server-messages/server-messages';
 import useChatActions from './hooks/use-chat-actions';
 import useUnreadBadges from './hooks/use-unread-badges';
 import buildTabs from './utils/build-tabs';
+import { toChatTypeFromHistory } from './utils/to-chat-type-from-history';
 import { useChatStream } from './websockets/hooks/use-chat-stream';
 import AnnouncementMessageDefinition from '../../api-definitions/chat/annoucement-message-definition';
-import ChatType from '../../api-definitions/chat/chat-message-definition';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 import { useGameData } from 'game-data/hooks/use-game-data';
@@ -29,24 +30,42 @@ const GameChat = () => {
   const isSilenced = character?.is_silenced ?? null;
   const canTalkAgainAt = character?.can_talk_again_at ?? null;
 
-  const { server, exploration, chatMessages } = useChatStream({
+  const {
+    server,
+    exploration,
+    chatMessages,
+    prependChatMessage,
+    replaceChatMessages,
+  } = useChatStream({
     character_data: character,
   });
 
   const { setRequestParams } = useSendChatMessage();
+  const { sendPrivateMessage, error: privateMessageError } =
+    useSendPrivateChatMessage();
 
   const {
     combinedChat,
     setInitialAnnouncements,
     setInitialChatHistory,
     pushSilencedMessage,
-    pushPrivateMessageSent,
     pushErrorMessage,
     onSend,
   } = useChatActions({
     chatMessages,
+    prependChatMessage,
+    replaceChatMessages,
     setRequestParams,
+    sendPrivateMessage,
   });
+
+  useEffect(() => {
+    if (privateMessageError === null) {
+      return;
+    }
+
+    pushErrorMessage(privateMessageError.message);
+  }, [privateMessageError, pushErrorMessage]);
 
   useEffect(() => {
     const initial: AnnouncementMessageDefinition[] = data?.announcements || [];
@@ -63,33 +82,21 @@ const GameChat = () => {
       return;
     }
 
-    const chatHistory: ChatType[] = data.chat_messages.map((chatMessage) => {
-      return {
-        color: chatMessage.color,
-        map_name: chatMessage.map,
-        character_name: chatMessage.name,
-        message: chatMessage.message,
-        x: chatMessage.x_position,
-        y: chatMessage.y_position,
-        type: 'chat',
-        hide_location: chatMessage.hide_location,
-        user_id: chatMessage.user_id,
-        custom_class: chatMessage.custom_class,
-        is_chat_bold: chatMessage.is_chat_bold,
-        is_chat_italic: chatMessage.is_chat_italic,
-        name_tag: chatMessage.name_tag,
-      };
-    });
-
-    setInitialChatHistory(chatHistory);
+    setInitialChatHistory(data.chat_messages.map(toChatTypeFromHistory));
   }, [data, setInitialChatHistory]);
 
-  const { unreadServer, activeTabIndex, handleActiveIndexChange } =
-    useUnreadBadges({
-      serverCount: server.length,
-      serverIndex: 1,
-      initialActiveIndex: 0,
-    });
+  const {
+    unreadServer,
+    unreadExploration,
+    activeTabIndex,
+    handleActiveIndexChange,
+  } = useUnreadBadges({
+    serverCount: server.length,
+    serverIndex: 1,
+    explorationCount: exploration.length,
+    explorationIndex: 2,
+    initialActiveIndex: 0,
+  });
 
   const renderBody = () => {
     if (!character) {
@@ -104,7 +111,6 @@ const GameChat = () => {
           chat={combinedChat.chat}
           set_tab_to_updated={() => {}}
           push_silenced_message={pushSilencedMessage}
-          push_private_message_sent={pushPrivateMessageSent}
           push_error_message={pushErrorMessage}
           on_send={onSend}
         />
@@ -123,18 +129,18 @@ const GameChat = () => {
         chat: combinedChat.chat,
         set_tab_to_updated: () => {},
         push_silenced_message: pushSilencedMessage,
-        push_private_message_sent: pushPrivateMessageSent,
         push_error_message: pushErrorMessage,
         on_send: onSend,
       },
       serverProps: {
         server_messages: server,
-        character_id: character!.id,
+        character_id: character.id,
       },
       explorationProps: {
         exploration_messages: exploration,
       },
       unreadServer,
+      unreadExploration,
     });
 
     return (

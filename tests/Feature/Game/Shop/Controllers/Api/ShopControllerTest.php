@@ -169,7 +169,7 @@ class ShopControllerTest extends TestCase
         $this->assertStringStartsWith('Purchased:', $jsonData['message']);
     }
 
-    public function test_shop_compare_returns_comparison_data(): void
+    public function test_shop_compare_returns_details_and_item_to_equip_at_top_level(): void
     {
         $item = $this->createItem(['type' => 'shield', 'name' => 'Compare Shield']);
 
@@ -182,8 +182,55 @@ class ShopControllerTest extends TestCase
         $data = json_decode($response->getContent(), true);
 
         $response->assertOk();
-        $this->assertArrayHasKey('comparison_data', $data);
-        $this->assertArrayHasKey('details', $data['comparison_data']);
+        $this->assertArrayHasKey('details', $data);
+        $this->assertArrayHasKey('item_to_equip', $data);
+    }
+
+    public function test_shop_compare_does_not_wrap_the_response_in_comparison_data(): void
+    {
+        $item = $this->createItem(['type' => 'shield', 'name' => 'Unwrapped Shield']);
+
+        $response = $this->actingAs($this->character->user)
+            ->call('GET', '/api/shop/view/comparison/'.$this->character->id, [
+                'item_name' => $item->name,
+                'item_type' => $item->type,
+            ]);
+
+        $data = json_decode($response->getContent(), true);
+
+        $response->assertOk();
+        $this->assertArrayNotHasKey('comparison_data', $data);
+    }
+
+    public function test_shop_compare_item_to_equip_identifies_the_shop_item(): void
+    {
+        $item = $this->createItem(['type' => 'shield', 'name' => 'Identity Shield', 'cost' => 250]);
+
+        $response = $this->actingAs($this->character->user)
+            ->call('GET', '/api/shop/view/comparison/'.$this->character->id, [
+                'item_name' => $item->name,
+                'item_type' => $item->type,
+            ]);
+
+        $data = json_decode($response->getContent(), true);
+
+        $response->assertOk();
+        $this->assertSame($item->id, $data['item_to_equip']['item_id']);
+        $this->assertSame('shield', $data['item_to_equip']['type']);
+        $this->assertSame(250, $data['item_to_equip']['cost']);
+        $this->assertNull($data['item_to_equip']['slot_id']);
+    }
+
+    public function test_shop_compare_returns_error_when_item_is_not_found(): void
+    {
+        $response = $this->actingAs($this->character->user)
+            ->call('GET', '/api/shop/view/comparison/'.$this->character->id, [
+                'item_name' => 'Missing Shop Item',
+                'item_type' => 'shield',
+            ]);
+
+        $response->assertStatus(422);
+        $response->assertJson(['message' => 'Item not found.']);
     }
 
     public function test_buy_and_replace_returns_generic_error_when_replacement_is_invalid(): void
@@ -426,6 +473,32 @@ class ShopControllerTest extends TestCase
         $this->assertNotNull($character->inventory->slots->first(function ($slot) use ($newShield) {
             return $slot->item_id === $newShield->id && $slot->equipped;
         }));
+    }
+
+    public function test_buy_and_replace_rejects_an_unknown_equipment_position(): void
+    {
+        $existingShield = $this->createItem(['type' => 'shield']);
+        $newShield = $this->createItem(['type' => 'shield', 'cost' => 100]);
+
+        $character = (new InventoryManagement($this->character))
+            ->giveItem($existingShield, true, 'left-hand')
+            ->getCharacter();
+
+        $equippedSlot = $character->inventory->slots->firstWhere('item_id', $existingShield->id);
+
+        $character->update(['gold' => 100000]);
+
+        $response = $this->actingAs($character->user)
+            ->postJson('/api/shop/buy-and-replace/'.$character->id, [
+                'item_id_to_buy' => $newShield->id,
+                'position' => 'artifact-one',
+                'slot_id' => $equippedSlot->id,
+                'equip_type' => 'shield',
+            ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['position' => 'Error. Invalid Input.']);
+        $this->assertSame(100000, $character->refresh()->gold);
     }
 
     public function test_buy_and_replace_applies_merchant_discount_and_purchases_successfully(): void

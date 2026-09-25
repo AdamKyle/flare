@@ -1,14 +1,9 @@
-import React, { Fragment, ReactNode, useState } from 'react';
+import React, { ReactNode, useState } from 'react';
 
 import GemWorldProps from './types/gem-world-props';
-import GemWorldSourceDefinition from '../../../../reusable-components/gems/api/definitions/gem-world-source-definition';
-import AreaGemContext from '../../../../reusable-components/gems/components/area-gem-context';
 import AreaGemEffectSummary from '../../../../reusable-components/gems/components/area-gem-effect-summary';
-import RolledGemSourceDetail from '../../../../reusable-components/gems/components/rolled-gem-source-detail';
-import {
-  LOCATION_GEM_PLAYER_DISPLAY_GROUPS,
-  MAP_GEM_PLAYER_DISPLAY_GROUPS,
-} from '../../../../reusable-components/gems/definitions/player-rolled-gem-display-groups';
+import GemContextEffectsDetail from '../../../../reusable-components/gems/components/gem-context-effects-detail';
+import GemContextProfileDetail from '../../../../reusable-components/gems/components/gem-context-profile-detail';
 import { useEnterGemWorld } from '../../../map-section/api/hooks/use-enter-gem-world';
 import { useCloseSidePeekEmitter } from '../../base/hooks/use-close-side-peek-emitter';
 import { useEmitMapRefresh } from '../traverse/hooks/use-emit-map-refresh';
@@ -19,16 +14,10 @@ import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import { StackedCardContentMode } from 'ui/cards/enums/stacked-card-content-mode';
 import StackedCard from 'ui/cards/stacked-card';
-import Separator from 'ui/separator/separator';
 import { useSidePeekOptions } from 'ui/side-peek/options/hooks/use-side-peek-options';
 import SidePeekOptionDefinition from 'ui/side-peek/options/types/side-peek-option-definition';
 
 type ActiveDetail = 'effects' | 'profile' | null;
-
-const displayGroupsForSource = (source: GemWorldSourceDefinition) =>
-  source.type === 'map_gem'
-    ? MAP_GEM_PLAYER_DISPLAY_GROUPS
-    : LOCATION_GEM_PLAYER_DISPLAY_GROUPS;
 
 const GemWorld = ({
   character_id: characterId,
@@ -103,21 +92,7 @@ const GemWorld = ({
         content_mode={StackedCardContentMode.FULL_BLEED}
         aria_label="Gem Effects"
       >
-        <div className="flex h-full flex-col gap-3 overflow-y-auto px-4 py-4 sm:px-5">
-          {context.rules.length > 0 && (
-            <div>
-              <h3 className="mb-1 text-sm font-semibold text-gray-800 dark:text-gray-200">
-                Rules Applied
-              </h3>
-              <ul className="list-disc space-y-1 pl-5 text-sm text-gray-700 dark:text-gray-300">
-                {context.rules.map((rule) => (
-                  <li key={rule}>{rule}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-          <AreaGemContext context={context} />
-        </div>
+        <GemContextEffectsDetail context={context} />
       </StackedCard>
     );
   };
@@ -133,21 +108,10 @@ const GemWorld = ({
         content_mode={StackedCardContentMode.FULL_BLEED}
         aria_label="Gem Profile"
       >
-        <div className="flex h-full flex-col gap-4 overflow-y-auto px-4 py-4 sm:px-5">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            This rolled Gem defines the base modifiers and rules applied to this
-            Gem World.
-          </p>
-          {context.sources.map((source, index) => (
-            <Fragment key={`${source.type}-${source.profile_id}`}>
-              {index > 0 && <Separator />}
-              <RolledGemSourceDetail
-                source={source}
-                display_groups={displayGroupsForSource(source)}
-              />
-            </Fragment>
-          ))}
-        </div>
+        <GemContextProfileDetail
+          context={context}
+          description="This rolled Gem defines the base modifiers and rules applied to this Gem World."
+        />
       </StackedCard>
     );
   };

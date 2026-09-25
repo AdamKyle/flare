@@ -2,7 +2,11 @@
 
 namespace App\Game\Shop\Requests;
 
+use App\Game\Core\Items\Values\EquippablePositionType;
+use App\Game\Core\Items\Values\ItemCatalogType;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Enum;
 
 class ShopReplaceItemValidation extends FormRequest
 {
@@ -11,34 +15,43 @@ class ShopReplaceItemValidation extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Get the validation rules for buying a Shop Item to replace an equipped Item.
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            'position' => 'required|in:left-hand,right-hand,body,shield,leggings,feet,sleeves,sleeves,helmet,gloves,ring-one,ring-two,spell-one,spell-two,artifact-one,artifact-two',
+            'position' => ['required', 'string', Rule::enum(EquippablePositionType::class)],
             'slot_id' => 'required',
-            'equip_type' => 'required|in:sword,dagger,claw,censer,wand,weapon,stave,bow,hammer,mace,fan,gun,scratch-awl,body,shield,leggings,feet,sleeves,helmet,gloves,ring,spell-healing,spell-damage,artifact',
+            'equip_type' => [
+                'required',
+                'string',
+                Rule::enum(ItemCatalogType::class)->except([ItemCatalogType::CENSOR, ItemCatalogType::TRINKET, ItemCatalogType::QUEST, ItemCatalogType::ALCHEMY]),
+            ],
             'item_id_to_buy' => 'required|integer|exists:items,id',
         ];
     }
 
-    public function messages()
+    /**
+     * Get the validation messages for the replacement selection.
+     *
+     * @return array
+     */
+    public function messages(): array
     {
         return [
             'position.required' => 'You must select a position for your item',
-            'position.in' => 'Error. Invalid Input.',
+            'position.'.Enum::class => 'Error. Invalid Input.',
             'slot_id.required' => 'Error. Invalid Input.',
             'equip_type.required' => 'Error. Invalid Input.',
-            'equip_type.in' => 'Error. Invalid Input.',
+            'equip_type.'.Enum::class => 'Error. Invalid Input.',
         ];
     }
 }

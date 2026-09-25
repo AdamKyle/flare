@@ -2,30 +2,26 @@
 
 namespace App\Admin\Controllers\Api;
 
-use App\Admin\Services\UserService;
-use App\Game\Messages\Models\Message;
+use App\Game\Messages\Services\FetchMessages;
 use App\Http\Controllers\Controller;
-use Facades\App\Admin\Formatters\MessagesFormatter;
+use Illuminate\Http\JsonResponse;
 
 class AdminMessagesController extends Controller
 {
     /**
-     * @var UserService
+     * @param FetchMessages $fetchMessages
      */
-    private $userService;
+    public function __construct(private readonly FetchMessages $fetchMessages) {}
 
     /**
-     * MessagesController constructor.
+     * Return the public chat messages from the previous 30 days for the Admin chat.
+     *
+     * @return JsonResponse
      */
-    public function __construct(UserService $userService)
+    public function index(): JsonResponse
     {
-        $this->userService = $userService;
-    }
-
-    public function index()
-    {
-        $messages = Message::orderByDesc('id')->take(100)->get();
-
-        return response()->json(MessagesFormatter::format($messages)->toArray(), 200);
+        return response()->json([
+            'chat_messages' => $this->fetchMessages->fetchAdminMessages(),
+        ]);
     }
 }

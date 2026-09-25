@@ -7,4 +7,5 @@ export enum CoreWebSocketChannels {
   UPDATE_GEM_PROGRESSION = 'update-gem-progression-{userId}',
   CHARACTER_REVIVE = 'character-revive-{userId}',
   CHARACTER_STATUS = 'update-character-status-{userId}',
+  BATTLE_REWARD_PROGRESSION = 'battle-reward-progression-{userId}',
 }

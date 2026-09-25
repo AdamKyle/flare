@@ -1,7 +1,10 @@
+import EnchantingAffixDefinition from '../../api/definitions/enchanting-affix-definition';
+
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 
 export interface EnchantingAffixSlotProps {
   items: DropdownItem[];
+  loadedAffixes: EnchantingAffixDefinition[];
   loading: boolean;
   isLoadingMore: boolean;
   canLoadMore: boolean;

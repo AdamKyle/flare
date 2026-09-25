@@ -1,77 +1,78 @@
 import { useActivityTimeout } from 'api-handler/hooks/use-activity-timeout';
 import { useApiHandler } from 'api-handler/hooks/use-api-handler';
-import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { useCallback, useEffect, useState } from 'react';
+import { resolveApiErrorMessage } from 'api-handler/utils/resolve-api-error-message';
+import axios, { AxiosError } from 'axios';
+import { useEffect, useRef, useState } from 'react';
 
 import UseGetMarketHistoryForTypeDefinition from '../definitions/use-get-market-history-for-type-definition';
 import UseGetMarketHistoryForTypeRequestParams from '../definitions/use-get-market-history-for-type-request-params';
 import MarketHistoryForTypeResponseDefinition from '../definitions/use-get-market-history-for-type-response-definition';
 import { MarketApis } from '../enums/market-apis';
 
-export const useGetMarketHistoryForType =
-  (): UseGetMarketHistoryForTypeDefinition => {
-    const { apiHandler, getUrl } = useApiHandler();
-    const { handleInactivity } = useActivityTimeout();
+export const useGetMarketHistoryForType = ({
+  type,
+  filter,
+}: UseGetMarketHistoryForTypeRequestParams): UseGetMarketHistoryForTypeDefinition => {
+  const { apiHandler, getUrl } = useApiHandler();
+  const { handleInactivity } = useActivityTimeout();
 
-    const [data, setData] = useState<
-      MarketHistoryForTypeResponseDefinition[] | []
-    >([]);
-    const [error, setError] = useState<
-      UseGetMarketHistoryForTypeDefinition['error'] | null
-    >(null);
-    const [loading, setLoading] = useState(true);
-    const [requestParams, setRequestParams] =
-      useState<UseGetMarketHistoryForTypeRequestParams>({
-        type: null,
-        filter: null,
-      });
+  const [data, setData] = useState<MarketHistoryForTypeResponseDefinition[]>(
+    []
+  );
+  const [error, setError] =
+    useState<UseGetMarketHistoryForTypeDefinition['error']>(null);
+  const [loading, setLoading] = useState(true);
 
-    const url = getUrl(MarketApis.MARKET_HISTORY_FOR_TYPE);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
-    const fetchMarketHistoryForType = useCallback(async () => {
-      if (!requestParams.type) {
-        return;
-      }
+  useEffect(() => {
+    abortControllerRef.current?.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
 
+    setLoading(true);
+    setError(null);
+
+    const fetchMarketHistory = async () => {
       try {
         const result = await apiHandler.get<
           MarketHistoryForTypeResponseDefinition[],
-          AxiosRequestConfig<
-            AxiosResponse<MarketHistoryForTypeResponseDefinition[]>
-          >
-        >(url, {
-          params: {
-            type: requestParams.type,
-            filter: requestParams.filter,
-          },
+          UseGetMarketHistoryForTypeRequestParams
+        >(getUrl(MarketApis.MARKET_HISTORY_FOR_TYPE), {
+          params: { type, filter },
+          signal: controller.signal,
         });
 
-        console.log(result);
-
         setData(result);
-      } catch (err) {
-        if (err instanceof AxiosError) {
-          handleInactivity({
-            setError: setError,
-            response: err,
-          });
+      } catch (requestError) {
+        if (axios.isCancel(requestError)) {
+          return;
+        }
 
-          setError(err.response?.data || null);
+        setError({
+          message: resolveApiErrorMessage(
+            requestError,
+            'Unable to load the Market history.'
+          ),
+        });
+
+        if (requestError instanceof AxiosError) {
+          handleInactivity({ response: requestError, setError });
         }
       } finally {
-        setLoading(false);
+        if (abortControllerRef.current === controller) {
+          abortControllerRef.current = null;
+          setLoading(false);
+        }
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [url, apiHandler, requestParams]);
-
-    useEffect(() => {
-      fetchMarketHistoryForType().catch(() => {});
-    }, [fetchMarketHistoryForType]);
-
-    return {
-      data,
-      loading,
-      error,
-      setRequestParams,
     };
-  };
+
+    void fetchMarketHistory();
+
+    return () => {
+      controller.abort();
+    };
+  }, [apiHandler, getUrl, handleInactivity, type, filter]);
+
+  return { data, loading, error };
+};

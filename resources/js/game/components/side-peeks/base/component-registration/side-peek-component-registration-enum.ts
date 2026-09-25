@@ -6,6 +6,7 @@ export enum SidePeekComponentRegistrationEnum {
   GEM_BAG = 'GEM_BAG',
   USABLE_ITEMS = 'USABLE_ITEMS',
   SETS = 'SETS',
+  EQUIPPED_ITEM_DETAILS = 'EQUIPPED_ITEM_DETAILS',
 
   /**
    * Map Actions
@@ -41,6 +42,11 @@ export enum SidePeekComponentRegistrationEnum {
    * Item Details
    */
   ITEM_DETAILS = 'ITEM_DETAILS',
+
+  /**
+   * Activity
+   */
+  ACTIVITY = 'ACTIVITY',
 
   /**
    * Class / Class Mastery Details

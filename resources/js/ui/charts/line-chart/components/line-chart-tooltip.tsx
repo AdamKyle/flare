@@ -54,15 +54,28 @@ const LineChartTooltip = <TData extends object>({
     return null;
   }
 
+  const renderSeriesValue = (
+    line: LineChartTooltipProps<TData>['lines'][number],
+    resolvedValue: number | null
+  ): React.ReactNode => {
+    if (resolvedValue === null) {
+      return UNAVAILABLE_VALUE_LABEL;
+    }
+
+    if (line.value_renderer) {
+      return line.value_renderer(resolvedValue);
+    }
+
+    return (
+      line.value_formatter?.(resolvedValue) ?? resolvedValue.toLocaleString()
+    );
+  };
+
   const renderSeriesRow = (
     line: LineChartTooltipProps<TData>['lines'][number]
   ) => {
     const resolvedValue = resolveLineChartNumber(activePoint[line.data_key]);
-    const formattedValue =
-      resolvedValue === null
-        ? UNAVAILABLE_VALUE_LABEL
-        : (line.value_formatter?.(resolvedValue) ??
-          resolvedValue.toLocaleString());
+    const formattedValue = renderSeriesValue(line, resolvedValue);
 
     return (
       <div key={line.data_key} className="flex items-center gap-1.5">

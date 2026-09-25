@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Game\Messages\Handlers;
 
+use App\Flare\Models\CharacterBattleRewardRequestMessage;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardStepName;
 use App\Game\BattleRewardProcessing\Services\BattleRewardMessageContext;
 use App\Game\BattleRewardProcessing\Services\BattleRewardMessageOutboxService;
 use App\Game\Messages\Builders\ServerMessageBuilder;
@@ -14,11 +16,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterBattleReward;
 use Tests\Traits\CreateUser;
 
 class ServerMessageHandlerTest extends TestCase
 {
-    use CreateUser, RefreshDatabase;
+    use CreateCharacterBattleReward, CreateUser, RefreshDatabase;
 
     private ?ServerMessageHandler $serverMessageHandler;
 
@@ -71,6 +74,32 @@ class ServerMessageHandlerTest extends TestCase
         $this->serverMessageHandler->handleMessageWithNewValue($user, CurrenciesMessageTypes::GOLD, 200, 500);
 
         Event::assertDispatched(ServerMessageEvent::class);
+    }
+
+    public function test_send_basic_message_inside_a_reward_context_stores_an_unemitted_outbox_message_without_broadcasting(): void
+    {
+        Event::fake();
+
+        $request = $this->createCharacterBattleRewardRequest();
+        $character = $request->character;
+        $battleRewardMessageContext = new BattleRewardMessageContext;
+        $battleRewardMessageContext->start($request->id, $character->id, $character->user_id);
+        $battleRewardMessageContext->setStep(BattleRewardStepName::XP);
+
+        $serverMessageHandler = new ServerMessageHandler(
+            new ServerMessageBuilder,
+            $battleRewardMessageContext,
+            new BattleRewardMessageOutboxService,
+        );
+
+        $serverMessageHandler->sendBasicMessage($character->user, 'reward message');
+
+        $storedMessage = CharacterBattleRewardRequestMessage::where('character_battle_reward_request_id', $request->id)->sole();
+
+        $this->assertSame('reward message', $storedMessage->message);
+        $this->assertSame(BattleRewardStepName::XP, $storedMessage->step_name);
+        $this->assertNull($storedMessage->emitted_at);
+        Event::assertNotDispatched(ServerMessageEvent::class);
     }
 
     public function test_send_basic_message_does_not_throw_when_broadcast_transport_fails(): void

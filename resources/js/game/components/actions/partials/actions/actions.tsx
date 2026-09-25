@@ -50,9 +50,9 @@ const Actions = (props: ActionsProps): ReactNode => {
       <Card>
         <div
           className={clsx('grid grid-cols-1 items-start gap-4 p-4', {
-            'lg:[grid-template-columns:6rem_minmax(0,1fr)]':
+            'lg:[grid-template-columns:max-content_minmax(0,1fr)]':
               isNotShowingSideSection(),
-            'lg:[grid-template-columns:6rem_minmax(0,1fr)_clamp(26rem,38vw,40rem)]':
+            'lg:[grid-template-columns:max-content_minmax(0,1fr)_clamp(26rem,38vw,40rem)]':
               isShowingSideSection(),
           })}
         >

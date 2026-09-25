@@ -18,6 +18,8 @@ const GenericItemList = ({
   is_selection_disabled,
   use_item_id,
   quest_item_ownership_state: questItemOwnershipState,
+  is_selectable = true,
+  empty_message,
 }: GenericItemListProps): ReactNode => {
   const [selection, setSelection] = useState<ItemSelectedType>({
     mode: 'include',
@@ -98,7 +100,7 @@ const GenericItemList = ({
   };
 
   const renderSelectAllHeader = () => {
-    if (is_quest_items) {
+    if (is_quest_items || !is_selectable) {
       return null;
     }
 
@@ -153,6 +155,10 @@ const GenericItemList = ({
       );
     }
 
+    if (isEmpty(items) && empty_message) {
+      return <div className="py-4 text-center">{empty_message}</div>;
+    }
+
     if (isEmpty(items) && !is_quest_items) {
       return (
         <div className="py-4 text-center">
@@ -173,6 +179,7 @@ const GenericItemList = ({
           is_selected={isItemSelected(item.slot_id)}
           on_item_selected={handleSelectItem}
           is_selection_disabled={is_selection_disabled}
+          is_selectable={is_selectable}
           quest_item_ownership_state={questItemOwnershipState}
         />
       )

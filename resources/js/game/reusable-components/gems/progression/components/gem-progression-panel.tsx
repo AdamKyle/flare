@@ -10,6 +10,11 @@ import { useOpenManageGemScrolls } from '../hooks/use-open-manage-gem-scrolls';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
 
+import {
+  formatNumberWithCommas,
+  formatPercent,
+} from 'game-utils/format-number';
+
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Button from 'ui/buttons/button';
@@ -112,8 +117,8 @@ const GemProgressionPanel = ({
               variant={ProgressBarVariant.PRIMARY}
               value_label={
                 globalAtCap
-                  ? `Level ${global.level} (Max)`
-                  : `Level ${global.level} — ${global.xp}/${global.next_level_xp} XP`
+                  ? `Level ${formatNumberWithCommas(global.level)} (Max)`
+                  : `Level ${formatNumberWithCommas(global.level)} — ${formatNumberWithCommas(global.xp)} / ${formatNumberWithCommas(global.next_level_xp)} XP`
               }
             />
           </div>
@@ -129,8 +134,8 @@ const GemProgressionPanel = ({
               variant={ProgressBarVariant.PRIMARY}
               value_label={
                 personalAtCap
-                  ? `Level ${personal.level} (Max)`
-                  : `Level ${personal.level} — ${personal.xp}/${personal.next_level_xp} XP`
+                  ? `Level ${formatNumberWithCommas(personal.level)} (Max)`
+                  : `Level ${formatNumberWithCommas(personal.level)} — ${formatNumberWithCommas(personal.xp)} / ${formatNumberWithCommas(personal.next_level_xp)} XP`
               }
             />
           </div>
@@ -155,10 +160,10 @@ const GemProgressionPanel = ({
           <Separator />
 
           <div className="text-sm text-gray-700 dark:text-gray-300">
-            {activeScrolls.count} active Gem Scroll
+            {formatNumberWithCommas(activeScrolls.count)} active Gem Scroll
             {activeScrolls.count === 1 ? '' : 's'} — Total Bonus{' '}
-            {(activeScrolls.total_primary_bonus * 100).toFixed(2)}% /{' '}
-            {(activeScrolls.cap * 100).toFixed(0)}%
+            {formatPercent(activeScrolls.total_primary_bonus)} /{' '}
+            {formatPercent(activeScrolls.cap)}
           </div>
 
           <Button

@@ -4,22 +4,52 @@ namespace Tests\Unit\Game\Skills\Services;
 
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
+use App\Flare\Pagination\Pagination;
+use App\Flare\Transformers\Serializer\PlainDataSerializer;
+use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ClassRanksWeaponMasteriesBuilder;
+use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\DamageBuilder;
+use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\DefenceBuilder;
+use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ElementalAtonement;
+use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HealingBuilder;
+use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HolyBuilder;
+use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ReductionsBuilder;
+use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\CharacterInventory\Jobs\DisenchantMany;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
+use App\Game\Character\CharacterInventory\Services\InventorySetService;
+use App\Game\Character\CharacterInventory\Transformers\CharacterGemsTransformer;
+use App\Game\Character\CharacterInventory\Transformers\InventorySetOptionTransformer;
+use App\Game\Character\CharacterInventory\Transformers\InventoryTransformer;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
+use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Core\Combat\Values\ElementAttackData;
 use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
+use App\Game\Core\Items\Enricher\ItemEnricherFactory;
+use App\Game\Core\Items\Transformers\Api\UsableItemTransformer as ApiUsableItemTransformer;
+use App\Game\Core\Items\Transformers\EquippableItemTransformer;
+use App\Game\Core\Items\Transformers\QuestItemTransformer;
 use App\Game\Core\Items\Values\ItemEffectType;
+use App\Game\Events\Services\GlobalEventGoalEligibilityService;
+use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
+use App\Game\Gems\Progression\Services\GemProgressionEffectService;
+use App\Game\Gems\Services\AreaGemEffectService;
+use App\Game\Gems\Services\GemComparison;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CraftingMessageTypes;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
 use App\Game\Skills\Events\UpdateSkillEvent;
 use App\Game\Skills\Services\DisenchantService;
+use App\Game\Skills\Services\EnchantingAffixService;
+use App\Game\Skills\Services\MassDisenchantService;
+use App\Game\Skills\Services\SkillCheckService;
+use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use League\Fractal\Manager;
 use Mockery;
 use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
@@ -41,6 +71,14 @@ class DisenchantServiceTest extends TestCase
 
     private ?GameSkill $disenchantingSkill;
 
+    private ?EnchantingAffixService $enchantingAffixService;
+
+    private ?RandomNumberGenerator $randomNumberGenerator;
+
+    private ?SkillCheckService $skillCheckService;
+
+    private ?ChanceCalculator $chanceCalculator;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -58,6 +96,32 @@ class DisenchantServiceTest extends TestCase
         $this->character = (new CharacterFactory)->createBaseCharacter()->assignSkill(
             $this->disenchantingSkill
         )->assignSkill($this->enchantingSkill)->givePlayerLocation();
+
+        $characterStatBuilder = new CharacterStatBuilder(
+            new DefenceBuilder(),
+            new DamageBuilder(new ClassRanksWeaponMasteriesBuilder()),
+            new HealingBuilder(new ClassRanksWeaponMasteriesBuilder()),
+            new HolyBuilder(),
+            new ReductionsBuilder(),
+            new ElementalAtonement(
+                new GemComparison(new CharacterGemsTransformer(), new PlainDataSerializer(), new Manager()),
+                new ElementAttackData(),
+            ),
+            new CharacterAreaGemEffectService(new AreaGemEffectService(), new GemProgressionEffectService()),
+        );
+
+        $this->enchantingAffixService = new EnchantingAffixService(
+            $characterStatBuilder,
+            new GlobalEventGoalEligibilityService(),
+        );
+
+        $this->randomNumberGenerator = Mockery::mock(RandomNumberGenerator::class);
+        $this->randomNumberGenerator->shouldReceive('numberBetween')->andReturnUsing(
+            fn (int $minimum, int $maximum): int => intdiv($minimum + $maximum, 2)
+        );
+
+        $this->skillCheckService = new SkillCheckService($this->randomNumberGenerator);
+        $this->chanceCalculator = new ChanceCalculator($this->randomNumberGenerator);
 
         $this->itemToDisenchant = $this->createItem([
             'cost' => 1000,
@@ -84,6 +148,10 @@ class DisenchantServiceTest extends TestCase
         $this->itemToDisenchant = null;
         $this->disenchantingSkill = null;
         $this->enchantingSkill = null;
+        $this->enchantingAffixService = null;
+        $this->randomNumberGenerator = null;
+        $this->skillCheckService = null;
+        $this->chanceCalculator = null;
     }
 
     public function test_disenchant_the_item_and_remove_the_item_from_the_inventory(): void
@@ -94,7 +162,12 @@ class DisenchantServiceTest extends TestCase
 
         $slot = $character->inventory->slots->first();
 
-        resolve(DisenchantService::class)->setUp($character)->disenchantWithSkill($slot);
+        new DisenchantService(
+            $this->skillCheckService,
+            $this->randomNumberGenerator,
+            $this->chanceCalculator,
+            $this->enchantingAffixService,
+        )->setUp($character)->disenchantWithSkill($slot);
 
         $character = $character->refresh();
 
@@ -116,7 +189,12 @@ class DisenchantServiceTest extends TestCase
 
         $slot = $character->inventory->slots->first();
 
-        resolve(DisenchantService::class)->setUp($character)->disenchantWithSkill($slot);
+        new DisenchantService(
+            $this->skillCheckService,
+            $this->randomNumberGenerator,
+            $this->chanceCalculator,
+            $this->enchantingAffixService,
+        )->setUp($character)->disenchantWithSkill($slot);
 
         $character = $character->refresh();
 
@@ -129,19 +207,21 @@ class DisenchantServiceTest extends TestCase
     {
         Event::fake();
 
-        $this->instance(
-            RandomNumberGenerator::class,
-            Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
-                $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(400, 1);
-                $mock->shouldReceive('numberBetween')->with(2, 1150)->andReturn(1000);
-            })
-        );
+        $randomNumberGenerator = Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(400, 1);
+            $mock->shouldReceive('numberBetween')->with(2, 1150)->andReturn(1000);
+        });
 
         $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->getCharacter();
 
         $slot = $character->inventory->slots->first();
 
-        resolve(DisenchantService::class)->setUp($character)->disenchantWithSkill($slot);
+        new DisenchantService(
+            new SkillCheckService($randomNumberGenerator),
+            $randomNumberGenerator,
+            new ChanceCalculator($randomNumberGenerator),
+            $this->enchantingAffixService,
+        )->setUp($character)->disenchantWithSkill($slot);
 
         $character = $character->refresh();
 
@@ -155,19 +235,21 @@ class DisenchantServiceTest extends TestCase
     {
         Event::fake();
 
-        $this->instance(
-            RandomNumberGenerator::class,
-            Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
-                $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(400, 1);
-                $mock->shouldReceive('numberBetween')->with(2, 1150)->andReturn(1000);
-            })
-        );
+        $randomNumberGenerator = Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(400, 1);
+            $mock->shouldReceive('numberBetween')->with(2, 1150)->andReturn(1000);
+        });
 
         $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->getCharacter();
 
         $slot = $character->inventory->slots->first();
 
-        resolve(DisenchantService::class)->setUp($character)->disenchantWithSkill($slot);
+        new DisenchantService(
+            new SkillCheckService($randomNumberGenerator),
+            $randomNumberGenerator,
+            new ChanceCalculator($randomNumberGenerator),
+            $this->enchantingAffixService,
+        )->setUp($character)->disenchantWithSkill($slot);
 
         $character = $character->refresh();
 
@@ -178,14 +260,11 @@ class DisenchantServiceTest extends TestCase
     {
         Event::fake();
 
-        $this->instance(
-            RandomNumberGenerator::class,
-            Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
-                $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(400, 1);
-                $mock->shouldReceive('numberBetween')->with(2, 1150)->andReturn(1000);
-                $mock->shouldReceive('numberBetween')->with(1, 100)->andReturn(2);
-            })
-        );
+        $randomNumberGenerator = Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(400, 1);
+            $mock->shouldReceive('numberBetween')->with(2, 1150)->andReturn(1000);
+            $mock->shouldReceive('numberBetween')->with(1, 100)->andReturn(2);
+        });
 
         $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->giveItem($this->createItem([
             'type' => 'quest',
@@ -194,7 +273,12 @@ class DisenchantServiceTest extends TestCase
 
         $slot = $character->inventory->slots->first();
 
-        resolve(DisenchantService::class)->setUp($character)->disenchantWithSkill($slot);
+        new DisenchantService(
+            new SkillCheckService($randomNumberGenerator),
+            $randomNumberGenerator,
+            new ChanceCalculator($randomNumberGenerator),
+            $this->enchantingAffixService,
+        )->setUp($character)->disenchantWithSkill($slot);
 
         $character = $character->refresh();
 
@@ -205,14 +289,11 @@ class DisenchantServiceTest extends TestCase
     {
         Event::fake();
 
-        $this->instance(
-            RandomNumberGenerator::class,
-            Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
-                $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(400, 1);
-                $mock->shouldReceive('numberBetween')->with(2, 1150)->andReturn(1000);
-                $mock->shouldReceive('numberBetween')->with(1, 100)->andReturn(1);
-            })
-        );
+        $randomNumberGenerator = Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(400, 1);
+            $mock->shouldReceive('numberBetween')->with(2, 1150)->andReturn(1000);
+            $mock->shouldReceive('numberBetween')->with(1, 100)->andReturn(1);
+        });
 
         $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->giveItem($this->createItem([
             'type' => 'quest',
@@ -221,7 +302,12 @@ class DisenchantServiceTest extends TestCase
 
         $slot = $character->inventory->slots->first();
 
-        resolve(DisenchantService::class)->setUp($character)->disenchantWithSkill($slot);
+        new DisenchantService(
+            new SkillCheckService($randomNumberGenerator),
+            $randomNumberGenerator,
+            new ChanceCalculator($randomNumberGenerator),
+            $this->enchantingAffixService,
+        )->setUp($character)->disenchantWithSkill($slot);
 
         $character = $character->refresh();
 
@@ -234,18 +320,20 @@ class DisenchantServiceTest extends TestCase
     {
         Event::fake();
 
-        $this->instance(
-            RandomNumberGenerator::class,
-            Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
-                $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(1, 400);
-            })
-        );
+        $randomNumberGenerator = Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(1, 400);
+        });
 
         $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->getCharacter();
 
         $slot = $character->inventory->slots->first();
 
-        resolve(DisenchantService::class)->setUp($character)->disenchantWithSkill($slot);
+        new DisenchantService(
+            new SkillCheckService($randomNumberGenerator),
+            $randomNumberGenerator,
+            new ChanceCalculator($randomNumberGenerator),
+            $this->enchantingAffixService,
+        )->setUp($character)->disenchantWithSkill($slot);
 
         $character = $character->refresh();
 
@@ -255,7 +343,7 @@ class DisenchantServiceTest extends TestCase
         Event::assertDispatched(UpdateCharacterEnchantingList::class);
 
         Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message === resolve(ServerMessageBuilder::class)->build(CraftingMessageTypes::FAILED_TO_DISENCHANT);
+            return $event->message === new ServerMessageBuilder()->build(CraftingMessageTypes::FAILED_TO_DISENCHANT);
         });
     }
 
@@ -263,13 +351,10 @@ class DisenchantServiceTest extends TestCase
     {
         Event::fake();
 
-        $this->instance(
-            RandomNumberGenerator::class,
-            Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
-                $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(1, 400);
-                $mock->shouldReceive('numberBetween')->with(1, 100)->never();
-            })
-        );
+        $randomNumberGenerator = Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(1, 400);
+            $mock->shouldReceive('numberBetween')->with(1, 100)->never();
+        });
 
         $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->giveItem($this->createItem([
             'type' => 'quest',
@@ -278,7 +363,12 @@ class DisenchantServiceTest extends TestCase
 
         $slot = $character->inventory->slots->first();
 
-        resolve(DisenchantService::class)->setUp($character)->disenchantWithSkill($slot);
+        new DisenchantService(
+            new SkillCheckService($randomNumberGenerator),
+            $randomNumberGenerator,
+            new ChanceCalculator($randomNumberGenerator),
+            $this->enchantingAffixService,
+        )->setUp($character)->disenchantWithSkill($slot);
 
         $character = $character->refresh();
 
@@ -289,14 +379,11 @@ class DisenchantServiceTest extends TestCase
     {
         Event::fake();
 
-        $this->instance(
-            RandomNumberGenerator::class,
-            Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
-                $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(400, 1);
-                $mock->shouldReceive('numberBetween')->with(2, 1150)->andReturn(1000);
-                $mock->shouldReceive('numberBetween')->with(1, 100)->andReturn(1);
-            })
-        );
+        $randomNumberGenerator = Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(400, 1);
+            $mock->shouldReceive('numberBetween')->with(2, 1150)->andReturn(1000);
+            $mock->shouldReceive('numberBetween')->with(1, 100)->andReturn(1);
+        });
 
         $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->giveItem($this->createItem([
             'type' => 'quest',
@@ -311,7 +398,12 @@ class DisenchantServiceTest extends TestCase
 
         $slot = $character->inventory->slots->first();
 
-        resolve(DisenchantService::class)->setUp($character)->disenchantWithSkill($slot);
+        new DisenchantService(
+            new SkillCheckService($randomNumberGenerator),
+            $randomNumberGenerator,
+            new ChanceCalculator($randomNumberGenerator),
+            $this->enchantingAffixService,
+        )->setUp($character)->disenchantWithSkill($slot);
 
         $character = $character->refresh();
 
@@ -325,14 +417,11 @@ class DisenchantServiceTest extends TestCase
     {
         Event::fake();
 
-        $this->instance(
-            RandomNumberGenerator::class,
-            Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
-                $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(400, 1);
-                $mock->shouldReceive('numberBetween')->with(2, 1150)->andReturn(1000);
-                $mock->shouldReceive('numberBetween')->with(1, 100)->andReturn(2);
-            })
-        );
+        $randomNumberGenerator = Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(400, 1);
+            $mock->shouldReceive('numberBetween')->with(2, 1150)->andReturn(1000);
+            $mock->shouldReceive('numberBetween')->with(1, 100)->andReturn(2);
+        });
 
         $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->giveItem($this->createItem([
             'type' => 'quest',
@@ -347,7 +436,12 @@ class DisenchantServiceTest extends TestCase
 
         $slot = $character->inventory->slots->first();
 
-        resolve(DisenchantService::class)->setUp($character)->disenchantWithSkill($slot);
+        new DisenchantService(
+            new SkillCheckService($randomNumberGenerator),
+            $randomNumberGenerator,
+            new ChanceCalculator($randomNumberGenerator),
+            $this->enchantingAffixService,
+        )->setUp($character)->disenchantWithSkill($slot);
 
         $character = $character->refresh();
 
@@ -359,12 +453,9 @@ class DisenchantServiceTest extends TestCase
     {
         Event::fake();
 
-        $this->instance(
-            RandomNumberGenerator::class,
-            Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
-                $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(400, 1);
-            })
-        );
+        $randomNumberGenerator = Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(400, 1);
+        });
 
         $character = $this->character->inventoryManagement()->giveItem($this->itemToDisenchant)->giveItem($this->createItem([
             'type' => 'quest',
@@ -379,7 +470,12 @@ class DisenchantServiceTest extends TestCase
 
         $slot = $character->inventory->slots->first();
 
-        resolve(DisenchantService::class)->setUp($character)->disenchantWithSkill($slot);
+        new DisenchantService(
+            new SkillCheckService($randomNumberGenerator),
+            $randomNumberGenerator,
+            new ChanceCalculator($randomNumberGenerator),
+            $this->enchantingAffixService,
+        )->setUp($character)->disenchantWithSkill($slot);
 
         $character = $character->refresh();
 
@@ -467,17 +563,19 @@ class DisenchantServiceTest extends TestCase
     {
         Event::fake();
 
-        $this->instance(
-            RandomNumberGenerator::class,
-            Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
-                $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(400, 1);
-                $mock->shouldReceive('numberBetween')->with(2, 1150)->andReturn(1000);
-            })
-        );
+        $randomNumberGenerator = Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(400, 1);
+            $mock->shouldReceive('numberBetween')->with(2, 1150)->andReturn(1000);
+        });
 
         $character = $this->character->getCharacter();
 
-        resolve(DisenchantService::class)->setUp($character)->disenchantItemWithSkill();
+        new DisenchantService(
+            new SkillCheckService($randomNumberGenerator),
+            $randomNumberGenerator,
+            new ChanceCalculator($randomNumberGenerator),
+            $this->enchantingAffixService,
+        )->setUp($character)->disenchantItemWithSkill();
 
         $character = $character->refresh();
 
@@ -492,12 +590,9 @@ class DisenchantServiceTest extends TestCase
     {
         Event::fake();
 
-        $this->instance(
-            RandomNumberGenerator::class,
-            Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
-                $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(400, 1);
-            })
-        );
+        $randomNumberGenerator = Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(400, 1);
+        });
 
         $character = $this->character->getCharacter();
 
@@ -505,7 +600,12 @@ class DisenchantServiceTest extends TestCase
             'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
         ]);
 
-        resolve(DisenchantService::class)->setUp($character)->disenchantItemWithSkill();
+        new DisenchantService(
+            new SkillCheckService($randomNumberGenerator),
+            $randomNumberGenerator,
+            new ChanceCalculator($randomNumberGenerator),
+            $this->enchantingAffixService,
+        )->setUp($character)->disenchantItemWithSkill();
 
         $character = $character->refresh();
 
@@ -520,14 +620,16 @@ class DisenchantServiceTest extends TestCase
 
         $character = $this->character->getCharacter();
 
-        $this->instance(
-            RandomNumberGenerator::class,
-            Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
-                $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(1, 400);
-            })
-        );
+        $randomNumberGenerator = Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(1, 400);
+        });
 
-        resolve(DisenchantService::class)->setUp($character)->disenchantItemWithSkill();
+        new DisenchantService(
+            new SkillCheckService($randomNumberGenerator),
+            $randomNumberGenerator,
+            new ChanceCalculator($randomNumberGenerator),
+            $this->enchantingAffixService,
+        )->setUp($character)->disenchantItemWithSkill();
 
         $character = $character->refresh();
 
@@ -535,7 +637,7 @@ class DisenchantServiceTest extends TestCase
         $this->assertEquals(1, $character->gold_dust);
 
         Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message === resolve(ServerMessageBuilder::class)->build(CraftingMessageTypes::FAILED_TO_DISENCHANT);
+            return $event->message === new ServerMessageBuilder()->build(CraftingMessageTypes::FAILED_TO_DISENCHANT);
         });
         Event::assertNotDispatched(UpdateCharacterInventoryCountEvent::class);
         Event::assertNotDispatched(UpdateCharacterBaseDetailsEvent::class);
@@ -547,7 +649,20 @@ class DisenchantServiceTest extends TestCase
 
         $item = $this->createItem();
 
-        $characterInventoryService = $this->app->make(CharacterInventoryService::class);
+        $characterInventoryService = new CharacterInventoryService(
+            Mockery::mock(ItemEnricherFactory::class),
+            Mockery::mock(EquippableItemTransformer::class),
+            Mockery::mock(QuestItemTransformer::class),
+            Mockery::mock(ApiUsableItemTransformer::class),
+            Mockery::mock(InventoryTransformer::class),
+            Mockery::mock(InventorySetService::class),
+            Mockery::mock(MassDisenchantService::class),
+            Mockery::mock(UpdateCharacterSkillsService::class),
+            Mockery::mock(DisenchantService::class),
+            new Pagination(new Manager()),
+            Mockery::mock(Manager::class),
+            Mockery::mock(InventorySetOptionTransformer::class),
+        );
 
         $result = $characterInventoryService->setCharacter($character)->disenchantItem($item->id);
 
@@ -559,13 +674,10 @@ class DisenchantServiceTest extends TestCase
     {
         Event::fake();
 
-        $this->instance(
-            RandomNumberGenerator::class,
-            Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
-                $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(400, 1);
-                $mock->shouldReceive('numberBetween')->with(2, 1150)->andReturn(1000);
-            })
-        );
+        $randomNumberGenerator = Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(400, 1);
+            $mock->shouldReceive('numberBetween')->with(2, 1150)->andReturn(1000);
+        });
 
         $item = $this->createItem();
 
@@ -573,7 +685,12 @@ class DisenchantServiceTest extends TestCase
 
         $slot = $character->inventory->slots->first();
 
-        $result = resolve(DisenchantService::class)->setUp($character)->disenchantItem($slot);
+        $result = new DisenchantService(
+            new SkillCheckService($randomNumberGenerator),
+            $randomNumberGenerator,
+            new ChanceCalculator($randomNumberGenerator),
+            $this->enchantingAffixService,
+        )->setUp($character)->disenchantItem($slot);
 
         $this->assertEquals('Disenchanted item '.$item->affix_name.' Check server message tab for Gold Dust output.', $result['message']);
         $this->assertEquals(200, $result['status']);
@@ -599,7 +716,20 @@ class DisenchantServiceTest extends TestCase
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
-        $characterInventoryService = $this->app->make(CharacterInventoryService::class);
+        $characterInventoryService = new CharacterInventoryService(
+            Mockery::mock(ItemEnricherFactory::class),
+            Mockery::mock(EquippableItemTransformer::class),
+            Mockery::mock(QuestItemTransformer::class),
+            Mockery::mock(ApiUsableItemTransformer::class),
+            Mockery::mock(InventoryTransformer::class),
+            Mockery::mock(InventorySetService::class),
+            Mockery::mock(MassDisenchantService::class),
+            Mockery::mock(UpdateCharacterSkillsService::class),
+            Mockery::mock(DisenchantService::class),
+            new Pagination(new Manager()),
+            Mockery::mock(Manager::class),
+            Mockery::mock(InventorySetOptionTransformer::class),
+        );
 
         $result = $characterInventoryService->setCharacter($character)->disenchantItem($item->id);
 
@@ -613,7 +743,12 @@ class DisenchantServiceTest extends TestCase
 
         $slot = $character->inventory->slots->first();
 
-        $result = resolve(DisenchantService::class)->setUp($character)->disenchantItem($slot, true);
+        $result = new DisenchantService(
+            $this->skillCheckService,
+            $this->randomNumberGenerator,
+            $this->chanceCalculator,
+            $this->enchantingAffixService,
+        )->setUp($character)->disenchantItem($slot, true);
 
         $this->assertEquals(200, $result['status']);
     }
@@ -624,7 +759,12 @@ class DisenchantServiceTest extends TestCase
 
         $slot = $character->inventory->slots->first();
 
-        $result = resolve(DisenchantService::class)->setUp($character)->disenchantItem($slot);
+        $result = new DisenchantService(
+            $this->skillCheckService,
+            $this->randomNumberGenerator,
+            $this->chanceCalculator,
+            $this->enchantingAffixService,
+        )->setUp($character)->disenchantItem($slot);
 
         $this->assertEquals('Disenchanted item '.$this->itemToDisenchant->affix_name.' Check server message tab for Gold Dust output.', $result['message']);
         $this->assertEquals(200, $result['status']);
@@ -634,18 +774,20 @@ class DisenchantServiceTest extends TestCase
     {
         Event::fake();
 
-        $this->instance(
-            RandomNumberGenerator::class,
-            Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
-                $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(400);
-                $mock->shouldReceive('numberBetween')->with(2, 1150)->andReturn(1000);
-            })
-        );
+        $randomNumberGenerator = Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(400);
+            $mock->shouldReceive('numberBetween')->with(2, 1150)->andReturn(1000);
+        });
 
         $character = $this->character->getCharacter();
         $goldDustBefore = $character->gold_dust;
 
-        resolve(DisenchantService::class)->setUp($character)->disenchantBatchCraftedItem();
+        new DisenchantService(
+            new SkillCheckService($randomNumberGenerator),
+            $randomNumberGenerator,
+            new ChanceCalculator($randomNumberGenerator),
+            $this->enchantingAffixService,
+        )->setUp($character)->disenchantBatchCraftedItem();
 
         $character = $character->refresh();
 
@@ -658,17 +800,19 @@ class DisenchantServiceTest extends TestCase
     {
         Event::fake();
 
-        $this->instance(
-            RandomNumberGenerator::class,
-            Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
-                $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(1, 400);
-            })
-        );
+        $randomNumberGenerator = Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(1, 400);
+        });
 
         $character = $this->character->getCharacter();
         $goldDustBefore = $character->gold_dust;
 
-        resolve(DisenchantService::class)->setUp($character)->disenchantBatchCraftedItem();
+        new DisenchantService(
+            new SkillCheckService($randomNumberGenerator),
+            $randomNumberGenerator,
+            new ChanceCalculator($randomNumberGenerator),
+            $this->enchantingAffixService,
+        )->setUp($character)->disenchantBatchCraftedItem();
 
         $character = $character->refresh();
 
@@ -699,7 +843,12 @@ class DisenchantServiceTest extends TestCase
 
         $slot = $character->inventory->slots->firstWhere('item_id', $this->itemToDisenchant->id);
 
-        resolve(DisenchantService::class)->setUp($character)->disenchantWithSkill($slot);
+        new DisenchantService(
+            $this->skillCheckService,
+            $this->randomNumberGenerator,
+            $this->chanceCalculator,
+            $this->enchantingAffixService,
+        )->setUp($character)->disenchantWithSkill($slot);
 
         Event::assertDispatched(function (UpdateCharacterEnchantingList $event) use ($remainingItem) {
             return $event->inventory->count() === 1

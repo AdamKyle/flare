@@ -1,17 +1,39 @@
 import React, { ReactNode } from 'react';
 
 import GemTierCostSummaryProps from './types/gem-tier-cost-summary-props';
-
-import { formatNumberWithCommas } from 'game-utils/format-number';
+import CurrencyDisplay from '../../../../../../../../reusable-components/currency/currency-display';
+import { CurrencyDisplayMode } from '../../../../../../../../reusable-components/currency/enums/currency-display-mode';
+import { CurrencyType } from '../../../../../../../../reusable-components/currency/enums/currency-type';
 
 const GemTierCostSummary = ({ tier }: GemTierCostSummaryProps): ReactNode => (
   <dl className="grid grid-cols-2 gap-2 rounded-md border border-gray-300 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-900">
     <dt>Gold Dust</dt>
-    <dd>{formatNumberWithCommas(tier.cost.gold_dust)}</dd>
+    <dd>
+      <CurrencyDisplay
+        currency={CurrencyType.GOLD_DUST}
+        amount={tier.cost.gold_dust}
+        display_mode={CurrencyDisplayMode.EXACT}
+        show_label={false}
+      />
+    </dd>
     <dt>Shards</dt>
-    <dd>{formatNumberWithCommas(tier.cost.shards)}</dd>
+    <dd>
+      <CurrencyDisplay
+        currency={CurrencyType.SHARDS}
+        amount={tier.cost.shards}
+        display_mode={CurrencyDisplayMode.EXACT}
+        show_label={false}
+      />
+    </dd>
     <dt>Copper Coins</dt>
-    <dd>{formatNumberWithCommas(tier.cost.copper_coins)}</dd>
+    <dd>
+      <CurrencyDisplay
+        currency={CurrencyType.COPPER_COINS}
+        amount={tier.cost.copper_coins}
+        display_mode={CurrencyDisplayMode.EXACT}
+        show_label={false}
+      />
+    </dd>
     <dt>Item value range</dt>
     <dd>
       {tier.min}–{tier.max}

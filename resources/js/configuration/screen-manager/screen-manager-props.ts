@@ -9,6 +9,7 @@ import CharacterSheetProps from '../../game/components/character-sheet/types/cha
 import DonationsProps from '../../game/components/donations/types/donations-props';
 import GoblinShopProps from '../../game/components/goblin-shop/types/goblin-shop-props';
 import GuideQuestProps from '../../game/components/guide-quests/types/guide-quest-props';
+import MarketProps from '../../game/components/market/types/market-props';
 import CharacterInventoryProps from '../../game/components/partials/types/character-inventory-props';
 import QuestDetailScreenProps from '../../game/components/quests/types/quest-detail-screen-props';
 import QuestLogScreenProps from '../../game/components/quests/types/quest-log-screen-props';
@@ -17,6 +18,7 @@ import ShopScreenProps from '../../game/components/shop/types/shop-screen-props'
 export interface AppScreenPropsMap {
   [Screens.CHARACTER_SHEET]: CharacterSheetProps;
   [Screens.SHOP]: ShopScreenProps;
+  [Screens.MARKET]: MarketProps;
   [Screens.GOBLIN_SHOP]: GoblinShopProps;
   [Screens.CHARACTER_INVENTORY]: CharacterInventoryProps;
   [Screens.MONSTER_DETAILS]: MonsterStatSectionProps;

@@ -30,28 +30,30 @@ class CelestialFightService
 {
     use ChecksAutomationRestrictions, ResponseBuilder;
 
-    private BattleEventHandler $battleEventHandler;
-
-    private CharacterCacheData $characterCacheData;
-
-    private MapTileValue $mapTileValue;
-
-    private ?MonsterPlayerFight $monsterPlayerFight;
-
+    /**
+     * @param BattleEventHandler $battleEventHandler
+     * @param CharacterCacheData $characterCacheData
+     * @param MonsterPlayerFight $monsterPlayerFight
+     * @param MapTileValue $mapTileValue
+     * @param RandomNumberGenerator $randomNumberGenerator
+     * @param CoordinatesQuery $coordinatesQuery
+     */
     public function __construct(
-        BattleEventHandler $battleEventHandler,
-        CharacterCacheData $characterCacheData,
-        MonsterPlayerFight $monsterPlayerFight,
-        MapTileValue $mapTileValue,
+        private readonly BattleEventHandler $battleEventHandler,
+        private readonly CharacterCacheData $characterCacheData,
+        private ?MonsterPlayerFight $monsterPlayerFight,
+        private readonly MapTileValue $mapTileValue,
         private readonly RandomNumberGenerator $randomNumberGenerator,
         private readonly CoordinatesQuery $coordinatesQuery,
-    ) {
-        $this->battleEventHandler = $battleEventHandler;
-        $this->characterCacheData = $characterCacheData;
-        $this->monsterPlayerFight = $monsterPlayerFight;
-        $this->mapTileValue = $mapTileValue;
-    }
+    ) {}
 
+    /**
+     * Join the Character to the Celestial fight, creating or refreshing their cached fight health.
+     *
+     * @param Character $character
+     * @param CelestialFight $celestialFight
+     * @return CharacterInCelestialFight
+     */
     public function joinFight(Character $character, CelestialFight $celestialFight): CharacterInCelestialFight
     {
         $characterInCelestialFight = CharacterInCelestialFight::where('character_id', $character->id)->first();
@@ -78,6 +80,15 @@ class CelestialFightService
         return $characterInCelestialFight;
     }
 
+    /**
+     * Resolve one Character attack against the Celestial fight and return the updated fight state.
+     *
+     * @param Character $character
+     * @param CelestialFight $celestialFight
+     * @param CharacterInCelestialFight $characterInCelestialFight
+     * @param string $attackType
+     * @return array
+     */
     public function fight(Character $character, CelestialFight $celestialFight, CharacterInCelestialFight $characterInCelestialFight, string $attackType): array
     {
         $restriction = $this->automationRestrictionErrorResult($character, AutomationRestrictionService::CELESTIAL_FIGHTING);
@@ -151,7 +162,13 @@ class CelestialFightService
         ]);
     }
 
-    public function revive(Character $character)
+    /**
+     * Restore the Character's cached Celestial fight health and return the current fight state.
+     *
+     * @param Character $character
+     * @return array
+     */
+    public function revive(Character $character): array
     {
         $character = $this->battleEventHandler->processRevive($character);
 
@@ -172,7 +189,14 @@ class CelestialFightService
         ]);
     }
 
-    protected function isPlayerAtSameLocationAsCelestialFight(Map $map, CelestialFight $celestialFight): bool
+    /**
+     * Determine whether the Character's current map position matches the Celestial fight's location.
+     *
+     * @param Map $map
+     * @param CelestialFight $celestialFight
+     * @return bool
+     */
+    private function isPlayerAtSameLocationAsCelestialFight(Map $map, CelestialFight $celestialFight): bool
     {
         $characterX = $map->character_position_x;
         $characterY = $map->character_position_y;
@@ -182,7 +206,14 @@ class CelestialFightService
             $celestialFight->monster->game_map_id === $map->game_map_id;
     }
 
-    protected function handleMonsterDeath(Character $character, CelestialFight $celestialFight)
+    /**
+     * Handle the Celestial's death: apply the engagement timeout, grant shards, and dispatch the reward handler.
+     *
+     * @param Character $character
+     * @param CelestialFight $celestialFight
+     * @return void
+     */
+    private function handleMonsterDeath(Character $character, CelestialFight $celestialFight): void
     {
         event(new UpdateCelestialFight(null, 0, $celestialFight->id));
 
@@ -190,7 +221,7 @@ class CelestialFightService
 
         $this->giveShards($character, $celestialFight);
 
-        BattleAttackHandler::dispatch($character->id, $celestialFight->monster_id)->onQueue('battle_reward_processing')->onConnection('battle_reward_processing')->delay(now()->addSeconds(2));
+        BattleAttackHandler::dispatch($character->id, $celestialFight->monster_id)->onQueue('battle_reward_processing')->onConnection('battle_reward_processing');
 
         $celestialFightType = new CelestialConjureType($celestialFight->type);
 
@@ -207,7 +238,13 @@ class CelestialFightService
         $celestialFight->delete();
     }
 
-    protected function timeOutCelestialEvent(Character $character): Character
+    /**
+     * Apply the Character's 10-second Celestial re-engagement timeout and broadcast the current status.
+     *
+     * @param Character $character
+     * @return Character
+     */
+    private function timeOutCelestialEvent(Character $character): Character
     {
         $timeLeft = now()->addSeconds(10);
 
@@ -227,7 +264,14 @@ class CelestialFightService
         return $character->refresh();
     }
 
-    protected function giveShards(Character $character, CelestialFight $celestialFight)
+    /**
+     * Grant the Character the defeated Celestial's shards, capped at the max shards limit.
+     *
+     * @param Character $character
+     * @param CelestialFight $celestialFight
+     * @return void
+     */
+    private function giveShards(Character $character, CelestialFight $celestialFight): void
     {
         $monsterShards = $celestialFight->monster->shards;
 
@@ -248,7 +292,14 @@ class CelestialFightService
         event(new ServerMessageEvent($character->user, 'You received: '.number_format($monsterShards).' shards! Shards can only be used in Alchemy.'));
     }
 
-    protected function updateCharacterInFight(Character $character, CharacterInCelestialFight $characterInCelestialFight)
+    /**
+     * Refresh the Character's cached health onto their Celestial fight participation record.
+     *
+     * @param Character $character
+     * @param CharacterInCelestialFight $characterInCelestialFight
+     * @return CharacterInCelestialFight
+     */
+    private function updateCharacterInFight(Character $character, CharacterInCelestialFight $characterInCelestialFight): CharacterInCelestialFight
     {
         $health = $this->characterCacheData->getCachedCharacterData($character, 'health');
 
@@ -262,7 +313,14 @@ class CelestialFightService
         return $characterInCelestialFight->refresh();
     }
 
-    protected function moveCelestial(Character $character, CelestialFight $celestialFight): CelestialFight
+    /**
+     * Move the Celestial to a new valid location and announce its flight.
+     *
+     * @param Character $character
+     * @param CelestialFight $celestialFight
+     * @return CelestialFight
+     */
+    private function moveCelestial(Character $character, CelestialFight $celestialFight): CelestialFight
     {
         $monster = $celestialFight->monster;
 
@@ -284,7 +342,10 @@ class CelestialFightService
     }
 
     /**
-     * Move the celestial to valid coordinates for special maps.
+     * Resolve valid Celestial coordinates, re-rolling water tiles on special maps.
+     *
+     * @param CelestialFight $celestialFight
+     * @return array
      */
     private function getCelestialCoordinates(CelestialFight $celestialFight): array
     {

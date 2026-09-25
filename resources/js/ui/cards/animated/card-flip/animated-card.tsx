@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import React, { isValidElement, useState } from 'react';
 
 import AnimatedCardProps from './types/animated-card-props';
@@ -14,6 +14,7 @@ const AnimatedCard = ({
   on_click_card,
 }: AnimatedCardProps) => {
   const [internalIsFlipped, setInternalIsFlipped] = useState<boolean>(false);
+  const reduceMotion = useReducedMotion();
 
   const resolvedIsFlipped =
     typeof is_flipped === 'boolean' ? is_flipped : internalIsFlipped;
@@ -58,7 +59,7 @@ const AnimatedCard = ({
         className="pointer-events-none relative z-10 h-full w-full"
         style={{ transformStyle: 'preserve-3d' }}
         animate={{ rotateY: resolvedIsFlipped ? 180 : 0 }}
-        transition={{ duration: 0.45 }}
+        transition={{ duration: reduceMotion ? 0 : 0.45 }}
       >
         {renderFaces()}
       </motion.div>

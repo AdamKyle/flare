@@ -1,11 +1,13 @@
 import React, { ReactNode } from 'react';
 
-import {
-  formatNumberWithCommas,
-  formatPercent,
-} from '../../../util/format-number';
+import CurrencyDisplay from '../../currency/currency-display';
+import { CurrencyDisplayMode } from '../../currency/enums/currency-display-mode';
+import { CurrencyType } from '../../currency/enums/currency-type';
 import FactualLink from '../../quest-item/partials/factual-link';
+import MonsterCurrencyCostRow from '../types/monster-currency-cost-row';
 import MonsterDetailProps from '../types/monster-detail-props';
+
+import { formatPercent } from 'game-utils/format-number';
 
 import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
@@ -17,11 +19,37 @@ const MonsterQuestCelestialSection = ({
 }: MonsterDetailProps): ReactNode => {
   const { quest_and_celestial: section } = monster;
 
-  const costRows: { label: string; value: number }[] = [
-    { label: 'Gold Cost', value: section.gold_cost ?? 0 },
-    { label: 'Gold Dust Cost', value: section.gold_dust_cost ?? 0 },
-    { label: 'Shards', value: section.shards ?? 0 },
+  const costRows: MonsterCurrencyCostRow[] = [
+    {
+      label: 'Gold Cost',
+      currency: CurrencyType.GOLD,
+      value: section.gold_cost ?? 0,
+    },
+    {
+      label: 'Gold Dust Cost',
+      currency: CurrencyType.GOLD_DUST,
+      value: section.gold_dust_cost ?? 0,
+    },
+    {
+      label: 'Shards',
+      currency: CurrencyType.SHARDS,
+      value: section.shards ?? 0,
+    },
   ].filter((row) => row.value > 0);
+
+  const renderCostRow = (row: MonsterCurrencyCostRow): ReactNode => (
+    <React.Fragment key={row.label}>
+      <Dt>{row.label}</Dt>
+      <Dd>
+        <CurrencyDisplay
+          currency={row.currency}
+          amount={row.value}
+          display_mode={CurrencyDisplayMode.EXACT}
+          show_label={false}
+        />
+      </Dd>
+    </React.Fragment>
+  );
 
   const dropChance = section.quest_item_drop_chance ?? 0;
 
@@ -72,12 +100,7 @@ const MonsterQuestCelestialSection = ({
             <Dd>{section.celestial_type}</Dd>
           </>
         )}
-        {costRows.map((row) => (
-          <React.Fragment key={row.label}>
-            <Dt>{row.label}</Dt>
-            <Dd>{formatNumberWithCommas(row.value)}</Dd>
-          </React.Fragment>
-        ))}
+        {costRows.map(renderCostRow)}
       </Dl>
     </div>
   );

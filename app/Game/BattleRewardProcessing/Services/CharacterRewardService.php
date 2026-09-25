@@ -89,7 +89,7 @@ class CharacterRewardService
     }
 
     /**
-     * Distribute XP in a single checkpointed step, invoking the callback once it is applied.
+     * Apply XP and its level ups in one checkpointed write, invoking the callback inside the same transaction with the applied XP, levels awarded, Character, and ordered progression.
      *
      * @param int $xp
      * @param ?Closure $checkpointCallback
@@ -100,6 +100,16 @@ class CharacterRewardService
         $this->characterXpService->setCharacter($this->character)->distributeCheckpointedXp($xp, $checkpointCallback);
 
         return $this;
+    }
+
+    /**
+     * Return the ordered level progression snapshots produced by the most recent checkpointed XP distribution.
+     *
+     * @return array
+     */
+    public function checkpointedProgression(): array
+    {
+        return $this->characterXpService->checkpointedProgression();
     }
 
     /**

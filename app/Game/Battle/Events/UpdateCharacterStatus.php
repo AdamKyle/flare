@@ -36,12 +36,13 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
 
     /**
      * @param Character $character
-     * @param AttackTimerService $attackTimerService
-     * @param float $attackCooldownSecondsOverride
+     * @param ?AttackTimerService $attackTimerService
+     * @param ?float $attackCooldownSecondsOverride
      */
     public function __construct(Character $character, ?AttackTimerService $attackTimerService = null, ?float $attackCooldownSecondsOverride = null)
     {
-        $attackTimerService ??= new AttackTimerService(new AutomationRestrictionService());
+        $automationRestrictionService = new AutomationRestrictionService();
+        $attackTimerService ??= new AttackTimerService($automationRestrictionService);
         $character = $attackTimerService->normalizeExpiredAttackTimer($character);
 
         $this->characterStatuses = [
@@ -65,8 +66,8 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
                 ->where('completed_at', '>', now())
                 ->exists(),
             'is_delve_visible' => $this->isDelveVisible($character),
-            'active_automation' => $this->activeAutomation($character),
-            'automation_completed_at' => $this->getTimeLeftOnAutomation($character),
+            'active_automation' => $this->activeAutomation($character, $automationRestrictionService),
+            'automation_completed_at' => $this->getTimeLeftOnAutomation($character, $automationRestrictionService),
             'is_silenced' => $character->is_silenced,
             'can_move' => $character->can_move,
             'is_alchemy_locked' => $this->isAlchemyLocked($character),
@@ -82,8 +83,8 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
     /**
      * Get the remaining manual attack cooldown, in seconds, to a tenth of a second.
      *
-     * @param Carbon $canAttackAgainAt
-     * @param float $secondsOverride
+     * @param ?Carbon $canAttackAgainAt
+     * @param ?float $secondsOverride
      * @return float
      */
     private function remainingAttackCooldownSeconds(?Carbon $canAttackAgainAt, ?float $secondsOverride): float
@@ -101,9 +102,16 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
         return max(0.0, round($remainingMilliseconds / 1000, 1));
     }
 
-    private function getTimeLeftOnAutomation(Character $character)
+    /**
+     * Return the Character's active automation's remaining timer, in seconds.
+     *
+     * @param Character $character
+     * @param AutomationRestrictionService $automationRestrictionService
+     * @return int
+     */
+    private function getTimeLeftOnAutomation(Character $character, AutomationRestrictionService $automationRestrictionService): int
     {
-        $automation = $this->activeAutomation($character);
+        $automation = $this->activeAutomation($character, $automationRestrictionService);
 
         if (! is_null($automation)) {
             return $automation['timer_seconds'];
@@ -112,12 +120,16 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
         return 0;
     }
 
-    private function activeAutomation(Character $character): ?array
+    /**
+     * Resolve the Character's currently active automation identity, if any.
+     *
+     * @param Character $character
+     * @param AutomationRestrictionService $automationRestrictionService
+     * @return ?array
+     */
+    private function activeAutomation(Character $character, AutomationRestrictionService $automationRestrictionService): ?array
     {
-        $automation = $character->currentAutomations()
-            ->where('completed_at', '>', now())
-            ->orderBy('id')
-            ->first();
+        $automation = $automationRestrictionService->activeAutomation($character);
 
         if (is_null($automation)) {
             return null;
@@ -141,6 +153,12 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
         ];
     }
 
+    /**
+     * Determine whether the Delve panel should be visible for the Character.
+     *
+     * @param Character $character
+     * @return bool
+     */
     private function isDelveVisible(Character $character): bool
     {
         $isDelveActive = $character->currentAutomations()
@@ -159,6 +177,12 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
             ->exists();
     }
 
+    /**
+     * Determine whether the Character's Alchemy skill is locked.
+     *
+     * @param Character $character
+     * @return bool
+     */
     private function isAlchemyLocked(Character $character): bool
     {
 
@@ -175,6 +199,12 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
         return $alchemySkill->is_locked;
     }
 
+    /**
+     * Determine whether the Character is currently standing at the Delve location.
+     *
+     * @param Character $character
+     * @return bool
+     */
     private function isAtDelveLocation(Character $character): bool
     {
         $characterMap = $character->map;
@@ -195,6 +225,12 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
         return ! is_null($location) && $characterHasItem;
     }
 
+    /**
+     * Determine whether the Character holds the Delve pact-choice quest item.
+     *
+     * @param Character $character
+     * @return bool
+     */
     private function canSetPactOptionsForDelve(Character $character): bool
     {
 
@@ -214,7 +250,7 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
      *
      * @return Channel|array
      */
-    public function broadcastOn()
+    public function broadcastOn(): Channel|array
     {
         return new PrivateChannel('update-character-status-'.$this->user->id);
     }

@@ -1,12 +1,16 @@
 import { debounce } from 'lodash';
 import React, { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 
+import CurrencyDisplay from '../../../../../../../../reusable-components/currency/currency-display';
+import { CurrencyDisplayMode } from '../../../../../../../../reusable-components/currency/enums/currency-display-mode';
+import { CurrencyType } from '../../../../../../../../reusable-components/currency/enums/currency-type';
 import { useCraftableItemsApi } from '../../crafting/api/hooks/use-craftable-items-api';
 import {
   armourTypeOptions,
   craftTypeOptions,
 } from '../../crafting/utils/crafting-options';
 import { useEnchantingAffixesApi } from '../../enchanting/api/hooks/use-enchanting-affixes-api';
+import EnchantingAffixOption from '../../enchanting/components/enchanting-affix-option';
 import { useCraftAndEnchantAmountPreview } from '../api/hooks/use-craft-and-enchant-amount-preview';
 import { useStartBatchCrafting } from '../api/hooks/use-start-batch-crafting';
 import BatchCraftingScreenManager from '../component-mapping/batch-crafting-screen-manager';
@@ -76,15 +80,17 @@ const CraftAndEnchantAmountScreen = ({
     itemType: null,
   });
 
-  const { affixes: prefixAffixes } = useEnchantingAffixesApi({
-    character_id: characterId,
-    type: 'prefix',
-  });
+  const { affixes: prefixAffixes, loadedAffixes: loadedPrefixAffixes } =
+    useEnchantingAffixesApi({
+      character_id: characterId,
+      type: 'prefix',
+    });
 
-  const { affixes: suffixAffixes } = useEnchantingAffixesApi({
-    character_id: characterId,
-    type: 'suffix',
-  });
+  const { affixes: suffixAffixes, loadedAffixes: loadedSuffixAffixes } =
+    useEnchantingAffixesApi({
+      character_id: characterId,
+      type: 'suffix',
+    });
 
   const {
     preview,
@@ -279,17 +285,47 @@ const CraftAndEnchantAmountScreen = ({
     return (
       <dl className="grid grid-cols-2 gap-x-3 gap-y-1 text-sm">
         <dt className="text-gray-600 dark:text-gray-400">Crafting Cost</dt>
-        <dd>{preview.crafting_gold_cost_each.toLocaleString()} Gold</dd>
+        <dd>
+          <CurrencyDisplay
+            currency={CurrencyType.GOLD}
+            amount={preview.crafting_gold_cost_each}
+            display_mode={CurrencyDisplayMode.EXACT}
+          />
+        </dd>
         <dt className="text-gray-600 dark:text-gray-400">Enchanting Cost</dt>
-        <dd>{preview.enchanting_gold_cost_each.toLocaleString()} Gold</dd>
+        <dd>
+          <CurrencyDisplay
+            currency={CurrencyType.GOLD}
+            amount={preview.enchanting_gold_cost_each}
+            display_mode={CurrencyDisplayMode.EXACT}
+          />
+        </dd>
         <dt className="text-gray-600 dark:text-gray-400">Total Cost Each</dt>
-        <dd>{preview.total_gold_cost_each.toLocaleString()} Gold</dd>
+        <dd>
+          <CurrencyDisplay
+            currency={CurrencyType.GOLD}
+            amount={preview.total_gold_cost_each}
+            display_mode={CurrencyDisplayMode.EXACT}
+          />
+        </dd>
         <dt className="text-gray-600 dark:text-gray-400">
           Total Requested Cost
         </dt>
-        <dd>{preview.total_requested_gold_cost.toLocaleString()} Gold</dd>
+        <dd>
+          <CurrencyDisplay
+            currency={CurrencyType.GOLD}
+            amount={preview.total_requested_gold_cost}
+            display_mode={CurrencyDisplayMode.EXACT}
+          />
+        </dd>
         <dt className="text-gray-600 dark:text-gray-400">Available Gold</dt>
-        <dd>{preview.gold_available.toLocaleString()} Gold</dd>
+        <dd>
+          <CurrencyDisplay
+            currency={CurrencyType.GOLD}
+            amount={preview.gold_available}
+            display_mode={CurrencyDisplayMode.BALANCE}
+          />
+        </dd>
         {preview.blockers.map((blocker) => (
           <dd key={blocker} className="col-span-2">
             <Alert variant={AlertVariant.DANGER}>{blocker}</Alert>
@@ -366,6 +402,12 @@ const CraftAndEnchantAmountScreen = ({
           pre_selected_item={prefix ?? undefined}
           selection_placeholder="Select a Prefix"
           force_clear={prefix === null}
+          render_item_content={(option) => (
+            <EnchantingAffixOption
+              option={option}
+              affixes={loadedPrefixAffixes}
+            />
+          )}
         />
       </fieldset>
 
@@ -383,6 +425,12 @@ const CraftAndEnchantAmountScreen = ({
           pre_selected_item={suffix ?? undefined}
           selection_placeholder="Select a Suffix"
           force_clear={suffix === null}
+          render_item_content={(option) => (
+            <EnchantingAffixOption
+              option={option}
+              affixes={loadedSuffixAffixes}
+            />
+          )}
         />
       </fieldset>
 

@@ -18,6 +18,15 @@ enum EquippablePositionType: string
     case FEET = 'feet';
     case HELMET = 'helmet';
 
+    case TRINKET = 'trinket';
+    case ARTIFACT = 'artifact';
+
+    /**
+     * Return the ordered paired equipment positions an Item type can be equipped in.
+     *
+     * @param ItemType $type
+     * @return array
+     */
     public static function orderForType(ItemType $type): array
     {
         return match ($type) {
@@ -27,8 +36,14 @@ enum EquippablePositionType: string
         };
     }
 
+    /**
+     * Return the backing values of the given equipment positions.
+     *
+     * @param array $slots
+     * @return array
+     */
     public static function values(array $slots): array
     {
-        return array_map(fn (self $s) => $s->value, $slots);
+        return array_map(fn (self $slot) => $slot->value, $slots);
     }
 }

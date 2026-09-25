@@ -1,5 +1,6 @@
 import some from 'lodash/some';
 
+import { resolveItemPositionLabel } from './resolve-item-labels';
 import { ItemAdjustments } from '../../../api-definitions/items/item-comparison-details';
 import { InventoryItemTypes } from '../../../components/character-sheet/partials/character-inventory/enums/inventory-item-types';
 import type { FieldDef } from '../types/item-comparison-types';
@@ -7,18 +8,6 @@ import type { FieldDef } from '../types/item-comparison-types';
 import { formatNumberWithCommas } from 'game-utils/format-number';
 import { isNilOrZeroValue } from 'game-utils/general-util';
 
-/**
- * Return the sign prefix for formatting a number.
- * Positive => "+", zero or negative => "-".
- *
- * @param value - Number to sign
- * @returns "+" or "-"
- *
- * @example
- * getSignedPrefix(5)   // "+"
- * getSignedPrefix(-2)  // "-"
- * getSignedPrefix(0)   // "-"
- */
 export const getSignedPrefix = (value: number): string => {
   if (value > 0) {
     return '+';
@@ -27,54 +16,18 @@ export const getSignedPrefix = (value: number): string => {
   return '-';
 };
 
-/**
- * Format a signed integer using a sign and thousands separators.
- *
- * @param value - Integer to format (sign preserved)
- * @returns Signed, comma-formatted string
- *
- * @example
- * formatSignedInteger(-6834)  // "-6,834"
- * formatSignedInteger(12000)  // "+12,000"
- */
 export const formatSignedInteger = (value: number): string => {
   const prefix = getSignedPrefix(value);
 
-  const absoluteValue = Math.abs(value);
-  const formatted = formatNumberWithCommas(absoluteValue);
-
-  return `${prefix}${formatted}`;
+  return `${prefix}${formatNumberWithCommas(Math.abs(value))}`;
 };
 
-/**
- * Format a signed fractional value as a percentage with two decimals.
- * (1.0 => 100.00%)
- *
- * @param value - Fractional number (1.0 = 100%)
- * @returns Signed percent string
- *
- * @example
- * formatSignedPercent(-1.659)  // "-165.90%"
- * formatSignedPercent(0.25)    // "+25.00%"
- */
 export const formatSignedPercent = (value: number): string => {
   const prefix = getSignedPrefix(value);
 
-  const absolutePercent = Math.abs(value * 100).toFixed(2);
-
-  return `${prefix}${absolutePercent}%`;
+  return `${prefix}${Math.abs(value * 100).toFixed(2)}%`;
 };
 
-/**
- * Auto format: integers => "+N"/"-N" with commas; non-integers => "+NN.NN%".
- *
- * @param value - Number to format
- * @returns Formatted string
- *
- * @example
- * formatSignedAuto(-6834)   // "-6,834"
- * formatSignedAuto(-1.659)  // "-165.90%"
- */
 export const formatSignedAuto = (value: number): string => {
   if (Number.isInteger(value)) {
     return formatSignedInteger(value);
@@ -83,17 +36,6 @@ export const formatSignedAuto = (value: number): string => {
   return formatSignedPercent(value);
 };
 
-/**
- * Human word for direction used by screen readers ("increased"/"decreased").
- *
- * @param value - Number to evaluate
- * @returns "increased" when positive, otherwise "decreased"
- *
- * @example
- * getDirectionWord(5)   // "increased"
- * getDirectionWord(-1)  // "decreased"
- * getDirectionWord(0)   // "decreased"
- */
 export const getDirectionWord = (value: number): 'increased' | 'decreased' => {
   if (value > 0) {
     return 'increased';
@@ -102,20 +44,6 @@ export const getDirectionWord = (value: number): 'increased' | 'decreased' => {
   return 'decreased';
 };
 
-/**
- * Build a screen-reader description for a numeric adjustment.
- * - Integers: “… by N”
- * - Non-integers: “… by NN.NN percent”
- * - Zero: “No change in …”
- *
- * @param value - Adjustment value
- * @param label - Human label for the field
- * @returns Human-friendly message for SR users
- *
- * @example
- * getScreenReaderExplanation(-6834, 'Damage Adjustment')
- * // "Damage Adjustment decreased by 6834"
- */
 export const getScreenReaderExplanation = (
   value: number,
   label: string
@@ -127,74 +55,36 @@ export const getScreenReaderExplanation = (
   const direction = getDirectionWord(value);
 
   if (Number.isInteger(value)) {
-    const integerAmount = Math.abs(value);
-    return `${label} ${direction} by ${integerAmount}`;
+    return `${label} ${direction} by ${Math.abs(value)}`;
   }
 
-  const percentAmount = Math.abs(value * 100).toFixed(2);
-
-  return `${label} ${direction} by ${percentAmount} percent`;
+  return `${label} ${direction} by ${Math.abs(value * 100).toFixed(2)} percent`;
 };
 
-/**
- * True if any of the provided fields on `adjustments` is non-nil and non-zero.
- *
- * @param adjustments - Item adjustments bag
- * @param fieldDefinitions - Keys to inspect
- * @returns Whether any field is present and non-zero
- *
- * @example
- * hasAnyNonZeroAdjustment(adjustments, TOP_FIELDS) // boolean
- */
 export const hasAnyNonZeroAdjustment = (
   adjustments: ItemAdjustments,
   fieldDefinitions: FieldDef[]
-): boolean => {
-  return some(fieldDefinitions, ({ key }) => {
-    const value = adjustments[key] as number | null | undefined;
+): boolean =>
+  some(fieldDefinitions, ({ key }) => !isNilOrZeroValue(adjustments[key]));
 
-    return !isNilOrZeroValue(value);
-  });
-};
-
-/**
- * Slot label, e.g., "left-hand" → "Left hand".
- *
- * @param position - Raw position key
- * @returns Human-friendly label
- *
- * @example
- * getPositionLabel('left-hand') // "Left hand"
- */
 export const getPositionLabel = (position?: string): string => {
   if (!position) {
     return 'Unknown slot';
   }
 
-  const label = position.replace('-', ' ');
-
-  return label.charAt(0).toUpperCase() + label.slice(1);
+  return resolveItemPositionLabel(position);
 };
 
-/**
- * Heuristic for which item types are two-handed.
- *
- * @param type - Raw item type
- * @returns Whether the type is considered two-handed
- *
- * @example
- * isTwoHandedType('stave') // true
- */
+const TWO_HANDED_ITEM_TYPES: InventoryItemTypes[] = [
+  InventoryItemTypes.STAVE,
+  InventoryItemTypes.BOW,
+  InventoryItemTypes.HAMMER,
+];
+
 export const isTwoHandedType = (type?: InventoryItemTypes): boolean => {
   if (!type) {
     return false;
   }
 
-  const twoHanded = [
-    InventoryItemTypes.STAVE,
-    InventoryItemTypes.BOW,
-    InventoryItemTypes.HAMMER,
-  ];
-
-  return twoHanded.includes(type.toLowerCase() as InventoryItemTypes);
+  return TWO_HANDED_ITEM_TYPES.includes(type);
 };

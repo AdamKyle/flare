@@ -9,12 +9,16 @@ use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestStatus;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepName;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepStatus;
+use App\Game\BattleRewardProcessing\Exceptions\WeeklyRewardInventoryFullException;
 use App\Game\BattleRewardProcessing\Jobs\DispatchBattleRewardSecondaryUpdates;
+use App\Game\BattleRewardProcessing\Jobs\ProcessCharacterBattleRewardPresentationQueue;
 use App\Game\BattleRewardProcessing\Jobs\ProcessCharacterBattleRewardQueue;
 use App\Game\BattleRewardProcessing\Services\BattleRewardLedgerService;
-use App\Game\BattleRewardProcessing\Services\BattleRewardMessageOutboxService;
+use App\Game\BattleRewardProcessing\Services\BattleRewardPresentationService;
+use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
 use App\Game\BattleRewardProcessing\Services\BattleRewardSharedContextService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardStepPlanService;
+use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
@@ -182,7 +186,7 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
 
         $this->assertSame(BattleRewardRequestStatus::COMPLETED, $firstRequest->refresh()->status);
         $this->assertSame(BattleRewardRequestStatus::COMPLETED, $secondRequest->refresh()->status);
-        Event::assertDispatchedTimes(UpdateTopBarEvent::class, 1);
+        Event::assertNotDispatched(UpdateTopBarEvent::class);
         Event::assertDispatchedTimes(UpdateCharacterCurrenciesEvent::class, 1);
         Event::assertDispatchedTimes(UpdateBaseCharacterInformation::class, 2);
     }
@@ -219,10 +223,10 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
         // One authoritative live Character update per completed request.
         Event::assertDispatchedTimes(UpdateBaseCharacterInformation::class, 51);
 
-        // One coalesced secondary flush for the first 50-request slice (reaching
-        // MAX_REQUESTS with pending work remaining) and one for the continuation
-        // slice that processes the 51st request.
-        Event::assertDispatchedTimes(UpdateTopBarEvent::class, 2);
+        // One coalesced secondary currency flush for the first 50-request slice
+        // (reaching MAX_REQUESTS with pending work remaining) and one for the
+        // continuation slice that processes the 51st request. Tops is never rebuilt.
+        Event::assertNotDispatched(UpdateTopBarEvent::class);
         Event::assertDispatchedTimes(UpdateCharacterCurrenciesEvent::class, 2);
     }
 
@@ -259,19 +263,14 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
         ProcessCharacterBattleRewardQueue::dispatch($character->id);
 
         $this->assertSame(BattleRewardRequestStatus::COMPLETED, $request->refresh()->status);
-        Event::assertDispatchedTimes(UpdateTopBarEvent::class, 1);
+        Event::assertNotDispatched(UpdateTopBarEvent::class);
         Event::assertDispatchedTimes(UpdateCharacterCurrenciesEvent::class, 1);
     }
 
-    public function test_message_outbox_retry_still_flushes_secondary_updates_without_replaying_the_reward(): void
+    public function test_completed_mutation_leaves_presentation_steps_for_the_presentation_lane(): void
     {
-        // The test environment forces the `battle_reward_processing` connection to the
-        // sync driver (see Tests\TestCase::setUp()), so the processor's own continuation
-        // dispatch after a notification-retryable failure runs immediately, in-process,
-        // as a second processor slice rather than a later queued attempt. The first slice
-        // fails MESSAGE_OUTBOX and exits notification-retryable; the second slice resumes
-        // directly into MESSAGE_OUTBOX (already-completed steps are skipped) and succeeds.
         Event::fake();
+        Queue::fake([ProcessCharacterBattleRewardPresentationQueue::class]);
         $this->createItem(['type' => 'weapon', 'skill_level_required' => 0]);
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id, 'gold' => 10, 'xp' => 5]);
@@ -281,33 +280,100 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
             'status' => BattleRewardRequestStatus::PENDING,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
-        $messageOutboxService = Mockery::mock(BattleRewardMessageOutboxService::class)->makePartial();
-        $messageOutboxService->shouldReceive('emitUnemittedMessages')->once()->andThrow(new RuntimeException('outbox boom'));
-        $messageOutboxService->shouldReceive('emitUnemittedMessages')->andReturn(0);
-        $this->app->instance(BattleRewardMessageOutboxService::class, $messageOutboxService);
 
         ProcessCharacterBattleRewardQueue::dispatch($character->id);
 
         $request = $request->refresh();
         $this->assertSame(BattleRewardRequestStatus::COMPLETED, $request->status);
+        $this->assertGreaterThan($goldBefore, $character->refresh()->gold);
         $this->assertSame(
-            BattleRewardStepStatus::COMPLETED,
+            BattleRewardStepStatus::PENDING,
             $request->steps()->where('step_name', BattleRewardStepName::FINAL_PLAYER_UPDATES)->firstOrFail()->status,
         );
         $this->assertSame(
-            BattleRewardStepStatus::COMPLETED,
+            BattleRewardStepStatus::PENDING,
             $request->steps()->where('step_name', BattleRewardStepName::MESSAGE_OUTBOX)->firstOrFail()->status,
         );
-        $this->assertGreaterThan($goldBefore, $character->refresh()->gold);
+        Event::assertNotDispatched(UpdateBaseCharacterInformation::class);
+    }
 
-        // One authoritative live update: FINAL_PLAYER_UPDATES only broadcasts it the first
-        // time it actually completes; the resumed slice finds it already completed and skips.
-        Event::assertDispatchedTimes(UpdateBaseCharacterInformation::class, 1);
+    public function test_completed_mutation_dispatches_the_presentation_job_to_the_presentation_queue(): void
+    {
+        Event::fake();
+        Queue::fake([ProcessCharacterBattleRewardPresentationQueue::class]);
+        $this->createItem(['type' => 'weapon', 'skill_level_required' => 0]);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id, 'gold' => 10, 'xp' => 5]);
+        $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+            'status' => BattleRewardRequestStatus::PENDING,
+            'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
+        ]);
 
-        // One coalesced secondary flush per processor slice; two slices ran because the
-        // first slice's MESSAGE_OUTBOX failure ended that slice notification-retryable.
-        Event::assertDispatchedTimes(UpdateTopBarEvent::class, 2);
-        Event::assertDispatchedTimes(UpdateCharacterCurrenciesEvent::class, 2);
+        ProcessCharacterBattleRewardQueue::dispatch($character->id);
+
+        Queue::assertPushedOn(
+            'battle_reward_presentation',
+            ProcessCharacterBattleRewardPresentationQueue::class,
+            fn (ProcessCharacterBattleRewardPresentationQueue $job): bool => $job->connection === 'battle_reward_processing',
+        );
+    }
+
+    public function test_presentation_runs_only_after_the_mutation_processor_releases_its_lock(): void
+    {
+        Event::fake();
+        $this->createItem(['type' => 'weapon', 'skill_level_required' => 0]);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id, 'gold' => 10, 'xp' => 5]);
+        $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+            'status' => BattleRewardRequestStatus::PENDING,
+            'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
+        ]);
+        $mutationLockHeldDuringPresentation = null;
+        $presentationService = Mockery::mock(BattleRewardPresentationService::class);
+        $presentationService->shouldReceive('present')->once()->andReturnUsing(
+            function (CharacterBattleRewardRequest $request) use (&$mutationLockHeldDuringPresentation, $character): void {
+                $mutationLockHeldDuringPresentation = resolve(BattleRewardProcessingQueueManager::class)->isProcessorLocked($character->id);
+
+                $request->steps()
+                    ->whereIn('step_name', [BattleRewardStepName::FINAL_PLAYER_UPDATES, BattleRewardStepName::MESSAGE_OUTBOX])
+                    ->update(['status' => BattleRewardStepStatus::COMPLETED]);
+            },
+        );
+        $this->app->instance(BattleRewardPresentationService::class, $presentationService);
+
+        ProcessCharacterBattleRewardQueue::dispatch($character->id);
+
+        $this->assertFalse($mutationLockHeldDuringPresentation);
+    }
+
+    public function test_weekly_reward_inventory_full_pauses_the_request_as_resumable_without_presenting_it(): void
+    {
+        Event::fake();
+        Queue::fake([ProcessCharacterBattleRewardPresentationQueue::class]);
+        $this->createItem(['type' => 'weapon', 'skill_level_required' => 0]);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id, 'gold' => 10, 'xp' => 5]);
+        $request = $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+            'status' => BattleRewardRequestStatus::PENDING,
+            'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
+        ]);
+        $weeklyBattleService = Mockery::mock(WeeklyBattleService::class);
+        $weeklyBattleService->shouldReceive('isWeeklyMonster')->andReturn(true);
+        $weeklyBattleService->shouldReceive('handleMonsterDeath')->andThrow(new WeeklyRewardInventoryFullException('Weekly reward inventory is full.'));
+        $this->app->instance(WeeklyBattleService::class, $weeklyBattleService);
+
+        ProcessCharacterBattleRewardQueue::dispatch($character->id);
+
+        $request = $request->refresh();
+        $this->assertSame(BattleRewardRequestStatus::RESUMABLE, $request->status);
+        $this->assertSame(
+            BattleRewardStepStatus::RESUMABLE,
+            $request->steps()->where('step_name', BattleRewardStepName::WEEKLY_REWARDS)->firstOrFail()->status,
+        );
+        Queue::assertNotPushed(ProcessCharacterBattleRewardPresentationQueue::class);
     }
 
     public function test_quest_reward_reaches_the_lightweight_live_update_with_no_battle_only_steps(): void

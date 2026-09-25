@@ -3,7 +3,9 @@
 namespace App\Game\Raids\Providers;
 
 use App\Game\Raids\Console\Commands\ResetDailyRaidAttackLimits;
+use App\Game\Raids\Contracts\RaidIdentityQuery;
 use App\Game\Raids\Services\RaidEventService;
+use App\Game\Raids\Services\RaidIdentityQueryService;
 use App\Game\Raids\Services\RaidMapConflictService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
@@ -14,7 +16,7 @@ class ServiceProvider extends ApplicationServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->app->bind(RaidEventService::class, function () {
             return new RaidEventService;
@@ -22,6 +24,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(RaidMapConflictService::class, function () {
             return new RaidMapConflictService;
+        });
+
+        $this->app->bind(RaidIdentityQuery::class, function () {
+            return new RaidIdentityQueryService;
         });
 
         $this->commands([

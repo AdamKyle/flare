@@ -8,7 +8,9 @@ use App\Game\Automation\Values\AutomationType;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\ServerFight\MonsterPlayerFight;
 use App\Game\Battle\Services\MonsterFightService;
+use App\Game\BattleRewardProcessing\Jobs\BattleAttackHandler;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Combat\Values\AttackType;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -20,10 +22,12 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\Monster\MonsterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterAutomation;
+use Tests\Traits\CreateItem;
+use Tests\Traits\CreateItemAffix;
 
 class MonsterFightServiceTest extends TestCase
 {
-    use CreateCharacterAutomation, RefreshDatabase;
+    use CreateCharacterAutomation, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?Character $character = null;
 
@@ -185,5 +189,77 @@ class MonsterFightServiceTest extends TestCase
         Event::assertDispatched(ServerMessageEvent::class, function (ServerMessageEvent $event) {
             return $event->message === 'You have defeated: '.$this->monster->name.'.';
         });
+    }
+
+    public function test_fight_monster_dispatches_battle_attack_handler_immediately_when_monster_is_killed(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+        Queue::fake();
+
+        Cache::put('monster-fight-'.$this->character->id, [
+            'monster' => ['id' => $this->monster->id, 'name' => $this->monster->name],
+        ], 900);
+
+        $monsterPlayerFight = Mockery::mock(MonsterPlayerFight::class);
+        $monsterPlayerFight->shouldReceive('setCharacter')->once();
+        $monsterPlayerFight->shouldReceive('fightMonster')->once();
+        $monsterPlayerFight->shouldReceive('getCharacterHealth')->andReturn(50);
+        $monsterPlayerFight->shouldReceive('getMonsterHealth')->andReturn(0);
+        $monsterPlayerFight->shouldReceive('getBattleMessages')->andReturn([]);
+        $monsterPlayerFight->shouldReceive('getMonsterLastRolledAttack')->andReturn(5);
+        $monsterPlayerFight->shouldReceive('getMonster')->andReturn(['id' => $this->monster->id]);
+
+        $weeklyBattleService = Mockery::mock(WeeklyBattleService::class);
+        $weeklyBattleService->shouldReceive('canFightMonster')->once()->andReturn(true);
+
+        $this->instance(MonsterPlayerFight::class, $monsterPlayerFight);
+        $this->instance(WeeklyBattleService::class, $weeklyBattleService);
+
+        $service = resolve(MonsterFightService::class);
+
+        $service->fightMonster($this->character, AttackType::ATTACK->value);
+
+        Queue::assertPushed(BattleAttackHandler::class, function (BattleAttackHandler $job): bool {
+            return $job->queue === 'battle_reward_processing'
+                && $job->connection === 'battle_reward_processing'
+                && is_null($job->delay);
+        });
+    }
+
+    public function test_setup_monster_consumes_character_sheet_cache_after_it_crosses_a_serialization_boundary(): void
+    {
+        $prefix = $this->createItemAffix([
+            'type' => 'prefix',
+            'reduces_enemy_stats' => true,
+            'str_reduction' => 0.5,
+        ]);
+        $item = $this->createItem(['type' => 'sword', 'item_prefix_id' => $prefix->id]);
+
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($item, true, 'left-hand')
+            ->getCharacter();
+
+        $monster = (new MonsterFactory)
+            ->buildMonster()
+            ->updateMonster(['game_map_id' => $character->map->game_map_id])
+            ->getMonster();
+
+        $characterSheet = resolve(CharacterCacheData::class)->characterSheetCache($character);
+
+        Cache::put('character-sheet-'.$character->id, unserialize(serialize($characterSheet)));
+
+        $service = resolve(MonsterFightService::class);
+
+        $result = $service->setupMonster($character, [
+            'selected_monster_id' => $monster->id,
+            'attack_type' => AttackType::ATTACK->value,
+        ], true, false, true);
+
+        $this->assertArrayHasKey('health', $result);
+        $this->assertArrayHasKey('current_monster_health', $result['health']);
+        $this->assertArrayHasKey('current_character_health', $result['health']);
     }
 }

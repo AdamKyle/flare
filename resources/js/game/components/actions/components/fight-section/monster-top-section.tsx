@@ -2,7 +2,6 @@ import React, { ReactNode } from 'react';
 
 import MonsterNamePicker from './partials/monster-name-picker';
 import MonsterTopSectionProps from './types/monster-top-section-props';
-import Notifications from '../../../notifications/notifications';
 
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import LinkButton from 'ui/buttons/link-button';
@@ -90,9 +89,6 @@ const MonsterTopSection = ({
           on_click={handleViewMonsterStats}
           disabled={!selectedMonster}
         />
-      </div>
-      <div className={'mt-2'}>
-        <Notifications />
       </div>
     </>
   );

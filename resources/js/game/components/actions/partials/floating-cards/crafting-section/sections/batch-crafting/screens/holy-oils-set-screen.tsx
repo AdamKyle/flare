@@ -1,6 +1,9 @@
 import { debounce } from 'lodash';
 import React, { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 
+import CurrencyDisplay from '../../../../../../../../reusable-components/currency/currency-display';
+import { CurrencyDisplayMode } from '../../../../../../../../reusable-components/currency/enums/currency-display-mode';
+import { CurrencyType } from '../../../../../../../../reusable-components/currency/enums/currency-type';
 import { useHolyOilsApi } from '../../work-bench/api/hooks/use-holy-oils-api';
 import { useHolyOilsSetPreview } from '../api/hooks/use-holy-oils-set-preview';
 import { useStartBatchCrafting } from '../api/hooks/use-start-batch-crafting';
@@ -149,11 +152,25 @@ const HolyOilsSetScreen = (): ReactNode => {
         <dt className="text-gray-600 dark:text-gray-400">
           Total Gold Dust Cost
         </dt>
-        <dd>{preview.total_gold_dust_cost.toLocaleString()}</dd>
+        <dd>
+          <CurrencyDisplay
+            currency={CurrencyType.GOLD_DUST}
+            amount={preview.total_gold_dust_cost}
+            display_mode={CurrencyDisplayMode.EXACT}
+            show_label={false}
+          />
+        </dd>
         <dt className="text-gray-600 dark:text-gray-400">
           Gold Dust Available
         </dt>
-        <dd>{preview.gold_dust_available.toLocaleString()}</dd>
+        <dd>
+          <CurrencyDisplay
+            currency={CurrencyType.GOLD_DUST}
+            amount={preview.gold_dust_available}
+            display_mode={CurrencyDisplayMode.BALANCE}
+            show_label={false}
+          />
+        </dd>
         {preview.blockers.map((blocker) => (
           <dd key={blocker} className="col-span-2">
             <Alert variant={AlertVariant.DANGER}>{blocker}</Alert>

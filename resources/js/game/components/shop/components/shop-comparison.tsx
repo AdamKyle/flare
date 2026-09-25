@@ -2,6 +2,7 @@ import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import { isNil } from 'lodash';
 import React from 'react';
 
+import EquipItemSelectionDefinition from '../../../reusable-components/item/definitions/equip-item-selection-definition';
 import ItemComparison from '../../../reusable-components/item/item-comparison';
 import { ShopApiUrls } from '../api/enums/shop-api-urls';
 import { useCompareItemApi } from '../api/hooks/use-compare-item-api';
@@ -35,32 +36,40 @@ const ShopComparison = ({
   const {
     loading: isPurchasing,
     error: purchaseAndReplaceError,
-    setRequestParams,
+    mutate: purchaseAndReplace,
   } = usePurchaseAndReplaceApi({
-    character_id: gameData?.character?.id || 0,
+    character_id: gameData?.character?.id ?? 0,
     on_success: on_purchase_and_replace_success,
   });
+
+  const handleBuyAndReplace = (selection: EquipItemSelectionDefinition) => {
+    void purchaseAndReplace({
+      position: selection.position,
+      slot_id: selection.slot_id,
+      equip_type: selection.equip_type,
+      item_id_to_buy: selection.item_id,
+    });
+  };
 
   const renderContent = () => {
     if (loading) {
       return <InfiniteLoader />;
     }
 
-    if (isNil(data)) {
-      return <GameDataError />;
-    }
-
     if (!isNil(error)) {
       return <ApiErrorAlert apiError={error.message} />;
+    }
+
+    if (isNil(data)) {
+      return <GameDataError />;
     }
 
     return (
       <ItemComparison
         comparisonDetails={data}
-        item_name={item_name}
         is_purchasing={isPurchasing}
         error_message={purchaseAndReplaceError}
-        set_request_params={setRequestParams}
+        on_buy_and_replace={handleBuyAndReplace}
         show_buy_and_replace
       />
     );

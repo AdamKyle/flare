@@ -2,52 +2,36 @@
 
 namespace App\Game\Market\Middleware;
 
-use App\Flare\Models\Location;
+use App\Game\Market\Services\MarketAccessService;
 use Closure;
 use Illuminate\Http\Request;
 
 class CanCharacterAccessMarket
 {
     /**
-     * Handle an incoming request.
+     * @param MarketAccessService $marketAccessService
+     */
+    public function __construct(private readonly MarketAccessService $marketAccessService) {}
+
+    /**
+     * Only allow Admins and characters standing on a port to access the Market.
      *
      * @param Request $request
-     * @param string|null $guard
+     * @param Closure $next
      * @return mixed
      */
-    public function handle($request, Closure $next, $guard = null)
+    public function handle(Request $request, Closure $next): mixed
     {
-
-        if (auth()->user()->hasRole('Admin')) {
+        if ($this->marketAccessService->canAccess($request->user())) {
             return $next($request);
         }
 
-        $character = auth()->user()->character;
-
-        $location = Location::where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->first();
+        $message = 'You must first travel to a port to access the market board. Ports are blue ship icons on the map.';
 
         if ($request->wantsJson()) {
-            if (is_null($location)) {
-                return response()->json([
-                    'error' => 'You must first travel to a port to access the market board. Ports are blue ship icons on the map.',
-                ], 422);
-            }
-
-            if (! $location->is_port) {
-                return response()->json([
-                    'error' => 'You must first travel to a port to access the market board. Ports are blue ship icons on the map.',
-                ], 422);
-            }
+            return response()->json(['message' => $message], 422);
         }
 
-        if (is_null($location)) {
-            return redirect()->route('game')->with('error', 'You must first travel to a port to access the market board. Ports are blue ship icons on the map.');
-        }
-
-        if (! $location->is_port) {
-            return redirect()->route('game')->with('error', 'You must first travel to a port to access the market board. Ports are blue ship icons on the map.');
-        }
-
-        return $next($request);
+        return redirect()->route('game')->with('error', $message);
     }
 }

@@ -1,5 +1,8 @@
 import React, { ReactNode } from 'react';
 
+import CurrencyDisplay from '../../../../../../../../../reusable-components/currency/currency-display';
+import { CurrencyDisplayMode } from '../../../../../../../../../reusable-components/currency/enums/currency-display-mode';
+import { CurrencyType } from '../../../../../../../../../reusable-components/currency/enums/currency-type';
 import { BatchCraftingDisposition } from '../../enums/batch-crafting-disposition';
 import { useOpenBatchCraftedAlchemyItem } from '../../hooks/use-open-batch-crafted-alchemy-item';
 import BatchCraftingDetailSection from '../batch-crafting-detail-section';
@@ -76,13 +79,41 @@ const AlchemyExperienceRunningSection = ({
           </dt>
           <dd>{progress.alchemy_xp_gained.toLocaleString()}</dd>
           <dt className="text-gray-600 dark:text-gray-400">Gold Dust Spent</dt>
-          <dd>{batch.gold_dust_spent.toLocaleString()}</dd>
+          <dd>
+            <CurrencyDisplay
+              currency={CurrencyType.GOLD_DUST}
+              amount={batch.gold_dust_spent}
+              display_mode={CurrencyDisplayMode.EXACT}
+              show_label={false}
+            />
+          </dd>
           <dt className="text-gray-600 dark:text-gray-400">Gold Dust Left</dt>
-          <dd>{batch.gold_dust_left.toLocaleString()}</dd>
+          <dd>
+            <CurrencyDisplay
+              currency={CurrencyType.GOLD_DUST}
+              amount={batch.gold_dust_left}
+              display_mode={CurrencyDisplayMode.BALANCE}
+              show_label={false}
+            />
+          </dd>
           <dt className="text-gray-600 dark:text-gray-400">Shards Spent</dt>
-          <dd>{batch.shards_spent.toLocaleString()}</dd>
+          <dd>
+            <CurrencyDisplay
+              currency={CurrencyType.SHARDS}
+              amount={batch.shards_spent}
+              display_mode={CurrencyDisplayMode.EXACT}
+              show_label={false}
+            />
+          </dd>
           <dt className="text-gray-600 dark:text-gray-400">Shards Left</dt>
-          <dd>{batch.shards_left.toLocaleString()}</dd>
+          <dd>
+            <CurrencyDisplay
+              currency={CurrencyType.SHARDS}
+              amount={batch.shards_left}
+              display_mode={CurrencyDisplayMode.BALANCE}
+              show_label={false}
+            />
+          </dd>
         </dl>
       </BatchCraftingDetailSection>
 

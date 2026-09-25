@@ -20,6 +20,24 @@ const GameSection = () => {
     return <GameLoader />;
   }
 
+  const renderGameChatAndNav = () => {
+    return (
+      <>
+        <div
+          className={clsx(
+            'mx-auto w-full lg:w-3/4 dark:rounded-sm dark:border dark:border-gray-700 dark:p-3',
+            {
+              'mt-4': stackDepth > 0,
+            }
+          )}
+        >
+          <GameChat />
+        </div>
+        <MobileNav />
+      </>
+    );
+  };
+
   const renderShell = () => {
     return (
       <div className="mobile-shell">
@@ -43,17 +61,7 @@ const GameSection = () => {
           </div>
         </div>
 
-        <div
-          className={clsx(
-            'mx-auto w-full lg:w-3/4 dark:rounded-sm dark:border dark:border-gray-700 dark:p-3',
-            {
-              'mt-4': stackDepth > 0,
-            }
-          )}
-        >
-          <GameChat />
-        </div>
-        <MobileNav />
+        {renderGameChatAndNav()}
       </div>
     );
   };

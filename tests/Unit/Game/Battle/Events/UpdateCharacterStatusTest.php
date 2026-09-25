@@ -3,15 +3,17 @@
 namespace Tests\Unit\Game\Battle\Events;
 
 use App\Flare\Models\Character;
+use App\Game\Automation\Values\AutomationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterAutomation;
 
 class UpdateCharacterStatusTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateCharacterAutomation, RefreshDatabase;
 
     private ?Character $character;
 
@@ -89,5 +91,26 @@ class UpdateCharacterStatusTest extends TestCase
         $event = new UpdateCharacterStatus($this->character->refresh());
 
         $this->assertSame(0.0, $event->characterStatuses['can_attack_again_at']);
+    }
+
+    public function test_active_automation_reports_the_newest_active_automation_when_multiple_exist(): void
+    {
+        $this->createCharacterAutomation([
+            'character_id' => $this->character->id,
+            'type' => AutomationType::EXPLORING->value,
+            'started_at' => now()->subMinutes(10),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $this->createCharacterAutomation([
+            'character_id' => $this->character->id,
+            'type' => AutomationType::DELVE->value,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $event = new UpdateCharacterStatus($this->character->refresh());
+
+        $this->assertSame('Delve', $event->characterStatuses['active_automation']['name']);
     }
 }

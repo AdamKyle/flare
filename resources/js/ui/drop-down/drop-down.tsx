@@ -77,6 +77,7 @@ const Dropdown = ({
   aria_described_by,
   aria_invalid,
   aria_required,
+  render_item_content,
 }: DropdownProps) => {
   const generatedId = useId().replace(/:/g, '');
   const triggerId = id ?? `dropdown-trigger-${generatedId}`;
@@ -396,12 +397,21 @@ const Dropdown = ({
     />
   );
 
+  const renderItemContent = (item: DropdownItem): React.ReactNode => {
+    if (!render_item_content) {
+      return item.label;
+    }
+
+    return render_item_content(item);
+  };
+
   const renderItems = () =>
     displayItems.map((item, index) => (
       <li
         key={item.value + '-' + index}
         id={`${listboxId}-option-${index}`}
         role="option"
+        aria-label={render_item_content ? item.label : undefined}
         aria-selected={selectedValue === item.value}
         tabIndex={-1}
         onClick={() => handleSelectItem(item)}
@@ -413,7 +423,7 @@ const Dropdown = ({
           item.class_name
         )}
       >
-        {item.label}
+        {renderItemContent(item)}
       </li>
     ));
 
@@ -441,7 +451,7 @@ const Dropdown = ({
     if (current) {
       return (
         <span className={current.class_name ?? 'text-gray-900 dark:text-white'}>
-          {current.label}
+          {renderItemContent(current)}
         </span>
       );
     }

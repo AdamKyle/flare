@@ -2,4 +2,6 @@ import ChatType from '../../../../../api-definitions/chat/chat-message-definitio
 
 export interface UseChatMessagesDefinition {
   chatMessages: ChatType[];
+  prependChatMessage: (message: ChatType) => void;
+  replaceChatMessages: (messages: ChatType[]) => void;
 }

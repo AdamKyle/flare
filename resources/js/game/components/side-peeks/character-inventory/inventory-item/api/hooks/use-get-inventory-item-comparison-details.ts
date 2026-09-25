@@ -1,10 +1,11 @@
 import { useActivityTimeout } from 'api-handler/hooks/use-activity-timeout';
 import { useApiHandler } from 'api-handler/hooks/use-api-handler';
-import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { resolveApiErrorMessage } from 'api-handler/utils/resolve-api-error-message';
+import axios, { AxiosError } from 'axios';
 import { isNil } from 'lodash';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { ItemComparison } from '../../../../../../api-definitions/items/item-comparison-details';
+import { InventoryItemTypes } from '../../../../../character-sheet/partials/character-inventory/enums/inventory-item-types';
 import { CharacterInventoryApiUrls } from '../../../api/enums/character-inventory-api-urls';
 import UseGetInventoryItemComparisonDefinition from '../definitions/use-get-inventory-item-comparison-definition';
 import UseGetInventoryItemComparisonDetailsParams from '../definitions/use-get-inventory-item-comparison-details-params-definition';
@@ -18,19 +19,31 @@ export const useGetInventoryItemComparisonDetails = ({
   const { apiHandler, getUrl } = useApiHandler();
   const { handleInactivity } = useActivityTimeout();
 
-  const [data, setData] = useState<ItemComparison | null>(null);
+  const [data, setData] =
+    useState<UseGetInventoryItemComparisonDefinition['data']>(null);
   const [error, setError] =
     useState<UseGetInventoryItemComparisonDefinition['error']>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const url = getUrl(CharacterInventoryApiUrls.CHARACTER_INVENTORY_COMPARISON, {
-    character: character_id,
-  });
+  const abortControllerRef = useRef<AbortController | null>(null);
 
-  const fetchInventoryComparison = useCallback(async () => {
+  useEffect(() => {
+    return () => {
+      const activeController = abortControllerRef.current;
+
+      abortControllerRef.current = null;
+      activeController?.abort();
+    };
+  }, []);
+
+  const fetchInventoryComparison = useCallback(async (): Promise<void> => {
     if (slot_id === 0 || isNil(item_to_equip_type)) {
       return;
     }
+
+    abortControllerRef.current?.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
 
     setLoading(true);
     setError(null);
@@ -38,37 +51,61 @@ export const useGetInventoryItemComparisonDetails = ({
     try {
       const result = await apiHandler.get<
         UseGetInventoryItemComparisonDetailsResponseDefinition,
-        AxiosRequestConfig<
-          AxiosResponse<UseGetInventoryItemComparisonDetailsResponseDefinition>
-        >
-      >(url, {
-        params: {
-          slot_id: slot_id,
-          item_to_equip_type: item_to_equip_type,
-        },
-      });
+        { slot_id: number; item_to_equip_type: InventoryItemTypes }
+      >(
+        getUrl(CharacterInventoryApiUrls.CHARACTER_INVENTORY_COMPARISON, {
+          character: character_id,
+        }),
+        {
+          params: { slot_id, item_to_equip_type },
+          signal: controller.signal,
+        }
+      );
+
+      if (abortControllerRef.current !== controller) {
+        return;
+      }
 
       setData({
         item_to_equip: result.itemToEquip,
         details: result.details,
       });
-    } catch (err) {
-      if (err instanceof AxiosError) {
-        handleInactivity({
-          setError: setError,
-          response: err,
-        });
+    } catch (requestError) {
+      if (axios.isCancel(requestError)) {
+        return;
+      }
 
-        setError(err.response?.data || null);
+      if (abortControllerRef.current !== controller) {
+        return;
+      }
+
+      setError({
+        message: resolveApiErrorMessage(
+          requestError,
+          'Unable to load the item comparison.'
+        ),
+      });
+
+      if (requestError instanceof AxiosError) {
+        handleInactivity({ response: requestError, setError });
       }
     } finally {
-      setLoading(false);
+      if (abortControllerRef.current === controller) {
+        abortControllerRef.current = null;
+        setLoading(false);
+      }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [apiHandler, url, slot_id, item_to_equip_type]);
+  }, [
+    apiHandler,
+    getUrl,
+    handleInactivity,
+    character_id,
+    slot_id,
+    item_to_equip_type,
+  ]);
 
   useEffect(() => {
-    fetchInventoryComparison().catch(() => {});
+    void fetchInventoryComparison();
   }, [fetchInventoryComparison]);
 
   return {

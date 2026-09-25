@@ -14,7 +14,7 @@ class DispatchBattleRewardSecondaryUpdatesTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_dispatching_secondary_updates_emits_tops_and_compatibility_currency_events(): void
+    public function test_dispatching_secondary_updates_emits_the_currency_event_without_rebuilding_tops(): void
     {
         Event::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
@@ -23,8 +23,8 @@ class DispatchBattleRewardSecondaryUpdatesTest extends TestCase
             ->onConnection('battle_reward_processing')
             ->onQueue('battle_reward_secondary');
 
-        Event::assertDispatched(UpdateTopBarEvent::class);
         Event::assertDispatched(UpdateCharacterCurrenciesEvent::class);
+        Event::assertNotDispatched(UpdateTopBarEvent::class);
     }
 
     public function test_missing_character_secondary_update_finishes_without_dispatching_player_events(): void

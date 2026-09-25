@@ -56,10 +56,6 @@ const BaseSidePeek = () => {
     };
   }, [eventSystem, closeSidePeek]);
 
-  useEffect(() => {
-    setSidePeekOptions([]);
-  }, [componentProps.is_open, componentKey]);
-
   const setOptions = useCallback((options: SidePeekOptionDefinition[]) => {
     setSidePeekOptions(options);
   }, []);

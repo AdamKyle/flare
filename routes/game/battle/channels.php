@@ -59,3 +59,8 @@ Broadcast::channel('character-revive-{userId}', function ($user, $userId) {
 Broadcast::channel('update-raid-attacks-left-{userId}', function ($user, $userId) {
     return $user->id === (int) $userId;
 });
+
+// When the Character's historical XP presentation stream advances.
+Broadcast::channel('battle-reward-progression-{userId}', function ($user, $userId) {
+    return $user->id === (int) $userId;
+});

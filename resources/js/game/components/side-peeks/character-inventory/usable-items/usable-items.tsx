@@ -17,6 +17,7 @@ import BaseUsableItemDefinition from '../../../../api-definitions/items/usable-i
 import { useInfiniteScroll } from '../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
 import UsableItemsList from '../../components/items/usable-items-list';
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
+import InventoryStackBody from '../components/inventory-stack-body';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 import { useGameData } from 'game-data/hooks/use-game-data';
@@ -24,6 +25,7 @@ import { useGameData } from 'game-data/hooks/use-game-data';
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
+import { StackedCardContentMode } from 'ui/cards/enums/stacked-card-content-mode';
 import StackedCard from 'ui/cards/stacked-card';
 import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
@@ -82,8 +84,7 @@ const UsableItems = ({
     }
 
     setFilters({ [initial_filter]: true });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [initial_filter, setFilters]);
 
   const handleUseSuccess = (): void => {
     setRefresh((previousValue) => !previousValue);
@@ -144,9 +145,14 @@ const UsableItems = ({
 
   const debouncedSetSearchText = useMemo(
     () => debounce((value: string) => setSearchText(value), 300),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [setSearchText]
   );
+
+  useEffect(() => {
+    return () => {
+      debouncedSetSearchText.cancel();
+    };
+  }, [debouncedSetSearchText]);
 
   const onSearch = (value: string) => {
     debouncedSetSearchText(value.trim());
@@ -409,24 +415,30 @@ const UsableItems = ({
       itemToView.holy_level !== null || itemToView.damages_kingdoms;
 
     return (
-      <StackedCard on_close={onCloseViewItem}>
-        <div className="flex flex-col gap-3">
-          <UsableItem item={itemToView} />
-          {(useError || useManyError || useSuccessMessage) && (
-            <Alert
-              variant={
-                useError || useManyError
-                  ? AlertVariant.DANGER
-                  : AlertVariant.SUCCESS
-              }
-            >
-              {useError ?? useManyError ?? useSuccessMessage}
-            </Alert>
-          )}
-          {isSpecialItem && <SpecialUsableItemGuidance item={itemToView} />}
-          {renderGemScrollAction()}
-          {renderDetailQuantityControl()}
-        </div>
+      <StackedCard
+        on_close={onCloseViewItem}
+        aria_label="Usable Item Details"
+        content_mode={StackedCardContentMode.FULL_BLEED}
+      >
+        <InventoryStackBody>
+          <div className="flex flex-col gap-3 px-4">
+            <UsableItem item={itemToView} />
+            {(useError || useManyError || useSuccessMessage) && (
+              <Alert
+                variant={
+                  useError || useManyError
+                    ? AlertVariant.DANGER
+                    : AlertVariant.SUCCESS
+                }
+              >
+                {useError ?? useManyError ?? useSuccessMessage}
+              </Alert>
+            )}
+            {isSpecialItem && <SpecialUsableItemGuidance item={itemToView} />}
+            {renderGemScrollAction()}
+            {renderDetailQuantityControl()}
+          </div>
+        </InventoryStackBody>
       </StackedCard>
     );
   };

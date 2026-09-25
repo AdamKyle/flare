@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 
 import MoveToSetProps from './types/move-to-set-props';
 import { isSetEquippable } from './utils/is-set-equippable';
+import SetOptionDefinition from '../../../sets/definitions/set-options-definition';
 import SetChoices from '../../../sets/set-choices';
 import UseGetSetEquippabilityResponse from '../../api/definitions/use-get-set-equippability-response-definition';
 import { UseGetSetEquippabilityDetails } from '../../api/hooks/use-get-set-equippability-details';
@@ -15,7 +16,6 @@ import IconButton from 'ui/buttons/icon-button';
 import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
-import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 import Separator from 'ui/separator/separator';
 
@@ -35,8 +35,8 @@ const MoveToSet = ({
 
   const [inventorySetId, setInventorySetId] = useState<number | null>(null);
 
-  const handleSelection = (selected: DropdownItem) => {
-    const setId = parseInt(selected.value as string) || 0;
+  const handleSelection = (selectedSet: SetOptionDefinition) => {
+    const setId = selectedSet.set_id;
 
     setInventorySetId(setId);
 

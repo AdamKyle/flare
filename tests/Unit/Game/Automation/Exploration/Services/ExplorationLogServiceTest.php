@@ -7,6 +7,7 @@ use App\Flare\Models\ExplorationWarning;
 use App\Game\Automation\Exploration\Events\ExplorationOutputUpdated;
 use App\Game\Automation\Exploration\Events\ExplorationWarningState;
 use App\Game\Automation\Exploration\Services\ExplorationLogService;
+use App\Game\Automation\Exploration\Values\ExplorationPhase;
 use App\Game\Automation\Values\AutomationType;
 use App\Game\Core\Combat\Values\AttackType;
 use Illuminate\Database\QueryException;
@@ -36,7 +37,7 @@ class ExplorationLogServiceTest extends TestCase
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
-        $this->explorationLogService = resolve(ExplorationLogService::class);
+        $this->explorationLogService = new ExplorationLogService;
     }
 
     protected function tearDown(): void
@@ -65,6 +66,26 @@ class ExplorationLogServiceTest extends TestCase
 
         $this->assertSame($character->id, $log->character_id);
         $this->assertSame('running', $log->stopped_reason);
+        $this->assertSame(ExplorationPhase::WAITING->value, $log->summary['phase']);
+        $this->assertEquals([
+            [
+                'elapsed_seconds' => 0,
+                'fights' => 0,
+                'kills' => 0,
+                'xp' => 0,
+                'skill_xp' => 0,
+                'faction_points' => 0,
+                'gold' => 0,
+                'gold_dust' => 0,
+                'shards' => 0,
+                'copper_coins' => 0,
+                'levels_gained' => 0,
+                'weapon_damage' => 0,
+                'spell_damage' => 0,
+                'healing' => 0,
+                'blocked' => 0,
+            ],
+        ], $log->fresh()->summary['chart_points']);
     }
 
     public function test_record_fight_totals_accumulates_totals_and_currencies(): void
@@ -172,6 +193,34 @@ class ExplorationLogServiceTest extends TestCase
         $this->assertSame(7, $log->fresh()->summary['current_round_creatures']);
     }
 
+    public function test_record_current_round_creatures_records_the_given_phase(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $log = $this->createExplorationLog([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+        ]);
+
+        $this->explorationLogService->recordCurrentRoundCreatures($log, 4, false, ExplorationPhase::FIGHTING);
+
+        $this->assertSame(ExplorationPhase::FIGHTING->value, $log->fresh()->summary['phase']);
+    }
+
+    public function test_record_fight_totals_records_the_given_phase(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $log = $this->createExplorationLog([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+        ]);
+
+        $this->explorationLogService->recordFightTotals($log, ['fights' => 1], false, ExplorationPhase::WAITING_FOR_NEXT_ENCOUNTER);
+
+        $this->assertSame(ExplorationPhase::WAITING_FOR_NEXT_ENCOUNTER->value, $log->fresh()->summary['phase']);
+    }
+
     public function test_finalize_ends_the_log_and_records_summary(): void
     {
         $character = $this->character->getCharacter();
@@ -181,6 +230,9 @@ class ExplorationLogServiceTest extends TestCase
             'user_id' => $character->user_id,
             'fights' => 5,
             'kills' => 3,
+            'summary' => [
+                'chart_points' => [['elapsed_seconds' => 60, 'fights' => 5]],
+            ],
         ]);
 
         $this->explorationLogService->finalize($log, 'died', true);
@@ -191,6 +243,8 @@ class ExplorationLogServiceTest extends TestCase
         $this->assertSame('died', $log->stopped_reason);
         $this->assertTrue($log->stopped_by_player);
         $this->assertSame(5, $log->summary['fights']);
+        $this->assertSame(ExplorationPhase::ENDED->value, $log->summary['phase']);
+        $this->assertEquals([['elapsed_seconds' => 60, 'fights' => 5]], $log->summary['chart_points']);
     }
 
     public function test_latest_for_character_returns_the_most_recent_log(): void
@@ -258,6 +312,145 @@ class ExplorationLogServiceTest extends TestCase
         $this->assertSame(50, $log->xp_gained);
         $this->assertSame(25, $log->skill_xp_gained);
         $this->assertSame(5, $log->faction_points_gained);
+    }
+
+    public function test_apply_reward_context_adds_round_totals_onto_existing_log_totals(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $log = $this->createExplorationLog([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'ended_at' => null,
+            'xp_gained' => 100,
+            'skill_xp_gained' => 40,
+            'faction_points_gained' => 8,
+        ]);
+
+        ExplorationLogService::applyRewardContext(
+            $log,
+            $character,
+            [],
+            ['total_xp' => 50, 'total_skill_xp' => 25, 'total_faction_points' => 5]
+        );
+
+        $log = $log->fresh();
+
+        $this->assertSame(150, $log->xp_gained);
+        $this->assertSame(65, $log->skill_xp_gained);
+        $this->assertSame(13, $log->faction_points_gained);
+    }
+
+    public function test_apply_reward_context_moves_an_active_log_to_waiting_for_next_encounter_and_keeps_its_summary(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $log = $this->createExplorationLog([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'ended_at' => null,
+            'summary' => [
+                'phase' => ExplorationPhase::PROCESSING_REWARDS->value,
+                'monster' => ['id' => 5, 'name' => 'Summary Monster'],
+                'current_round_creatures' => 6,
+                'chart_points' => [['elapsed_seconds' => 0, 'xp' => 0]],
+            ],
+        ]);
+
+        ExplorationLogService::applyRewardContext($log, $character, [], ['total_xp' => 10]);
+
+        $summary = $log->fresh()->summary;
+
+        $this->assertSame(ExplorationPhase::WAITING_FOR_NEXT_ENCOUNTER->value, $summary['phase']);
+        $this->assertSame('Summary Monster', $summary['monster']['name']);
+        $this->assertSame(6, $summary['current_round_creatures']);
+        $this->assertEquals(['elapsed_seconds' => 0, 'xp' => 0], $summary['chart_points'][0]);
+    }
+
+    public function test_apply_reward_context_appends_a_cumulative_chart_point(): void
+    {
+        $this->freezeTime();
+
+        $character = $this->character->getCharacter();
+        $character->update([
+            'gold' => 500,
+            'gold_dust' => 20,
+            'shards' => 7,
+            'copper_coins' => 3,
+        ]);
+        $character = $character->refresh();
+
+        $log = $this->createExplorationLog([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'ended_at' => null,
+            'started_at' => now()->subSeconds(90),
+            'fights' => 4,
+            'kills' => 3,
+            'weapon_damage' => 900,
+            'spell_damage' => 250,
+            'xp_gained' => 100,
+            'skill_xp_gained' => 40,
+            'faction_points_gained' => 8,
+            'currencies_gained' => [
+                'gold' => 50,
+                'healing_done' => 30,
+                'damage_blocked' => 12,
+            ],
+            'summary' => [
+                'chart_points' => [['elapsed_seconds' => 0, 'fights' => 0]],
+            ],
+        ]);
+
+        ExplorationLogService::applyRewardContext(
+            $log,
+            $character,
+            [
+                'gold' => 300,
+                'gold_dust' => 10,
+                'shards' => 2,
+                'copper_coins' => 0,
+                'level' => $character->level - 1,
+            ],
+            ['total_xp' => 50, 'total_skill_xp' => 25, 'total_faction_points' => 5]
+        );
+
+        $chartPoints = $log->fresh()->summary['chart_points'];
+
+        $this->assertCount(2, $chartPoints);
+        $this->assertEquals([
+            'elapsed_seconds' => 90,
+            'fights' => 4,
+            'kills' => 3,
+            'xp' => 150,
+            'skill_xp' => 65,
+            'faction_points' => 13,
+            'gold' => 250,
+            'gold_dust' => 10,
+            'shards' => 5,
+            'copper_coins' => 3,
+            'levels_gained' => 1,
+            'weapon_damage' => 900,
+            'spell_damage' => 250,
+            'healing' => 30,
+            'blocked' => 12,
+        ], $chartPoints[1]);
+    }
+
+    public function test_apply_reward_context_leaves_an_ended_log_in_the_ended_phase(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $log = $this->createExplorationLog([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'ended_at' => now(),
+            'summary' => ['phase' => ExplorationPhase::ENDED->value],
+        ]);
+
+        ExplorationLogService::applyRewardContext($log, $character, [], ['total_xp' => 10]);
+
+        $this->assertSame(ExplorationPhase::ENDED->value, $log->fresh()->summary['phase']);
     }
 
     public function test_apply_reward_context_logs_a_warning_when_broadcasting_warning_state_fails(): void
@@ -457,6 +650,28 @@ class ExplorationLogServiceTest extends TestCase
 
         $this->assertNull($result['type']);
         $this->assertNull($result['output']);
+    }
+
+    public function test_output_for_character_exposes_persisted_chart_points(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $chartPoints = [
+            ['elapsed_seconds' => 0, 'fights' => 0, 'xp' => 0],
+            ['elapsed_seconds' => 60, 'fights' => 3, 'xp' => 120],
+        ];
+
+        $this->createExplorationLog([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'ended_at' => now(),
+            'panel_dismissed_at' => null,
+            'summary' => ['chart_points' => $chartPoints],
+        ]);
+
+        $result = $this->explorationLogService->outputForCharacter($character);
+
+        $this->assertEquals($chartPoints, $result['output']['chart_points']);
     }
 
     public function test_output_for_character_uses_snapshot_health_and_attack_damage_when_present(): void

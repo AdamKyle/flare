@@ -34,6 +34,16 @@ use Throwable;
 
 class EventLifecycleService
 {
+    /**
+     * @param LocationService $locationService
+     * @param UpdateRaidMonsters $updateRaidMonsters
+     * @param EventSchedulerService $eventSchedulerService
+     * @param KingdomEventService $kingdomEventService
+     * @param TraverseService $traverseService
+     * @param ExplorationAutomationService $explorationAutomationService
+     * @param BuildQuestCacheService $buildQuestCacheService
+     * @param FactionLoyaltyService $factionLoyaltyService
+     */
     public function __construct(
         private readonly LocationService $locationService,
         private readonly UpdateRaidMonsters $updateRaidMonsters,
@@ -46,10 +56,9 @@ class EventLifecycleService
     ) {}
 
     /**
-     * Naturally completes every running schedule whose runtime event has
-     * actually ended. Each schedule is evaluated independently by its own
-     * runtime event's end time, so a seasonal parent and its still-active
-     * child raid never affect each other's natural completion.
+     * Complete every running schedule whose own runtime event has ended.
+     *
+     * @return void
      */
     public function completeNaturallyExpired(): void
     {
@@ -73,11 +82,10 @@ class EventLifecycleService
     }
 
     /**
-     * Forces immediate cancellation of the given schedule, regardless of
-     * whether its runtime event's end time has been reached. Cancelling a
-     * seasonal parent first cancels every currently running child raid; if
-     * any running child fails to cancel, the parent is left active/not
-     * cancelled.
+     * Cancel the schedule immediately, cancelling a seasonal parent's running child raids first.
+     *
+     * @param ScheduledEvent $scheduledEvent
+     * @return void
      */
     public function cancel(ScheduledEvent $scheduledEvent): void
     {
@@ -101,10 +109,12 @@ class EventLifecycleService
     }
 
     /**
-     * Cancels only the child raids of this exact parent that are genuinely
-     * running right now, invalidates every other non-terminal child so it
-     * can never start after the parent has ended, then tears down the
-     * parent itself normally. Historical (terminal) children are untouched.
+     * Cancel a seasonal parent's running child raids, invalidate its future children, then cancel the parent.
+     *
+     * @param ScheduledEvent $parent
+     * @return void
+     *
+     * @throws RuntimeException
      */
     private function cancelSeasonalParent(ScheduledEvent $parent): void
     {
@@ -154,6 +164,12 @@ class EventLifecycleService
         $this->cancelSingle($parent);
     }
 
+    /**
+     * Cancel one schedule and tear down its runtime event when it has one.
+     *
+     * @param ScheduledEvent $scheduledEvent
+     * @return void
+     */
     private function cancelSingle(ScheduledEvent $scheduledEvent): void
     {
         $status = $scheduledEvent->status();
@@ -180,10 +196,12 @@ class EventLifecycleService
     }
 
     /**
-     * Runtime ownership resolves by exact scheduled_event_id first. The
-     * legacy fallback (by type/raid, no owning schedule) is only used when
-     * it matches exactly one candidate; more than one is ambiguous and
-     * throws rather than guessing.
+     * Resolve the runtime event owned by the schedule, falling back to a single unowned legacy match.
+     *
+     * @param ScheduledEvent $scheduledEvent
+     * @return Event|null
+     *
+     * @throws RuntimeException
      */
     private function resolveRuntimeEvent(ScheduledEvent $scheduledEvent): ?Event
     {
@@ -208,6 +226,13 @@ class EventLifecycleService
         return $candidates->first();
     }
 
+    /**
+     * Tear down the runtime event for its event type.
+     *
+     * @param ScheduledEvent $scheduledEvent
+     * @param Event $event
+     * @return void
+     */
     private function teardownRuntimeEvent(ScheduledEvent $scheduledEvent, Event $event): void
     {
         $eventType = new EventType($scheduledEvent->event_type);
@@ -259,6 +284,13 @@ class EventLifecycleService
         }
     }
 
+    /**
+     * End a raid, remove its runtime event, then rebuild the raid quest cache without it.
+     *
+     * @param ScheduledEvent $scheduledEvent
+     * @param Event $event
+     * @return void
+     */
     private function teardownRaid(ScheduledEvent $scheduledEvent, Event $event): void
     {
         $raid = Raid::find($scheduledEvent->raid_id);
@@ -273,11 +305,17 @@ class EventLifecycleService
 
         $this->updateMonstersForCharactersAtRaidLocations($raid);
 
-        $this->buildQuestCacheService->buildRaidQuestCache(true);
-
         $this->cleanUpEvent($event);
+
+        $this->buildQuestCacheService->buildRaidQuestCache(true);
     }
 
+    /**
+     * End the Winter event and return its characters to the Surface.
+     *
+     * @param Event $event
+     * @return void
+     */
     private function teardownWinterEvent(Event $event): void
     {
         $this->kingdomEventService->handleKingdomRewardsForEvent(MapName::ICE_PLANE->value);
@@ -305,6 +343,12 @@ class EventLifecycleService
         $this->updateAllCharacterStatuses();
     }
 
+    /**
+     * End the Delusional Memories event and return its characters to the Surface.
+     *
+     * @param Event $event
+     * @return void
+     */
     private function teardownDelusionalEvent(Event $event): void
     {
         $this->kingdomEventService->handleKingdomRewardsForEvent(MapName::DELUSIONAL_MEMORIES->value);
@@ -332,6 +376,14 @@ class EventLifecycleService
         $this->updateAllCharacterStatuses();
     }
 
+    /**
+     * Stop exploration, reset event-map factions and move every character on the event map to the Surface.
+     *
+     * @param GameMap $gameMap
+     * @param GameMap $surfaceMap
+     * @param Faction|null $faction
+     * @return void
+     */
     private function resetCharactersOnEventMap(GameMap $gameMap, GameMap $surfaceMap, ?Faction $faction): void
     {
         Character::select('characters.*')
@@ -356,6 +408,12 @@ class EventLifecycleService
             });
     }
 
+    /**
+     * Delete the runtime event and its announcement.
+     *
+     * @param Event $event
+     * @return void
+     */
     private function cleanUpEvent(Event $event): void
     {
         $announcement = Announcement::where('event_id', $event->id)->first();
@@ -369,6 +427,11 @@ class EventLifecycleService
         $event->delete();
     }
 
+    /**
+     * Broadcast a status update for every character.
+     *
+     * @return void
+     */
     private function updateAllCharacterStatuses(): void
     {
         Character::chunkById(250, function ($characters) {
@@ -378,30 +441,45 @@ class EventLifecycleService
         });
     }
 
+    /**
+     * Remove the character's pledge to the event map's Faction and stop any NPC they are assisting.
+     *
+     * @param Character $character
+     * @param Faction|null $faction
+     * @return void
+     */
     private function unpledgeFromTheMapsFaction(Character $character, ?Faction $faction = null): void
     {
-        if (! is_null($faction)) {
-            $factionLoyalty = $character->factionLoyalties()
-                ->where('faction_id', $faction->id)
-                ->first();
-
-            if (is_null($factionLoyalty)) {
-                return;
-            }
-
-            $assistingNpc = $factionLoyalty
-                ->factionLoyaltyNpcs()
-                ->where('currently_helping', true)
-                ->first();
-
-            if (! is_null($assistingNpc)) {
-                $this->factionLoyaltyService->stopAssistingNpc($character, $assistingNpc);
-            }
-
-            $this->factionLoyaltyService->removePledge($character, $faction);
+        if (is_null($faction)) {
+            return;
         }
+
+        $factionLoyalty = $character->factionLoyalties()
+            ->where('faction_id', $faction->id)
+            ->first();
+
+        if (is_null($factionLoyalty)) {
+            return;
+        }
+
+        $assistingNpc = $factionLoyalty
+            ->factionLoyaltyNpcs()
+            ->where('currently_helping', true)
+            ->first();
+
+        if (! is_null($assistingNpc)) {
+            $this->factionLoyaltyService->stopAssistingNpc($character, $assistingNpc);
+        }
+
+        $this->factionLoyaltyService->removePledge($character, $faction);
     }
 
+    /**
+     * Clear the raid's corruption from its Locations and broadcast the corrupted Location data.
+     *
+     * @param Raid $raid
+     * @return void
+     */
     private function unCorruptLocations(Raid $raid): void
     {
         $raidLocations = [...$raid->corrupted_location_ids, $raid->raid_boss_location_id];
@@ -419,6 +497,12 @@ class EventLifecycleService
         event(new CorruptLocations($this->locationService->fetchCorruptedLocationData($raid)));
     }
 
+    /**
+     * Refresh the monster list for every character standing at one of the raid's Locations.
+     *
+     * @param Raid $raid
+     * @return void
+     */
     private function updateMonstersForCharactersAtRaidLocations(Raid $raid): void
     {
         $corruptedLocationIds = $raid->corrupted_location_ids;

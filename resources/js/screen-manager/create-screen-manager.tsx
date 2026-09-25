@@ -212,6 +212,13 @@ const createScreenManager = <TMap extends ScreenMap>() => {
         behavior: 'auto',
       });
 
+      // The game layout scrolls inside <main> rather than the window.
+      topRef.current?.closest('main')?.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'auto',
+      });
+
       topRef.current?.focus({ preventScroll: true });
     }, [top?.key]);
 

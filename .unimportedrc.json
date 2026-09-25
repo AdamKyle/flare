@@ -3,6 +3,7 @@
     "resources/js/app.ts",
     "resources/js/admin-apps.ts",
     "resources/js/game.ts",
+    "resources/js/onboarding.ts",
     "resources/js/layouts/app-layout.ts",
     "resources/js/admin/monitoring/batch-crafting-monitoring.tsx",
     "resources/js/admin/monitoring/battle-reward-queue.tsx",

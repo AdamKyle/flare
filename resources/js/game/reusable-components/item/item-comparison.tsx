@@ -1,4 +1,5 @@
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
+import clsx from 'clsx';
 import React, { Fragment, useState } from 'react';
 
 import { TOP_ADVANCED_CHILD_FIELDS } from './constants/item-comparison-constants';
@@ -6,7 +7,7 @@ import EquipItemActions from './equip-item-actions';
 import ItemComparisonColumn from './partials/item-comparison/item-comparison-column';
 import ItemComparisonProps from './types/item-comparison-props';
 import { hasAnyNonZeroAdjustment } from './utils/item-comparison';
-import UsePurchaseAndReplaceApiRequestDefinition from '../../components/shop/api/hooks/definitions/use-purchase-and-replace-api-request-definition';
+import { ItemComparisonRow } from '../../api-definitions/items/item-comparison-details';
 
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import IconButton from 'ui/buttons/icon-button';
@@ -17,7 +18,7 @@ const ItemComparison = ({
   show_buy_and_replace = false,
   is_purchasing,
   error_message,
-  set_request_params,
+  on_buy_and_replace,
 }: ItemComparisonProps) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showEquipActions, setShowEquipActions] = useState(false);
@@ -30,10 +31,8 @@ const ItemComparison = ({
     setShowEquipActions(true);
   };
 
-  const handleBuyAndReplace = (
-    requestParams: UsePurchaseAndReplaceApiRequestDefinition
-  ) => {
-    set_request_params(requestParams);
+  const handleCloseEquipSection = () => {
+    setShowEquipActions(false);
   };
 
   const comparisonRows = (comparisonDetails.details ?? []).slice(0, 2);
@@ -51,10 +50,26 @@ const ItemComparison = ({
       )
     );
 
+  const advancedToggleLabel = showAdvanced
+    ? 'Hide advanced details'
+    : 'Show advanced details';
+
   const isSingle = comparisonRows.length === 1;
   const gridClasses = isSingle
     ? 'grid grid-cols-1'
     : 'grid grid-cols-1 md:grid-cols-2 gap-4';
+
+  const renderRowSeparator = (index: number) => {
+    if (index >= comparisonRows.length - 1) {
+      return null;
+    }
+
+    return (
+      <div className="my-6 block px-2 md:hidden">
+        <Separator />
+      </div>
+    );
+  };
 
   const renderBuyAndReplaceAction = () => {
     if (!show_buy_and_replace) {
@@ -63,13 +78,21 @@ const ItemComparison = ({
 
     return (
       <IconButton
-        additional_css={'ml-4'}
+        additional_css="ml-4"
         on_click={handleShowEquipSection}
         variant={ButtonVariant.SUCCESS}
-        label={'But and replace'}
-        aria_label={'Purchase and Replace'}
+        label="Buy and replace"
+        aria_label="Buy and replace"
       />
     );
+  };
+
+  const renderPurchaseError = () => {
+    if (!error_message) {
+      return null;
+    }
+
+    return <ApiErrorAlert apiError={error_message.message} />;
   };
 
   const renderEquipActions = () => {
@@ -77,20 +100,32 @@ const ItemComparison = ({
       return null;
     }
 
-    if (error_message) {
-      return <ApiErrorAlert apiError={error_message.message} />;
-    }
-
     return (
-      <div className="my-4">
+      <div className="my-4 space-y-2">
+        {renderPurchaseError()}
         <EquipItemActions
           comparison_details={comparisonDetails}
-          on_confirm_action={handleBuyAndReplace}
+          on_confirm_action={on_buy_and_replace}
+          on_close_equip_action={handleCloseEquipSection}
           is_processing={is_purchasing}
         />
       </div>
     );
   };
+
+  const renderComparisonRow = (row: ItemComparisonRow, index: number) => (
+    <Fragment key={`${row.position}-${row.equipped_item.slot_id}`}>
+      <div className="min-w-0">
+        <ItemComparisonColumn
+          row={row}
+          showAdvanced={showAdvanced}
+          showAdvancedChildUnderTop={showAdvancedChildUnderTop}
+        />
+      </div>
+
+      {renderRowSeparator(index)}
+    </Fragment>
+  );
 
   return (
     <div className="space-y-3">
@@ -99,18 +134,14 @@ const ItemComparison = ({
           on_click={handleToggleAdvanced}
           icon={
             <i
-              className={`fas ${showAdvanced ? 'fa-eye-slash' : 'fa-eye'}`}
+              className={clsx('fas', showAdvanced ? 'fa-eye-slash' : 'fa-eye')}
               aria-hidden="true"
             />
           }
           variant={ButtonVariant.PRIMARY}
-          label={
-            showAdvanced ? 'Hide advanced details' : 'Show advanced details'
-          }
+          label={advancedToggleLabel}
           additional_css="px-3"
-          aria_label={
-            showAdvanced ? 'Hide advanced details' : 'Show advanced details'
-          }
+          aria_label={advancedToggleLabel}
         />
         {renderBuyAndReplaceAction()}
       </div>
@@ -118,23 +149,7 @@ const ItemComparison = ({
       {renderEquipActions()}
 
       <div className={gridClasses}>
-        {comparisonRows.map((row, index) => (
-          <Fragment key={index}>
-            <div className="min-w-0">
-              <ItemComparisonColumn
-                row={row}
-                showAdvanced={showAdvanced}
-                showAdvancedChildUnderTop={showAdvancedChildUnderTop}
-              />
-            </div>
-
-            {index < comparisonRows.length - 1 && (
-              <div className="my-6 block px-2 md:hidden">
-                <Separator />
-              </div>
-            )}
-          </Fragment>
-        ))}
+        {comparisonRows.map(renderComparisonRow)}
       </div>
     </div>
   );

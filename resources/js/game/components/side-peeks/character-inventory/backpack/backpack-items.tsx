@@ -9,7 +9,7 @@ import { EquippableItemWithBase } from '../../../../api-definitions/items/equipp
 import { useInfiniteScroll } from '../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
 import GenericItemList from '../../components/items/generic-item-list';
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
-import InventoryItem from '../inventory-item/inventory-item';
+import InventoryItemDetailStack from '../inventory-item/inventory-item-detail-stack';
 import { SelectedEquippableItemsOptions } from './enums/selected-equippable-items-options';
 import BackpackItemsProps from './types/backpack-items-props';
 import { useManageMultipleSelectedItemsApi } from '../hooks/use-manage-multiple-selected-items-api';
@@ -22,7 +22,6 @@ import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
-import StackedCard from 'ui/cards/stacked-card';
 import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 import Input from 'ui/input/input';
@@ -283,13 +282,13 @@ const BackpackItems = ({
     }
 
     return (
-      <StackedCard on_close={handleCloseItemView}>
-        <InventoryItem
-          slot_id={slotId}
-          character_id={character.id}
-          on_action={onEquipSuccess}
-        />
-      </StackedCard>
+      <InventoryItemDetailStack
+        slot_id={slotId}
+        character_id={character.id}
+        aria_label="Item Details"
+        on_close={handleCloseItemView}
+        on_action={onEquipSuccess}
+      />
     );
   };
 

@@ -1,13 +1,15 @@
 import { getType } from './get-type';
 import { BaseItemDetails } from '../../../api-definitions/items/base-item-details';
-import { EquippableItemWithBase } from '../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
-import { armourPositions } from '../../../components/character-sheet/partials/character-inventory/enums/inventory-item-types';
+import {
+  armourPositions,
+  InventoryItemTypes,
+} from '../../../components/character-sheet/partials/character-inventory/enums/inventory-item-types';
 import { ItemBaseTypes } from '../enums/item-base-type';
 import { ItemPositions } from '../enums/item-positions';
 
 export const getItemPositions = (
-  item: BaseItemDetails | EquippableItemWithBase
-) => {
+  item: Pick<BaseItemDetails, 'type'>
+): ItemPositions[] | null => {
   const itemType = getType(item, armourPositions);
 
   if (itemType === ItemBaseTypes.Weapon) {
@@ -22,20 +24,32 @@ export const getItemPositions = (
     return [ItemPositions.SPELL_ONE, ItemPositions.SPELL_TWO];
   }
 
-  if (itemType === ItemBaseTypes.Armour) {
-    const positions = [
-      ItemPositions.BODY,
-      ItemPositions.HELMET,
-      ItemPositions.FEET,
-      ItemPositions.GLOVES,
-      ItemPositions.LEGGINGS,
-      ItemPositions.SLEEVES,
-    ];
-
-    return positions.find(
-      (position) => (item.type as string) === (position as string)
-    );
+  if (itemType === ItemBaseTypes.Trinket) {
+    return [ItemPositions.TRINKET];
   }
 
-  return [];
+  if (itemType === ItemBaseTypes.Artifact) {
+    return [ItemPositions.ARTIFACT];
+  }
+
+  if (itemType === ItemBaseTypes.Armour) {
+    switch (item.type) {
+      case InventoryItemTypes.BODY:
+        return [ItemPositions.BODY];
+      case InventoryItemTypes.HELMET:
+        return [ItemPositions.HELMET];
+      case InventoryItemTypes.FEET:
+        return [ItemPositions.FEET];
+      case InventoryItemTypes.GLOVES:
+        return [ItemPositions.GLOVES];
+      case InventoryItemTypes.LEGGINGS:
+        return [ItemPositions.LEGGINGS];
+      case InventoryItemTypes.SLEEVES:
+        return [ItemPositions.SLEEVES];
+      default:
+        return null;
+    }
+  }
+
+  return null;
 };

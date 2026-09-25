@@ -1,10 +1,12 @@
 import { AxiosErrorDefinition } from 'api-handler/definitions/axios-error-definition';
 
-import UseListItemOnMarketRequestParamsDefinition from './use-list-item-on-market-request-params-definition';
-import { StateSetter } from '../../../../../types/state-setter-type';
+import UseListItemOnMarketResponseDefinition from './use-list-item-on-market-response-definition';
 
 export default interface UseListItemOnMarketDefinition {
   loading: boolean;
   error: AxiosErrorDefinition | null;
-  setRequestParams: StateSetter<UseListItemOnMarketRequestParamsDefinition>;
+  list_item: (
+    slotId: number,
+    listFor: number
+  ) => Promise<UseListItemOnMarketResponseDefinition | null>;
 }

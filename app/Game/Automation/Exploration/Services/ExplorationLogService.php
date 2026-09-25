@@ -9,22 +9,26 @@ use App\Flare\Models\ExplorationWarning;
 use App\Flare\Models\Monster;
 use App\Game\Automation\Exploration\Events\ExplorationOutputUpdated;
 use App\Game\Automation\Exploration\Events\ExplorationWarningState;
-use App\Game\Tops\Services\BroadcastTopsUpdateService;
+use App\Game\Automation\Exploration\Values\ExplorationPhase;
+use Carbon\CarbonInterface;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class ExplorationLogService
 {
     /**
-     * Create the Exploration log for a newly started automation run.
+     * Create the Exploration log, with its zero-origin chart point, for a newly started automation run.
      *
-     * @param Character $character The character starting Exploration.
-     * @param CharacterAutomation $automation The character's Exploration automation record.
-     * @return ExplorationLog The newly created Exploration log.
+     * Persistence-only with no broadcast so it stays safe inside the caller's database transaction.
+     *
+     * @param Character $character
+     * @param CharacterAutomation $automation
+     * @return ExplorationLog
      */
     public function start(Character $character, CharacterAutomation $automation): ExplorationLog
     {
-        $log = ExplorationLog::create([
+        return ExplorationLog::create([
             'character_id' => $character->id,
             'user_id' => $character->user_id,
             'character_automation_id' => $automation->id,
@@ -33,22 +37,23 @@ class ExplorationLogService
             'starting_level' => $character->level,
             'started_at' => now(),
             'stopped_reason' => 'running',
+            'summary' => [
+                'phase' => ExplorationPhase::WAITING->value,
+                'chart_points' => [self::baselineChartPoint()],
+            ],
         ]);
-
-        $this->broadcastOutputForCharacter($character);
-
-        return $log;
     }
 
     /**
      * Accumulate fight/kill/damage/currency totals onto the active Exploration log.
      *
-     * @param ExplorationLog $log The Exploration log to update.
-     * @param array $totals The round's fight/kill/damage/currency totals.
-     * @param bool $broadcast Whether to broadcast the updated output.
-     * @return void This method does not return a value.
+     * @param ExplorationLog $log
+     * @param array $totals
+     * @param bool $broadcast
+     * @param ExplorationPhase|null $phase
+     * @return void
      */
-    public function recordFightTotals(ExplorationLog $log, array $totals, bool $broadcast = true): void
+    public function recordFightTotals(ExplorationLog $log, array $totals, bool $broadcast = true, ?ExplorationPhase $phase = null): void
     {
         $log->refresh();
 
@@ -77,9 +82,17 @@ class ExplorationLogService
             'currencies_gained' => $currenciesGained,
         ];
 
+        $summary = $log->summary ?? [];
+
         if (isset($totals['monster']) && is_array($totals['monster'])) {
-            $summary = $log->summary ?? [];
             $summary['monster'] = $totals['monster'];
+        }
+
+        if (! is_null($phase)) {
+            $summary['phase'] = $phase->value;
+        }
+
+        if ($summary !== ($log->summary ?? [])) {
             $updates['summary'] = $summary;
         }
 
@@ -93,10 +106,10 @@ class ExplorationLogService
     /**
      * Store the current monster's stat snapshot on the Exploration log summary.
      *
-     * @param ExplorationLog $log The Exploration log to update.
-     * @param array $monster The monster snapshot to record.
-     * @param bool $broadcast Whether to broadcast the updated output.
-     * @return void This method does not return a value.
+     * @param ExplorationLog $log
+     * @param array $monster
+     * @param bool $broadcast
+     * @return void
      */
     public function recordMonsterSnapshot(ExplorationLog $log, array $monster, bool $broadcast = true): void
     {
@@ -117,17 +130,22 @@ class ExplorationLogService
     /**
      * Store the current round's creature count on the Exploration log summary.
      *
-     * @param ExplorationLog $log The Exploration log to update.
-     * @param int $currentRoundCreatures The number of creatures in the current round.
-     * @param bool $broadcast Whether to broadcast the updated output.
-     * @return void This method does not return a value.
+     * @param ExplorationLog $log
+     * @param int $currentRoundCreatures
+     * @param bool $broadcast
+     * @param ExplorationPhase|null $phase
+     * @return void
      */
-    public function recordCurrentRoundCreatures(ExplorationLog $log, int $currentRoundCreatures, bool $broadcast = true): void
+    public function recordCurrentRoundCreatures(ExplorationLog $log, int $currentRoundCreatures, bool $broadcast = true, ?ExplorationPhase $phase = null): void
     {
         $log->refresh();
 
         $summary = $log->summary ?? [];
         $summary['current_round_creatures'] = $currentRoundCreatures;
+
+        if (! is_null($phase)) {
+            $summary['phase'] = $phase->value;
+        }
 
         $log->update([
             'summary' => $summary,
@@ -141,10 +159,10 @@ class ExplorationLogService
     /**
      * End the Exploration log with its final summary and stop reason.
      *
-     * @param ExplorationLog $log The Exploration log to finalize.
-     * @param string|null $stoppedReason The reason Exploration ended.
-     * @param bool $stoppedByPlayer Whether the player manually stopped Exploration.
-     * @return void This method does not return a value.
+     * @param ExplorationLog $log
+     * @param string|null $stoppedReason
+     * @param bool $stoppedByPlayer
+     * @return void
      */
     public function finalize(ExplorationLog $log, ?string $stoppedReason = null, bool $stoppedByPlayer = false): void
     {
@@ -152,6 +170,7 @@ class ExplorationLogService
         $summary = $log->summary ?? [];
         $summary = [
             ...$summary,
+            'phase' => ExplorationPhase::ENDED->value,
             'fights' => $log->fights,
             'kills' => $log->kills,
             'weapon_damage' => $log->weapon_damage,
@@ -170,14 +189,13 @@ class ExplorationLogService
         ]);
 
         $this->broadcastOutputForCharacter($log->character);
-        BroadcastTopsUpdateService::make()->broadcastExplorationCurrentMonth();
     }
 
     /**
      * Return the character's most recent Exploration log.
      *
-     * @param Character $character The character to look up.
-     * @return ExplorationLog|null The character's most recent Exploration log, if any.
+     * @param Character $character
+     * @return ExplorationLog|null
      */
     public function latestForCharacter(Character $character): ?ExplorationLog
     {
@@ -189,8 +207,8 @@ class ExplorationLogService
     /**
      * Return the character's currently active (unended) Exploration log.
      *
-     * @param Character $character The character to look up.
-     * @return ExplorationLog|null The character's active Exploration log, if any.
+     * @param Character $character
+     * @return ExplorationLog|null
      */
     public function activeForCharacter(Character $character): ?ExplorationLog
     {
@@ -201,13 +219,13 @@ class ExplorationLogService
     }
 
     /**
-     * Apply post-reward currency/xp deltas to the Exploration log and broadcast the updated output.
+     * Apply a completed reward batch to the Exploration log, append its cumulative chart point, and broadcast the updated output.
      *
-     * @param ExplorationLog $log The Exploration log to update.
-     * @param Character $character The character receiving rewards.
-     * @param array $beforeSnapshot The character's currency/level values before rewards were applied.
-     * @param array $context The xp/skill xp/faction point totals awarded.
-     * @return void This method does not return a value.
+     * @param ExplorationLog $log
+     * @param Character $character
+     * @param array $beforeSnapshot
+     * @param array $context
+     * @return void
      */
     public static function applyRewardContext(
         ExplorationLog $log,
@@ -224,16 +242,30 @@ class ExplorationLogService
         $currenciesGained = self::addCurrencyDelta($currenciesGained, 'copper_coins', $character->copper_coins, $beforeSnapshot['copper_coins'] ?? 0);
         $currenciesGained = self::addCurrencyDelta($currenciesGained, 'levels_gained', $character->level, $beforeSnapshot['level'] ?? 0);
 
-        $log->update([
+        $rewardTotals = [
             'xp_gained' => $log->xp_gained + ($context['total_xp'] ?? 0),
             'skill_xp_gained' => $log->skill_xp_gained + ($context['total_skill_xp'] ?? 0),
             'faction_points_gained' => $log->faction_points_gained + ($context['total_faction_points'] ?? 0),
+        ];
+
+        $summary = $log->summary ?? [];
+        $summary['phase'] = is_null($log->ended_at)
+            ? ExplorationPhase::WAITING_FOR_NEXT_ENCOUNTER->value
+            : ExplorationPhase::ENDED->value;
+        $summary['chart_points'] = [
+            ...self::chartPointsFrom($summary),
+            self::buildChartPoint($log, $rewardTotals, $currenciesGained),
+        ];
+
+        $log->update([
+            ...$rewardTotals,
             'currencies_gained' => $currenciesGained,
+            'summary' => $summary,
         ]);
 
         try {
             event(new ExplorationWarningState($character->user, false, []));
-        } catch (\Throwable $throwable) {
+        } catch (Throwable $throwable) {
             Log::warning('ExplorationLogService::applyRewardContext failed to broadcast ExplorationWarningState.', [
                 'character_id' => $character->id,
                 'exception_class' => $throwable::class,
@@ -243,8 +275,7 @@ class ExplorationLogService
 
         try {
             (new self)->broadcastOutputForCharacter($character);
-            BroadcastTopsUpdateService::make()->broadcastExplorationCurrentMonth();
-        } catch (\Throwable $throwable) {
+        } catch (Throwable $throwable) {
             Log::warning('ExplorationLogService::applyRewardContext failed to broadcast exploration output.', [
                 'character_id' => $character->id,
                 'exception_class' => $throwable::class,
@@ -256,11 +287,11 @@ class ExplorationLogService
     /**
      * Add the positive difference between the current and previous currency values to the totals.
      *
-     * @param array $currenciesGained The currency totals to update.
-     * @param string $currency The currency key being updated.
-     * @param int $currentValue The character's current currency value.
-     * @param int $previousValue The character's currency value before the reward.
-     * @return array The updated currency totals.
+     * @param array $currenciesGained
+     * @param string $currency
+     * @param int $currentValue
+     * @param int $previousValue
+     * @return array
      */
     private static function addCurrencyDelta(array $currenciesGained, string $currency, int $currentValue, int $previousValue): array
     {
@@ -276,10 +307,94 @@ class ExplorationLogService
     }
 
     /**
+     * Build the all-zero chart point that anchors every Exploration chart at the start of a run.
+     *
+     * @return array
+     */
+    private static function baselineChartPoint(): array
+    {
+        return [
+            'elapsed_seconds' => 0,
+            'fights' => 0,
+            'kills' => 0,
+            'xp' => 0,
+            'skill_xp' => 0,
+            'faction_points' => 0,
+            'gold' => 0,
+            'gold_dust' => 0,
+            'shards' => 0,
+            'copper_coins' => 0,
+            'levels_gained' => 0,
+            'weapon_damage' => 0,
+            'spell_damage' => 0,
+            'healing' => 0,
+            'blocked' => 0,
+        ];
+    }
+
+    /**
+     * Build the cumulative chart point for the Exploration run after a completed reward batch.
+     *
+     * @param ExplorationLog $log
+     * @param array $rewardTotals
+     * @param array $currenciesGained
+     * @return array
+     */
+    private static function buildChartPoint(ExplorationLog $log, array $rewardTotals, array $currenciesGained): array
+    {
+        return [
+            'elapsed_seconds' => self::secondsBetween($log->started_at, now()),
+            'fights' => $log->fights,
+            'kills' => $log->kills,
+            'xp' => $rewardTotals['xp_gained'],
+            'skill_xp' => $rewardTotals['skill_xp_gained'],
+            'faction_points' => $rewardTotals['faction_points_gained'],
+            'gold' => $currenciesGained['gold'] ?? 0,
+            'gold_dust' => $currenciesGained['gold_dust'] ?? 0,
+            'shards' => $currenciesGained['shards'] ?? 0,
+            'copper_coins' => $currenciesGained['copper_coins'] ?? 0,
+            'levels_gained' => $currenciesGained['levels_gained'] ?? 0,
+            'weapon_damage' => $log->weapon_damage,
+            'spell_damage' => $log->spell_damage,
+            'healing' => $currenciesGained['healing_done'] ?? 0,
+            'blocked' => $currenciesGained['damage_blocked'] ?? 0,
+        ];
+    }
+
+    /**
+     * Return the chart points persisted on an Exploration log summary.
+     *
+     * @param array $summary
+     * @return array
+     */
+    private static function chartPointsFrom(array $summary): array
+    {
+        $chartPoints = $summary['chart_points'] ?? [];
+
+        if (! is_array($chartPoints)) {
+            return [];
+        }
+
+        return $chartPoints;
+    }
+
+    /**
+     * Return the whole, non-negative number of seconds between two moments.
+     *
+     * @param CarbonInterface $start
+     * @param CarbonInterface $end
+     * @return int
+     */
+    private static function secondsBetween(CarbonInterface $start, CarbonInterface $end): int
+    {
+        return max(0, $end->getTimestamp() - $start->getTimestamp());
+    }
+
+    /**
      * Return and broadcast the character's current Exploration output panel.
      *
-     * @param Character $character The character to resolve output for.
-     * @return array The current Exploration output panel.
+     * @param Character $character
+     * @return array
      */
     public function outputForCharacter(Character $character): array
     {
@@ -293,9 +408,9 @@ class ExplorationLogService
     /**
      * Clear the character's active Exploration log or dismiss a specific warning.
      *
-     * @param Character $character The character to clear output for.
-     * @param ExplorationWarning|null $warning The specific warning to dismiss, or null to clear the active log.
-     * @return void This method does not return a value.
+     * @param Character $character
+     * @param ExplorationWarning|null $warning
+     * @return void
      */
     public function clear(Character $character, ?ExplorationWarning $warning = null): void
     {
@@ -325,8 +440,8 @@ class ExplorationLogService
     /**
      * Broadcast the character's current Exploration output panel.
      *
-     * @param Character $character The character to broadcast output for.
-     * @return void This method does not return a value.
+     * @param Character $character
+     * @return void
      */
     private function broadcastOutputForCharacter(Character $character): void
     {
@@ -338,8 +453,8 @@ class ExplorationLogService
     /**
      * Dismiss the character's ended Exploration log panel.
      *
-     * @param Character $character The character dismissing the ended log.
-     * @return void This method does not return a value.
+     * @param Character $character
+     * @return void
      */
     public function dismissEndedLog(Character $character): void
     {
@@ -354,8 +469,8 @@ class ExplorationLogService
     /**
      * Resolve the character's current Exploration output panel: active log, warning, or ended log.
      *
-     * @param Character $character The character to resolve output for.
-     * @return array The resolved Exploration output panel.
+     * @param Character $character
+     * @return array
      */
     private function resolveOutputForCharacter(Character $character): array
     {
@@ -364,54 +479,12 @@ class ExplorationLogService
             ->latest()
             ->first();
 
+        if (! is_null($activeLog) && $this->hasMatchingAutomation($character, $activeLog)) {
+            return ['type' => 'active', 'output' => $this->formatLogOutput($activeLog)];
+        }
+
         if (! is_null($activeLog)) {
-            $automation = CharacterAutomation::where('id', $activeLog->character_automation_id)
-                ->where('character_id', $character->id)
-                ->first();
-
-            if (is_null($automation)) {
-                Log::error('Exploration log found active with no matching automation. Repairing.', [
-                    'character_id' => $character->id,
-                    'exploration_log_id' => $activeLog->id,
-                    'character_automation_id' => $activeLog->character_automation_id,
-                ]);
-
-                $activeLog->update([
-                    'ended_at' => now(),
-                    'stopped_reason' => 'missing_automation',
-                ]);
-
-                try {
-                    ExplorationWarning::create([
-                        'character_id' => $character->id,
-                        'user_id' => $character->user_id,
-                        'exploration_log_id' => $activeLog->id,
-                        'type' => 'missing_automation',
-                        'message' => 'Exploration ended because the automation was missing. Please report this as a bug.',
-                    ]);
-                } catch (QueryException $exception) {
-                    $exceptionCode = (int) $exception->getCode();
-                    $previousCode = (int) ($exception->getPrevious()?->getCode() ?? 0);
-                    $isRetryable = in_array($exceptionCode, [1205, 1213], true)
-                        || in_array($previousCode, [1205, 1213], true)
-                        || str_contains($exception->getMessage(), '1205')
-                        || str_contains($exception->getMessage(), '1213')
-                        || str_contains($exception->getMessage(), 'Lock wait timeout exceeded')
-                        || str_contains($exception->getMessage(), 'Deadlock found');
-
-                    if (! $isRetryable) {
-                        throw $exception;
-                    }
-
-                    Log::warning('Exploration log repair skipped warning creation after database lock error.', [
-                        'character_id' => $character->id,
-                        'exploration_log_id' => $activeLog->id,
-                        'exception_code' => $exceptionCode !== 0 ? $exceptionCode : $previousCode,
-                    ]);
-                }
-            } else {
-                return ['type' => 'active', 'output' => $this->formatLogOutput($activeLog)];
-            }
+            $this->repairOrphanedActiveLog($character, $activeLog);
         }
 
         $warning = ExplorationWarning::where('character_id', $character->id)
@@ -437,10 +510,106 @@ class ExplorationLogService
     }
 
     /**
+     * Determine whether the active Exploration log still has its Exploration automation.
+     *
+     * @param Character $character
+     * @param ExplorationLog $activeLog
+     * @return bool
+     */
+    private function hasMatchingAutomation(Character $character, ExplorationLog $activeLog): bool
+    {
+        return CharacterAutomation::where('id', $activeLog->character_automation_id)
+            ->where('character_id', $character->id)
+            ->exists();
+    }
+
+    /**
+     * End an active Exploration log whose automation no longer exists and warn the player about it.
+     *
+     * @param Character $character
+     * @param ExplorationLog $activeLog
+     * @return void
+     */
+    private function repairOrphanedActiveLog(Character $character, ExplorationLog $activeLog): void
+    {
+        Log::error('Exploration log found active with no matching automation. Repairing.', [
+            'character_id' => $character->id,
+            'exploration_log_id' => $activeLog->id,
+            'character_automation_id' => $activeLog->character_automation_id,
+        ]);
+
+        $activeLog->update([
+            'ended_at' => now(),
+            'stopped_reason' => 'missing_automation',
+        ]);
+
+        $this->createMissingAutomationWarning($character, $activeLog);
+    }
+
+    /**
+     * Create the missing-automation warning, skipping it when the database reports a lock wait or deadlock.
+     *
+     * @param Character $character
+     * @param ExplorationLog $activeLog
+     * @return void
+     */
+    private function createMissingAutomationWarning(Character $character, ExplorationLog $activeLog): void
+    {
+        try {
+            ExplorationWarning::create([
+                'character_id' => $character->id,
+                'user_id' => $character->user_id,
+                'exploration_log_id' => $activeLog->id,
+                'type' => 'missing_automation',
+                'message' => 'Exploration ended because the automation was missing. Please report this as a bug.',
+            ]);
+        } catch (QueryException $exception) {
+            if (! $this->isRetryableLockException($exception)) {
+                throw $exception;
+            }
+
+            Log::warning('Exploration log repair skipped warning creation after database lock error.', [
+                'character_id' => $character->id,
+                'exploration_log_id' => $activeLog->id,
+                'exception_code' => $exception->getCode(),
+            ]);
+        }
+    }
+
+    /**
+     * Determine whether a query exception is a MySQL lock wait timeout or deadlock.
+     *
+     * @param QueryException $exception
+     * @return bool
+     */
+    private function isRetryableLockException(QueryException $exception): bool
+    {
+        $message = $exception->getMessage();
+
+        return $this->isRetryableLockCode($exception->getCode())
+            || $this->isRetryableLockCode($exception->getPrevious()?->getCode())
+            || str_contains($message, '1205')
+            || str_contains($message, '1213')
+            || str_contains($message, 'Lock wait timeout exceeded')
+            || str_contains($message, 'Deadlock found');
+    }
+
+    /**
+     * Determine whether an exception code, integer or string, is a MySQL lock wait timeout or deadlock code.
+     *
+     * @param int|string|null $code
+     * @return bool
+     */
+    private function isRetryableLockCode(int|string|null $code): bool
+    {
+        return in_array($code, [1205, 1213, '1205', '1213'], true);
+    }
+
+    /**
      * Format an Exploration warning into its output panel shape.
      *
-     * @param ExplorationWarning $warning The warning to format.
-     * @return array The formatted warning output panel.
+     * @param ExplorationWarning $warning
+     * @return array
      */
     private function formatWarningOutput(ExplorationWarning $warning): array
     {
@@ -463,8 +632,8 @@ class ExplorationLogService
     /**
      * Format an Exploration log into its output panel shape.
      *
-     * @param ExplorationLog $log The log to format.
-     * @return array The formatted log output panel.
+     * @param ExplorationLog $log
+     * @return array
      */
     private function formatLogOutput(ExplorationLog $log): array
     {
@@ -498,6 +667,8 @@ class ExplorationLogService
             'faction_points_gained' => $log->faction_points_gained,
             'currencies_gained' => $currencies,
             'summary' => $log->summary,
+            'chart_points' => self::chartPointsFrom($summary),
+            'phase' => $summary['phase'] ?? null,
             'current_round_creatures' => $summary['current_round_creatures'] ?? 0,
             'monster' => $this->formatMonster($monster, $log->monster_id, $monsterSnapshot),
             'totals' => [
@@ -523,11 +694,12 @@ class ExplorationLogService
     /**
      * Return the empty default Exploration output panel shape.
      *
-     * @return array The empty default output panel.
+     * @return array
      */
     private function emptyOutput(): array
     {
         return [
+            'phase' => null,
             'monster' => null,
             'totals' => [
                 'fights' => 0,
@@ -537,6 +709,7 @@ class ExplorationLogService
                 'faction_points' => 0,
             ],
             'currencies' => [],
+            'chart_points' => [],
             'damage' => [
                 'weapon' => 0,
                 'spell' => 0,
@@ -551,10 +724,10 @@ class ExplorationLogService
     /**
      * Format the current monster's display stats, preferring the log snapshot over live model data.
      *
-     * @param Monster|null $monster The base monster model, if it still exists.
-     * @param int $monsterId The monster id recorded on the log.
-     * @param array|null $snapshot The recorded monster snapshot, if any.
-     * @return array The formatted monster display data.
+     * @param Monster|null $monster
+     * @param int $monsterId
+     * @param array|null $snapshot
+     * @return array
      */
     private function formatMonster(?Monster $monster, int $monsterId, ?array $snapshot = null): array
     {
@@ -595,11 +768,11 @@ class ExplorationLogService
     /**
      * Resolve a single monster stat, preferring the log snapshot over live model data.
      *
-     * @param array|null $snapshot The recorded monster snapshot, if any.
-     * @param Monster|null $monster The base monster model, if it still exists.
-     * @param string $baseAttribute The monster model attribute name.
-     * @param string $runtimeAttribute The snapshot's runtime attribute key.
-     * @return mixed The resolved stat value.
+     * @param array|null $snapshot
+     * @param Monster|null $monster
+     * @param string $baseAttribute
+     * @param string $runtimeAttribute
+     * @return mixed
      */
     private function formatMonsterStat(?array $snapshot, ?Monster $monster, string $baseAttribute, string $runtimeAttribute): mixed
     {
@@ -611,13 +784,13 @@ class ExplorationLogService
     }
 
     /**
-     * Calculate the Exploration log's elapsed duration in seconds.
+     * Calculate the Exploration log's elapsed duration in whole seconds.
      *
-     * @param ExplorationLog $log The log to measure.
-     * @return int The elapsed duration in seconds.
+     * @param ExplorationLog $log
+     * @return int
      */
     private function duration(ExplorationLog $log): int
     {
-        return (int) $log->started_at->diffInSeconds($log->ended_at ?? now());
+        return self::secondsBetween($log->started_at, $log->ended_at ?? now());
     }
 }

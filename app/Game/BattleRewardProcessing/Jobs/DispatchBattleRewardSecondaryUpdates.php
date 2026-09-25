@@ -24,7 +24,7 @@ class DispatchBattleRewardSecondaryUpdates implements ShouldBeUniqueUntilProcess
     public function __construct(private readonly int $characterId) {}
 
     /**
-     * Dispatch the Character's non-authoritative Tops/profile and compatibility currency updates.
+     * Dispatch the Character's non-authoritative compatibility currency update.
      *
      * @param BattleRewardSecondaryUpdateService $battleRewardSecondaryUpdateService
      * @return void

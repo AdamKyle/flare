@@ -1,5 +1,5 @@
-import ExplorationMessageDefinition from '../../../../../api-definitions/chat/exploration-message-definition';
+import ExplorationMessageRecordDefinition from '../../../components/exploration-messages/definitions/exploration-message-record-definition';
 
 export interface UseExplorationMessagesDefinition {
-  explorationMessages: ExplorationMessageDefinition[];
+  explorationMessages: ExplorationMessageRecordDefinition[];
 }

@@ -3,17 +3,25 @@
 namespace Tests\Unit\Game\Character\Builders\AttackBuilders;
 
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Combat\Values\AttackType;
 use App\Game\Core\Items\Values\ItemType;
+use ErrorException;
+use Illuminate\Cache\ArrayStore;
+use Illuminate\Cache\Repository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use Mockery;
+use Tests\Setup\Battle\ServerFight\BuildMonsterFactory;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
+use Tests\Traits\CreateItemAffix;
 
 class CharacterCacheDataTest extends TestCase
 {
-    use CreateItem, RefreshDatabase;
+    use CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -75,6 +83,61 @@ class CharacterCacheDataTest extends TestCase
         $value = $this->characterCacheData->getCachedCharacterData($character, 'str');
 
         $this->assertGreaterThan(0, $value);
+    }
+
+    public function test_get_cached_character_data_discards_an_unreadable_character_sheet_and_rebuilds_it_from_the_character(): void
+    {
+        Log::spy();
+
+        $character = $this->character->equipBasicAttackLoadout()->getCharacter();
+        $cacheKey = 'character-sheet-'.$character->id;
+
+        Cache::swap(new Repository(new class($cacheKey) extends ArrayStore
+        {
+            private bool $hasFailedRead = false;
+
+            public function __construct(private readonly string $unreadableKey)
+            {
+                parent::__construct();
+            }
+
+            public function get($key)
+            {
+                if ($key !== $this->unreadableKey || $this->hasFailedRead) {
+                    return parent::get($key);
+                }
+
+                $this->hasFailedRead = true;
+
+                throw new ErrorException('unserialize(): Error at offset 0 of 42 bytes');
+            }
+        }));
+
+        Cache::put($cacheKey, ['level' => number_format($character->level), 'str' => -1]);
+
+        $value = $this->characterCacheData->getCachedCharacterData($character, 'str');
+
+        $this->assertGreaterThan(0, $value);
+        $this->assertSame($value, Cache::get($cacheKey)['str']);
+        Log::shouldHaveReceived('warning')->once()->with(
+            'Discarded an unreadable Character sheet cache entry.',
+            Mockery::on(fn (array $context): bool => $context['character_id'] === $character->id
+                && $context['cache_key'] === $cacheKey
+                && $context['exception_class'] === ErrorException::class
+                && $context['exception_message'] === 'unserialize(): Error at offset 0 of 42 bytes'),
+        );
+    }
+
+    public function test_get_cached_character_data_returns_a_value_from_a_valid_character_sheet_for_the_current_level(): void
+    {
+        $character = $this->character->equipBasicAttackLoadout()->getCharacter();
+
+        Cache::put('character-sheet-'.$character->id, [
+            'level' => number_format($character->level),
+            'str' => 12345,
+        ]);
+
+        $this->assertSame(12345, $this->characterCacheData->getCachedCharacterData($character, 'str'));
     }
 
     public function test_delete_character_sheet_data()
@@ -196,5 +259,55 @@ class CharacterCacheDataTest extends TestCase
         $data = $this->characterCacheData->characterSheetCache($character);
 
         $this->assertLessThan(1000, $data['weapon_attack']);
+    }
+
+    public function test_character_sheet_cache_stat_affixes_all_stat_reduction_is_plain_array_data_that_build_monster_can_consume_after_serialization()
+    {
+        $prefix = $this->createItemAffix([
+            'type' => 'prefix',
+            'reduces_enemy_stats' => true,
+            'str_reduction' => 0.5,
+        ]);
+        $item = $this->createItem(['type' => 'sword', 'item_prefix_id' => $prefix->id]);
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($item, true, 'left-hand')
+            ->getCharacter();
+
+        $data = $this->characterCacheData->characterSheetCache($character);
+
+        $rehydratedStatAffixes = unserialize(serialize($data['stat_affixes']));
+
+        $this->assertIsArray($rehydratedStatAffixes['all_stat_reduction']);
+        $this->assertSame(0.5, $rehydratedStatAffixes['all_stat_reduction']['str_reduction']);
+
+        $randomNumberGenerator = Mockery::mock(RandomNumberGenerator::class);
+        $randomNumberGenerator->shouldReceive('numberBetween')->once()->with('100', '100')->andReturn(100);
+
+        $buildMonster = (new BuildMonsterFactory)->buildBuildMonster(randomNumberGenerator: $randomNumberGenerator);
+
+        $result = $buildMonster->buildMonster([
+            'name' => 'Test Monster',
+            'only_for_location_type' => null,
+            'health_range' => '100-100',
+            'increases_damage_by' => null,
+            'accuracy' => 0.5,
+            'casting_accuracy' => 0.5,
+            'dodge' => 0.5,
+            'criticality' => 0.5,
+            'spell_evasion' => 0.5,
+            'affix_resistance' => 2.0,
+            'counter_resistance_chance' => 0.5,
+            'ambush_resistance_chance' => 0.5,
+            'str' => 100,
+            'int' => 100,
+            'dex' => 100,
+            'dur' => 100,
+            'agi' => 100,
+            'chr' => 100,
+            'focus' => 100,
+        ], $rehydratedStatAffixes, 0.0, 0.0);
+
+        $this->assertSame(50.0, $result->getMonsterStat('str'));
     }
 }

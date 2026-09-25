@@ -3,13 +3,17 @@ import React, { ReactNode } from 'react';
 import CharacterAlchemyBoons from './alchemy-boons/character-alchemy-boons';
 import { useManageCharacterInventoryVisibility } from './hooks/use-manage-character-inventory-visibility';
 import CharacterCardDetailsProps from './types/character-card-details-props';
-import { shortenNumber } from '../../../../../util/format-number';
+import CurrencyDisplay from '../../../../../reusable-components/currency/currency-display';
+import { CurrencyDisplayMode } from '../../../../../reusable-components/currency/enums/currency-display-mode';
+import { CurrencyType } from '../../../../../reusable-components/currency/enums/currency-type';
 import { AttackTypes } from '../../../../character-sheet/enums/attack-types';
 import { StatTypes } from '../../../../character-sheet/enums/stat-types';
 import { useManageAttackDetailsBreakdown } from '../../../../character-sheet/hooks/use-manage-attack-details-breakdown';
 import { useManageStatDetailsBreakdown } from '../../../../character-sheet/hooks/use-manage-stat-details-breakdown';
 import { useManageCharacterSheetVisibility } from '../../../../hooks/use-manage-character-sheet-visibility';
 import XpBar from '../../../components/character-details/xp-bar';
+
+import { shortenNumber } from 'game-utils/format-number';
 
 import Button from 'ui/buttons/button';
 import ProgressButton from 'ui/buttons/button-progress';
@@ -190,13 +194,41 @@ const CharacterCardDetails = ({
         <Separator />
         <Dl>
           <Dt>Gold:</Dt>
-          <Dd>{shortenNumber(characterData.gold)}</Dd>
+          <Dd>
+            <CurrencyDisplay
+              currency={CurrencyType.GOLD}
+              amount={characterData.gold}
+              display_mode={CurrencyDisplayMode.BALANCE}
+              show_label={false}
+            />
+          </Dd>
           <Dt>Gold Dust:</Dt>
-          <Dd>{shortenNumber(characterData.gold_dust)}</Dd>
+          <Dd>
+            <CurrencyDisplay
+              currency={CurrencyType.GOLD_DUST}
+              amount={characterData.gold_dust}
+              display_mode={CurrencyDisplayMode.BALANCE}
+              show_label={false}
+            />
+          </Dd>
           <Dt>Shards:</Dt>
-          <Dd>{shortenNumber(characterData.shards)}</Dd>
+          <Dd>
+            <CurrencyDisplay
+              currency={CurrencyType.SHARDS}
+              amount={characterData.shards}
+              display_mode={CurrencyDisplayMode.BALANCE}
+              show_label={false}
+            />
+          </Dd>
           <Dt>Copper Coins:</Dt>
-          <Dd>{shortenNumber(characterData.copper_coins)}</Dd>
+          <Dd>
+            <CurrencyDisplay
+              currency={CurrencyType.COPPER_COINS}
+              amount={characterData.copper_coins}
+              display_mode={CurrencyDisplayMode.BALANCE}
+              show_label={false}
+            />
+          </Dd>
         </Dl>
       </div>
       <Separator />

@@ -1,9 +1,16 @@
 import clsx from 'clsx';
-import React, { useCallback, useRef } from 'react';
+import React, { ReactNode, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
 import useTooltipDisclosure from 'ui/tool-tips/hooks/use-tooltip-disclosure';
 import useTooltipPlacement from 'ui/tool-tips/hooks/use-tooltip-placement';
 import BaseToolTipProps from 'ui/tool-tips/types/base-tool-tips-props';
+
+const isNodeInside = (
+  element: HTMLElement | null,
+  target: EventTarget | null
+): boolean =>
+  target instanceof Node && element !== null && element.contains(target);
 
 const BaseToolTip = (props: BaseToolTipProps) => {
   const {
@@ -15,7 +22,6 @@ const BaseToolTip = (props: BaseToolTipProps) => {
     on_open,
     on_close,
     content,
-    placementDeps,
     trigger,
     trigger_aria_label: triggerAriaLabel,
     placement = 'auto',
@@ -31,25 +37,42 @@ const BaseToolTip = (props: BaseToolTipProps) => {
     onClose: on_close,
   });
 
-  const { horizontal, vertical } = useTooltipPlacement({
-    containerRef,
+  const { position } = useTooltipPlacement({
     buttonRef,
     popoverRef,
     align,
+    placement,
     open,
-    extraDeps: placementDeps,
   });
 
-  const handlePointerEnter = (event: React.PointerEvent): void => {
+  const handleTriggerPointerEnter = (event: React.PointerEvent): void => {
     if (event.pointerType === 'mouse') {
       openTip();
     }
   };
 
-  const handlePointerLeave = (event: React.PointerEvent): void => {
-    if (event.pointerType === 'mouse') {
-      closeTip();
+  const handleTriggerPointerLeave = (event: React.PointerEvent): void => {
+    if (event.pointerType !== 'mouse') {
+      return;
     }
+
+    if (isNodeInside(popoverRef.current, event.relatedTarget)) {
+      return;
+    }
+
+    closeTip();
+  };
+
+  const handlePopoverPointerLeave = (event: React.PointerEvent): void => {
+    if (event.pointerType !== 'mouse') {
+      return;
+    }
+
+    if (isNodeInside(containerRef.current, event.relatedTarget)) {
+      return;
+    }
+
+    closeTip();
   };
 
   const handleKeyDown = (event: React.KeyboardEvent): void => {
@@ -59,52 +82,27 @@ const BaseToolTip = (props: BaseToolTipProps) => {
   };
 
   const handleBlur = (event: React.FocusEvent): void => {
-    const nextTarget = event.relatedTarget as Node | null;
-
-    if (
-      containerRef.current &&
-      nextTarget &&
-      containerRef.current.contains(nextTarget)
-    ) {
+    if (isNodeInside(containerRef.current, event.relatedTarget)) {
       return;
     }
 
     closeTip();
   };
 
-  const renderContentNode = useCallback(() => {
-    if (!open) {
-      return null;
+  const contentClassName = clsx('leading-snug', {
+    'text-base': size === 'md',
+    'text-sm': size !== 'md',
+  });
+
+  const renderContentNode = (): ReactNode => {
+    if (typeof content === 'string') {
+      return <p className={contentClassName}>{content}</p>;
     }
 
-    const isString = typeof content === 'string';
+    return <div className={contentClassName}>{content}</div>;
+  };
 
-    if (isString) {
-      return (
-        <p
-          className={clsx('leading-snug', {
-            'text-base': size === 'md',
-            'text-sm': size !== 'md',
-          })}
-        >
-          {content as string}
-        </p>
-      );
-    }
-
-    return (
-      <div
-        className={clsx('leading-snug', {
-          'text-base': size === 'md',
-          'text-sm': size !== 'md',
-        })}
-      >
-        {content as React.ReactNode}
-      </div>
-    );
-  }, [open, content, size]);
-
-  const renderTrigger = (): React.ReactNode => {
+  const renderTrigger = (): ReactNode => {
     if (trigger) {
       return (
         <button
@@ -114,9 +112,7 @@ const BaseToolTip = (props: BaseToolTipProps) => {
           aria-expanded={open}
           aria-describedby={open ? tooltipId : undefined}
           onClick={toggleTip}
-          className={clsx(
-            'focus-visible:ring-danube-500 dark:focus-visible:ring-danube-300 inline-flex items-center justify-center rounded focus:outline-none focus-visible:ring-2'
-          )}
+          className="focus-visible:ring-danube-500 dark:focus-visible:ring-danube-300 inline-flex items-center justify-center rounded focus:outline-none focus-visible:ring-2"
         >
           {trigger}
         </button>
@@ -131,63 +127,55 @@ const BaseToolTip = (props: BaseToolTipProps) => {
         aria-expanded={open}
         aria-describedby={open ? tooltipId : undefined}
         onClick={toggleTip}
-        className={clsx(
-          'mr-2 inline-flex h-7 w-7 items-center justify-center rounded',
-          'text-gray-500',
-          'dark:text-gray-400'
-        )}
+        className="mr-2 inline-flex h-7 w-7 items-center justify-center rounded text-gray-500 dark:text-gray-400"
       >
         <i className="fas fa-info-circle" aria-hidden="true" />
       </button>
     );
   };
 
-  const renderPopover = useCallback(() => {
+  const renderPopover = (): ReactNode => {
     if (!open) {
       return null;
     }
 
-    const placementClasses =
-      placement === 'above'
-        ? 'bottom-full left-1/2 -translate-x-1/2 mb-2 origin-bottom'
-        : clsx(
-            horizontal === 'right' ? 'left-full ml-1' : 'right-full mr-1',
-            vertical === 'below'
-              ? 'top-0 origin-top translate-y-[-6px]'
-              : 'bottom-full mb-1 origin-bottom'
-          );
-
-    return (
+    return createPortal(
       <div
         ref={popoverRef}
         id={tooltipId}
         role="tooltip"
         aria-live="polite"
+        onPointerLeave={handlePopoverPointerLeave}
+        onKeyDown={handleKeyDown}
+        style={{
+          top: position?.top ?? 0,
+          left: position?.left ?? 0,
+        }}
         className={clsx(
-          'absolute z-50 rounded-md border bg-white p-3 shadow-lg',
+          'fixed z-[99999] rounded-md border bg-white p-3 shadow-lg',
           'w-max max-w-72 break-words whitespace-normal sm:max-w-md sm:min-w-64',
           'max-h-[min(70vh,28rem)] overflow-auto',
           'border-gray-200 text-gray-800',
           'dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100',
-          placementClasses
+          { invisible: position === null }
         )}
       >
         {renderContentNode()}
-      </div>
+      </div>,
+      document.body
     );
-  }, [open, tooltipId, placement, horizontal, vertical, renderContentNode]);
+  };
 
   return (
     <span
       ref={containerRef}
       className="relative inline-flex items-center"
-      onPointerEnter={handlePointerEnter}
-      onPointerLeave={handlePointerLeave}
+      onPointerEnter={handleTriggerPointerEnter}
+      onPointerLeave={handleTriggerPointerLeave}
       onKeyDown={handleKeyDown}
       onBlur={handleBlur}
     >
       {renderTrigger()}
-
       {renderPopover()}
     </span>
   );

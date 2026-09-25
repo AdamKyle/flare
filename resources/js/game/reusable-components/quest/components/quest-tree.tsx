@@ -63,6 +63,7 @@ const QuestTree = ({
       accessibility_label={accessibilityLabel}
       mobile_mode={mobileMode}
       default_focus_node_id={defaultFocusNodeId}
+      default_zoom={0.7}
       available_empty_state={
         <p className="text-glacier-600 dark:text-glacier-400 text-sm">
           No Quests are currently available.

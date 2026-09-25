@@ -2,6 +2,10 @@ import React, { ReactNode, useMemo } from 'react';
 
 import BatchCraftingChartDataPointDefinition from './definitions/batch-crafting-chart-data-point-definition';
 import BatchCraftingOutcomeChartProps from './types/batch-crafting-outcome-chart-props';
+import CurrencyDisplay from '../../../../../../../../reusable-components/currency/currency-display';
+import { CurrencyDisplayMode } from '../../../../../../../../reusable-components/currency/enums/currency-display-mode';
+import { CurrencyType } from '../../../../../../../../reusable-components/currency/enums/currency-type';
+import { formatCurrencyText } from '../../../../../../../../reusable-components/currency/utils/format-currency-text';
 import { buildBatchCraftingChartData } from '../utils/build-batch-crafting-chart-data';
 import { formatBatchCraftingChartTime } from '../utils/format-batch-crafting-duration';
 
@@ -41,31 +45,37 @@ const RESOURCE_LINE_DEFINITIONS: Array<{
   data_key: ResourceLineKey;
   label: string;
   color: LineChartColor;
+  currency: CurrencyType;
 }> = [
   {
     data_key: 'gold_spent',
     label: 'Gold Spent',
     color: LineChartColor.REGENT_ST_BLUE,
+    currency: CurrencyType.GOLD,
   },
   {
     data_key: 'gold_gained',
     label: 'Gold Gained',
     color: LineChartColor.MARIGOLD,
+    currency: CurrencyType.GOLD,
   },
   {
     data_key: 'gold_dust_spent',
     label: 'Gold Dust Spent',
     color: LineChartColor.REGENT_ST_BLUE,
+    currency: CurrencyType.GOLD_DUST,
   },
   {
     data_key: 'shards_spent',
     label: 'Shards Spent',
     color: LineChartColor.MARIGOLD,
+    currency: CurrencyType.SHARDS,
   },
   {
     data_key: 'copper_coins_spent',
     label: 'Copper Coins Spent',
     color: LineChartColor.DANUBE,
+    currency: CurrencyType.COPPER_COINS,
   },
 ];
 
@@ -116,8 +126,16 @@ const BatchCraftingOutcomeChart = ({
       data_key: definition.data_key,
       label: definition.label,
       color: definition.color,
-      y_axis_key: 'gold' as const,
-      value_formatter: formatNumberWithCommas,
+      y_axis_key: 'gold',
+      value_formatter: (value: number) =>
+        formatCurrencyText(definition.currency, value),
+      value_renderer: (value: number) => (
+        <CurrencyDisplay
+          currency={definition.currency}
+          amount={value}
+          display_mode={CurrencyDisplayMode.EXACT}
+        />
+      ),
     }));
 
     return [...baseLines, ...resourceChartLines];

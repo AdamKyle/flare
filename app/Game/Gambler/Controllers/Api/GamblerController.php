@@ -4,26 +4,34 @@ namespace App\Game\Gambler\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Game\Gambler\Services\GamblerService;
-use App\Game\Gambler\Values\CurrencyValue;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class GamblerController extends Controller
 {
-    private GamblerService $gamblerService;
+    /**
+     * @param GamblerService $gamblerService
+     */
+    public function __construct(private readonly GamblerService $gamblerService) {}
 
-    public function __construct(GamblerService $gamblerService)
+    /**
+     * Return the slot machine symbols and the authenticated character's spin availability.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getSlots(Request $request): JsonResponse
     {
-        $this->gamblerService = $gamblerService;
+        return response()->json($this->gamblerService->getSlotStatus($request->user()->character));
     }
 
-    public function getSlots(): JsonResponse
-    {
-        return response()->json([
-            'icons' => CurrencyValue::getIcons(),
-        ]);
-    }
-
+    /**
+     * Spin the slot machine for the character.
+     *
+     * @param Character $character
+     * @return JsonResponse
+     */
     public function rollSlots(Character $character): JsonResponse
     {
         $response = $this->gamblerService->roll($character);

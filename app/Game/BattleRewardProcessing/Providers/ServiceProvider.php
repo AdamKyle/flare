@@ -9,11 +9,8 @@ use App\Game\BattleRewardProcessing\Handlers\GoldMinesRewardHandler;
 use App\Game\BattleRewardProcessing\Handlers\LocationSpecialtyHandler;
 use App\Game\BattleRewardProcessing\Handlers\PurgatorySmithHouseRewardHandler;
 use App\Game\BattleRewardProcessing\Handlers\TheOldChurchRewardHandler;
-use App\Game\BattleRewardProcessing\Services\BattleLocationRewardService;
-use App\Game\BattleRewardProcessing\Services\BattleRewardLedgerService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardMessageContext;
 use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
-use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\BattleRewardProcessing\Services\CharacterCurrencyRewardService;
 use App\Game\BattleRewardProcessing\Services\CharacterRewardService;
 use App\Game\BattleRewardProcessing\Services\CharacterXPService;
@@ -28,17 +25,12 @@ use App\Game\Core\Items\Builders\BuildMythicItem;
 use App\Game\Core\Items\Builders\BuildUniqueItem;
 use App\Game\Core\Items\Builders\RandomAffixGenerator;
 use App\Game\Core\Services\CharacterService;
-use App\Game\Core\Services\DropCheckService;
-use App\Game\Core\Services\GoldRush;
-use App\Game\Events\Contracts\BattleGlobalEventParticipation;
+use App\Game\Core\Values\LevelUpValue;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Gems\Progression\Contracts\CharacterAreaGemEffects;
-use App\Game\Gems\Progression\Services\GemWorldRewardService;
 use App\Game\Gems\Services\AreaGemEffectService;
 use App\Game\GuideQuests\Services\GuideQuestService;
-use App\Game\Monsters\Services\MonsterListService;
 use App\Game\Skills\Services\SkillService;
-use App\Game\Tops\Services\BroadcastTopsUpdateService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
 class ServiceProvider extends ApplicationServiceProvider
@@ -57,6 +49,7 @@ class ServiceProvider extends ApplicationServiceProvider
         ));
         $this->app->bind(CharacterXPService::class, fn ($app) => new CharacterXPService(
             $app->make(CharacterService::class),
+            $app->make(LevelUpValue::class),
             $app->make(SkillService::class),
             $app->make(BattleMessageHandler::class),
             $app->make(CharacterAreaGemEffects::class),
@@ -139,29 +132,6 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(WeeklyBattleService::class, function ($app) {
             return new WeeklyBattleService(
                 $app->make(LocationSpecialtyHandler::class),
-            );
-        });
-
-        $this->app->bind(BattleRewardService::class, function ($app) {
-            return new BattleRewardService(
-                $app->make(BattleMessageHandler::class),
-                $app->make(CharacterRewardService::class),
-                $app->make(FactionHandler::class),
-                $app->make(FactionLoyaltyBountyHandler::class),
-                $app->make(FactionLoyaltyService::class),
-                $app->make(GoldRush::class),
-                $app->make(BattleLocationRewardService::class),
-                $app->make(DropCheckService::class),
-                $app->make(WeeklyBattleService::class),
-                $app->make(SecondaryRewardService::class),
-                $app->make(BattleGlobalEventParticipation::class),
-                $app->make(SkillService::class),
-                $app->make(BattleRewardLedgerService::class),
-                $app->make(BattleRewardMessageContext::class),
-                $app->make(RandomAffixGenerator::class),
-                $app->make(BroadcastTopsUpdateService::class),
-                $app->make(GemWorldRewardService::class),
-                $app->make(MonsterListService::class),
             );
         });
 

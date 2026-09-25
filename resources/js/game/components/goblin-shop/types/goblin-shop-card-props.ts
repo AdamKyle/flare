@@ -4,4 +4,5 @@ export default interface GoblinShopCardProps {
   item: BaseUsableItemDefinition;
   view_item: (item_id: number) => void;
   action_disabled: boolean;
+  gold_bars: number;
 }

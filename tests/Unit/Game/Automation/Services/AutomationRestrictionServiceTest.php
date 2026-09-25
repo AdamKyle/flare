@@ -604,6 +604,98 @@ class AutomationRestrictionServiceTest extends TestCase
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::START_ITEM_CRAFTING));
     }
 
+    public function test_exploration_blocks_equipment_management(): void
+    {
+        $character = $this->character;
+
+        $this->createCharacterAutomation([
+            'character_id' => $character->id,
+            'type' => AutomationType::EXPLORING->value,
+            'started_at' => now(),
+            'completed_at' => now()->addSeconds(3),
+            'attack_type' => AttackType::ATTACK->value,
+            'started_in_special_location' => false,
+        ]);
+
+        $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::EQUIPMENT_MANAGEMENT));
+    }
+
+    public function test_exploration_allows_inventory_management(): void
+    {
+        $character = $this->character;
+
+        $this->createCharacterAutomation([
+            'character_id' => $character->id,
+            'type' => AutomationType::EXPLORING->value,
+            'started_at' => now(),
+            'completed_at' => now()->addSeconds(3),
+            'attack_type' => AttackType::ATTACK->value,
+            'started_in_special_location' => false,
+        ]);
+
+        $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::INVENTORY_MANAGEMENT));
+    }
+
+    public function test_delve_blocks_equipment_management(): void
+    {
+        $character = $this->character;
+
+        $this->createCharacterAutomation([
+            'character_id' => $character->id,
+            'type' => AutomationType::DELVE->value,
+            'started_at' => now(),
+            'completed_at' => now()->addSeconds(3),
+            'attack_type' => AttackType::ATTACK->value,
+        ]);
+
+        $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::EQUIPMENT_MANAGEMENT));
+    }
+
+    public function test_delve_allows_inventory_management(): void
+    {
+        $character = $this->character;
+
+        $this->createCharacterAutomation([
+            'character_id' => $character->id,
+            'type' => AutomationType::DELVE->value,
+            'started_at' => now(),
+            'completed_at' => now()->addSeconds(3),
+            'attack_type' => AttackType::ATTACK->value,
+        ]);
+
+        $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::INVENTORY_MANAGEMENT));
+    }
+
+    public function test_faction_loyalty_blocks_equipment_management(): void
+    {
+        $character = $this->character;
+
+        $this->createCharacterAutomation([
+            'character_id' => $character->id,
+            'type' => AutomationType::FACTION_LOYALTY->value,
+            'started_at' => now(),
+            'completed_at' => now()->addSeconds(3),
+            'attack_type' => AttackType::ATTACK->value,
+        ]);
+
+        $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::EQUIPMENT_MANAGEMENT));
+    }
+
+    public function test_faction_loyalty_allows_inventory_management(): void
+    {
+        $character = $this->character;
+
+        $this->createCharacterAutomation([
+            'character_id' => $character->id,
+            'type' => AutomationType::FACTION_LOYALTY->value,
+            'started_at' => now(),
+            'completed_at' => now()->addSeconds(3),
+            'attack_type' => AttackType::ATTACK->value,
+        ]);
+
+        $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::INVENTORY_MANAGEMENT));
+    }
+
     public function test_exploration_started_in_special_location_blocks_directional_movement(): void
     {
         $character = $this->character;

@@ -39,7 +39,9 @@ import NpcFormSidePeekProps from '../../../../../admin/npcs/components/side-peek
 import NpcImportSidePeekProps from '../../../../../admin/npcs/components/side-peeks/types/npc-import-side-peek-props';
 import AdminQuestDetailSidePeekProps from '../../../../../admin/quests/components/side-peeks/types/admin-quest-detail-side-peek-props';
 import RaceImportSidePeekProps from '../../../../../admin/races/components/side-peeks/types/race-import-side-peek-props';
+import ActivitySidePeekProps from '../../activity/types/activity-side-peek-props';
 import BackpackProps from '../../character-inventory/backpack/types/backpack-props';
+import EquippedItemDetailsProps from '../../character-inventory/equipped-item/types/equipped-item-details-props';
 import GemBagProps from '../../character-inventory/gem-bag/types/gem-bag-props';
 import SetsProps from '../../character-inventory/sets/types/sets-props';
 import UsableItemsProps from '../../character-inventory/usable-items/types/usable-items-props';
@@ -68,6 +70,7 @@ export type SidePeekComponentPropsMap = {
   [SidePeekComponentRegistrationEnum.GEM_BAG]: GemBagProps;
   [SidePeekComponentRegistrationEnum.USABLE_ITEMS]: UsableItemsProps;
   [SidePeekComponentRegistrationEnum.SETS]: SetsProps;
+  [SidePeekComponentRegistrationEnum.EQUIPPED_ITEM_DETAILS]: EquippedItemDetailsProps;
   [SidePeekComponentRegistrationEnum.MAP_ACTIONS_TELEPORT]: TeleportProps;
   [SidePeekComponentRegistrationEnum.LOCATION_DETAILS]: LocationDetailsProps;
   [SidePeekComponentRegistrationEnum.CHARACTER_KINGDOM_DETAILS]: CharacterKingdomDetailsProps;
@@ -83,6 +86,7 @@ export type SidePeekComponentPropsMap = {
   [SidePeekComponentRegistrationEnum.SERVER_CHAT_ITEM]: ServerChatItemProps;
   [SidePeekComponentRegistrationEnum.CRAFTED_ITEM]: CraftedItemProps;
   [SidePeekComponentRegistrationEnum.ITEM_DETAILS]: ItemDetailsProps;
+  [SidePeekComponentRegistrationEnum.ACTIVITY]: ActivitySidePeekProps;
   [SidePeekComponentRegistrationEnum.CLASS_DETAIL]: ClassDetailSidePeekProps;
   [SidePeekComponentRegistrationEnum.CLASS_MASTERY_DETAIL]: ClassMasteryDetailSidePeekProps;
   [Registration.CHARACTER_CLASS_RANK_DETAIL]: CharacterClassRankDetailSidePeekProps;

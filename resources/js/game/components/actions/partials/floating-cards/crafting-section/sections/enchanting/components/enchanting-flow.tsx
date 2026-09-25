@@ -159,6 +159,7 @@ const EnchantingFlow = (): ReactNode => {
       <EnchantingAffixSelection
         prefix={{
           items: prefixApi.affixes,
+          loadedAffixes: prefixApi.loadedAffixes,
           loading: prefixApi.loading,
           isLoadingMore: prefixApi.isLoadingMore,
           canLoadMore: prefixApi.canLoadMore,
@@ -168,6 +169,7 @@ const EnchantingFlow = (): ReactNode => {
         }}
         suffix={{
           items: suffixApi.affixes,
+          loadedAffixes: suffixApi.loadedAffixes,
           loading: suffixApi.loading,
           isLoadingMore: suffixApi.isLoadingMore,
           canLoadMore: suffixApi.canLoadMore,

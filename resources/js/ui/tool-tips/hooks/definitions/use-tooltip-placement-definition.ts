@@ -1,5 +1,5 @@
+import TooltipPosition from '../../types/tooltip-position';
+
 export default interface UseTooltipPlacementDefinition {
-  horizontal: 'left' | 'right';
-  vertical: 'above' | 'below';
-  place: () => void;
+  position: TooltipPosition | null;
 }

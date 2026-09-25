@@ -3,37 +3,30 @@
 namespace App\Game\Messages\Controllers\Api;
 
 use App\Flare\Models\Announcement;
-use App\Game\Events\Values\EventType;
-use App\Game\Raids\Values\RaidType;
+use App\Game\Messages\Services\AnnouncementPresenter;
 use App\Http\Controllers\Controller;
-use Carbon\Carbon;
-use Exception;
 use Illuminate\Http\JsonResponse;
 
 class AnnouncementsController extends Controller
 {
     /**
-     * @throws Exception
+     * @param AnnouncementPresenter $announcementPresenter
+     */
+    public function __construct(
+        private readonly AnnouncementPresenter $announcementPresenter,
+    ) {}
+
+    /**
+     * Return every Announcement, decorated for player-facing display.
+     *
+     * @return JsonResponse
      */
     public function fetchAnnouncements(): JsonResponse
     {
-        return response()->json(Announcement::orderByDesc('id')->get()->transform(function ($announcement) {
-            $announcement->expires_at_formatted = (new Carbon($announcement->expires_at))->format('l, j \of F \a\t h:ia \G\M\TP');
+        $announcements = Announcement::orderByDesc('id')->get()->transform(
+            fn (Announcement $announcement) => $this->announcementPresenter->present($announcement)
+        );
 
-            if (is_null($announcement->event)) {
-                return $announcement;
-            }
-
-            $eventType = new EventType($announcement->event->type);
-            $eventName = $eventType->getNameForEvent();
-
-            if ($eventType->isRaidEvent()) {
-                $eventName = new RaidType($announcement->event->raid->raid_type)->getNameForRaid();
-            }
-
-            $announcement->event_name = $eventName;
-
-            return $announcement;
-        }));
+        return response()->json($announcements);
     }
 }

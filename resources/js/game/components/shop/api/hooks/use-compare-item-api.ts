@@ -1,62 +1,95 @@
+import { useActivityTimeout } from 'api-handler/hooks/use-activity-timeout';
 import { useApiHandler } from 'api-handler/hooks/use-api-handler';
-import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { useCallback, useEffect, useState } from 'react';
+import { resolveApiErrorMessage } from 'api-handler/utils/resolve-api-error-message';
+import axios, { AxiosError } from 'axios';
+import { useEffect, useRef, useState } from 'react';
 
 import UseCompareItemApiDefinition from './definitions/use-compare-item-api-definition';
+import UseCompareItemApiQueryDefinition from './definitions/use-compare-item-api-query-definition';
 import UseCompareItemApiRequestParameters from './definitions/use-compare-item-api-request-params';
 import { UseCompareItemApiResponseDefinition } from './definitions/use-compare-item-api-response-definition';
-import { ItemComparison } from '../../../../api-definitions/items/item-comparison-details';
 
 export const useCompareItemApi = (
   params: UseCompareItemApiRequestParameters
 ): UseCompareItemApiDefinition => {
   const { apiHandler, getUrl } = useApiHandler();
+  const { handleInactivity } = useActivityTimeout();
 
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<ItemComparison | null>(null);
+  const [data, setData] = useState<UseCompareItemApiDefinition['data']>(null);
   const [error, setError] =
     useState<UseCompareItemApiDefinition['error']>(null);
 
-  // Depend on the character id (a stable primitive) rather than the whole
-  // `characterData` object, which is replaced on every unrelated character
-  // update and would otherwise re-trigger this fetch constantly.
-  const characterId = params.characterData?.id;
+  const abortControllerRef = useRef<AbortController | null>(null);
 
-  let url = '';
-
-  if (characterId) {
-    url = getUrl(params.url, { character: characterId });
-  }
-
-  const fetchComparisonData = useCallback(async () => {
-    if (!characterId) {
-      setLoading(false);
-    }
-
-    try {
-      const result = await apiHandler.get<
-        UseCompareItemApiResponseDefinition,
-        AxiosRequestConfig<AxiosResponse<UseCompareItemApiResponseDefinition>>
-      >(url, {
-        params: {
-          item_type: params.item_type,
-          item_name: params.item_name,
-        },
-      });
-
-      setData(result);
-    } catch (err) {
-      if (err instanceof AxiosError) {
-        setError(err.response?.data || null);
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [apiHandler, url, characterId, params.item_type, params.item_name]);
+  const characterId = params.characterData?.id ?? 0;
+  const { url, item_name: itemName, item_type: itemType } = params;
 
   useEffect(() => {
-    fetchComparisonData().catch(() => {});
-  }, [fetchComparisonData]);
+    if (characterId <= 0) {
+      setLoading(false);
+
+      return;
+    }
+
+    abortControllerRef.current?.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
+    setLoading(true);
+    setError(null);
+
+    const fetchComparisonData = async () => {
+      try {
+        const result = await apiHandler.get<
+          UseCompareItemApiResponseDefinition,
+          UseCompareItemApiQueryDefinition
+        >(getUrl(url, { character: characterId }), {
+          params: {
+            item_type: itemType,
+            item_name: itemName,
+          },
+          signal: controller.signal,
+        });
+
+        setData(result);
+      } catch (requestError) {
+        if (axios.isCancel(requestError)) {
+          return;
+        }
+
+        setError({
+          message: resolveApiErrorMessage(
+            requestError,
+            'Unable to load the item comparison.'
+          ),
+        });
+
+        if (requestError instanceof AxiosError) {
+          handleInactivity({ response: requestError, setError });
+        }
+      } finally {
+        if (abortControllerRef.current === controller) {
+          abortControllerRef.current = null;
+          setLoading(false);
+        }
+      }
+    };
+
+    void fetchComparisonData();
+
+    return () => {
+      controller.abort();
+    };
+  }, [
+    apiHandler,
+    getUrl,
+    handleInactivity,
+    url,
+    characterId,
+    itemType,
+    itemName,
+  ]);
 
   return {
     loading,

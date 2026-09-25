@@ -3,9 +3,6 @@
 namespace App\Game\Messages\Events;
 
 use App\Flare\Models\Announcement;
-use App\Game\Events\Values\EventType;
-use Carbon\Carbon;
-use Exception;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -20,29 +17,20 @@ class AnnouncementMessageEvent implements ShouldBroadcastNow
     public Announcement $announcement;
 
     /**
-     * @throws Exception
+     * @param Announcement $announcement
      */
     public function __construct(Announcement $announcement)
     {
-        $this->announcement = $this->appendAdditionalDetails($announcement);
+        $this->announcement = $announcement;
     }
 
     /**
-     * @return Channel|array|Channel[]|string[]
+     * Get the channel the Announcement message should broadcast on.
+     *
+     * @return Channel|array
      */
     public function broadcastOn(): Channel|array
     {
         return new PresenceChannel('announcement-message');
-    }
-
-    /**
-     * @throws Exception
-     */
-    protected function appendAdditionalDetails(Announcement $announcement): Announcement
-    {
-        $announcement->expires_at_formatted = (new Carbon($announcement->expires_at))->format('l, j \of F \a\t h:ia \G\M\TP');
-        $announcement->event_name = (new EventType($announcement->event->type))->getNameForEvent();
-
-        return $announcement;
     }
 }

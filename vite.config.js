@@ -12,6 +12,7 @@ export default defineConfig({
             'resources/css/styles.css',
             'resources/js/app.ts',
             'resources/js/game.ts',
+            'resources/js/onboarding.ts',
             'resources/js/admin-apps.ts',
             'resources/js/layouts/app-layout.ts',
             'resources/js/admin/monitoring/batch-crafting-monitoring.tsx',

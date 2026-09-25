@@ -5,6 +5,8 @@ namespace App\Flare\Models;
 use App\Game\Messages\Models\Message;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -49,6 +51,8 @@ class User extends Authenticatable
         'show_gold_dust_per_kill',
         'show_shards_per_kill',
         'show_copper_coins_per_kill',
+        'show_global_gem_progression_xp_messages',
+        'show_personal_gem_progression_xp_messages',
         'show_faction_point_message',
         'auto_disenchant',
         'disable_attack_type_popover',
@@ -106,6 +110,8 @@ class User extends Authenticatable
         'show_gold_dust_per_kill' => 'boolean',
         'show_shards_per_kill' => 'boolean',
         'show_copper_coins_per_kill' => 'boolean',
+        'show_global_gem_progression_xp_messages' => 'boolean',
+        'show_personal_gem_progression_xp_messages' => 'boolean',
         'show_faction_point_message' => 'boolean',
         'auto_disenchant' => 'boolean',
         'auto_sell_item' => 'boolean',
@@ -117,17 +123,30 @@ class User extends Authenticatable
         'show_intro_page' => 'boolean',
     ];
 
-    public function character()
+    /**
+     * Return the User's playable Character.
+     *
+     * @return HasOne
+     */
+    public function character(): HasOne
     {
         return $this->hasOne(Character::class);
     }
 
-    public function messages()
+    /**
+     * Return the User's server Messages.
+     *
+     * @return HasMany
+     */
+    public function messages(): HasMany
     {
         return $this->hasMany(Message::class);
     }
 
-    protected static function newFactory()
+    /**
+     * @return UserFactory
+     */
+    protected static function newFactory(): UserFactory
     {
         return UserFactory::new();
     }

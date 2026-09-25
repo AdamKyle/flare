@@ -14,15 +14,15 @@ use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Gems\Services\AreaGemEffectService;
 use App\Game\Maps\Transformers\GemWorldContextTransformer;
 
-/**
- * Resolves the Player-facing Gem World Map card action, contextual Map/Location
- * Gem World entry eligibility, and Gem World entry/exit, delegating all Gem
- * effect calculation to AreaGemEffectService and all traversal to TraverseService.
- */
 class GemWorldService
 {
     use ChecksAutomationRestrictions, ResponseBuilder;
 
+    /**
+     * @param TraverseService $traverseService
+     * @param AreaGemEffectService $areaGemEffectService
+     * @param GemWorldContextTransformer $gemWorldContextTransformer
+     */
     public function __construct(
         private readonly TraverseService $traverseService,
         private readonly AreaGemEffectService $areaGemEffectService,
@@ -33,6 +33,9 @@ class GemWorldService
      * Resolve the current Gem World Map card state: whether the Character is inside a
      * generated Gem World, the current inspectable Gem context, the single contextually
      * valid entry, and the exit destination.
+     *
+     * @param Character $character
+     * @return array
      */
     public function context(Character $character): array
     {
@@ -49,6 +52,9 @@ class GemWorldService
     /**
      * Enter the single contextually valid generated Gem World for the Character's current
      * persisted Map/Location state.
+     *
+     * @param Character $character
+     * @return array
      */
     public function enter(Character $character): array
     {
@@ -75,6 +81,9 @@ class GemWorldService
 
     /**
      * Exit the Character's current generated Gem World back to its authoritative parent Game Map.
+     *
+     * @param Character $character
+     * @return array
      */
     public function exit(Character $character): array
     {
@@ -103,6 +112,9 @@ class GemWorldService
 
     /**
      * Resolve the Character's current factual Gem context, when any effect is present.
+     *
+     * @param Character $character
+     * @return array|null
      */
     private function resolveCurrentContext(Character $character): ?array
     {
@@ -117,6 +129,9 @@ class GemWorldService
 
     /**
      * Resolve the Character's single contextually valid Gem World entry, when one exists.
+     *
+     * @param Character $character
+     * @return array|null
      */
     private function resolveEntry(Character $character): ?array
     {
@@ -137,6 +152,10 @@ class GemWorldService
 
     /**
      * Resolve the Location at the Character's exact current persisted coordinates.
+     *
+     * @param Character $character
+     * @param GameMap $gameMap
+     * @return Location|null
      */
     private function resolveCurrentLocation(Character $character, GameMap $gameMap): ?Location
     {
@@ -148,6 +167,10 @@ class GemWorldService
 
     /**
      * Resolve the Location Gem World entry for the Character's current Location, when eligible.
+     *
+     * @param Location $location
+     * @param GameMap $currentMap
+     * @return array|null
      */
     private function resolveLocationEntry(Location $location, GameMap $currentMap): ?array
     {
@@ -171,6 +194,9 @@ class GemWorldService
 
     /**
      * Resolve the Map Gem World entry for the Character's current normal Game Map, when eligible.
+     *
+     * @param GameMap $currentMap
+     * @return array|null
      */
     private function resolveMapEntry(GameMap $currentMap): ?array
     {
@@ -195,6 +221,10 @@ class GemWorldService
     /**
      * Determine whether the given Location Gem profile has a valid, correctly linked generated
      * Location Gem World for the Character's current normal Game Map.
+     *
+     * @param GameLocationGemParamter|null $profile
+     * @param GameMap $currentMap
+     * @return bool
      */
     private function isEligibleLocationGemWorld(?GameLocationGemParamter $profile, GameMap $currentMap): bool
     {
@@ -216,6 +246,10 @@ class GemWorldService
     /**
      * Determine whether the given Map Gem profile has a valid, correctly linked generated
      * Map Gem World for the Character's current normal Game Map.
+     *
+     * @param GameMapGemParamter|null $profile
+     * @param GameMap $currentMap
+     * @return bool
      */
     private function isEligibleMapGemWorld(?GameMapGemParamter $profile, GameMap $currentMap): bool
     {
@@ -236,6 +270,9 @@ class GemWorldService
 
     /**
      * Resolve the Gem World exit destination for the Character's current generated Map, when inside one.
+     *
+     * @param Character $character
+     * @return array|null
      */
     private function resolveExit(Character $character): ?array
     {
@@ -258,7 +295,27 @@ class GemWorldService
     }
 
     /**
+     * Resolve the Player-facing factual Gem context of a Game Map, when it has a rolled Gem.
+     *
+     * @param GameMap $gameMap
+     * @return array|null
+     */
+    public function gameMapGemContext(GameMap $gameMap): ?array
+    {
+        $effects = $this->areaGemEffectService->resolveForGameMap($gameMap);
+
+        if (empty($effects->sources())) {
+            return null;
+        }
+
+        return $this->gemWorldContextTransformer->transform($effects);
+    }
+
+    /**
      * Persist the Character's Gem World first-time introduction acknowledgement, once, server-side.
+     *
+     * @param Character $character
+     * @return array
      */
     public function acknowledgeIntroduction(Character $character): array
     {

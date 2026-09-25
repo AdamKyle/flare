@@ -2,6 +2,9 @@ import { debounce } from 'lodash';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import ShopCardDetails from './shop-card-details';
+import CurrencyDisplay from '../../../reusable-components/currency/currency-display';
+import { CurrencyDisplayMode } from '../../../reusable-components/currency/enums/currency-display-mode';
+import { CurrencyType } from '../../../reusable-components/currency/enums/currency-type';
 import Section from '../../../reusable-components/viewable-sections/section';
 import { UsePurchaseManyItems } from '../api/hooks/use-purchase-many-items';
 import ShopBuyManyProps from '../types/shop-buy-many-props';
@@ -238,7 +241,13 @@ const ShopBuyMany = ({ item, on_close }: ShopBuyManyProps) => {
           </span>
         </Dt>
         <Dd>
-          <span className="font-semibold">{formatNumberWithCommas(gold)}</span>
+          <CurrencyDisplay
+            currency={CurrencyType.GOLD}
+            amount={gold}
+            display_mode={CurrencyDisplayMode.BALANCE}
+            show_label={false}
+            additional_css="font-semibold"
+          />
         </Dd>
       </Section>
     );
@@ -280,9 +289,12 @@ const ShopBuyMany = ({ item, on_close }: ShopBuyManyProps) => {
             </span>
           </Dt>
           <Dd>
-            <span className="font-semibold">
-              {formatNumberWithCommas(totalWithTax)}
-            </span>
+            <CurrencyDisplay
+              currency={CurrencyType.GOLD}
+              amount={totalWithTax}
+              display_mode={CurrencyDisplayMode.EXACT}
+              additional_css="font-semibold"
+            />
           </Dd>
         </Section>
         {renderCannotBuyMessage()}

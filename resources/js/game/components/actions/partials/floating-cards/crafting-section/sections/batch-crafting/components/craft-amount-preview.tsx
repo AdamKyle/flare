@@ -1,6 +1,9 @@
 import React, { ReactNode } from 'react';
 
 import CraftAmountPreviewProps from './types/craft-amount-preview-props';
+import CurrencyDisplay from '../../../../../../../../reusable-components/currency/currency-display';
+import { CurrencyDisplayMode } from '../../../../../../../../reusable-components/currency/enums/currency-display-mode';
+import { CurrencyType } from '../../../../../../../../reusable-components/currency/enums/currency-type';
 import { outputDestinationLabel } from '../utils/batch-crafting-labels';
 
 import { formatNumberWithCommas } from 'game-utils/format-number';
@@ -13,8 +16,8 @@ import Dt from 'ui/dl/dt';
 import { ProgressBarVariant } from 'ui/progress/enums/progress-bar-variant';
 import ProgressBar from 'ui/progress/progress-bar';
 
-const renderBlocker = (blocker: string, index: number): ReactNode => (
-  <li key={`batch-crafting-blocker-${index}`}>{blocker}</li>
+const renderBlocker = (blocker: string): ReactNode => (
+  <li key={blocker}>{blocker}</li>
 );
 
 const CraftAmountPreview = ({
@@ -65,16 +68,44 @@ const CraftAmountPreview = ({
         <Dd>{formatNumberWithCommas(preview.requested_amount)}</Dd>
 
         <Dt>Cost / Item</Dt>
-        <Dd>{formatNumberWithCommas(preview.unit_cost)}</Dd>
+        <Dd>
+          <CurrencyDisplay
+            currency={CurrencyType.GOLD}
+            amount={preview.unit_cost}
+            display_mode={CurrencyDisplayMode.EXACT}
+            show_label={false}
+          />
+        </Dd>
 
         <Dt>Total Cost</Dt>
-        <Dd>{formatNumberWithCommas(preview.total_cost)}</Dd>
+        <Dd>
+          <CurrencyDisplay
+            currency={CurrencyType.GOLD}
+            amount={preview.total_cost}
+            display_mode={CurrencyDisplayMode.EXACT}
+            show_label={false}
+          />
+        </Dd>
 
         <Dt>Gold Available</Dt>
-        <Dd>{formatNumberWithCommas(preview.available_gold)}</Dd>
+        <Dd>
+          <CurrencyDisplay
+            currency={CurrencyType.GOLD}
+            amount={preview.available_gold}
+            display_mode={CurrencyDisplayMode.BALANCE}
+            show_label={false}
+          />
+        </Dd>
 
         <Dt>Gold After</Dt>
-        <Dd>{formatNumberWithCommas(preview.gold_after_purchase)}</Dd>
+        <Dd>
+          <CurrencyDisplay
+            currency={CurrencyType.GOLD}
+            amount={preview.gold_after_purchase}
+            display_mode={CurrencyDisplayMode.EXACT}
+            show_label={false}
+          />
+        </Dd>
 
         <Dt>Maximum Craftable</Dt>
         <Dd>{formatNumberWithCommas(preview.maximum_request_amount)}</Dd>

@@ -158,7 +158,7 @@ class EventSchedulerService
 
                 $name = AnnouncementHandler::getNameForType($params['selected_event_type']);
 
-                AnnouncementHandler::createAnnouncement($name);
+                AnnouncementHandler::createAnnouncement($name, $event);
             }
         }
 

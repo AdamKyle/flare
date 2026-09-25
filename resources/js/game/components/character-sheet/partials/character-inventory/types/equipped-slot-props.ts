@@ -5,4 +5,5 @@ export default interface EquippedSlotProps {
   positionName: string;
   position: Position;
   equipped_item?: BaseInventoryItemDefinition;
+  on_open_item_details: (equippedItem: BaseInventoryItemDefinition) => void;
 }

@@ -10,8 +10,11 @@ use App\Flare\Models\Monster;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Events\AutomationStatus;
 use App\Game\Automation\Events\AutomationTimeOut;
+use App\Game\Automation\Exploration\Events\ExplorationOutputUpdated;
 use App\Game\Automation\Exploration\Jobs\Exploration;
 use App\Game\Automation\Exploration\Services\ExplorationAutomationService;
+use App\Game\Automation\Exploration\Services\ExplorationLogService;
+use App\Game\Automation\Exploration\Values\ExplorationPhase;
 use App\Game\Automation\Values\AutomationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Combat\Values\AttackType;
@@ -21,6 +24,10 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
+use Mockery;
+use Mockery\MockInterface;
+use RuntimeException;
+use Tests\Setup\Automation\ExplorationAutomationServiceFactory;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\Monster\MonsterFactory;
 use Tests\TestCase;
@@ -48,7 +55,7 @@ class ExplorationAutomationServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->service = resolve(ExplorationAutomationService::class);
+        $this->service = (new ExplorationAutomationServiceFactory)->build();
 
         $this->character = (new CharacterFactory)
             ->createBaseCharacter()
@@ -222,7 +229,7 @@ class ExplorationAutomationServiceTest extends TestCase
 
         $response = $this->service->stopExploration($this->character);
 
-        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals(422, $response['status']);
     }
 
     public function test_stop_exploration_clears_character_survival_cache(): void
@@ -590,19 +597,78 @@ class ExplorationAutomationServiceTest extends TestCase
         $this->assertEquals(0, ExplorationWarning::where('character_id', $this->character->id)->count());
     }
 
-    public function test_begin_automation_falls_back_to_a_map_monster_when_no_monster_is_selected(): void
+    public function test_begin_automation_leaves_no_automation_row_when_log_start_fails(): void
     {
         Queue::fake();
         Event::fake();
 
         CharacterAutomation::where('character_id', $this->character->id)->delete();
 
-        $this->service->beginAutomation($this->character, [
+        $failingExplorationLogService = Mockery::mock(ExplorationLogService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('start')->once()->andThrow(new RuntimeException('Forced Exploration log start failure.'));
+        });
+
+        $service = (new ExplorationAutomationServiceFactory)->build($failingExplorationLogService);
+
+        $result = $service->beginAutomation($this->character, [
+            'selected_monster_id' => $this->monster->id,
+            'auto_attack_length' => 1,
+            'move_down_the_list_every' => 10,
             'attack_type' => AttackType::ATTACK->value,
         ]);
 
-        $automation = CharacterAutomation::where('character_id', $this->character->id)->first();
+        $this->assertEquals(422, $result['status']);
+        $this->assertNull(CharacterAutomation::where('character_id', $this->character->id)->first());
+        Event::assertNotDispatched(ExplorationOutputUpdated::class);
+        Queue::assertNotPushed(Exploration::class);
+    }
 
-        $this->assertSame($this->monster->id, $automation->monster_id);
+    public function test_begin_automation_broadcasts_exploration_output_after_a_successful_start(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $this->service->beginAutomation($this->character, [
+            'selected_monster_id' => $this->monster->id,
+            'auto_attack_length' => 1,
+            'move_down_the_list_every' => 10,
+            'attack_type' => AttackType::ATTACK->value,
+        ]);
+
+        Event::assertDispatched(ExplorationOutputUpdated::class);
+    }
+
+    public function test_begin_automation_broadcasts_the_waiting_phase_before_the_first_encounter(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $this->service->beginAutomation($this->character, [
+            'selected_monster_id' => $this->monster->id,
+            'auto_attack_length' => 1,
+            'move_down_the_list_every' => 10,
+            'attack_type' => AttackType::ATTACK->value,
+        ]);
+
+        Event::assertDispatched(ExplorationOutputUpdated::class, fn (ExplorationOutputUpdated $event): bool => $event->output['phase'] === ExplorationPhase::WAITING->value);
+    }
+
+    public function test_stop_exploration_targets_the_newest_active_exploration_automation(): void
+    {
+        Event::fake();
+
+        $newestAutomation = $this->createCharacterAutomation([
+            'character_id' => $this->character->id,
+            'monster_id' => $this->monster->id,
+            'type' => AutomationType::EXPLORING->value,
+            'started_at' => now(),
+            'completed_at' => now()->addSeconds(3),
+            'attack_type' => AttackType::ATTACK->value,
+        ]);
+
+        $this->service->stopExploration($this->character);
+
+        $this->assertNull(CharacterAutomation::find($newestAutomation->id));
+        $this->assertNotNull(CharacterAutomation::find($this->automation->id));
     }
 }

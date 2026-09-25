@@ -1,34 +1,18 @@
-import clsx from 'clsx';
 import React, { ReactNode } from 'react';
+
+import CombatStatusCurrency from './types/combat-status-currency';
+import CurrencyDisplay from '../../../../reusable-components/currency/currency-display';
+import { CurrencyDisplayMode } from '../../../../reusable-components/currency/enums/currency-display-mode';
+import { CurrencyType } from '../../../../reusable-components/currency/enums/currency-type';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
 
-import {
-  formatNumberWithCommas,
-  shortenNumber,
-} from 'game-utils/format-number';
+import { formatNumberWithCommas } from 'game-utils/format-number';
 
 import { ProgressBarSize } from 'ui/progress/enums/progress-bar-size';
 import { ProgressBarVariant } from 'ui/progress/enums/progress-bar-variant';
 import ProgressBar from 'ui/progress/progress-bar';
-import Separator from 'ui/separator/separator';
-import GeneralToolTip from 'ui/tool-tips/general-tool-tip';
 
-interface CurrencyDisplay {
-  key: string;
-  label: string;
-  value: number;
-  icon_class: string;
-  icon_color_class: string;
-  description?: string;
-}
-
-/**
- * Compact, always-live Character level/XP and currency strip for manual
- * combat. Reads directly from the globally mounted Character state so it
- * rerenders on the same websocket-driven updates that already keep the rest
- * of the game live, with no fetching or duplicated state of its own.
- */
 const CharacterCombatStatus = (): ReactNode => {
   const { gameData } = useGameData();
   const character = gameData?.character ?? null;
@@ -37,95 +21,45 @@ const CharacterCombatStatus = (): ReactNode => {
     return null;
   }
 
-  const isMaxLevel = character.level >= character.max_level;
+  const progression = gameData?.battleRewardProgression ?? null;
+  const displayedLevel = progression?.level ?? character.level;
+  const displayedXp = progression?.xp ?? character.xp;
+  const displayedXpNext = progression?.xp_next ?? character.xp_next;
 
-  const currencies: CurrencyDisplay[] = [
-    {
-      key: 'gold',
-      label: 'Gold',
-      value: character.gold,
-      icon_class: 'ra ra-gold-bar',
-      icon_color_class: 'text-marigold-600 dark:text-marigold-400',
-      description: 'Gold is the key currency of the game.',
-    },
-    {
-      key: 'gold_dust',
-      label: 'Gold Dust',
-      value: character.gold_dust,
-      icon_class: 'fas fa-magic',
-      icon_color_class: 'text-indigo-500 dark:text-indigo-300',
-    },
-    {
-      key: 'shards',
-      label: 'Shards',
-      value: character.shards,
-      icon_class: 'ra ra-crystals',
-      icon_color_class: 'text-glacier-600 dark:text-glacier-400',
-    },
-    {
-      key: 'copper_coins',
-      label: 'Copper Coins',
-      value: character.copper_coins,
-      icon_class: 'fas fa-coins',
-      icon_color_class: 'text-mango-tango-600 dark:text-mango-tango-400',
-    },
+  const isMaxLevel = displayedLevel >= character.max_level;
+
+  const currencies: CombatStatusCurrency[] = [
+    { currency: CurrencyType.GOLD, amount: character.gold },
+    { currency: CurrencyType.GOLD_DUST, amount: character.gold_dust },
+    { currency: CurrencyType.SHARDS, amount: character.shards },
+    { currency: CurrencyType.COPPER_COINS, amount: character.copper_coins },
   ];
 
-  const renderCurrency = (currency: CurrencyDisplay): ReactNode => {
-    const fullAmount = `${currency.label}: ${formatNumberWithCommas(currency.value)}`;
-
-    const tooltipContent = (
-      <div className="space-y-2">
-        <p className={clsx('font-semibold', currency.icon_color_class)}>
-          {currency.label}
-        </p>
-        {currency.description && <p>{currency.description}</p>}
-        <Separator />
-        <div className="flex items-center gap-2">
-          <i
-            className={`${currency.icon_class} ${currency.icon_color_class} text-base`}
-            aria-hidden="true"
-          />
-          <span>{fullAmount}</span>
-        </div>
-      </div>
-    );
-
-    return (
-      <GeneralToolTip
-        key={currency.key}
-        label={currency.label}
-        message={tooltipContent}
-        placement="above"
-        size="md"
-        trigger_aria_label={fullAmount}
-        trigger={
-          <span className="flex items-center gap-1.5">
-            <i
-              className={`${currency.icon_class} ${currency.icon_color_class} text-base`}
-              aria-hidden="true"
-            />
-            <span aria-hidden="true">{shortenNumber(currency.value)}</span>
-          </span>
-        }
-      />
-    );
-  };
+  const renderCurrency = (currency: CombatStatusCurrency): ReactNode => (
+    <CurrencyDisplay
+      key={currency.currency}
+      currency={currency.currency}
+      amount={currency.amount}
+      display_mode={CurrencyDisplayMode.BALANCE}
+      show_label={false}
+      additional_css="gap-1.5 text-base"
+    />
+  );
 
   return (
     <div className="space-y-2">
       <ProgressBar
-        label={`Lv. ${character.level}`}
-        value={character.xp}
-        max={Math.max(character.xp_next, 1)}
+        label={`Lv. ${displayedLevel}`}
+        value={displayedXp}
+        max={Math.max(displayedXpNext, 1)}
         size={ProgressBarSize.THIN}
         variant={ProgressBarVariant.XP}
         value_label={
           isMaxLevel
             ? 'Max'
-            : `${formatNumberWithCommas(character.xp)}/${formatNumberWithCommas(character.xp_next)}`
+            : `${formatNumberWithCommas(displayedXp)}/${formatNumberWithCommas(displayedXpNext)}`
         }
-        aria_label={`Character level ${character.level} experience progress`}
+        aria_label={`Character level ${displayedLevel} experience progress`}
       />
       <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-gray-800 lg:grid-cols-4 dark:text-gray-200">
         {currencies.map(renderCurrency)}

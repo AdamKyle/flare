@@ -1,5 +1,5 @@
 import UsePaginatedApiHandler from 'api-handler/hooks/use-paginated-api-handler';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 
 import SetOptionDefinition from './definitions/set-options-definition';
 import SetChoicesProps from './types/set-choices-props';
@@ -15,6 +15,7 @@ const SetChoices = ({
   character_id,
   on_set_change,
   on_set_selection_clear,
+  on_preselected_set_resolved,
   set_equipped_set_name,
   dont_show_equipped_set,
   initial_set_id,
@@ -60,6 +61,26 @@ const SetChoices = ({
     return { label: initial_set_name, value: initial_set_id };
   }, [initial_set_id, initial_set_name]);
 
+  const preselectedSet = useMemo((): SetOptionDefinition | null => {
+    if (initial_set_id) {
+      return data.find((set) => set.set_id === initial_set_id) ?? null;
+    }
+
+    if (!set_equipped_set_name) {
+      return null;
+    }
+
+    return data.find((set) => set.equipped) ?? data[0] ?? null;
+  }, [data, initial_set_id, set_equipped_set_name]);
+
+  useEffect(() => {
+    if (!on_preselected_set_resolved || preselectedSet === null) {
+      return;
+    }
+
+    on_preselected_set_resolved(preselectedSet);
+  }, [preselectedSet, on_preselected_set_resolved]);
+
   const setPreSelectedOption = () => {
     if (initialSetOption) {
       return initialSetOption;
@@ -72,7 +93,13 @@ const SetChoices = ({
     return preSelectedSetOption ?? setOptions[0];
   };
 
-  const handleSetSelection = (selectedSet: DropdownItem) => {
+  const handleSetSelection = (selectedOption: DropdownItem) => {
+    const selectedSet = data.find((set) => set.set_id === selectedOption.value);
+
+    if (!selectedSet) {
+      return;
+    }
+
     on_set_change(selectedSet);
   };
 

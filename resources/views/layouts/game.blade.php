@@ -35,15 +35,17 @@
     @vite('resources/js/layouts/app-layout.ts')
     @stack('head')
 </head>
-<body class="bg-gray-100 transition-colors duration-200 dark:bg-gray-800">
-    @include('layouts.partials.plain-header', [
-        'isLoggedIn' => true,
-        'user' => auth()->user(),
-    ])
-    <main>
-        @yield('content')
-    </main>
-    @vite('resources/js/game.ts')
+<body class="h-dvh overflow-hidden bg-gray-100 transition-colors duration-200 dark:bg-gray-800">
+    <div class="flex h-dvh min-h-0 flex-col overflow-hidden">
+        @include('layouts.partials.plain-header', [
+            'isLoggedIn' => true,
+            'user' => auth()->user(),
+        ])
+        <main class="min-h-0 flex-1 overflow-y-auto">
+            @yield('content')
+        </main>
+    </div>
+    @stack('game-app')
     <script>
         setInterval(() => {
             fetch('/api/game-heart-beat', {

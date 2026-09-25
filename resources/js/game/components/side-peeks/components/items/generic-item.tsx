@@ -20,6 +20,7 @@ const GenericItem = ({
   is_selected,
   on_item_selected,
   is_selection_disabled,
+  is_selectable = true,
   quest_item_ownership_state: questItemOwnershipState,
 }: GenericItemComponentProps): ReactNode => {
   const itemColor = backpackItemTextColors(item);
@@ -62,7 +63,7 @@ const GenericItem = ({
   };
 
   const renderCheckbox = () => {
-    if (item.type === InventoryItemTypes.QUEST) {
+    if (item.type === InventoryItemTypes.QUEST || !is_selectable) {
       return null;
     }
 
@@ -111,10 +112,16 @@ const GenericItem = ({
   }
 
   return (
-    <div className="grid grid-cols-[auto_1fr] items-start gap-3">
+    <div
+      className={clsx(
+        'grid items-start gap-3',
+        is_selectable ? 'grid-cols-[auto_1fr]' : 'grid-cols-1'
+      )}
+    >
       {renderCheckbox()}
 
       <button
+        type="button"
         className={clsx(
           backpackBaseItemStyles(),
           backpackFocusRingStyles(item),
@@ -126,7 +133,10 @@ const GenericItem = ({
         aria-labelledby={titleId}
         aria-describedby={detailsId}
       >
-        <i className="ra ra-bone-knife text-2xl text-gray-800 dark:text-gray-600" />
+        <i
+          className="ra ra-bone-knife text-2xl text-gray-800 dark:text-gray-600"
+          aria-hidden="true"
+        />
         <div className="text-left">
           <div
             id={titleId}

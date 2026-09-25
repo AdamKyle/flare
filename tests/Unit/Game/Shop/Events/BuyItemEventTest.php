@@ -2,16 +2,18 @@
 
 namespace Tests\Unit\Game\Shop\Events;
 
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Shop\Events\BuyItemEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
-use Tests\Traits\CreateClass;
 use Tests\Traits\CreateItem;
 
 class BuyItemEventTest extends TestCase
 {
-    use CreateClass, CreateItem, RefreshDatabase;
+    use CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -19,11 +21,7 @@ class BuyItemEventTest extends TestCase
     {
         parent::setUp();
 
-        $gameClass = $this->createClass([
-            'name' => 'Merchant',
-        ]);
-
-        $this->character = (new CharacterFactory)->createBaseCharacter([], $gameClass)->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
     protected function tearDown(): void
@@ -33,27 +31,31 @@ class BuyItemEventTest extends TestCase
         $this->character = null;
     }
 
-    public function test_merchant_should_get_a_discount()
+    public function test_completed_purchase_broadcasts_the_updated_currencies_and_inventory_count(): void
     {
+        Event::fake([UpdateCharacterCurrenciesEvent::class, UpdateCharacterInventoryCountEvent::class]);
+
         $character = $this->character->getCharacter();
-
-        $character->update([
-            'gold' => 10,
-        ]);
-
-        $item = $this->createItem([
-            'name' => 'something',
-            'type' => 'weapon',
-            'cost' => 10,
-        ]);
-
-        $character = $character->refresh();
+        $item = $this->createItem(['type' => 'weapon', 'cost' => 10]);
 
         event(new BuyItemEvent($item, $character));
 
+        Event::assertDispatched(UpdateCharacterCurrenciesEvent::class);
+        Event::assertDispatched(UpdateCharacterInventoryCountEvent::class);
+    }
+
+    public function test_handling_a_completed_purchase_does_not_charge_gold_or_add_items(): void
+    {
+        $character = $this->character->getCharacter();
+        $character->update(['gold' => 10]);
+
+        $item = $this->createItem(['type' => 'weapon', 'cost' => 10]);
+
+        event(new BuyItemEvent($item, $character->refresh()));
+
         $character = $character->refresh();
 
-        $this->assertNotEmpty($character->inventory->slots);
-        $this->assertEquals(3, $character->gold);
+        $this->assertSame(10, $character->gold);
+        $this->assertNull($character->inventory->slots->firstWhere('item_id', $item->id));
     }
 }

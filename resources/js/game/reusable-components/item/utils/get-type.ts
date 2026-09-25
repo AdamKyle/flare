@@ -1,15 +1,21 @@
 import { BaseItemDetails } from '../../../api-definitions/items/base-item-details';
-import { EquippableItemWithBase } from '../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
-import { InventoryItemTypes } from '../../../components/character-sheet/partials/character-inventory/enums/inventory-item-types';
+import {
+  InventoryItemTypes,
+  weaponTypes,
+} from '../../../components/character-sheet/partials/character-inventory/enums/inventory-item-types';
 import { ItemBaseTypes } from '../enums/item-base-type';
 import { ItemBaseType } from '../types/item-base-type';
 
 export const getType = (
-  item: EquippableItemWithBase | BaseItemDetails,
+  item: Pick<BaseItemDetails, 'type'>,
   armourPositions: InventoryItemTypes[]
-): ItemBaseType => {
-  if (armourPositions.includes(item.type as InventoryItemTypes)) {
+): ItemBaseType | null => {
+  if (armourPositions.includes(item.type)) {
     return ItemBaseTypes.Armour;
+  }
+
+  if (weaponTypes.includes(item.type)) {
+    return ItemBaseTypes.Weapon;
   }
 
   switch (item.type) {
@@ -20,7 +26,13 @@ export const getType = (
     case InventoryItemTypes.RING:
       return ItemBaseTypes.Ring;
 
+    case InventoryItemTypes.TRINKET:
+      return ItemBaseTypes.Trinket;
+
+    case InventoryItemTypes.ARTIFACT:
+      return ItemBaseTypes.Artifact;
+
     default:
-      return ItemBaseTypes.Weapon;
+      return null;
   }
 };

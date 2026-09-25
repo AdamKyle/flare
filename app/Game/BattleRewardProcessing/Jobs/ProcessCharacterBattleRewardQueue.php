@@ -8,23 +8,18 @@ use App\Flare\Models\CharacterBattleRewardRequest;
 use App\Flare\Models\GuideQuest;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Quest;
-use App\Game\Automation\Delve\Events\DelveStatusUpdated;
-use App\Game\Automation\Exploration\Services\ExplorationLogService;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestStatus;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepName;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepStatus;
 use App\Game\BattleRewardProcessing\Exceptions\WeeklyRewardInventoryFullException;
 use App\Game\BattleRewardProcessing\Services\BattleRewardLedgerService;
-use App\Game\BattleRewardProcessing\Services\BattleRewardLiveUpdateService;
-use App\Game\BattleRewardProcessing\Services\BattleRewardMessageOutboxService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardSharedContextService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardStepPlanService;
 use App\Game\BattleRewardProcessing\Values\BattleRewardSharedContext;
 use App\Game\Character\Exceptions\MissingInventoryException;
-use App\Game\Core\Traits\SafelyBroadcastsEvents;
 use App\Game\GuideQuests\Services\GuideQuestService;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Quests\Handlers\NpcQuestRewardHandler;
@@ -39,7 +34,7 @@ use Throwable;
 
 class ProcessCharacterBattleRewardQueue implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SafelyBroadcastsEvents, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private const MAX_REQUESTS = 50;
 
@@ -53,18 +48,15 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
     public function __construct(private readonly int $characterId) {}
 
     /**
-     * Process the Character's pending battle reward requests under the per-Character processor lock.
+     * Apply the Character's pending battle reward mutations under the per-Character processor lock, then hand presentation to the presentation lane.
      *
      * @param BattleRewardProcessingQueueManager $queueManager
      * @param BattleRewardService $battleRewardService
      * @param NpcQuestRewardHandler $npcQuestRewardHandler
      * @param GuideQuestService $guideQuestService
-     * @param ExplorationLogService $explorationLogService
      * @param BattleRewardStepPlanService $battleRewardStepPlanService
      * @param BattleRewardSharedContextService $battleRewardSharedContextService
-     * @param BattleRewardLiveUpdateService $battleRewardLiveUpdateService
-     * @param ?BattleRewardLedgerService $battleRewardLedgerService
-     * @param ?BattleRewardMessageOutboxService $battleRewardMessageOutboxService
+     * @param BattleRewardLedgerService $battleRewardLedgerService
      * @return void
      */
     public function handle(
@@ -72,16 +64,10 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
         BattleRewardService $battleRewardService,
         NpcQuestRewardHandler $npcQuestRewardHandler,
         GuideQuestService $guideQuestService,
-        ExplorationLogService $explorationLogService,
         BattleRewardStepPlanService $battleRewardStepPlanService,
         BattleRewardSharedContextService $battleRewardSharedContextService,
-        BattleRewardLiveUpdateService $battleRewardLiveUpdateService,
-        ?BattleRewardLedgerService $battleRewardLedgerService = null,
-        ?BattleRewardMessageOutboxService $battleRewardMessageOutboxService = null,
+        BattleRewardLedgerService $battleRewardLedgerService,
     ): void {
-        $battleRewardLedgerService ??= new BattleRewardLedgerService();
-        $battleRewardMessageOutboxService ??= new BattleRewardMessageOutboxService();
-
         $lockKey = 'character-reward-queue:'.$this->characterId;
 
         Log::channel('reward_processing')->debug('Processor job starts. Attempting lock.', [
@@ -137,6 +123,7 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
         $shouldCheckPendingAfterUnlock = false;
         $capacityRetryPaused = false;
         $secondaryPlayerUpdatesDirty = false;
+        $presentationDirty = false;
         $heartbeatCallback = fn () => $queueManager->updateHeartbeat($this->characterId);
 
         Log::channel('reward_processing')->debug('Processor loop starts.', [
@@ -247,37 +234,18 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
                         ),
                     };
 
-                    Log::channel('reward_processing')->debug('After reward processing. Starting final player updates.', [
+                    $queueManager->markCompleted($request);
+
+                    $secondaryPlayerUpdatesDirty = true;
+                    $presentationDirty = true;
+                    $requestResult = 'completed';
+
+                    Log::channel('reward_processing')->debug('Reward mutation completed. Presentation deferred to the presentation lane.', [
                         'character_id' => $this->characterId,
                         'request_id' => $request->id,
                         'source_type' => $request->source_type?->value,
                         'elapsed_ms' => intdiv(hrtime(true) - $loopStartedAtNs, 1_000_000),
                         'memory_usage' => memory_get_usage(true),
-                    ]);
-
-                    $this->runFinalPlayerUpdatesStep(
-                        $request,
-                        $battleRewardLedgerService,
-                        $request->source_type,
-                        $battleRewardLiveUpdateService,
-                        $explorationLogService,
-                    );
-
-                    $secondaryPlayerUpdatesDirty = true;
-
-                    $this->runMessageOutboxStep(
-                        $request,
-                        $battleRewardLedgerService,
-                        $battleRewardMessageOutboxService,
-                    );
-
-                    $queueManager->markCompleted($request);
-
-                    $requestResult = 'completed';
-
-                    Log::channel('reward_processing')->debug('Final player updates finished.', [
-                        'character_id' => $this->characterId,
-                        'request_id' => $request->id,
                     ]);
                 } catch (Throwable $exception) {
                     if ($exception instanceof MissingInventoryException) {
@@ -320,14 +288,6 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
                             $queueManager->markNotificationRetryable($request, $activeStep, $exception);
                             $notificationRetryScheduled = true;
                             $capacityRetryPaused = true;
-                            $requestResult = 'retryable';
-                        } elseif (! is_null($activeStep) && in_array($activeStep->step_name, [
-                            BattleRewardStepName::FINAL_PLAYER_UPDATES,
-                            BattleRewardStepName::MESSAGE_OUTBOX,
-                        ], true)) {
-                            $queueManager->markNotificationRetryable($request, $activeStep, $exception);
-                            $notificationRetryScheduled = true;
-                            $shouldDispatchAfterUnlock = true;
                             $requestResult = 'retryable';
                         } else {
                             if (! is_null($activeStep)) {
@@ -403,6 +363,12 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
                     ->onConnection('battle_reward_processing')
                     ->onQueue('battle_reward_secondary');
             }
+
+            if ($presentationDirty) {
+                ProcessCharacterBattleRewardPresentationQueue::dispatch($this->characterId)
+                    ->onConnection('battle_reward_processing')
+                    ->onQueue('battle_reward_presentation');
+            }
         }
 
         if ($shouldCheckPendingAfterUnlock && $queueManager->hasPendingRequests($this->characterId)) {
@@ -422,56 +388,6 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
             self::dispatch($this->characterId)
                 ->onConnection('battle_reward_processing')
                 ->onQueue('battle_reward_processing');
-        }
-    }
-
-    /**
-     * Run the request's FINAL_PLAYER_UPDATES ledger step, dispatching the source-specific live update.
-     *
-     * @param CharacterBattleRewardRequest $request
-     * @param BattleRewardLedgerService $battleRewardLedgerService
-     * @param BattleRewardRequestSourceType $sourceType
-     * @param BattleRewardLiveUpdateService $battleRewardLiveUpdateService
-     * @param ExplorationLogService $explorationLogService
-     * @return void
-     */
-    private function runFinalPlayerUpdatesStep(
-        CharacterBattleRewardRequest $request,
-        BattleRewardLedgerService $battleRewardLedgerService,
-        BattleRewardRequestSourceType $sourceType,
-        BattleRewardLiveUpdateService $battleRewardLiveUpdateService,
-        ExplorationLogService $explorationLogService,
-    ): void {
-        $step = $request->steps()
-            ->where('step_name', BattleRewardStepName::FINAL_PLAYER_UPDATES)
-            ->first();
-
-        if (is_null($step)) {
-            throw new RuntimeException(
-                'Reward request '.$request->id.' has no FINAL_PLAYER_UPDATES ledger row. The ledger is incomplete.',
-            );
-        }
-
-        if ($step->status === BattleRewardStepStatus::COMPLETED) {
-            $battleRewardLedgerService->log('step.skipped_completed', $request, $step);
-
-            return;
-        }
-
-        $step = $battleRewardLedgerService->startStep($step);
-
-        try {
-            $this->dispatchFinalPlayerUpdates(
-                $sourceType,
-                $battleRewardLiveUpdateService,
-                $explorationLogService,
-            );
-
-            $battleRewardLedgerService->completeStep($step);
-        } catch (Throwable $throwable) {
-            $battleRewardLedgerService->failStep($step, $throwable);
-
-            throw $throwable;
         }
     }
 
@@ -507,34 +423,6 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
         }
 
         throw $failure;
-    }
-
-    /**
-     * Run the request's MESSAGE_OUTBOX ledger step, emitting any unemitted durable messages.
-     *
-     * @param CharacterBattleRewardRequest $request
-     * @param BattleRewardLedgerService $battleRewardLedgerService
-     * @param BattleRewardMessageOutboxService $battleRewardMessageOutboxService
-     * @return void
-     */
-    private function runMessageOutboxStep(
-        CharacterBattleRewardRequest $request,
-        BattleRewardLedgerService $battleRewardLedgerService,
-        BattleRewardMessageOutboxService $battleRewardMessageOutboxService,
-    ): void {
-        $step = $request->steps()
-            ->where('step_name', BattleRewardStepName::MESSAGE_OUTBOX)
-            ->firstOrFail();
-
-        if ($step->status === BattleRewardStepStatus::COMPLETED) {
-            $battleRewardLedgerService->log('step.skipped_completed', $request, $step);
-
-            return;
-        }
-
-        $step = $battleRewardLedgerService->startStep($step);
-        $emittedCount = $battleRewardMessageOutboxService->emitUnemittedMessages($request);
-        $battleRewardLedgerService->completeStep($step, ['emitted_message_count' => $emittedCount]);
     }
 
     /**
@@ -596,65 +484,6 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
         self::dispatch($this->characterId)
             ->onConnection('battle_reward_processing')
             ->onQueue('battle_reward_processing');
-    }
-
-    /**
-     * Dispatch the authoritative live player update, plus any source-specific output update.
-     *
-     * @param BattleRewardRequestSourceType $sourceType
-     * @param BattleRewardLiveUpdateService $battleRewardLiveUpdateService
-     * @param ExplorationLogService $explorationLogService
-     * @return void
-     */
-    private function dispatchFinalPlayerUpdates(
-        BattleRewardRequestSourceType $sourceType,
-        BattleRewardLiveUpdateService $battleRewardLiveUpdateService,
-        ExplorationLogService $explorationLogService,
-    ): void {
-        $character = Character::find($this->characterId)?->refresh();
-
-        if (is_null($character)) {
-            return;
-        }
-
-        Log::channel('reward_processing')->debug('Authoritative live reward update attempted.', [
-            'character_id' => $this->characterId,
-        ]);
-
-        $battleRewardLiveUpdateService->broadcast($this->characterId);
-
-        if ($sourceType === BattleRewardRequestSourceType::EXPLORATION) {
-            Log::channel('reward_processing')->debug('Exploration output update attempted.', [
-                'character_id' => $this->characterId,
-            ]);
-
-            try {
-                $explorationLogService->outputForCharacter($character);
-            } catch (Throwable $throwable) {
-                Log::channel('reward_processing')->warning('Exploration output update failed. Reward row will not be marked failed.', [
-                    'character_id' => $this->characterId,
-                    'exception_class' => $throwable::class,
-                    'exception_message' => $throwable->getMessage(),
-                ]);
-
-                Log::warning('Unable to dispatch exploration reward queue update.', [
-                    'character_id' => $this->characterId,
-                    'exception_class' => $throwable::class,
-                    'exception' => $throwable->getMessage(),
-                ]);
-            }
-        }
-
-        if ($sourceType === BattleRewardRequestSourceType::AUTOMATION) {
-            Log::channel('reward_processing')->debug('Delve status update attempted.', [
-                'character_id' => $this->characterId,
-            ]);
-
-            $this->safelyDispatchBroadcastEvent(
-                new DelveStatusUpdated($character->user_id),
-                ['character_id' => $this->characterId]
-            );
-        }
     }
 
     /**

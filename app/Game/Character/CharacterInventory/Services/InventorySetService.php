@@ -343,7 +343,19 @@ class InventorySetService
             }
 
             if ($slot->item->type === 'trinket') {
-                $data = $this->setPositionEquipData($slot, $data, 'trinket-one', 'trinket-two');
+                $data[$slot->id] = [
+                    'item_id' => $slot->item->id,
+                    'equipped' => true,
+                    'position' => 'trinket',
+                ];
+            }
+
+            if ($slot->item->type === 'artifact') {
+                $data[$slot->id] = [
+                    'item_id' => $slot->item->id,
+                    'equipped' => true,
+                    'position' => 'artifact',
+                ];
             }
 
             if (in_array($slot->item->default_position, $armourPositions)) {
@@ -370,6 +382,64 @@ class InventorySetService
     }
 
     /**
+     * Repair legacy Trinket and Artifact slot positions on an already-equipped inventory set.
+     *
+     * @param InventorySet $inventorySet
+     * @return void
+     */
+    public function normalizeEquippedSetSlotPositions(InventorySet $inventorySet): void
+    {
+        if ($inventorySet->is_equipped !== true) {
+            return;
+        }
+
+        $inventorySet->loadMissing('slots.item');
+
+        foreach ($inventorySet->slots as $slot) {
+            $this->normalizeEquippedSetSlotPosition($slot);
+        }
+    }
+
+    /**
+     * Persist the canonical equipped position for a Trinket or Artifact set slot when it is not already canonical.
+     *
+     * @param SetSlot $slot
+     * @return void
+     */
+    private function normalizeEquippedSetSlotPosition(SetSlot $slot): void
+    {
+        $canonicalPosition = $this->resolveCanonicalEquippedSetSlotPosition($slot);
+
+        if (is_null($canonicalPosition)) {
+            return;
+        }
+
+        if ($slot->equipped === true && $slot->position === $canonicalPosition) {
+            return;
+        }
+
+        $slot->update([
+            'equipped' => true,
+            'position' => $canonicalPosition,
+        ]);
+    }
+
+    /**
+     * Resolve the canonical equipped position for a Trinket or Artifact set slot.
+     *
+     * @param SetSlot $slot
+     * @return string|null
+     */
+    private function resolveCanonicalEquippedSetSlotPosition(SetSlot $slot): ?string
+    {
+        return match (ItemType::tryFrom($slot->item->type)) {
+            ItemType::TRINKET => 'trinket',
+            ItemType::ARTIFACT => 'artifact',
+            default => null,
+        };
+    }
+
+    /**
      * Checks to see if the set is equippable.
      */
     public function isSetEquippable(InventorySet $inventorySet): bool
@@ -393,7 +463,7 @@ class InventorySetService
             }
         }
 
-        // Bail if we have more than two trinkets
+        // Bail if we have more than one trinket.
         if (! $this->hasTrinkets($inventorySet)) {
             return false;
         }
@@ -408,7 +478,7 @@ class InventorySetService
             return false;
         }
 
-        // Bail if we have more than two artifacts.
+        // Bail if we have more than one artifact.
         if (! $this->hasArtifacts($inventorySet)) {
             return false;
         }
@@ -527,7 +597,7 @@ class InventorySetService
     }
 
     /**
-     * Do you only have two trinkets?
+     * Do you have at most one trinket?
      */
     protected function hasTrinkets(InventorySet $inventorySet): bool
     {
@@ -543,7 +613,7 @@ class InventorySetService
     }
 
     /**
-     * Do you only have a max of 2 artifacts.
+     * Do you have at most one artifact?
      */
     public function hasArtifacts(InventorySet $inventorySet): bool
     {

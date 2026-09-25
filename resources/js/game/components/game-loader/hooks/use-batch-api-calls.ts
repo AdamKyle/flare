@@ -18,6 +18,8 @@ export const useBatchApiCalls = (
     monsters: [],
     announcements: [],
     hasNewAnnouncements: false,
+    explorationOutput: null,
+    battleRewardProgression: null,
   });
 
   const hasExecutedRef = useRef(false);

@@ -3,9 +3,41 @@
 namespace Tests\Unit\Game\Market\Services;
 
 use App\Flare\Models\MarketBoard as MarketBoardModel;
+use App\Flare\Pagination\Pagination;
+use App\Flare\Transformers\Serializer\PlainDataSerializer;
+use App\Game\Character\CharacterAttack\Transformers\CharacterAttackTransformer;
+use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
+use App\Game\Character\CharacterInventory\Services\ComparisonService;
+use App\Game\Character\CharacterInventory\Services\EquipItemService;
+use App\Game\Character\CharacterInventory\Services\InventorySetService;
+use App\Game\Character\CharacterInventory\Transformers\CharacterGemsTransformer;
+use App\Game\Character\CharacterInventory\Transformers\CharacterInventoryCountTransformer;
+use App\Game\Character\CharacterInventory\Transformers\InventorySetOptionTransformer;
+use App\Game\Character\CharacterInventory\Transformers\InventoryTransformer;
+use App\Game\Character\CharacterInventory\Validations\SetHandsValidation;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\PhpRandomNumberGenerator;
 use App\Game\Core\Currency\Services\CurrencyLimit;
+use App\Game\Core\Items\Enricher\EquippableEnricher;
+use App\Game\Core\Items\Enricher\ItemEnricherFactory;
+use App\Game\Core\Items\Transformers\Api\UsableItemTransformer as ApiUsableItemTransformer;
+use App\Game\Core\Items\Transformers\EquippableItemTransformer;
+use App\Game\Core\Items\Transformers\ItemTransformer;
+use App\Game\Core\Items\Transformers\QuestItemTransformer;
+use App\Game\Core\Items\Transformers\UsableItemTransformer;
+use App\Game\Core\Values\ValidEquipPositionsValue;
+use App\Game\Gems\Services\GemComparison;
+use App\Game\Gems\Services\ItemAtonements;
 use App\Game\Market\Services\MarketBoard;
+use App\Game\Market\Services\MarketRealtimePublisher;
+use App\Game\Market\Transformers\MarketItemsTransformer;
+use App\Game\Skills\Services\DisenchantService;
+use App\Game\Skills\Services\MassDisenchantService;
+use App\Game\Skills\Services\SkillCheckService;
+use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use League\Fractal\Manager;
+use Mockery;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
@@ -20,12 +52,60 @@ class MarketBoardBatchCraftingTest extends TestCase
     {
         parent::setUp();
 
-        $this->marketBoard = resolve(MarketBoard::class);
+        $manager = new Manager;
+        $plainDataSerializer = new PlainDataSerializer;
+        $randomNumberGenerator = new PhpRandomNumberGenerator;
+        $equippableItemTransformer = new EquippableItemTransformer;
+        $questItemTransformer = new QuestItemTransformer;
+        $apiUsableItemTransformer = new ApiUsableItemTransformer;
+        $inventorySetService = new InventorySetService(new SetHandsValidation);
+        $equipItemService = new EquipItemService($manager, new CharacterAttackTransformer, $inventorySetService);
+
+        $itemEnricherFactory = new ItemEnricherFactory(
+            new EquippableEnricher,
+            $equippableItemTransformer,
+            new UsableItemTransformer,
+            $questItemTransformer,
+            $plainDataSerializer,
+            $manager,
+        );
+
+        $comparisonService = new ComparisonService(
+            new ValidEquipPositionsValue,
+            new CharacterInventoryService(
+                $itemEnricherFactory,
+                $equippableItemTransformer,
+                $questItemTransformer,
+                $apiUsableItemTransformer,
+                new InventoryTransformer($itemEnricherFactory),
+                $inventorySetService,
+                new MassDisenchantService(new SkillCheckService($randomNumberGenerator), $randomNumberGenerator, new ChanceCalculator($randomNumberGenerator)),
+                Mockery::mock(UpdateCharacterSkillsService::class),
+                Mockery::mock(DisenchantService::class),
+                new Pagination($manager),
+                $manager,
+                new InventorySetOptionTransformer,
+            ),
+            $equipItemService,
+            new ItemAtonements(new GemComparison(new CharacterGemsTransformer, $plainDataSerializer, $manager)),
+            $manager,
+            $equippableItemTransformer,
+            $apiUsableItemTransformer,
+        );
+
+        $this->marketBoard = new MarketBoard(
+            $equipItemService,
+            $comparisonService,
+            new MarketRealtimePublisher($manager, new MarketItemsTransformer(new ItemTransformer($itemEnricherFactory))),
+            new CharacterInventoryCountTransformer,
+        );
     }
 
     protected function tearDown(): void
     {
         parent::tearDown();
+
+        Mockery::close();
 
         $this->marketBoard = null;
     }

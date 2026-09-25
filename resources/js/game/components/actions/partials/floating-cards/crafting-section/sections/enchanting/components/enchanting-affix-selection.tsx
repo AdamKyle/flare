@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 
+import EnchantingAffixOption from './enchanting-affix-option';
 import EnchantingAffixSelectionProps, {
   EnchantingAffixSlotProps,
 } from './types/enchanting-affix-selection-props';
@@ -29,6 +30,9 @@ const EnchantingAffixSelection = ({
     onClear: () => void
   ): ReactNode => (
     <Dropdown
+      render_item_content={(option) => (
+        <EnchantingAffixOption option={option} affixes={slot.loadedAffixes} />
+      )}
       aria_labelled_by={labelId}
       items={slot.items}
       on_clear={onClear}

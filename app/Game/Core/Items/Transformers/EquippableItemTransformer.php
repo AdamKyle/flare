@@ -4,31 +4,28 @@ namespace App\Game\Core\Items\Transformers;
 
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\SetSlot;
+use App\Game\Core\Items\Values\ItemType;
 use App\Game\Core\Items\Values\ItemUniqueness;
 use App\Game\Gems\Traits\GetItemAtonements;
 use Facades\App\Game\Core\Items\Pricing\SellItemCalculator;
 use League\Fractal\TransformerAbstract;
 
-/**
- * Transformer for equippable items.
- *
- * Assumes the provided Item has already been passed through EquippableEnricher.
- * This transformer maps both base and enriched fields for API output.
- */
 class EquippableItemTransformer extends TransformerAbstract
 {
     use GetItemAtonements;
 
     /**
-     * Transforms an enriched Item model into an API-ready array.
+     * Transform a slot holding an enriched equippable Item into its API detail payload.
      *
-     * @param InventorySlot|SetSlot $slot ->item
-     * @return array<string, mixed>
+     * @param InventorySlot|SetSlot $slot
+     * @return array
      */
     public function transform(InventorySlot|SetSlot $slot): array
     {
         return [
             'slot_id' => $slot->id,
+            'is_equipped' => $slot->equipped === true,
+            'can_manage_item_skills' => $this->canManageItemSkills($slot),
             'item_id' => $slot->item->id,
             'name' => $slot->item->affix_name,
             'affix_count' => $slot->item->affix_count,
@@ -91,5 +88,18 @@ class EquippableItemTransformer extends TransformerAbstract
             'position' => $slot->position,
             'min_list_price' => SellItemCalculator::fetchMinPrice($slot->item),
         ];
+    }
+
+    /**
+     * Determine whether the slot holds an equipped Artifact whose Item Skills can be trained.
+     *
+     * @param InventorySlot|SetSlot $slot
+     * @return bool
+     */
+    private function canManageItemSkills(InventorySlot|SetSlot $slot): bool
+    {
+        return $slot->equipped === true
+            && $slot->item->type === ItemType::ARTIFACT->value
+            && ! is_null($slot->item->itemSkill);
     }
 }

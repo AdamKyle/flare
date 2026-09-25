@@ -18,21 +18,40 @@ class LevelUpValue
     const BASE_STAT_MODIFIER = 'base_stat_mod';
 
     /**
-     * Create the level up value object.
+     * Build the level, XP, core stat, and modifier values for one level up trigger, resolving the Character's boon and max level rules.
      *
-     * Increases core stats.
+     * @param Character $character
+     * @param int $leftOverXP
+     * @return array
      */
     public function createValueObject(Character $character, int $leftOverXP = 0): array
     {
+        $levelsToGain = $this->gainsAdditionalLevelOnLevelUp($character) ? $this->additionalLevelsToGain($character) : 1;
 
-        $gainsAdditionalLevel = $this->gainsAdditionalLevelOnLevelUp($character);
-        $newLevel = $character->level + ($gainsAdditionalLevel ? $this->additionalLevelsToGain($character) : 1);
-        $maxLevel = $this->getMaxLevel($character);
+        return $this->createValueObjectForResolvedRules(
+            $character,
+            $leftOverXP,
+            $this->getMaxLevel($character),
+            $levelsToGain,
+        );
+    }
 
-        if ($newLevel > $maxLevel) {
-            $newLevel = $maxLevel;
-        }
-
+    /**
+     * Build the level, XP, core stat, and modifier values for one level up trigger using an already resolved max level and levels per trigger.
+     *
+     * @param Character $character
+     * @param int $leftOverXP
+     * @param int $maxLevel
+     * @param int $levelsToGain
+     * @return array
+     */
+    public function createValueObjectForResolvedRules(
+        Character $character,
+        int $leftOverXP,
+        int $maxLevel,
+        int $levelsToGain,
+    ): array {
+        $newLevel = min($character->level + $levelsToGain, $maxLevel);
         $levelsGained = $newLevel - $character->level;
         $baseStatMod = $this->addModifier($character, self::BASE_STAT_MODIFIER, $levelsGained);
         $baseDamageStatMod = $this->addModifier($character, self::BASE_STAT_DAMAGE_MODIFIER, $levelsGained);
@@ -54,11 +73,14 @@ class LevelUpValue
     }
 
     /**
-     * Add the new value to the character stat.
+     * Add the gained levels to a core stat: the damage stat gains two per level and every other stat gains one, capped at the max stat value.
      *
-     * Regular stats get +1 and the damage stat gets a +2
+     * @param Character $character
+     * @param string $currenStat
+     * @param int $levelsGained
+     * @return int
      */
-    protected function addValue(Character $character, string $currenStat, int $levelsGained = 1): int
+    private function addValue(Character $character, string $currenStat, int $levelsGained = 1): int
     {
 
         if ($character->damage_stat === $currenStat) {
@@ -69,9 +91,14 @@ class LevelUpValue
     }
 
     /**
-     * Add to the stat modifier pool when the stats are maxed out.
+     * Add to the stat modifier pool when the relevant stat is already maxed out.
+     *
+     * @param Character $character
+     * @param string $stat
+     * @param int $levelsGained
+     * @return float
      */
-    protected function addModifier(Character $character, string $stat, int $levelsGained = 1): float
+    private function addModifier(Character $character, string $stat, int $levelsGained = 1): float
     {
 
         if ($character->{$character->damage_stat} >= MaxReincarnationStats::MAX_STATS && $stat === self::BASE_STAT_DAMAGE_MODIFIER) {
@@ -98,9 +125,12 @@ class LevelUpValue
     }
 
     /**
-     * Get the max level for the character.
+     * Return the Character's max level, which is raised by the continue leveling quest item.
+     *
+     * @param Character $character
+     * @return int
      */
-    protected function getMaxLevel(Character $character): int
+    private function getMaxLevel(Character $character): int
     {
         if ($this->canContinueLeveling($character)) {
             return MaxLevelConfiguration::first()->max_level;
@@ -110,9 +140,12 @@ class LevelUpValue
     }
 
     /**
-     * Can we continue to level?
+     * Determine whether the Character holds the continue leveling quest item.
+     *
+     * @param Character $character
+     * @return bool
      */
-    protected function canContinueLeveling(Character $character): bool
+    private function canContinueLeveling(Character $character): bool
     {
         $inventory = Inventory::where('character_id', $character->id)->first();
 

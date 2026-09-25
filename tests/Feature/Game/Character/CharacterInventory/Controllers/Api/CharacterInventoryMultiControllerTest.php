@@ -3,17 +3,19 @@
 namespace Tests\Feature\Game\Character\CharacterInventory\Controllers\Api;
 
 use App\Flare\Models\InventorySet;
+use App\Game\Automation\Values\AutomationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateBatchCrafting;
+use Tests\Traits\CreateCharacterAutomation;
 use Tests\Traits\CreateInventorySets;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
 class CharacterInventoryMultiControllerTest extends TestCase
 {
-    use CreateBatchCrafting, CreateInventorySets, CreateItem, CreateItemAffix, RefreshDatabase;
+    use CreateBatchCrafting, CreateCharacterAutomation, CreateInventorySets, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -45,6 +47,29 @@ class CharacterInventoryMultiControllerTest extends TestCase
 
         $response->assertOk();
         $this->assertTrue($character->inventory->slots()->where('id', $slotId)->first()->equipped);
+    }
+
+    public function test_equip_selected_is_blocked_by_faction_loyalty_automation(): void
+    {
+        $item = $this->createItem(['type' => 'body']);
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+        $slotId = $character->inventory->slots()->where('item_id', $item->id)->first()->id;
+
+        $this->createCharacterAutomation([
+            'character_id' => $character->id,
+            'type' => AutomationType::FACTION_LOYALTY->value,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->postJson('/api/character/'.$character->id.'/inventory/equip-selected', [
+                'mode' => 'include',
+                'slot_ids' => [$slotId],
+            ]);
+
+        $response->assertStatus(422);
+        $this->assertFalse($character->inventory->slots()->where('id', $slotId)->first()->equipped);
     }
 
     public function test_move_selected_moves_items_into_the_chosen_set(): void

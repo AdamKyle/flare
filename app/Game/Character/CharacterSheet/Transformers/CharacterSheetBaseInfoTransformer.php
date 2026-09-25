@@ -9,6 +9,7 @@ use App\Flare\Models\FactionLoyaltyAutomationWarning;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\Item;
 use App\Flare\Transformers\BaseTransformer;
+use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Automation\Values\AutomationType;
 use App\Game\Battle\Services\AttackTimerService;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
@@ -17,27 +18,40 @@ use App\Game\Character\CharacterInventory\Transformers\CharacterInventoryCountTr
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Maps\Values\LocationBasedCraftingOptions;
 use Carbon\Carbon;
-use Exception;
 
 class CharacterSheetBaseInfoTransformer extends BaseTransformer
 {
     private bool $ignoreReductions = false;
 
+    /**
+     * @param CharacterStatBuilder $characterStatBuilder
+     * @param AttackTimerService $attackTimerService
+     * @param CharacterInventoryCountTransformer $characterInventoryCountTransformer
+     * @param AutomationRestrictionService $automationRestrictionService
+     */
     public function __construct(
         private readonly CharacterStatBuilder $characterStatBuilder,
         private readonly AttackTimerService $attackTimerService,
         private readonly CharacterInventoryCountTransformer $characterInventoryCountTransformer,
+        private readonly AutomationRestrictionService $automationRestrictionService,
     ) {}
 
+    /**
+     * Set whether stat reductions should be ignored when building the character sheet.
+     *
+     * @param bool $ignoreReductions
+     * @return void
+     */
     public function setIgnoreReductions(bool $ignoreReductions): void
     {
         $this->ignoreReductions = $ignoreReductions;
     }
 
     /**
-     * Gets the response data for the character sheet
+     * Build the character sheet's base info payload for the given Character.
      *
-     * @throws Exception
+     * @param Character $character
+     * @return array
      */
     public function transform(Character $character): array
     {
@@ -108,6 +122,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'automation_completed_at' => $this->getTimeLeftOnAutomation($character),
             'is_silenced' => $character->user->is_silenced,
             'can_talk_again_at' => $character->user->can_talk_again_at,
+            'show_intro_page' => $character->user->show_intro_page,
             'can_move_again_at' => $this->remainingSecondsUntil($character->can_move_again_at),
             'force_name_change' => $character->force_name_change,
             'is_alchemy_locked' => $this->isAlchemyLocked($character),
@@ -130,6 +145,12 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
         ];
     }
 
+    /**
+     * Return the Character's undismissed Faction Loyalty automation warning notices.
+     *
+     * @param Character $character
+     * @return array
+     */
     private function getFactionLoyaltyWarningNotices(Character $character): array
     {
         return FactionLoyaltyAutomationWarning::where('character_id', $character->id)
@@ -146,6 +167,12 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             ->toArray();
     }
 
+    /**
+     * Return the non-bounty fame tasks for the Faction Loyalty's currently helped NPC.
+     *
+     * @param ?FactionLoyalty $factionLoyalty
+     * @return array
+     */
     private function getFactionTasks(?FactionLoyalty $factionLoyalty = null): array
     {
 
@@ -164,7 +191,13 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
         })->toArray());
     }
 
-    private function getTimeLeftOnAutomation(Character $character)
+    /**
+     * Return the Character's active automation's remaining timer, in seconds.
+     *
+     * @param Character $character
+     * @return int
+     */
+    private function getTimeLeftOnAutomation(Character $character): int
     {
         $automation = $this->activeAutomation($character);
 
@@ -175,12 +208,15 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
         return 0;
     }
 
+    /**
+     * Resolve the Character's currently active automation identity, if any.
+     *
+     * @param Character $character
+     * @return ?array
+     */
     private function activeAutomation(Character $character): ?array
     {
-        $automation = $character->currentAutomations()
-            ->where('completed_at', '>', now())
-            ->orderBy('id')
-            ->first();
+        $automation = $this->automationRestrictionService->activeAutomation($character);
 
         if (is_null($automation)) {
             return null;
@@ -204,6 +240,12 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
         ];
     }
 
+    /**
+     * Return the remaining whole seconds until the given timestamp, or zero when it is past or missing.
+     *
+     * @param ?Carbon $timestamp
+     * @return int
+     */
     private function remainingSecondsUntil(?Carbon $timestamp): int
     {
         if (is_null($timestamp) || $timestamp->isPast()) {
@@ -213,6 +255,12 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
         return now()->diffInSeconds($timestamp, false);
     }
 
+    /**
+     * Determine whether the Delve panel should be visible for the Character.
+     *
+     * @param Character $character
+     * @return bool
+     */
     private function isDelveVisible(Character $character): bool
     {
         $isDelveActive = $character->currentAutomations()
@@ -231,6 +279,12 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             ->exists();
     }
 
+    /**
+     * Determine whether the Character holds the Delve pact-choice quest item.
+     *
+     * @param Character $character
+     * @return bool
+     */
     private function canSetPactOptionsForDelve(Character $character): bool
     {
         $questItemForDelve = Item::where('effect', ItemEffectType::DELVE_PACK_CHOICE->value)->first();

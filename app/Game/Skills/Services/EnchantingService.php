@@ -28,6 +28,7 @@ use App\Game\Skills\Values\SkillTypeValue;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Log;
 
 class EnchantingService
 {
@@ -202,9 +203,7 @@ class EnchantingService
     }
 
     /**
-     * Fetches the affixes for a character.
-     *
-     * Only returns that which the player has the skill level and intelligence for.
+     * Resolve the character's available affixes and eligible enchanting inventory and event items.
      *
      * @param Character $character
      * @param bool $ignoreTrinkets
@@ -264,7 +263,7 @@ class EnchantingService
         }
 
         if ($character->classType()->isMerchant()) {
-            $cost = floor($cost - $cost * 0.15);
+            $cost = $this->wholeMerchantEnchantingCost($cost, floor($cost - $cost * 0.15));
 
             ServerMessageHandler::sendBasicMessage($character->user, 'As a Merchant you get a 15% reduction on enchanting items (reduction applied to total price).');
         }
@@ -273,10 +272,27 @@ class EnchantingService
     }
 
     /**
-     * Enchant an item.
+     * Validate and extract the genuine integer value of the discounted Merchant enchanting cost, or the un-discounted cost when the calculation is invalid.
      *
-     * Attempts to enchant an item with the supplied affixes and slot. The params passed in
-     * must be the request params coming back from the request.
+     * @param int $undiscountedCost
+     * @param float $discountedCost
+     * @return int
+     */
+    private function wholeMerchantEnchantingCost(int $undiscountedCost, float $discountedCost): int
+    {
+        $wholeDiscountedCost = filter_var($discountedCost, FILTER_VALIDATE_INT);
+
+        if ($wholeDiscountedCost === false) {
+            Log::error('Invalid whole Merchant enchanting cost calculated: '.$discountedCost.' cannot be represented as an integer. Falling back to the un-discounted cost: '.$undiscountedCost.'.');
+
+            return $undiscountedCost;
+        }
+
+        return $wholeDiscountedCost;
+    }
+
+    /**
+     * Attempt to enchant the item in the given slot with the supplied affixes after deducting the gold cost.
      *
      * @param Character $character
      * @param array $params
@@ -302,16 +318,7 @@ class EnchantingService
     }
 
     /**
-     * Enchant an item directly for Batch Crafting, with no InventorySlot involved.
-     *
-     * Applies the given affixes to a clone of the item after validating the full
-     * affix list and gold cost. Returns the final item on success, or a destroyed
-     * result if the roll fails.
-     *
-     * $suppressSuccessServerMessage skips only the "Applied enchantment: X to: Y"
-     * success message, used when the batch processor will emit a linked equivalent
-     * once the item is committed to the Crafted Items Set. Failure messages are
-     * never suppressed.
+     * Enchant an item for Batch Crafting by validating and applying the given affixes directly to a cloned item without an inventory slot.
      *
      * @param Character $character
      * @param Item $item
@@ -399,11 +406,7 @@ class EnchantingService
     }
 
     /**
-     * Resolve an exact requested Prefix/Suffix affix pair for Batch Crafting, without any fallback.
-     *
-     * Validates that at least one affix id is present, that each requested id resolves to a real
-     * non-random affix of the correct type, and that the character's Enchanting skill level meets
-     * each requested affix's requirement. Never substitutes a different affix than the one requested.
+     * Resolve the exact requested Prefix/Suffix affix pair for Batch Crafting without any fallback.
      *
      * @param Character $character
      * @param int|null $prefixId
@@ -441,11 +444,7 @@ class EnchantingService
     }
 
     /**
-     * Resolve the strongest meaningful Prefix/Suffix affix pair for Craft and Enchant For Experience.
-     *
-     * Independently resolves the highest requirement non-trivial Prefix and Suffix the character's
-     * current Enchanting skill level can meaningfully learn from. Never selects a weaker affix
-     * because Intelligence is insufficient for the resolved combination.
+     * Resolve the strongest non-trivial Prefix/Suffix affix pair the character's Enchanting skill can meaningfully learn from for Craft and Enchant For Experience.
      *
      * @param Character $character
      * @return array
@@ -466,11 +465,7 @@ class EnchantingService
     }
 
     /**
-     * Resolve the cheapest affordable Prefix/Suffix affix pair for Enchant For Event.
-     *
-     * Independently resolves the cheapest eligible, affordable Prefix and Suffix the character's
-     * current Enchanting skill level and Gold allow. Never selects a weaker affix because
-     * Intelligence is insufficient for the resolved combination.
+     * Resolve the cheapest affordable Prefix/Suffix affix pair the character can enchant with for Enchant For Event.
      *
      * @param Character $character
      * @return array

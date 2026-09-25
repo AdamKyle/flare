@@ -53,7 +53,7 @@ export enum InventoryPositionDefinition {
   RING_TWO = 'ring-two',
   SPELL_ONE = 'spell-one',
   SPELL_TWO = 'spell-two',
-  TRINKET = 'trinket-one',
+  TRINKET = 'trinket',
   ARTIFACT = 'artifact',
 }
 

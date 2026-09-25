@@ -5,14 +5,17 @@ import {
   Position,
 } from './enums/equipment-positions';
 import {
-  handBasedItems,
+  nonArmourEquippableItems,
   InventoryItemTypes,
 } from './enums/inventory-item-types';
 import EquippedSlot from './equipped-slot';
 import EquippedSlotsProps from './types/equipped-slots-props';
 import { fetchEquippedItemForSlot } from './utils/fetch-equipped-item-for-slot';
 
-const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
+const EquippedSlots = ({
+  equipped_items,
+  on_open_item_details,
+}: EquippedSlotsProps) => {
   return (
     <div className="flex w-full flex-col items-center gap-4 sm:flex-row md:justify-center lg:w-3/4 lg:p-4">
       <div className="flex flex-col items-center space-y-4">
@@ -25,6 +28,7 @@ const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
             )}
             positionName={'Helmet'}
             position={Position.HELMET}
+            on_open_item_details={on_open_item_details}
           />
         </div>
 
@@ -37,6 +41,7 @@ const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
             )}
             positionName={'Sleeves (Left)'}
             position={Position.SLEEVES_LEFT}
+            on_open_item_details={on_open_item_details}
           />
           <EquippedSlot
             equipped_item={fetchEquippedItemForSlot(
@@ -46,6 +51,7 @@ const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
             )}
             positionName={'Body'}
             position={Position.BODY}
+            on_open_item_details={on_open_item_details}
           />
           <EquippedSlot
             equipped_item={fetchEquippedItemForSlot(
@@ -55,6 +61,7 @@ const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
             )}
             positionName={'Sleeves (Right)'}
             position={Position.SLEEVES_RIGHT}
+            on_open_item_details={on_open_item_details}
           />
         </div>
 
@@ -67,6 +74,7 @@ const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
             )}
             positionName={'Gloves (Left)'}
             position={Position.GLOVES_LEFT}
+            on_open_item_details={on_open_item_details}
           />
           <EquippedSlot
             equipped_item={fetchEquippedItemForSlot(
@@ -76,6 +84,7 @@ const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
             )}
             positionName={'Leggings'}
             position={Position.LEGGINGS}
+            on_open_item_details={on_open_item_details}
           />
           <EquippedSlot
             equipped_item={fetchEquippedItemForSlot(
@@ -85,6 +94,7 @@ const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
             )}
             positionName={'Gloves (Right)'}
             position={Position.GLOVES_RIGHT}
+            on_open_item_details={on_open_item_details}
           />
         </div>
 
@@ -97,6 +107,7 @@ const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
             )}
             positionName={'Feet'}
             position={Position.FEET}
+            on_open_item_details={on_open_item_details}
           />
         </div>
       </div>
@@ -105,65 +116,82 @@ const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
         <EquippedSlot
           equipped_item={fetchEquippedItemForSlot(
             equipped_items,
-            handBasedItems,
+            nonArmourEquippableItems,
             InventoryPositionDefinition.LEFT_HAND
           )}
           positionName={'Weapon (Left Hand)'}
           position={Position.LEFT_HAND}
+          on_open_item_details={on_open_item_details}
         />
         <EquippedSlot
           equipped_item={fetchEquippedItemForSlot(
             equipped_items,
-            handBasedItems,
+            nonArmourEquippableItems,
             InventoryPositionDefinition.RIGHT_HAND
           )}
           positionName={'Weapon (Right Hand)'}
           position={Position.RING_HAND}
+          on_open_item_details={on_open_item_details}
         />
         <EquippedSlot
           equipped_item={fetchEquippedItemForSlot(
             equipped_items,
-            handBasedItems,
+            nonArmourEquippableItems,
             InventoryPositionDefinition.RING_TWO
           )}
           positionName={'Ring (Ring Two)'}
           position={Position.RING_TWO}
+          on_open_item_details={on_open_item_details}
         />
         <EquippedSlot
           equipped_item={fetchEquippedItemForSlot(
             equipped_items,
-            handBasedItems,
+            nonArmourEquippableItems,
             InventoryPositionDefinition.RING_ONE
           )}
           positionName={'Ring (Ring One)'}
           position={Position.RING_ONE}
+          on_open_item_details={on_open_item_details}
         />
         <EquippedSlot
           equipped_item={fetchEquippedItemForSlot(
             equipped_items,
-            handBasedItems,
+            nonArmourEquippableItems,
             InventoryPositionDefinition.SPELL_ONE
           )}
           positionName={'Spell (Spell One)'}
           position={Position.SPELL_ONE}
+          on_open_item_details={on_open_item_details}
         />
         <EquippedSlot
           equipped_item={fetchEquippedItemForSlot(
             equipped_items,
-            handBasedItems,
+            nonArmourEquippableItems,
             InventoryPositionDefinition.SPELL_TWO
           )}
           positionName={'Spell (Spell Two)'}
           position={Position.SPELL_TWO}
+          on_open_item_details={on_open_item_details}
         />
         <EquippedSlot
           equipped_item={fetchEquippedItemForSlot(
             equipped_items,
-            handBasedItems,
+            nonArmourEquippableItems,
             InventoryPositionDefinition.TRINKET
           )}
           positionName={'Trinket'}
           position={Position.TRINKET}
+          on_open_item_details={on_open_item_details}
+        />
+        <EquippedSlot
+          equipped_item={fetchEquippedItemForSlot(
+            equipped_items,
+            InventoryItemTypes.ARTIFACT,
+            InventoryPositionDefinition.ARTIFACT
+          )}
+          positionName={'Artifact'}
+          position={Position.ARTIFACT}
+          on_open_item_details={on_open_item_details}
         />
       </div>
     </div>

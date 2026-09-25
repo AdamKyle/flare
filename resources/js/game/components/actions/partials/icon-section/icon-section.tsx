@@ -2,6 +2,9 @@ import React, { ReactNode } from 'react';
 
 import CharacterActiveBoonIndicator from './character-active-boon-indicator';
 import { useCharacterActiveBoonStatus } from './hooks/use-character-active-boon-status';
+import ActivityStatusIndicator from '../../../activity/components/activity-status-indicator';
+import { useActivityActions } from '../../../activity/hooks/use-activity-actions';
+import { useOpenActivitySidePeek } from '../../../activity/hooks/use-open-activity-side-peek';
 import { useManageQuestLogVisibility } from '../../../quests/hooks/use-manage-quest-log-visibility';
 import { useManageCharacterCardVisibility } from '../floating-cards/character-details/hooks/use-manage-character-card-visibility';
 import { useManageCraftingCardVisibility } from '../floating-cards/crafting-section/hooks/use-manage-crafting-card-visibility';
@@ -24,6 +27,14 @@ export const IconSection = (): ReactNode => {
   const { openQuestLog } = useManageQuestLogVisibility();
 
   const { has_active_boons: hasActiveBoons } = useCharacterActiveBoonStatus();
+
+  const { open_activity } = useOpenActivitySidePeek();
+
+  const { has_new_announcements } = useActivityActions();
+
+  const activityAriaLabel = has_new_announcements
+    ? 'Activity, new announcements available'
+    : 'Activity';
 
   return (
     <IconContainer>
@@ -64,6 +75,17 @@ export const IconSection = (): ReactNode => {
         variant={ButtonVariant.PRIMARY}
         on_click={openShop}
         additional_css="w-full lg:w-auto"
+      />
+      <IconButton
+        label="Activity"
+        icon={<i className="far fa-bell text-sm" aria-hidden="true"></i>}
+        variant={ButtonVariant.PRIMARY}
+        on_click={open_activity}
+        additional_css="w-full lg:w-auto"
+        aria_label={activityAriaLabel}
+        status_indicator={
+          <ActivityStatusIndicator active={has_new_announcements} />
+        }
       />
     </IconContainer>
   );

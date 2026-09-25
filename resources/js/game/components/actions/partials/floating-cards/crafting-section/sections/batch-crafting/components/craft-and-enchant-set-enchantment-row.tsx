@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react';
 
 import CraftAndEnchantSetEnchantmentRowProps from './types/craft-and-enchant-set-enchantment-row-props';
+import EnchantingAffixOption from '../../enchanting/components/enchanting-affix-option';
 
 import Dropdown from 'ui/drop-down/drop-down';
 
@@ -9,6 +10,8 @@ const CraftAndEnchantSetEnchantmentRow = ({
   item_name,
   prefix_items,
   suffix_items,
+  prefix_affixes,
+  suffix_affixes,
   selected_prefix,
   selected_suffix,
   on_prefix_select,
@@ -40,6 +43,9 @@ const CraftAndEnchantSetEnchantmentRow = ({
             pre_selected_item={selected_prefix ?? undefined}
             selection_placeholder="Select a Prefix"
             force_clear={selected_prefix === null}
+            render_item_content={(option) => (
+              <EnchantingAffixOption option={option} affixes={prefix_affixes} />
+            )}
           />
         </fieldset>
 
@@ -57,6 +63,9 @@ const CraftAndEnchantSetEnchantmentRow = ({
             pre_selected_item={selected_suffix ?? undefined}
             selection_placeholder="Select a Suffix"
             force_clear={selected_suffix === null}
+            render_item_content={(option) => (
+              <EnchantingAffixOption option={option} affixes={suffix_affixes} />
+            )}
           />
         </fieldset>
       </div>

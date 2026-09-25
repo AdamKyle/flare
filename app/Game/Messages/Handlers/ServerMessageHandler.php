@@ -14,6 +14,11 @@ class ServerMessageHandler
 {
     use SafelyBroadcastsEvents;
 
+    /**
+     * @param ServerMessageBuilder $serverMessageBuilder
+     * @param BattleRewardMessageContext $battleRewardMessageContext
+     * @param BattleRewardMessageOutboxService $battleRewardMessageOutboxService
+     */
     public function __construct(
         private ServerMessageBuilder $serverMessageBuilder,
         private readonly BattleRewardMessageContext $battleRewardMessageContext,
@@ -21,9 +26,13 @@ class ServerMessageHandler
     ) {}
 
     /**
-     * Handle sending a message with additional information
+     * Send a typed server message built from a gained amount and a new total.
      *
-     * - Can pass in a formessage and a newValue, both are used in the string
+     * @param User $user
+     * @param BaseMessageType $type
+     * @param string|int|null $forMessage
+     * @param string|int|null $newValue
+     * @return void
      */
     public function handleMessageWithNewValue(User $user, BaseMessageType $type, string|int|null $forMessage = null, string|int|null $newValue = null): void
     {
@@ -33,9 +42,13 @@ class ServerMessageHandler
     }
 
     /**
-     * Handle sending a message with basic information.
+     * Send a typed server message, optionally linked to an item by id.
      *
-     * - Can pass in an id of an item to create a link
+     * @param User $user
+     * @param BaseMessageType $type
+     * @param string|int|null $forMessage
+     * @param ?int $id
+     * @return void
      */
     public function handleMessage(User $user, BaseMessageType $type, string|int|null $forMessage = null, ?int $id = null): void
     {
@@ -45,26 +58,56 @@ class ServerMessageHandler
     }
 
     /**
-     * Send a basic message
+     * Send a plain server message.
+     *
+     * @param User $user
+     * @param string $message
+     * @return void
      */
     public function sendBasicMessage(User $user, string $message): void
     {
         $this->dispatchOrOutbox($user, $message);
     }
 
+    /**
+     * Send a plain server message, optionally linked to an item by id.
+     *
+     * @param User $user
+     * @param string $message
+     * @param ?int $id
+     * @return void
+     */
     public function sendBasicMessageWithId(User $user, string $message, ?int $id = null): void
     {
         $this->dispatchOrOutbox($user, $message, $id);
     }
 
     /**
-     * Send a basic message with a clickable item link.
+     * Send a plain server message with a clickable item link.
+     *
+     * @param User $user
+     * @param string $message
+     * @param int $id
+     * @param ?string $source
+     * @param ?string $linkText
+     * @return void
      */
     public function sendBasicMessageWithLink(User $user, string $message, int $id, ?string $source, ?string $linkText): void
     {
         $this->dispatchOrOutbox($user, $message, $id, $source, null, $linkText);
     }
 
+    /**
+     * Broadcast the message immediately, or store it in the durable reward outbox while a reward request is being processed.
+     *
+     * @param User $user
+     * @param string $message
+     * @param ?int $id
+     * @param ?string $source
+     * @param ?int $itemId
+     * @param ?string $linkText
+     * @return void
+     */
     private function dispatchOrOutbox(
         User $user,
         string $message,
@@ -82,7 +125,7 @@ class ServerMessageHandler
             return;
         }
 
-        $storedMessage = $this->battleRewardMessageOutboxService->storeMessage(
+        $this->battleRewardMessageOutboxService->storeMessage(
             $this->battleRewardMessageContext->requestId(),
             $this->battleRewardMessageContext->characterId(),
             $user->id,
@@ -93,23 +136,5 @@ class ServerMessageHandler
             $itemId,
             $linkText,
         );
-
-        $event = new ServerMessageEvent($user, $message, $id, $source, $itemId, $linkText);
-        $dispatched = $this->safelyDispatchBroadcastEvent(
-            $event,
-            [
-                'user_id' => $user->id,
-                'character_id' => $this->battleRewardMessageContext->characterId(),
-                'reward_request_id' => $this->battleRewardMessageContext->requestId(),
-                'reward_step' => $this->battleRewardMessageContext->stepName()?->value,
-                'message_record_id' => $storedMessage->id,
-                'message' => $message,
-                'event_class' => $event::class,
-            ],
-        );
-
-        if ($dispatched) {
-            $this->battleRewardMessageOutboxService->markEmitted($storedMessage);
-        }
     }
 }

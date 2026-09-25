@@ -8,7 +8,7 @@ import {
 } from '../enums/equipment-positions';
 import {
   armourPositions,
-  handBasedItems,
+  nonArmourEquippableItems,
   InventoryItemTypes,
 } from '../enums/inventory-item-types';
 import FetchEquippedImageDefinition from './definitions/fetch-equipped-image-definition';
@@ -43,7 +43,7 @@ export const fetchEquippedImage = (
     };
   }
 
-  if (handBasedItems.includes(item.type)) {
+  if (nonArmourEquippableItems.includes(item.type)) {
     path = fetchItemImage(item, position) || defaultPositionImage[position];
     itemName = item.name;
   } else if (armourPositions.includes(item.type)) {
@@ -69,6 +69,13 @@ const fetchItemImage = (
   position: Position
 ): string | null => {
   return match(item)
+    .with({ type: InventoryItemTypes.TRINKET }, () => {
+      const imagePath = trinketItemRecord[InventoryItemTypes.TRINKET];
+
+      return isPartialPositionRecord(imagePath)
+        ? imagePath[position] || null
+        : imagePath || null;
+    })
     .with({ is_cosmic: true, affix_count: 2 }, () => {
       const imagePath = cosmicItemRecord[item.type];
       return isPartialPositionRecord(imagePath)
@@ -104,13 +111,6 @@ const fetchItemImage = (
     })
     .with({ affix_count: 1 }, () => {
       const imagePath = oneEnchantItemRecord[item.type];
-      return isPartialPositionRecord(imagePath)
-        ? imagePath[position] || null
-        : imagePath || null;
-    })
-    .with({ type: InventoryItemTypes.TRINKET }, () => {
-      const imagePath = trinketItemRecord[item.type];
-
       return isPartialPositionRecord(imagePath)
         ? imagePath[position] || null
         : imagePath || null;

@@ -330,7 +330,7 @@ class TheOldChurchRewardHandler
      * @param int $killCount
      * @return void
      */
-    private function createPossibleEvent(int $killCount = 1)
+    private function createPossibleEvent(int $killCount = 1): void
     {
 
         if (Event::where('type', EventType::THE_OLD_CHURCH)->exists()) {
@@ -345,7 +345,7 @@ class TheOldChurchRewardHandler
                 'ends_at' => now()->addHour(),
             ]);
 
-            AnnouncementHandler::createAnnouncement('the_old_house');
+            AnnouncementHandler::createAnnouncement('the_old_church');
 
             event(new GlobalMessageEvent(
                 'The shadows of the past come to dance and finally you are able to see the light of the answers as
@@ -599,7 +599,7 @@ class TheOldChurchRewardHandler
         return [
             'create' => $this->chanceCalculator->passesPercentage($chancePercent + 1),
             'type' => EventType::THE_OLD_CHURCH,
-            'announcement' => 'the_old_house',
+            'announcement' => 'the_old_church',
             'message' => 'The shadows of the past come to dance and finally you are able to see the light of the answers as
                 The Emerald Prince appears before you.',
         ];

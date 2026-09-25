@@ -1,10 +1,10 @@
 import { useActivityTimeout } from 'api-handler/hooks/use-activity-timeout';
 import { useApiHandler } from 'api-handler/hooks/use-api-handler';
-import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { useCallback, useEffect, useState } from 'react';
+import { resolveApiErrorMessage } from 'api-handler/utils/resolve-api-error-message';
+import axios, { AxiosError } from 'axios';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { EquippableItemWithBase } from '../../../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
-import BaseQuestItemDefinition from '../../../../../../api-definitions/items/quest-item-definitions/base-quest-item-definition';
+import { EquippableItemDetailsDefinition } from '../../../../../../api-definitions/items/equippable-item-definitions/equippable-item-details-definition';
 import UseGetInventoryItemDetailsApiDefinition from '../definitions/use-get-inventory-item-details-api-request-definition';
 import UseGetInventoryItemDetailsResponse from '../definitions/use-get-inventory-item-details-response-definition';
 
@@ -16,49 +16,80 @@ export const useGetInventoryItemDetails = ({
   const { apiHandler, getUrl } = useApiHandler();
   const { handleInactivity } = useActivityTimeout();
 
-  const [data, setData] = useState<
-    EquippableItemWithBase | BaseQuestItemDefinition | null
-  >(null);
+  const [data, setData] =
+    useState<UseGetInventoryItemDetailsResponse['data']>(null);
   const [error, setError] =
     useState<UseGetInventoryItemDetailsResponse['error']>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const apiUrl = getUrl(url, { character: character_id, item: slot_id });
-
-  const fetchInventoryItemDetails = useCallback(async () => {
-    try {
-      const result = await apiHandler.get<
-        EquippableItemWithBase,
-        AxiosRequestConfig<AxiosResponse<EquippableItemWithBase>>
-      >(apiUrl, {
-        params: {
-          slot_id: slot_id,
-        },
-      });
-
-      setData(result);
-    } catch (err) {
-      if (err instanceof AxiosError) {
-        handleInactivity({
-          setError: setError,
-          response: err,
-        });
-
-        setError(err.response?.data || null);
-      }
-    } finally {
-      setLoading(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [apiHandler, apiUrl, slot_id]);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    fetchInventoryItemDetails().catch(() => {});
+    return () => {
+      const activeController = abortControllerRef.current;
+
+      abortControllerRef.current = null;
+      activeController?.abort();
+    };
+  }, []);
+
+  const fetchInventoryItemDetails = useCallback(async (): Promise<void> => {
+    abortControllerRef.current?.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const result = await apiHandler.get<
+        EquippableItemDetailsDefinition,
+        { slot_id: number }
+      >(getUrl(url, { character: character_id, item: slot_id }), {
+        params: { slot_id },
+        signal: controller.signal,
+      });
+
+      if (abortControllerRef.current !== controller) {
+        return;
+      }
+
+      setData(result);
+    } catch (requestError) {
+      if (axios.isCancel(requestError)) {
+        return;
+      }
+
+      if (abortControllerRef.current !== controller) {
+        return;
+      }
+
+      setError({
+        message: resolveApiErrorMessage(
+          requestError,
+          'Unable to load the item details.'
+        ),
+      });
+
+      if (requestError instanceof AxiosError) {
+        handleInactivity({ response: requestError, setError });
+      }
+    } finally {
+      if (abortControllerRef.current === controller) {
+        abortControllerRef.current = null;
+        setLoading(false);
+      }
+    }
+  }, [apiHandler, getUrl, handleInactivity, url, character_id, slot_id]);
+
+  useEffect(() => {
+    void fetchInventoryItemDetails();
   }, [fetchInventoryItemDetails]);
 
   return {
     data,
     error,
     loading,
+    refetch: fetchInventoryItemDetails,
   };
 };

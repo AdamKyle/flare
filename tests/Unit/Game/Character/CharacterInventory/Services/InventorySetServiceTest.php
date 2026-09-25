@@ -4,6 +4,7 @@ namespace Tests\Unit\Game\Character\CharacterInventory\Services;
 
 use App\Flare\Models\InventorySet;
 use App\Game\Character\CharacterInventory\Services\InventorySetService;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -352,16 +353,22 @@ class InventorySetServiceTest extends TestCase
         $ring = $this->createItem(['type' => 'ring']);
         $spell = $this->createItem(['type' => 'spell-damage']);
         $trinket = $this->createItem(['type' => 'trinket']);
+        $artifact = $this->createItem(['type' => 'artifact']);
         $armour = $this->createItem(['type' => 'body', 'default_position' => 'body']);
 
         $this->createInventorySetSlotsForItems($set, [
-            $weapon->id, $shield->id, $bow->id, $ring->id, $spell->id, $trinket->id, $armour->id,
+            $weapon->id, $shield->id, $bow->id, $ring->id, $spell->id, $trinket->id, $artifact->id, $armour->id,
         ]);
 
         $this->inventorySetService->equipInventorySet($character, $set);
 
         $this->assertTrue($set->fresh()->is_equipped);
-        $this->assertSame(7, $set->fresh()->slots()->where('equipped', true)->count());
+        $equippedSlots = $set->fresh()->slots()->where('equipped', true)->get();
+
+        $this->assertSame(8, $equippedSlots->count());
+        $this->assertSame('trinket', $equippedSlots->firstWhere('item_id', $trinket->id)->position);
+        $this->assertSame('artifact', $equippedSlots->firstWhere('item_id', $artifact->id)->position);
+        $this->assertTrue($equippedSlots->firstWhere('item_id', $artifact->id)->equipped);
     }
 
     public function test_is_set_equippable_returns_true_for_an_empty_set(): void
@@ -692,5 +699,108 @@ class InventorySetServiceTest extends TestCase
 
         $this->assertSame(200, $result['status']);
         $this->assertStringContainsString('Stash', $result['message']);
+    }
+
+    public function test_normalize_equipped_set_slot_positions_repairs_legacy_trinket_position(): void
+    {
+        $character = $this->character->getCharacter();
+        $set = $this->createInventorySet(['character_id' => $character->id, 'is_equipped' => true]);
+        $slot = $this->createInventorySetSlot([
+            'inventory_set_id' => $set->id,
+            'item_id' => $this->createItem(['type' => 'trinket'])->id,
+            'equipped' => true,
+            'position' => 'trinket-one',
+        ]);
+
+        $this->inventorySetService->normalizeEquippedSetSlotPositions($set);
+
+        $slot = $slot->refresh();
+
+        $this->assertTrue($slot->equipped);
+        $this->assertSame('trinket', $slot->position);
+    }
+
+    public function test_normalize_equipped_set_slot_positions_repairs_legacy_second_trinket_position(): void
+    {
+        $character = $this->character->getCharacter();
+        $set = $this->createInventorySet(['character_id' => $character->id, 'is_equipped' => true]);
+        $slot = $this->createInventorySetSlot([
+            'inventory_set_id' => $set->id,
+            'item_id' => $this->createItem(['type' => 'trinket'])->id,
+            'equipped' => true,
+            'position' => 'trinket-two',
+        ]);
+
+        $this->inventorySetService->normalizeEquippedSetSlotPositions($set);
+
+        $slot = $slot->refresh();
+
+        $this->assertTrue($slot->equipped);
+        $this->assertSame('trinket', $slot->position);
+    }
+
+    public function test_normalize_equipped_set_slot_positions_repairs_artifact_position(): void
+    {
+        $character = $this->character->getCharacter();
+        $set = $this->createInventorySet(['character_id' => $character->id, 'is_equipped' => true]);
+        $slot = $this->createInventorySetSlot([
+            'inventory_set_id' => $set->id,
+            'item_id' => $this->createItem(['type' => 'artifact'])->id,
+            'equipped' => false,
+            'position' => null,
+        ]);
+
+        $this->inventorySetService->normalizeEquippedSetSlotPositions($set);
+
+        $slot = $slot->refresh();
+
+        $this->assertTrue($slot->equipped);
+        $this->assertSame('artifact', $slot->position);
+    }
+
+    public function test_normalize_equipped_set_slot_positions_does_not_modify_unequipped_set(): void
+    {
+        $character = $this->character->getCharacter();
+        $set = $this->createInventorySet(['character_id' => $character->id, 'is_equipped' => false]);
+        $slot = $this->createInventorySetSlot([
+            'inventory_set_id' => $set->id,
+            'item_id' => $this->createItem(['type' => 'trinket'])->id,
+            'equipped' => false,
+            'position' => 'trinket-one',
+        ]);
+
+        $this->inventorySetService->normalizeEquippedSetSlotPositions($set);
+
+        $slot = $slot->refresh();
+
+        $this->assertFalse($slot->equipped);
+        $this->assertSame('trinket-one', $slot->position);
+    }
+
+    public function test_normalize_equipped_set_slot_positions_does_not_change_canonical_slot(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
+
+        $character = $this->character->getCharacter();
+        $set = $this->createInventorySet(['character_id' => $character->id, 'is_equipped' => true]);
+        $slot = $this->createInventorySetSlot([
+            'inventory_set_id' => $set->id,
+            'item_id' => $this->createItem(['type' => 'trinket'])->id,
+            'equipped' => true,
+            'position' => 'trinket',
+        ]);
+        $originalUpdatedAt = $slot->refresh()->updated_at->toDateTimeString();
+
+        Carbon::setTestNow(Carbon::parse('2026-01-01 13:00:00'));
+
+        $this->inventorySetService->normalizeEquippedSetSlotPositions($set);
+
+        $slot = $slot->refresh();
+
+        Carbon::setTestNow();
+
+        $this->assertTrue($slot->equipped);
+        $this->assertSame('trinket', $slot->position);
+        $this->assertSame($originalUpdatedAt, $slot->updated_at->toDateTimeString());
     }
 }

@@ -27,7 +27,9 @@ class SetSlot extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'equipped' => 'boolean',
+    ];
 
     public function inventorySet()
     {

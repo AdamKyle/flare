@@ -8,5 +8,6 @@ export default interface GenericItemComponentProps {
   is_selected?: boolean;
   on_item_selected?: (id: number, checked: boolean) => void;
   is_selection_disabled?: boolean;
+  is_selectable?: boolean;
   quest_item_ownership_state?: QuestItemOwnershipState;
 }

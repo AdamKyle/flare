@@ -10,7 +10,7 @@ const QuestBrowseControls = ({
   selected_game_map_id: selectedGameMapId,
   on_select_game_map: onSelectGameMap,
 }: QuestBrowseControlsProps): ReactNode => (
-  <div className="mb-4 w-full sm:max-w-xs">
+  <div className="w-full sm:max-w-xs">
     <Dropdown
       id={id}
       aria_label="Plane"

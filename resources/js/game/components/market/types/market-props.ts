@@ -1,3 +1,3 @@
 export default interface MarketProps {
-  close_shop: () => void;
+  close_market: () => void;
 }

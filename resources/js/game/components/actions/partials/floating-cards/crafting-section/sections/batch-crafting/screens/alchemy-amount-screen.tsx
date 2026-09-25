@@ -1,7 +1,11 @@
 import { debounce } from 'lodash';
 import React, { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 
+import CurrencyDisplay from '../../../../../../../../reusable-components/currency/currency-display';
+import { CurrencyDisplayMode } from '../../../../../../../../reusable-components/currency/enums/currency-display-mode';
+import { CurrencyType } from '../../../../../../../../reusable-components/currency/enums/currency-type';
 import { useAlchemyItemsApi } from '../../alchemy/api/hooks/use-alchemy-items-api';
+import AlchemyItemOption from '../../alchemy/components/alchemy-item-option';
 import { useAlchemyAmountPreview } from '../api/hooks/use-alchemy-amount-preview';
 import { useStartBatchCrafting } from '../api/hooks/use-start-batch-crafting';
 import BatchCraftingScreenManager from '../component-mapping/batch-crafting-screen-manager';
@@ -45,6 +49,7 @@ const AlchemyAmountScreen = (): ReactNode => {
 
   const {
     items: itemOptions,
+    loadedItems,
     loading,
     isLoadingMore,
     canLoadMore,
@@ -123,6 +128,16 @@ const AlchemyAmountScreen = (): ReactNode => {
     }
   };
 
+  const renderItemOption = (option: DropdownItem): ReactNode => {
+    const alchemyItem = loadedItems.find((item) => item.id === option.value);
+
+    if (!alchemyItem) {
+      return option.label;
+    }
+
+    return <AlchemyItemOption item={alchemyItem} />;
+  };
+
   const renderPreview = () => {
     if (previewLoading) {
       return (
@@ -146,21 +161,63 @@ const AlchemyAmountScreen = (): ReactNode => {
         <dt className="text-gray-600 dark:text-gray-400">
           Gold Dust Cost Each
         </dt>
-        <dd>{preview.gold_dust_cost_each.toLocaleString()}</dd>
+        <dd>
+          <CurrencyDisplay
+            currency={CurrencyType.GOLD_DUST}
+            amount={preview.gold_dust_cost_each}
+            display_mode={CurrencyDisplayMode.EXACT}
+            show_label={false}
+          />
+        </dd>
         <dt className="text-gray-600 dark:text-gray-400">Shards Cost Each</dt>
-        <dd>{preview.shards_cost_each.toLocaleString()}</dd>
+        <dd>
+          <CurrencyDisplay
+            currency={CurrencyType.SHARDS}
+            amount={preview.shards_cost_each}
+            display_mode={CurrencyDisplayMode.EXACT}
+            show_label={false}
+          />
+        </dd>
         <dt className="text-gray-600 dark:text-gray-400">
           Total Gold Dust Cost
         </dt>
-        <dd>{preview.total_gold_dust_cost.toLocaleString()}</dd>
+        <dd>
+          <CurrencyDisplay
+            currency={CurrencyType.GOLD_DUST}
+            amount={preview.total_gold_dust_cost}
+            display_mode={CurrencyDisplayMode.EXACT}
+            show_label={false}
+          />
+        </dd>
         <dt className="text-gray-600 dark:text-gray-400">Total Shards Cost</dt>
-        <dd>{preview.total_shards_cost.toLocaleString()}</dd>
+        <dd>
+          <CurrencyDisplay
+            currency={CurrencyType.SHARDS}
+            amount={preview.total_shards_cost}
+            display_mode={CurrencyDisplayMode.EXACT}
+            show_label={false}
+          />
+        </dd>
         <dt className="text-gray-600 dark:text-gray-400">
           Gold Dust Available
         </dt>
-        <dd>{preview.gold_dust_available.toLocaleString()}</dd>
+        <dd>
+          <CurrencyDisplay
+            currency={CurrencyType.GOLD_DUST}
+            amount={preview.gold_dust_available}
+            display_mode={CurrencyDisplayMode.BALANCE}
+            show_label={false}
+          />
+        </dd>
         <dt className="text-gray-600 dark:text-gray-400">Shards Available</dt>
-        <dd>{preview.shards_available.toLocaleString()}</dd>
+        <dd>
+          <CurrencyDisplay
+            currency={CurrencyType.SHARDS}
+            amount={preview.shards_available}
+            display_mode={CurrencyDisplayMode.BALANCE}
+            show_label={false}
+          />
+        </dd>
         {preview.alchemy_bag_capacity && (
           <>
             <dt className="text-gray-600 dark:text-gray-400">
@@ -243,6 +300,7 @@ const AlchemyAmountScreen = (): ReactNode => {
             loading ? 'Loading Alchemy items...' : 'No Alchemy items found.'
           }
           search_placeholder="Search Alchemy items"
+          render_item_content={renderItemOption}
         />
       </fieldset>
 

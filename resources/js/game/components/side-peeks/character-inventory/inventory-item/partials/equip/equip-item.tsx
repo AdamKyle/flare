@@ -4,6 +4,7 @@ import React, { useMemo } from 'react';
 
 import EquipComparison from './equip-comparison';
 import { TOP_ADVANCED_CHILD_FIELDS } from '../../../../../../reusable-components/item/constants/item-comparison-constants';
+import { UNSUPPORTED_EQUIPMENT_MESSAGE } from '../../../../../../reusable-components/item/constants/unsupported-equipment-message';
 import { ItemBaseTypes } from '../../../../../../reusable-components/item/enums/item-base-type';
 import EquipItemActions from '../../../../../../reusable-components/item/equip-item-actions';
 import { getType } from '../../../../../../reusable-components/item/utils/get-type';
@@ -21,6 +22,8 @@ import ItemMetaSection from '../item-view/item-meta-tsx';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 
+import { Alert } from 'ui/alerts/alert';
+import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 import Separator from 'ui/separator/separator';
 import PillTabs from 'ui/tabs/pill-tabs';
@@ -80,6 +83,14 @@ const EquipItem = ({
       TOP_ADVANCED_CHILD_FIELDS
     )
   );
+
+  if (!itemToEquip || getType(itemToEquip, armourPositions) === null) {
+    return (
+      <Alert variant={AlertVariant.DANGER}>
+        {UNSUPPORTED_EQUIPMENT_MESSAGE}
+      </Alert>
+    );
+  }
 
   const handleEquipItem = (
     requestParams: UseEquipItemRequestParamsDefinition

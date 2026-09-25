@@ -1,5 +1,8 @@
 import React from 'react';
 
+import CurrencyDisplay from '../../../../../reusable-components/currency/currency-display';
+import { CurrencyDisplayMode } from '../../../../../reusable-components/currency/enums/currency-display-mode';
+import { CurrencyType } from '../../../../../reusable-components/currency/enums/currency-type';
 import MonsterSectionProps from '../types/partials/monster-section-props';
 
 import {
@@ -37,7 +40,14 @@ const MonsterRewardsSection = (props: MonsterSectionProps) => {
     return (
       <>
         <Dt>Gold:</Dt>
-        <Dd>{formatNumberWithCommas(monster.gold)}</Dd>
+        <Dd>
+          <CurrencyDisplay
+            currency={CurrencyType.GOLD}
+            amount={monster.gold}
+            display_mode={CurrencyDisplayMode.EXACT}
+            show_label={false}
+          />
+        </Dd>
       </>
     );
   };
@@ -50,7 +60,14 @@ const MonsterRewardsSection = (props: MonsterSectionProps) => {
     return (
       <>
         <Dt>Shard Reward:</Dt>
-        <Dd>{formatNumberWithCommas(monster.shard_reward)}</Dd>
+        <Dd>
+          <CurrencyDisplay
+            currency={CurrencyType.SHARDS}
+            amount={monster.shard_reward}
+            display_mode={CurrencyDisplayMode.EXACT}
+            show_label={false}
+          />
+        </Dd>
       </>
     );
   };

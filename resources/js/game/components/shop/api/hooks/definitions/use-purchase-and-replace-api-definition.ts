@@ -1,10 +1,12 @@
 import { AxiosErrorDefinition } from 'api-handler/definitions/axios-error-definition';
 
 import UsePurchaseAndReplaceApiRequestDefinition from './use-purchase-and-replace-api-request-definition';
-import { StateSetter } from '../../../../../../types/state-setter-type';
+import UsePurchaseAndReplaceApiResponseDefinition from './use-purchase-and-replace-api-response-definition';
 
 export default interface UsePurchaseAndReplaceApiDefinition {
   error: AxiosErrorDefinition | null;
   loading: boolean;
-  setRequestParams: StateSetter<UsePurchaseAndReplaceApiRequestDefinition>;
+  mutate: (
+    request: UsePurchaseAndReplaceApiRequestDefinition
+  ) => Promise<UsePurchaseAndReplaceApiResponseDefinition | null>;
 }

@@ -32,6 +32,7 @@ export const uniqueItemRecord: Partial<
   [InventoryItemTypes.SCRATCH_AWL]: `${EquipmentImagePaths.UNIQUE_ITEMS}/scratch-awl-unique.gif`,
   [InventoryItemTypes.WAND]: `${EquipmentImagePaths.UNIQUE_ITEMS}/wand-unique.gif`,
   [InventoryItemTypes.CENSOR]: `${EquipmentImagePaths.UNIQUE_ITEMS}/censor-unique.gif`,
+  [InventoryItemTypes.CENSER]: `${EquipmentImagePaths.UNIQUE_ITEMS}/censor-unique.gif`,
   [InventoryItemTypes.SPELL_HEALING]: `${EquipmentImagePaths.UNIQUE_ITEMS}/spell-healing-unique.gif`,
   [InventoryItemTypes.SPELL_DAMAGE]: `${EquipmentImagePaths.UNIQUE_ITEMS}/spell-damage-unique.gif`,
   [InventoryItemTypes.RING]: `${EquipmentImagePaths.UNIQUE_ITEMS}/ring-unique.gif`,

@@ -10,12 +10,17 @@ use App\Game\BattleRewardProcessing\Services\BattleRewardMessageOutboxService;
 use App\Game\BattleRewardProcessing\Services\CharacterCurrencyRewardService;
 use App\Game\Gems\Progression\Values\GemProgressionBands;
 use App\Game\Gems\Progression\Values\GemScrollAggregate;
+use App\Game\Gems\Progression\Values\GemWorldRewardApplicationResult;
 use App\Game\Gems\Progression\Values\GemWorldRewardPlan;
 use App\Game\Gems\Progression\Values\ResolvedGemWorldProfile;
 use Illuminate\Support\Facades\DB;
+use RuntimeException;
+use Throwable;
 
 class GemWorldRewardService
 {
+    private ?Throwable $calculationFailure = null;
+
     /**
      * @param GemWorldProfileResolver $gemWorldProfileResolver
      * @param GemProgressionService $gemProgressionService
@@ -47,7 +52,7 @@ class GemWorldRewardService
      * @param array $effectiveMonster
      * @param int $qualifyingKills
      * @param array $earnedCurrencies
-     * @return array
+     * @return GemWorldRewardApplicationResult
      */
     public function applyToLedgerStep(
         CharacterBattleRewardRequestStep $step,
@@ -55,17 +60,26 @@ class GemWorldRewardService
         array $effectiveMonster,
         int $qualifyingKills,
         array $earnedCurrencies,
-    ): array {
+    ): GemWorldRewardApplicationResult {
+        $this->calculationFailure = null;
+
         $resolvedProfile = $this->gemWorldProfileResolver->resolveForCharacter($character);
 
         if (is_null($resolvedProfile)) {
-            return ['applied' => false, 'reason' => 'not_a_gem_world'];
+            return GemWorldRewardApplicationResult::success([
+                'applied' => false,
+                'reason' => 'not_a_gem_world',
+            ]);
         }
 
         $checkpoint = $step->checkpoint_json ?? [];
 
         if (! ($checkpoint['xp_applied'] ?? false)) {
             [$step, $checkpoint] = $this->applyXpPhase($step, $checkpoint, $character, $resolvedProfile, $effectiveMonster, $qualifyingKills);
+        }
+
+        if (! is_null($this->calculationFailure)) {
+            return GemWorldRewardApplicationResult::failed($this->calculationFailure);
         }
 
         if (! ($checkpoint['reward_plan'] ?? null)) {
@@ -80,8 +94,12 @@ class GemWorldRewardService
             [$step, $checkpoint] = $this->applyCurrencyScrollBonusPhase($step, $checkpoint, $character, $resolvedProfile, $earnedCurrencies);
         }
 
+        if (! is_null($this->calculationFailure)) {
+            return GemWorldRewardApplicationResult::failed($this->calculationFailure);
+        }
+
         if (! ($checkpoint['messages_stored'] ?? false)) {
-            [$step, $checkpoint] = $this->storeLostRewardMessagesPhase($step, $checkpoint, $character);
+            [$step, $checkpoint] = $this->storeRewardMessagesPhase($step, $checkpoint, $character);
         }
 
         $this->gemProgressionBroadcastService->broadcastForProfile(
@@ -93,12 +111,12 @@ class GemWorldRewardService
             $checkpoint['personal_xp'],
         );
 
-        return [
+        return GemWorldRewardApplicationResult::success([
             'applied' => true,
             'profile_type' => $resolvedProfile->type()->value,
             'profile_id' => $resolvedProfile->profileId(),
             'personal_level' => $checkpoint['personal_level'],
-        ];
+        ]);
     }
 
     /**
@@ -121,7 +139,13 @@ class GemWorldRewardService
         int $qualifyingKills,
     ): array {
         return DB::transaction(function () use ($step, $checkpoint, $character, $resolvedProfile, $effectiveMonster, $qualifyingKills): array {
-            $checkpoint = array_merge($checkpoint, $this->applyGemXp($character, $resolvedProfile, $effectiveMonster, $qualifyingKills));
+            $xpCheckpoint = $this->applyGemXp($character, $resolvedProfile, $effectiveMonster, $qualifyingKills);
+
+            if (! is_null($this->calculationFailure)) {
+                return [$step, $checkpoint];
+            }
+
+            $checkpoint = array_merge($checkpoint, $xpCheckpoint);
             $checkpoint['xp_applied'] = true;
             $step = $this->battleRewardLedgerService->checkpointStep($step, $checkpoint);
 
@@ -140,14 +164,35 @@ class GemWorldRewardService
      */
     private function applyGemXp(Character $character, ResolvedGemWorldProfile $resolvedProfile, array $effectiveMonster, int $qualifyingKills): array
     {
-        $globalXpPerKill = intval(round($effectiveMonster['xp'] * GemProgressionBands::GLOBAL_BASE_XP_MULTIPLIER));
+        $globalXpPerKill = $this->wholeAmount(
+            $effectiveMonster['xp'] * GemProgressionBands::GLOBAL_BASE_XP_MULTIPLIER,
+        );
+
+        if (is_null($globalXpPerKill)) {
+            return [];
+        }
+
         $globalXpTotal = $globalXpPerKill * $qualifyingKills;
 
-        $personalXpPerKill = intval(round($effectiveMonster['xp'] * GemProgressionBands::PERSONAL_BASE_XP_MULTIPLIER));
+        $personalXpPerKill = $this->wholeAmount(
+            $effectiveMonster['xp'] * GemProgressionBands::PERSONAL_BASE_XP_MULTIPLIER,
+        );
+
+        if (is_null($personalXpPerKill)) {
+            return [];
+        }
+
         $personalBaseXpTotal = $personalXpPerKill * $qualifyingKills;
 
         $xpScrollBonus = $this->resolveScrollAggregate($character, $resolvedProfile)->xpBonusTotal();
-        $personalXpTotal = intval(round($personalBaseXpTotal * (1 + $xpScrollBonus)));
+
+        $personalXpTotal = $this->wholeAmount(
+            $personalBaseXpTotal * (1 + $xpScrollBonus),
+        );
+
+        if (is_null($personalXpTotal)) {
+            return [];
+        }
 
         if ($resolvedProfile->isMapProfile()) {
             $globalResult = $this->gemProgressionService->applyGlobalMapProgressionXp($resolvedProfile->mapProfile(), $globalXpTotal);
@@ -164,6 +209,8 @@ class GemWorldRewardService
             'global_xp' => $globalResult->newXp(),
             'global_leveled_up' => $globalResult->leveledUp(),
             'personal_leveled_up' => $personalResult->leveledUp(),
+            'global_xp_applied' => $globalResult->xpApplied(),
+            'personal_xp_applied' => $personalResult->xpApplied(),
         ];
     }
 
@@ -243,6 +290,10 @@ class GemWorldRewardService
             'copper_coins' => $this->currencyScrollBonusAmount($currencies['copper_coins'] ?? 0, $scrollAggregate->copperCoinBonusTotal()),
         ];
 
+        if (in_array(null, $bonusAmounts, true)) {
+            return [$step, $checkpoint];
+        }
+
         $checkpoint['currency_scroll_result'] = $this->characterCurrencyRewardService->applyGemScrollBonus($character->fresh(), $bonusAmounts);
         $checkpoint['currency_scroll_applied'] = true;
         $step = $this->battleRewardLedgerService->checkpointStep($step, $checkpoint);
@@ -255,32 +306,62 @@ class GemWorldRewardService
      *
      * @param int $baseAmount
      * @param float $bonusRatio
-     * @return int
+     * @return ?int
      */
-    private function currencyScrollBonusAmount(int $baseAmount, float $bonusRatio): int
+    private function currencyScrollBonusAmount(int $baseAmount, float $bonusRatio): ?int
     {
         if ($bonusRatio <= 0.0 || $baseAmount <= 0) {
             return 0;
         }
 
-        return intval(round($baseAmount * $bonusRatio));
+        return $this->wholeAmount($baseAmount * $bonusRatio);
     }
 
     /**
-     * Store a one-time warning message for every reward lost to a full Alchemy Bag/inventory or a currency cap this request.
+     * Round a floating XP or currency amount to its validated whole integer value, or null when the
+     * calculation is invalid. Follows the Battle Reward numeric-failure convention used by
+     * `CharacterXPService` and `CharacterCurrencyRewardService`.
+     *
+     * @param float $amount
+     * @return ?int
+     */
+    private function wholeAmount(float $amount): ?int
+    {
+        $wholeAmount = filter_var(round($amount), FILTER_VALIDATE_INT);
+
+        if ($wholeAmount === false) {
+            $this->calculationFailure = new RuntimeException(
+                'Invalid whole amount calculated: '.$amount.' cannot be represented as an integer.',
+            );
+
+            return null;
+        }
+
+        return $wholeAmount;
+    }
+
+    /**
+     * Store the enabled Gem Progression XP messages and the existing lost-reward warning messages, then mark the messages phase complete.
      *
      * @param CharacterBattleRewardRequestStep $step
      * @param array $checkpoint
      * @param Character $character
      * @return array
      */
-    private function storeLostRewardMessagesPhase(CharacterBattleRewardRequestStep $step, array $checkpoint, Character $character): array
+    private function storeRewardMessagesPhase(CharacterBattleRewardRequestStep $step, array $checkpoint, Character $character): array
     {
-        foreach ($this->buildLostRewardMessages($checkpoint) as $message) {
+        $user = $character->user;
+
+        $messages = array_merge(
+            $this->buildProgressionXpMessages($character, $checkpoint),
+            $this->buildLostRewardMessages($checkpoint),
+        );
+
+        foreach ($messages as $message) {
             $this->battleRewardMessageOutboxService->storeMessage(
                 $step->character_battle_reward_request_id,
                 $character->id,
-                $character->user_id,
+                $user->id,
                 $step->step_name->value,
                 $message,
             );
@@ -290,6 +371,33 @@ class GemWorldRewardService
         $step = $this->battleRewardLedgerService->checkpointStep($step, $checkpoint);
 
         return [$step, $checkpoint];
+    }
+
+    /**
+     * Build the enabled Global/Personal Gem Progression XP messages for this request's checkpointed applied XP.
+     *
+     * @param Character $character
+     * @param array $checkpoint
+     * @return array
+     */
+    private function buildProgressionXpMessages(Character $character, array $checkpoint): array
+    {
+        $user = $character->user;
+        $messages = [];
+
+        $globalXpApplied = $checkpoint['global_xp_applied'] ?? 0;
+
+        if ($globalXpApplied > 0 && $user->show_global_gem_progression_xp_messages) {
+            $messages[] = 'You contributed '.number_format($globalXpApplied).' XP towards Global Gem Progression.';
+        }
+
+        $personalXpApplied = $checkpoint['personal_xp_applied'] ?? 0;
+
+        if ($personalXpApplied > 0 && $user->show_personal_gem_progression_xp_messages) {
+            $messages[] = 'You gained '.number_format($personalXpApplied).' Personal Gem Progression XP.';
+        }
+
+        return $messages;
     }
 
     /**

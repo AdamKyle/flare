@@ -2,7 +2,9 @@ import clsx from 'clsx';
 import React from 'react';
 
 import SetSailSectionProps from './types/set-sail-section-props';
-import { formatNumberWithCommas } from '../../../../../util/format-number';
+import CurrencyDisplay from '../../../../../reusable-components/currency/currency-display';
+import { CurrencyDisplayMode } from '../../../../../reusable-components/currency/enums/currency-display-mode';
+import { CurrencyType } from '../../../../../reusable-components/currency/enums/currency-type';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
@@ -42,7 +44,13 @@ const SetSailSection = ({
           Your Gold:
         </span>
         <span className="font-mono text-gray-900 dark:text-gray-100">
-          {formatNumberWithCommas(character_gold)}
+          <CurrencyDisplay
+            currency={CurrencyType.GOLD}
+            amount={character_gold}
+            display_mode={CurrencyDisplayMode.BALANCE}
+            label="Your Gold"
+            show_label={false}
+          />
         </span>
       </div>
       <div className="flex justify-between">
@@ -57,7 +65,11 @@ const SetSailSection = ({
               : 'text-rose-600 dark:text-rose-500'
           )}
         >
-          {formatNumberWithCommas(selected_port.cost)}
+          <CurrencyDisplay
+            currency={CurrencyType.GOLD}
+            amount={selected_port.cost}
+            display_mode={CurrencyDisplayMode.EXACT}
+          />
         </span>
       </div>
       <div className="flex justify-between">

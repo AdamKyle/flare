@@ -14,4 +14,6 @@ export default interface GenericItemListProps {
   is_selection_disabled?: boolean;
   use_item_id?: boolean;
   quest_item_ownership_state?: QuestItemOwnershipState;
+  is_selectable?: boolean;
+  empty_message?: string;
 }

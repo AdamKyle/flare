@@ -17,6 +17,7 @@ use App\Game\Core\Combat\Values\AttackType;
 use App\Game\Core\Items\Values\ItemType;
 use App\Game\Core\Services\CharacterService;
 use App\Game\Core\Values\FactionLevel;
+use App\Game\Core\Values\LevelUpValue;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use App\Game\Skills\Values\SkillTypeValue;
 use DB;
@@ -579,7 +580,7 @@ class CharacterFactory
      */
     public function levelCharacterUp(int $levels = 1): CharacterFactory
     {
-        $characterService = new CharacterService;
+        $characterService = new CharacterService(new LevelUpValue);
 
         for ($i = 0; $i <= $levels; $i++) {
             $characterService->levelUpCharacter($this->character, 0);

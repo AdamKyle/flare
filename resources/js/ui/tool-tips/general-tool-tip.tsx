@@ -39,7 +39,6 @@ const GeneralToolTip = (props: GeneralToolTipProps) => {
       on_open={on_open}
       on_close={on_close}
       content={getMessage()}
-      placementDeps={[label]}
       trigger={trigger}
       trigger_aria_label={triggerAriaLabel}
       placement={placement}

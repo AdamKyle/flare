@@ -15,13 +15,17 @@ use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardSharedContextService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardStepPlanService;
 use App\Game\BattleRewardProcessing\Services\CharacterRewardService;
+use App\Game\Gems\Progression\Services\GemWorldRewardService;
+use App\Game\Gems\Progression\Values\GemWorldRewardApplicationResult;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use RuntimeException;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\Setup\GemProgression\GemWorldRewardTestFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterBattleReward;
 use Tests\Traits\CreateMonster;
@@ -45,7 +49,7 @@ class BattleRewardXpCheckpointResumeTest extends TestCase
         $characterRewardService->shouldReceive('fetchXpForMonster')->once()->andReturn(150);
         $characterRewardService->shouldReceive('xpCalculationFailure')->andReturn(null);
         $characterRewardService->shouldReceive('distributeCheckpointedXp')->once()->withArgs(function (int $xp, callable $callback): bool {
-            $callback($xp, 0, Character::first());
+            $callback($xp, 0, Character::first(), []);
 
             return $xp === 150;
         })->andReturnSelf();
@@ -76,7 +80,7 @@ class BattleRewardXpCheckpointResumeTest extends TestCase
         $characterRewardService->shouldReceive('setCharacter')->once()->andReturnSelf();
         $characterRewardService->shouldReceive('fetchXpForMonster')->never();
         $characterRewardService->shouldReceive('distributeCheckpointedXp')->once()->withArgs(function (int $xp, callable $callback): bool {
-            $callback($xp, 0, Character::first());
+            $callback($xp, 0, Character::first(), []);
 
             return $xp === 125;
         })->andReturnSelf();
@@ -131,7 +135,7 @@ class BattleRewardXpCheckpointResumeTest extends TestCase
         $characterRewardService->shouldReceive('setCharacter')->once()->andReturnSelf();
         $characterRewardService->shouldReceive('fetchXpForMonster')->never();
         $characterRewardService->shouldReceive('distributeCheckpointedXp')->once()->withArgs(function (int $xp, callable $callback): bool {
-            $callback($xp, 0, Character::first());
+            $callback($xp, 0, Character::first(), []);
 
             return $xp === 75;
         })->andReturnSelf();
@@ -325,6 +329,33 @@ class BattleRewardXpCheckpointResumeTest extends TestCase
         $this->assertSame(0, CharacterBattleRewardRequestMessage::where('character_battle_reward_request_id', $request->id)->where('message', 'like', 'You gained:%')->count());
     }
 
+    public function test_gem_world_reward_calculation_failure_fails_the_ledger_step_without_the_public_battle_reward_service_method_throwing(): void
+    {
+        $graph = (new GemWorldRewardTestFactory)->buildGeneratedMapGemWorldCharacter();
+        $character = $graph->character;
+        $monster = $this->createMonster(['game_map_id' => $character->map->gameMap->monsterSourceGameMap()->id]);
+        $request = $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+            'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
+        ]);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request, resolve(BattleRewardStepPlanService::class)->planBattleLike($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster)));
+        $request->steps()->where('step_name', '!=', BattleRewardStepName::GEM_WORLD_REWARDS)->update(['status' => BattleRewardStepStatus::COMPLETED]);
+
+        $failure = new RuntimeException('Invalid whole amount calculated: test failure.');
+
+        $gemWorldRewardService = Mockery::mock(GemWorldRewardService::class);
+        $gemWorldRewardService->shouldReceive('applyToLedgerStep')->once()->andReturn(GemWorldRewardApplicationResult::failed($failure));
+        $this->instance(GemWorldRewardService::class, $gemWorldRewardService);
+
+        $result = resolve(BattleRewardService::class)->processLedgerAwareRewards($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster));
+
+        $this->assertFalse($result->successful());
+        $this->assertSame($failure, $result->failure());
+
+        $step = $request->steps()->where('step_name', BattleRewardStepName::GEM_WORLD_REWARDS)->firstOrFail();
+        $this->assertSame(BattleRewardStepStatus::FAILED, $step->status);
+    }
+
     public function test_resumed_xp_step_does_not_duplicate_level_up_effects(): void
     {
         Event::fake();
@@ -376,5 +407,163 @@ class BattleRewardXpCheckpointResumeTest extends TestCase
         $this->assertSame($xpNextAfterFirstPass, $characterAfterResume->xp_next);
         $this->assertSame($levelUpMessageCountAfterFirstPass, CharacterBattleRewardRequestMessage::where('character_battle_reward_request_id', $request->id)->where('step_name', BattleRewardStepName::XP)->where('message', 'like', '%level%')->count());
         $this->assertSame($checkpointAfterFirstPass['current_level'], $request->steps()->where('step_name', BattleRewardStepName::XP)->firstOrFail()->checkpoint_json['current_level']);
+    }
+
+    public function test_multi_level_xp_checkpoint_records_final_state_and_the_ordered_progression_timeline(): void
+    {
+        Event::fake();
+        Queue::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character->update(['level' => 1, 'xp' => 0, 'xp_next' => 100, 'xp_penalty' => 0]);
+        $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id, 'max_level' => 9999]);
+        $request = $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+            'source_type' => BattleRewardRequestSourceType::EXPLORATION,
+            'handler_payload' => ['monster_id' => $monster->id, 'context' => ['total_creatures' => 1, 'total_xp' => 350]],
+        ]);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request, resolve(BattleRewardStepPlanService::class)->planBattleLike($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster)));
+        $request->steps()->where('step_name', '!=', BattleRewardStepName::XP)->update(['status' => BattleRewardStepStatus::COMPLETED]);
+
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster));
+
+        $checkpoint = $request->steps()->where('step_name', BattleRewardStepName::XP)->firstOrFail()->checkpoint_json;
+
+        $this->assertSame(4, $checkpoint['current_level']);
+        $this->assertSame(50, $checkpoint['current_xp']);
+        $this->assertSame(3, $checkpoint['levels_awarded']);
+        $this->assertSame(0, $checkpoint['remaining_xp']);
+        $this->assertSame(
+            [[2, 250, 100], [3, 150, 100], [4, 50, 100]],
+            array_map(fn (array $snapshot): array => [$snapshot['level'], $snapshot['xp'], $snapshot['xp_next']], $checkpoint['progression']),
+        );
+    }
+
+    public function test_multi_level_xp_award_stores_one_ordered_level_up_outbox_message_per_trigger(): void
+    {
+        Event::fake();
+        Queue::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character->update(['level' => 1, 'xp' => 0, 'xp_next' => 100, 'xp_penalty' => 0]);
+        $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id, 'max_level' => 9999]);
+        $request = $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+            'source_type' => BattleRewardRequestSourceType::EXPLORATION,
+            'handler_payload' => ['monster_id' => $monster->id, 'context' => ['total_creatures' => 1, 'total_xp' => 350]],
+        ]);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request, resolve(BattleRewardStepPlanService::class)->planBattleLike($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster)));
+        $request->steps()->where('step_name', '!=', BattleRewardStepName::XP)->update(['status' => BattleRewardStepStatus::COMPLETED]);
+
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster));
+
+        $levelUpMessages = CharacterBattleRewardRequestMessage::where('character_battle_reward_request_id', $request->id)
+            ->where('step_name', BattleRewardStepName::XP)
+            ->where('message', 'like', 'You are now level:%')
+            ->orderBy('id')
+            ->get();
+
+        $this->assertSame(
+            ['You are now level: 2!', 'You are now level: 3!', 'You are now level: 4!'],
+            $levelUpMessages->pluck('message')->all(),
+        );
+        $this->assertSame(3, $levelUpMessages->whereNull('emitted_at')->count());
+    }
+
+    public function test_resumed_xp_step_with_no_remaining_xp_keeps_the_progression_and_does_not_reapply_xp_or_duplicate_level_up_messages(): void
+    {
+        Event::fake();
+        Queue::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character->update(['level' => 1, 'xp' => 0, 'xp_next' => 100, 'xp_penalty' => 0]);
+        $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id, 'max_level' => 9999]);
+        $request = $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+            'source_type' => BattleRewardRequestSourceType::EXPLORATION,
+            'handler_payload' => ['monster_id' => $monster->id, 'context' => ['total_creatures' => 1, 'total_xp' => 350]],
+        ]);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request, resolve(BattleRewardStepPlanService::class)->planBattleLike($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster)));
+        $request->steps()->where('step_name', '!=', BattleRewardStepName::XP)->update(['status' => BattleRewardStepStatus::COMPLETED]);
+
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster));
+
+        $request->steps()->where('step_name', BattleRewardStepName::XP)->update([
+            'status' => BattleRewardStepStatus::RESUMABLE,
+            'completed_at' => null,
+        ]);
+
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request->refresh(), resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster));
+
+        $character = $character->refresh();
+        $xpStep = $request->steps()->where('step_name', BattleRewardStepName::XP)->firstOrFail();
+
+        $this->assertSame(4, $character->level);
+        $this->assertSame(50, $character->xp);
+        $this->assertCount(3, $xpStep->checkpoint_json['progression']);
+        $this->assertSame(3, CharacterBattleRewardRequestMessage::where('character_battle_reward_request_id', $request->id)->where('message', 'like', 'You are now level:%')->count());
+    }
+
+    public function test_failed_level_up_message_storage_rolls_back_the_character_xp_and_its_checkpoint(): void
+    {
+        Event::fake();
+        Queue::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character->update(['level' => 1, 'xp' => 0, 'xp_next' => 100, 'xp_penalty' => 0]);
+        $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id, 'max_level' => 9999]);
+        $request = $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+            'source_type' => BattleRewardRequestSourceType::EXPLORATION,
+            'handler_payload' => ['monster_id' => $monster->id, 'context' => ['total_creatures' => 1, 'total_xp' => 350]],
+        ]);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request, resolve(BattleRewardStepPlanService::class)->planBattleLike($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster)));
+        $request->steps()->where('step_name', '!=', BattleRewardStepName::XP)->update(['status' => BattleRewardStepStatus::COMPLETED]);
+        $messageOutboxService = Mockery::mock(BattleRewardMessageOutboxService::class)->makePartial();
+        $messageOutboxService->shouldReceive('storeMessages')->once()->andThrow(new RuntimeException('outbox insert failed'));
+        $this->instance(BattleRewardMessageOutboxService::class, $messageOutboxService);
+
+        $result = resolve(BattleRewardService::class)->processLedgerAwareRewards($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster));
+
+        $character = $character->refresh();
+        $xpStep = $request->steps()->where('step_name', BattleRewardStepName::XP)->firstOrFail();
+
+        $this->assertFalse($result->successful());
+        $this->assertSame(1, $character->level);
+        $this->assertSame(0, $character->xp);
+        $this->assertArrayNotHasKey('remaining_xp', $xpStep->checkpoint_json ?? []);
+        $this->assertSame(0, CharacterBattleRewardRequestMessage::where('character_battle_reward_request_id', $request->id)->where('message', 'like', 'You are now level:%')->count());
+    }
+
+    public function test_resumed_exploration_xp_step_does_not_duplicate_the_exploration_xp_message(): void
+    {
+        Event::fake();
+        Queue::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character->user->update(['show_xp_for_exploration' => true]);
+        $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id, 'max_level' => 9999]);
+        DB::table('sessions')->insert([[
+            'id' => 'exploration-xp-message-resume',
+            'user_id' => $character->user_id,
+            'ip_address' => '127.0.0.1',
+            'user_agent' => 'PHPUnit',
+            'payload' => 'payload',
+            'last_activity' => now()->timestamp,
+        ]]);
+        $request = $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+            'source_type' => BattleRewardRequestSourceType::EXPLORATION,
+            'handler_payload' => ['monster_id' => $monster->id, 'context' => ['total_creatures' => 3, 'total_xp' => 45]],
+        ]);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request, resolve(BattleRewardStepPlanService::class)->planBattleLike($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster)));
+        $request->steps()->where('step_name', '!=', BattleRewardStepName::XP)->update(['status' => BattleRewardStepStatus::COMPLETED]);
+
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request, resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster));
+
+        $request->steps()->where('step_name', BattleRewardStepName::XP)->update([
+            'status' => BattleRewardStepStatus::RESUMABLE,
+            'checkpoint_json' => null,
+            'completed_at' => null,
+        ]);
+
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request->refresh(), resolve(BattleRewardSharedContextService::class)->build($request, $character, $monster));
+
+        $this->assertSame(1, CharacterBattleRewardRequestMessage::where('character_battle_reward_request_id', $request->id)->where('message', 'like', 'You slaughtered:%')->count());
     }
 }

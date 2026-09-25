@@ -52,6 +52,8 @@ const resolveRequiredQuestItemCopy = (
 const GameMapDetail = ({
   game_map: gameMap,
   split_layout: splitLayout = false,
+  single_column: singleColumn = false,
+  gem_section: gemSection,
 }: GameMapDetailProps): ReactNode => {
   const bonusEntries = resolveBonusEntries(gameMap);
   const hasAccessRows =
@@ -176,6 +178,7 @@ const GameMapDetail = ({
   const hasFactsBelowDescription =
     hasAccessRows ||
     Boolean(gameMap.required_quest_item) ||
+    Boolean(gemSection) ||
     bonusEntries.length > 0;
 
   return (
@@ -192,7 +195,7 @@ const GameMapDetail = ({
           className="h-full w-full object-contain"
         />
       </div>
-      <DetailGrid>
+      <DetailGrid single_column={singleColumn}>
         {gameMap.description && (
           <div className="col-span-full">{renderDescription()}</div>
         )}
@@ -201,6 +204,7 @@ const GameMapDetail = ({
         )}
         {renderAccessConfiguration()}
         {renderRequiredQuestItem()}
+        {gemSection}
         {renderBonuses()}
       </DetailGrid>
     </div>

@@ -56,6 +56,7 @@ const GoblinShop = ({ on_close }: GoblinShopProps) => {
             item={item}
             view_item={handleViewItem}
             action_disabled={inventoryIsFull || gold_bars <= 0}
+            gold_bars={gold_bars}
           />
         ))}
       </InfiniteRow>

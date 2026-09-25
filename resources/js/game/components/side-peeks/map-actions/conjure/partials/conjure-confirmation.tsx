@@ -2,9 +2,10 @@ import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import React from 'react';
 
 import ConjureConfirmationProps from './types/conjure-confirmation-props';
+import CurrencyDisplay from '../../../../../reusable-components/currency/currency-display';
+import { CurrencyDisplayMode } from '../../../../../reusable-components/currency/enums/currency-display-mode';
+import { CurrencyType } from '../../../../../reusable-components/currency/enums/currency-type';
 import { ConjureType } from '../api/enums/conjure-type';
-
-import { formatNumberWithCommas } from 'game-utils/format-number';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
@@ -86,10 +87,24 @@ const ConjureConfirmation = ({
         <Dd>{celestial_name}</Dd>
 
         <Dt>Gold Cost:</Dt>
-        <Dd>{formatNumberWithCommas(gold_cost)}</Dd>
+        <Dd>
+          <CurrencyDisplay
+            currency={CurrencyType.GOLD}
+            amount={gold_cost}
+            display_mode={CurrencyDisplayMode.EXACT}
+            show_label={false}
+          />
+        </Dd>
 
         <Dt>Gold Dust Cost:</Dt>
-        <Dd>{formatNumberWithCommas(gold_dust_cost)}</Dd>
+        <Dd>
+          <CurrencyDisplay
+            currency={CurrencyType.GOLD_DUST}
+            amount={gold_dust_cost}
+            display_mode={CurrencyDisplayMode.EXACT}
+            show_label={false}
+          />
+        </Dd>
       </Dl>
 
       <Separator />

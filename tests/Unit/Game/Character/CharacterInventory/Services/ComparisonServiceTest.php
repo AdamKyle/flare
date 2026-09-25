@@ -2,10 +2,37 @@
 
 namespace Tests\Unit\Game\Character\CharacterInventory\Services;
 
+use App\Flare\Pagination\Pagination;
+use App\Flare\Transformers\Serializer\PlainDataSerializer;
+use App\Game\Character\CharacterAttack\Transformers\CharacterAttackTransformer;
+use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\ComparisonService;
+use App\Game\Character\CharacterInventory\Services\EquipItemService;
+use App\Game\Character\CharacterInventory\Services\InventorySetService;
+use App\Game\Character\CharacterInventory\Transformers\CharacterGemsTransformer;
+use App\Game\Character\CharacterInventory\Transformers\InventorySetOptionTransformer;
+use App\Game\Character\CharacterInventory\Transformers\InventoryTransformer;
+use App\Game\Character\CharacterInventory\Validations\SetHandsValidation;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\PhpRandomNumberGenerator;
+use App\Game\Core\Items\Enricher\EquippableEnricher;
+use App\Game\Core\Items\Enricher\ItemEnricherFactory;
+use App\Game\Core\Items\Transformers\Api\UsableItemTransformer as ApiUsableItemTransformer;
+use App\Game\Core\Items\Transformers\EquippableItemTransformer;
+use App\Game\Core\Items\Transformers\QuestItemTransformer;
+use App\Game\Core\Items\Transformers\UsableItemTransformer;
 use App\Game\Core\Items\Values\ArmourType;
 use App\Game\Core\Items\Values\ItemType;
+use App\Game\Core\Values\ValidEquipPositionsValue;
+use App\Game\Gems\Services\GemComparison;
+use App\Game\Gems\Services\ItemAtonements;
+use App\Game\Skills\Services\DisenchantService;
+use App\Game\Skills\Services\MassDisenchantService;
+use App\Game\Skills\Services\SkillCheckService;
+use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use League\Fractal\Manager;
+use Mockery;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
@@ -25,12 +52,52 @@ class ComparisonServiceTest extends TestCase
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
 
-        $this->comparisonService = resolve(ComparisonService::class);
+        $manager = new Manager;
+        $plainDataSerializer = new PlainDataSerializer;
+        $randomNumberGenerator = new PhpRandomNumberGenerator;
+        $equippableItemTransformer = new EquippableItemTransformer;
+        $questItemTransformer = new QuestItemTransformer;
+        $apiUsableItemTransformer = new ApiUsableItemTransformer;
+        $inventorySetService = new InventorySetService(new SetHandsValidation);
+
+        $itemEnricherFactory = new ItemEnricherFactory(
+            new EquippableEnricher,
+            $equippableItemTransformer,
+            new UsableItemTransformer,
+            $questItemTransformer,
+            $plainDataSerializer,
+            $manager,
+        );
+
+        $this->comparisonService = new ComparisonService(
+            new ValidEquipPositionsValue,
+            new CharacterInventoryService(
+                $itemEnricherFactory,
+                $equippableItemTransformer,
+                $questItemTransformer,
+                $apiUsableItemTransformer,
+                new InventoryTransformer($itemEnricherFactory),
+                $inventorySetService,
+                new MassDisenchantService(new SkillCheckService($randomNumberGenerator), $randomNumberGenerator, new ChanceCalculator($randomNumberGenerator)),
+                Mockery::mock(UpdateCharacterSkillsService::class),
+                Mockery::mock(DisenchantService::class),
+                new Pagination($manager),
+                $manager,
+                new InventorySetOptionTransformer,
+            ),
+            new EquipItemService($manager, new CharacterAttackTransformer, $inventorySetService),
+            new ItemAtonements(new GemComparison(new CharacterGemsTransformer, $plainDataSerializer, $manager)),
+            $manager,
+            $equippableItemTransformer,
+            $apiUsableItemTransformer,
+        );
     }
 
     protected function tearDown(): void
     {
         parent::tearDown();
+
+        Mockery::close();
 
         $this->character = null;
 
@@ -45,7 +112,7 @@ class ComparisonServiceTest extends TestCase
 
         $slot = $character->inventory->slots->first();
 
-        $comparisonData = $this->comparisonService->buildComparisonData($character, $slot, ItemType::DAGGER->value);
+        $comparisonData = $this->comparisonService->buildComparisonData($character, $slot);
 
         $this->assertEmpty($comparisonData['details']);
     }
@@ -66,7 +133,7 @@ class ComparisonServiceTest extends TestCase
 
         $slot = $character->inventory->slots->first();
 
-        $comparisonData = $this->comparisonService->buildComparisonData($character, $slot, ItemType::SWORD->value);
+        $comparisonData = $this->comparisonService->buildComparisonData($character, $slot);
 
         $this->assertEmpty($comparisonData['details']);
         $this->assertEquals($item->affix_name, $comparisonData['itemToEquip']['name']);
@@ -88,7 +155,7 @@ class ComparisonServiceTest extends TestCase
 
         $slot = $character->inventory->slots->first();
 
-        $comparisonData = $this->comparisonService->buildComparisonData($character, $slot, ItemType::STAVE->value);
+        $comparisonData = $this->comparisonService->buildComparisonData($character, $slot);
 
         $this->assertEmpty($comparisonData['details']);
         $this->assertEquals($item->affix_name, $comparisonData['itemToEquip']['affix_name']);
@@ -110,7 +177,7 @@ class ComparisonServiceTest extends TestCase
 
         $slot = $character->inventory->slots->first();
 
-        $comparisonData = $this->comparisonService->buildComparisonData($character, $slot, ItemType::SWORD->value);
+        $comparisonData = $this->comparisonService->buildComparisonData($character, $slot);
 
         $this->assertNotEmpty($comparisonData['details']);
     }
@@ -133,7 +200,7 @@ class ComparisonServiceTest extends TestCase
 
         $slot = $character->inventory->slots->first();
 
-        $comparisonData = $this->comparisonService->buildComparisonData($character, $slot, 'trinket');
+        $comparisonData = $this->comparisonService->buildComparisonData($character, $slot);
 
         $this->assertNotEmpty($comparisonData['details']);
         $this->assertEquals('trinket', $comparisonData['details'][0]['position']);
@@ -154,7 +221,7 @@ class ComparisonServiceTest extends TestCase
 
         $slot = $character->inventory->slots->first();
 
-        $comparisonData = $this->comparisonService->buildComparisonData($character, $slot, 'artifact');
+        $comparisonData = $this->comparisonService->buildComparisonData($character, $slot);
 
         $this->assertEmpty($comparisonData['details']);
     }
@@ -175,7 +242,7 @@ class ComparisonServiceTest extends TestCase
 
         $slot = $character->inventory->slots->first();
 
-        $comparisonData = $this->comparisonService->buildComparisonData($character, $slot, ItemType::SWORD->value);
+        $comparisonData = $this->comparisonService->buildComparisonData($character, $slot);
 
         $this->assertNotEmpty($comparisonData['details']);
         $this->assertTrue($comparisonData['setEquipped']);
@@ -196,7 +263,7 @@ class ComparisonServiceTest extends TestCase
             'left-hand'
         )->getCharacter();
 
-        $comparisonData = $this->comparisonService->buildShopData($character, $item, ItemType::BOW->value);
+        $comparisonData = $this->comparisonService->buildShopData($character, $item);
 
         $this->assertArrayHasKey('details', $comparisonData);
         $this->assertIsArray($comparisonData['details']);
@@ -217,7 +284,7 @@ class ComparisonServiceTest extends TestCase
             'left-hand'
         )->getCharacter();
 
-        $comparisonData = $this->comparisonService->buildShopData($character, $item, ArmourType::SHIELD->value);
+        $comparisonData = $this->comparisonService->buildShopData($character, $item);
 
         $this->assertArrayHasKey('details', $comparisonData);
         $this->assertIsArray($comparisonData['details']);
@@ -238,7 +305,7 @@ class ComparisonServiceTest extends TestCase
             'spell-one'
         )->getCharacter();
 
-        $comparisonData = $this->comparisonService->buildShopData($character, $item, ItemType::SPELL_DAMAGE->value);
+        $comparisonData = $this->comparisonService->buildShopData($character, $item);
 
         $this->assertArrayHasKey('details', $comparisonData);
         $this->assertIsArray($comparisonData['details']);
@@ -259,7 +326,7 @@ class ComparisonServiceTest extends TestCase
 
         $character = $manager->getCharacter();
 
-        $comparisonData = $this->comparisonService->buildShopData($character, $item, ItemType::SPELL_DAMAGE->value);
+        $comparisonData = $this->comparisonService->buildShopData($character, $item);
 
         $this->assertArrayHasKey('details', $comparisonData);
         $this->assertIsArray($comparisonData['details']);

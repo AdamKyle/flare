@@ -1,101 +1,64 @@
-import { useLayoutEffect, useCallback, useState } from 'react';
+import { useCallback, useLayoutEffect, useState } from 'react';
 
 import UseTooltipPlacementDefinition from 'ui/tool-tips/hooks/definitions/use-tooltip-placement-definition';
 import UseTooltipPlacementParams from 'ui/tool-tips/hooks/definitions/use-tooltip-placement-params';
-import { getScrollParent } from 'ui/tool-tips/utils/get-scroll-parent';
+import TooltipPosition from 'ui/tool-tips/types/tooltip-position';
+import { resolveTooltipPosition } from 'ui/tool-tips/utils/resolve-tooltip-position';
 
 const useTooltipPlacement = (
   params: UseTooltipPlacementParams
 ): UseTooltipPlacementDefinition => {
-  const { containerRef, buttonRef, popoverRef, align, open, extraDeps } =
-    params;
+  const { buttonRef, popoverRef, align, placement, open } = params;
 
-  const [horizontal, setHorizontal] = useState<'left' | 'right'>(
-    align !== 'left' ? 'right' : 'left'
-  );
-  const [vertical, setVertical] = useState<'above' | 'below'>('below');
+  const [position, setPosition] = useState<TooltipPosition | null>(null);
 
   const place = useCallback((): void => {
-    const triggerEl = buttonRef.current;
-    const tooltipEl = popoverRef.current;
+    const triggerElement = buttonRef.current;
+    const popoverElement = popoverRef.current;
 
-    if (!triggerEl || !tooltipEl) {
+    if (!triggerElement || !popoverElement) {
       return;
     }
 
-    const scrollParent = getScrollParent(containerRef.current);
-    const parentRect = scrollParent
-      ? scrollParent.getBoundingClientRect()
-      : new DOMRect(0, 0, window.innerWidth, window.innerHeight);
-
-    const triggerRect = triggerEl.getBoundingClientRect();
-
-    const tooltipWidth = tooltipEl.offsetWidth || 256;
-    const tooltipHeight = tooltipEl.offsetHeight || 120;
-
-    const spaceRight = parentRect.right - triggerRect.right;
-    const spaceLeft = triggerRect.left - parentRect.left;
-    const spaceBelow = parentRect.bottom - triggerRect.bottom;
-    const spaceAbove = triggerRect.top - parentRect.top;
-
-    const preferRight = align !== 'left';
-
-    if (preferRight && spaceRight >= tooltipWidth + 4) {
-      setHorizontal('right');
-    } else if (!preferRight && spaceLeft >= tooltipWidth + 4) {
-      setHorizontal('left');
-    } else if (spaceRight >= spaceLeft) {
-      setHorizontal('right');
-    } else {
-      setHorizontal('left');
-    }
-
-    if (spaceBelow >= tooltipHeight + 4) {
-      setVertical('below');
-    } else if (spaceAbove >= tooltipHeight + 4) {
-      setVertical('above');
-    } else {
-      setVertical(spaceBelow >= spaceAbove ? 'below' : 'above');
-    }
-  }, [align, buttonRef, popoverRef, containerRef]);
+    setPosition(
+      resolveTooltipPosition({
+        trigger_rect: triggerElement.getBoundingClientRect(),
+        popover_width: popoverElement.offsetWidth,
+        popover_height: popoverElement.offsetHeight,
+        viewport_width: window.innerWidth,
+        viewport_height: window.innerHeight,
+        placement,
+        align,
+      })
+    );
+  }, [align, placement, buttonRef, popoverRef]);
 
   useLayoutEffect(() => {
     if (!open) {
+      setPosition(null);
+
       return;
     }
 
     place();
 
-    const parent = getScrollParent(containerRef.current);
+    const resizeObserver = new ResizeObserver(place);
 
-    const onScroll = () => {
-      place();
-    };
+    if (popoverRef.current) {
+      resizeObserver.observe(popoverRef.current);
+    }
 
-    const onResize = () => {
-      place();
-    };
-
-    window.addEventListener('resize', onResize);
-    parent?.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('scroll', onScroll, {
-      passive: true,
-      capture: true,
-    });
+    window.addEventListener('resize', place);
+    window.addEventListener('scroll', place, { passive: true, capture: true });
 
     return () => {
-      window.removeEventListener('resize', onResize);
-      parent?.removeEventListener('scroll', onScroll);
-      window.removeEventListener('scroll', onScroll, true);
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', place);
+      window.removeEventListener('scroll', place, true);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, align, containerRef, place, ...(extraDeps || [])]);
+  }, [open, place, popoverRef]);
 
-  return {
-    horizontal,
-    vertical,
-    place,
-  };
+  return { position };
 };
 
 export default useTooltipPlacement;

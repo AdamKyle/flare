@@ -325,5 +325,37 @@
     </div>
     <x-core.separator.separator />
 
+    <div class="grid grid-cols-2 gap-4">
+        <div>
+            <x-form-elements.check-box
+                name="show_global_gem_progression_xp_messages"
+                label="Global Gem Progression XP Messages"
+                :model="$user"
+                model-key="show_global_gem_progression_xp_messages"
+            />
+        </div>
+        <x-core.alerts.info-alert title="ATTN!">
+            By selecting this, you are saying you want server message notifications showing the Gem Progression XP you
+            contributed towards global Gem progression.
+        </x-core.alerts.info-alert>
+    </div>
+    <x-core.separator.separator />
+
+    <div class="grid grid-cols-2 gap-4">
+        <div>
+            <x-form-elements.check-box
+                name="show_personal_gem_progression_xp_messages"
+                label="Personal Gem Progression XP Messages"
+                :model="$user"
+                model-key="show_personal_gem_progression_xp_messages"
+            />
+        </div>
+        <x-core.alerts.info-alert title="ATTN!">
+            By selecting this, you are saying you want server message notifications showing the Gem Progression XP your
+            character gained towards personal Gem progression.
+        </x-core.alerts.info-alert>
+    </div>
+    <x-core.separator.separator />
+
     <x-core.buttons.primary-button type="submit"> Update Server Message Settings. </x-core.buttons.primary-button>
 </form>

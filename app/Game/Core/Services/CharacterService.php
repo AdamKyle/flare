@@ -8,11 +8,20 @@ use App\Game\Core\Values\LevelUpValue;
 class CharacterService
 {
     /**
-     * Level up the character.
+     * @param LevelUpValue $levelUpValue
+     */
+    public function __construct(private readonly LevelUpValue $levelUpValue) {}
+
+    /**
+     * Level the Character up once, carrying the left over XP into the new level.
+     *
+     * @param Character $character
+     * @param int $leftOverXP
+     * @return void
      */
     public function levelUpCharacter(Character $character, int $leftOverXP): void
     {
-        $character->update(resolve(LevelUpValue::class)->createValueObject($character, $leftOverXP));
+        $character->update($this->levelUpValue->createValueObject($character, $leftOverXP));
 
         $character = $character->refresh();
 
@@ -24,9 +33,12 @@ class CharacterService
     }
 
     /**
-     * Get next level XP requirement.
+     * Return the base XP required to reach the given level, before the Character's XP penalty is applied.
+     *
+     * @param int $nextLevel
+     * @return int
      */
-    protected function getXPForNextLevel(int $nextLevel): int
+    public function getXPForNextLevel(int $nextLevel): int
     {
         if ($nextLevel <= 1000) {
             return 100;
@@ -40,8 +52,10 @@ class CharacterService
         $endLevel = 5000;
         $startXP = 1000;
         $maxXP = 35000;
-        $progress = ($nextLevel - $startLevel) / ($endLevel - $startLevel);
+        $levelRange = $endLevel - $startLevel;
+        $levelOffset = $nextLevel - $startLevel;
+        $xpRange = $maxXP - $startXP;
 
-        return (int) ($startXP + (($maxXP - $startXP) * pow($progress, 3)));
+        return $startXP + intdiv($xpRange * ($levelOffset ** 3), $levelRange ** 3);
     }
 }

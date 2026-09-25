@@ -14,6 +14,7 @@ type Params = {
   serverProps: ServerMessagesProps;
   explorationProps: ExplorationMessageProps;
   unreadServer: boolean;
+  unreadExploration: boolean;
 };
 
 const buildTabs = (
@@ -33,6 +34,7 @@ const buildTabs = (
     serverProps,
     explorationProps,
     unreadServer,
+    unreadExploration,
   } = params;
 
   const chatTab = {
@@ -55,11 +57,19 @@ const buildTabs = (
         props: serverProps,
       } as const);
 
-  const explorationTab = {
-    label: 'Exploration',
-    component: explorationComponent,
-    props: explorationProps,
-  } as const;
+  const explorationTab = unreadExploration
+    ? ({
+        label: 'Exploration',
+        component: explorationComponent,
+        activity_icon: bellIconClass,
+        icon_styles: bellIconStyles,
+        props: explorationProps,
+      } as const)
+    : ({
+        label: 'Exploration',
+        component: explorationComponent,
+        props: explorationProps,
+      } as const);
 
   return [chatTab, serverTab, explorationTab] as const;
 };

@@ -4,124 +4,231 @@ namespace App\Game\Market\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\MarketBoard;
-use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
-use App\Game\Automation\Services\AutomationRestrictionService;
-use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
-use App\Game\Core\Currency\Services\CurrencyLimit;
-use App\Game\Core\Traits\UpdateMarketBoard;
+use App\Flare\Pagination\Requests\PaginationRequest;
 use App\Game\Market\Builders\MarketHistoryDailyPriceSeriesQueryBuilder;
 use App\Game\Market\Enums\MarketHistorySecondaryFilter;
-use App\Game\Market\Requests\ChangeItemTypeRequest;
+use App\Game\Market\Enums\MarketListingPriceSort;
 use App\Game\Market\Requests\HistoryRequest;
 use App\Game\Market\Requests\ListPriceRequest;
-use App\Game\Market\Transformers\MarketItemsTransformer;
+use App\Game\Market\Requests\MarketBuyAndReplaceRequest;
+use App\Game\Market\Requests\MarketListingPriceRequest;
+use App\Game\Market\Requests\MarketListingsRequest;
+use App\Game\Market\Services\MarketAccessService;
+use App\Game\Market\Services\MarketBoard as MarketBoardService;
+use App\Game\Market\Services\MarketListingService;
 use App\Http\Controllers\Controller;
 use Carbon\CarbonImmutable;
-use Facades\App\Game\Core\Items\Pricing\SellItemCalculator;
 use Illuminate\Http\JsonResponse;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
+use Illuminate\Http\Request;
 
 class MarketController extends Controller
 {
-    use ChecksAutomationRestrictions, UpdateMarketBoard;
-
+    /**
+     * @param MarketListingService $marketListingService
+     * @param MarketBoardService $marketBoardService
+     * @param MarketHistoryDailyPriceSeriesQueryBuilder $marketHistoryDailyPriceSeriesQueryBuilder
+     * @param MarketAccessService $marketAccessService
+     */
     public function __construct(
-        private readonly Manager $manager,
-        private readonly MarketItemsTransformer $transformer,
-        private readonly CharacterInventoryService $characterInventoryService,
+        private readonly MarketListingService $marketListingService,
+        private readonly MarketBoardService $marketBoardService,
         private readonly MarketHistoryDailyPriceSeriesQueryBuilder $marketHistoryDailyPriceSeriesQueryBuilder,
+        private readonly MarketAccessService $marketAccessService,
     ) {}
 
-    public function marketItems(ChangeItemTypeRequest $request)
+    /**
+     * Report whether the character's user may currently use the Market.
+     *
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function access(Character $character): JsonResponse
     {
-        $items = MarketBoard::where('is_locked', false)
-            ->where('item_id', $request->item_id)
-            ->select('market_board.*')
-            ->get();
-
-        $items = new Collection($items, $this->transformer);
-        $items = $this->manager->createData($items)->toArray();
-
         return response()->json([
-            'items' => $items,
-            'gold' => auth()->user()->character->gold,
+            'can_access_market' => $this->marketAccessService->canAccess($character->user),
         ]);
     }
 
     /**
-     * List an owned Item on the Market Board for the given Character, rejecting Items that are not market sellable.
+     * Paginate the unlocked Market listings.
      *
+     * @param MarketListingsRequest $request
      * @return JsonResponse
      */
-    public function sellItem(ListPriceRequest $request, Character $character)
+    public function marketItems(MarketListingsRequest $request): JsonResponse
     {
-        $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::INVENTORY_MANAGEMENT);
-
-        if (! is_null($restriction)) {
-            return $restriction;
-        }
-
-        if ($request->list_for < 1) {
-            return response()->json(['message' => 'Listing price must be at least 1 Gold.'], 422);
-        }
-
-        $slot = $character->inventory->slots()->find($request->slot_id);
-
-        if (is_null($slot)) {
-            return response()->json(['message' => 'item is not found.'], 422);
-        }
-
-        if (! $slot->item->market_sellable) {
-            return response()->json(['message' => 'This item cannot be sold on the Market.'], 422);
-        }
-
-        $minCost = SellItemCalculator::fetchMinPrice($slot->item);
-
-        if ($minCost !== 0 && $minCost > $request->list_for) {
-            return response()->json(['message' => 'No! The minimum selling price is: '.number_format($minCost).' Gold.'], 422);
-        }
-
-        $listPrice = $request->list_for;
-
-        if ($listPrice > CurrencyLimit::MAX_GOLD) {
-            $listPrice = CurrencyLimit::MAX_GOLD;
-        }
-
-        MarketBoard::create([
-            'character_id' => auth()->user()->character->id,
-            'item_id' => $slot->item->id,
-            'listed_price' => $listPrice,
-        ]);
-
-        $itemName = $slot->item->affix_name;
-
-        $slot->delete();
-
-        $this->sendUpdate($this->transformer, $this->manager);
-
-        $inventory = $this->characterInventoryService->setCharacter($character->refresh());
-
-        return response()->json([
-            'message' => 'Listed: '.$itemName.' For: '.number_format($listPrice).' Gold.',
-            'inventory' => [
-                'inventory' => $inventory->getInventoryForType('inventory'),
-                'usable_items' => $inventory->getInventoryForType('usable_items'),
-            ],
-        ]);
+        return response()->json($this->marketListingService->browse(
+            $request->string('search_text')->toString(),
+            $request->input('filters.type'),
+            MarketListingPriceSort::tryFrom($request->input('filters.sort_price') ?? ''),
+            $request->integer('per_page'),
+            $request->integer('page'),
+        ));
     }
 
+    /**
+     * Return the current details of a listing for the authenticated character.
+     *
+     * @param Request $request
+     * @param MarketBoard $marketBoard
+     * @return JsonResponse
+     */
+    public function listing(Request $request, MarketBoard $marketBoard): JsonResponse
+    {
+        return $this->resultResponse($this->marketListingService->listingDetails($request->user()->character, $marketBoard));
+    }
+
+    /**
+     * Compare a listing against the character's equipped Items.
+     *
+     * @param MarketBoard $marketBoard
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function compare(MarketBoard $marketBoard, Character $character): JsonResponse
+    {
+        return $this->resultResponse($this->marketBoardService->compare($character, $marketBoard));
+    }
+
+    /**
+     * Buy a listing for the character.
+     *
+     * @param MarketBoard $marketBoard
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function buy(MarketBoard $marketBoard, Character $character): JsonResponse
+    {
+        return $this->resultResponse($this->marketBoardService->purchase($character, $marketBoard));
+    }
+
+    /**
+     * Buy a listing and equip it in place of one of the character's equipped Items.
+     *
+     * @param MarketBuyAndReplaceRequest $request
+     * @param MarketBoard $marketBoard
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function buyAndReplace(MarketBuyAndReplaceRequest $request, MarketBoard $marketBoard, Character $character): JsonResponse
+    {
+        return $this->resultResponse($this->marketBoardService->purchaseAndReplace(
+            $character,
+            $marketBoard,
+            $request->string('position')->toString(),
+            $request->integer('slot_id'),
+            $request->string('equip_type')->toString(),
+        ));
+    }
+
+    /**
+     * Paginate the character's own listings.
+     *
+     * @param PaginationRequest $request
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function currentListings(PaginationRequest $request, Character $character): JsonResponse
+    {
+        return response()->json($this->marketListingService->ownedListings(
+            $character,
+            $request->integer('per_page'),
+            $request->integer('page'),
+        ));
+    }
+
+    /**
+     * Lock an owned listing for editing.
+     *
+     * @param MarketBoard $marketBoard
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function beginEdit(MarketBoard $marketBoard, Character $character): JsonResponse
+    {
+        return $this->resultResponse($this->marketListingService->beginEdit($character, $marketBoard));
+    }
+
+    /**
+     * Save a new price for an owned listing.
+     *
+     * @param MarketListingPriceRequest $request
+     * @param MarketBoard $marketBoard
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function updateListing(MarketListingPriceRequest $request, MarketBoard $marketBoard, Character $character): JsonResponse
+    {
+        return $this->resultResponse($this->marketListingService->updatePrice($character, $marketBoard, $request->integer('listed_price')));
+    }
+
+    /**
+     * Release the edit lock on an owned listing.
+     *
+     * @param MarketBoard $marketBoard
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function cancelEdit(MarketBoard $marketBoard, Character $character): JsonResponse
+    {
+        return $this->resultResponse($this->marketListingService->cancelEdit($character, $marketBoard));
+    }
+
+    /**
+     * Remove an owned listing and return its Item to the character.
+     *
+     * @param MarketBoard $marketBoard
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function delist(MarketBoard $marketBoard, Character $character): JsonResponse
+    {
+        return $this->resultResponse($this->marketListingService->delist($character, $marketBoard));
+    }
+
+    /**
+     * List an owned inventory Item on the Market for the character.
+     *
+     * @param ListPriceRequest $request
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function sellItem(ListPriceRequest $request, Character $character): JsonResponse
+    {
+        return $this->resultResponse($this->marketListingService->listItem($character, $request->integer('slot_id'), $request->integer('list_for')));
+    }
+
+    /**
+     * Return the daily sale price series for an Item type over the last 90 days.
+     *
+     * @param HistoryRequest $request
+     * @return JsonResponse
+     */
     public function fetchMarketHistoryForItem(HistoryRequest $request): JsonResponse
     {
-
         $builder = $this->marketHistoryDailyPriceSeriesQueryBuilder->setup($request->type, CarbonImmutable::now(), 90)->clearFilters();
 
-        if ($request->has('filter')) {
-            $type = MarketHistorySecondaryFilter::tryFrom($request->filter);
+        $filter = MarketHistorySecondaryFilter::tryFrom($request->input('filter') ?? '');
 
-            $builder = $builder->addFilter($type);
+        if (! is_null($filter)) {
+            $builder = $builder->addFilter($filter);
         }
 
         return response()->json($builder->fetchDataSet());
+    }
+
+    /**
+     * Convert a service operation result into a JSON response using its status.
+     *
+     * @param array $result
+     * @return JsonResponse
+     */
+    private function resultResponse(array $result): JsonResponse
+    {
+        $status = $result['status'];
+
+        unset($result['status']);
+
+        return response()->json($result, $status);
     }
 }

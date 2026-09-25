@@ -72,9 +72,11 @@ const CharacterQuestBrowsePanel = ({
           href="/information/quests"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-danube-700 dark:text-danube-300 text-sm font-semibold hover:underline"
+          className="text-danube-700 dark:text-danube-300 focus:ring-danube-500 inline-flex items-center gap-1 rounded text-sm font-semibold hover:underline focus:ring-2 focus:outline-none"
         >
-          Quests help
+          <span aria-hidden="true">(?)</span>
+          <span>Quests help</span>
+          <span className="sr-only"> (opens in a new tab)</span>
         </a>
       </div>
 

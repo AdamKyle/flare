@@ -15,10 +15,12 @@ use Tests\Traits\CreateBatchCrafting;
 use Tests\Traits\CreateCharacterAutomation;
 use Tests\Traits\CreateInventorySets;
 use Tests\Traits\CreateItem;
+use Tests\Traits\CreateItemSkill;
+use Tests\Traits\CreateItemSkillProgression;
 
 class CharacterInventoryControllerTest extends TestCase
 {
-    use CreateAlchemyBagSlot, CreateBatchCrafting, CreateCharacterAutomation, CreateInventorySets, CreateItem, RefreshDatabase;
+    use CreateAlchemyBagSlot, CreateBatchCrafting, CreateCharacterAutomation, CreateInventorySets, CreateItem, CreateItemSkill, CreateItemSkillProgression, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -269,6 +271,72 @@ class CharacterInventoryControllerTest extends TestCase
         $response->assertOk();
     }
 
+    public function test_item_details_returns_item_skill_tree_and_progressions_for_artifact(): void
+    {
+        $rootSkill = $this->createItemSkill();
+        $childSkill = $this->createItemSkill(['parent_id' => $rootSkill->id, 'parent_level_needed' => 1]);
+        $artifact = $this->createItem(['type' => 'artifact', 'item_skill_id' => $rootSkill->id]);
+        $rootProgression = $this->createItemSkillProgression(['item_id' => $artifact->id, 'item_skill_id' => $rootSkill->id]);
+        $childProgression = $this->createItemSkillProgression(['item_id' => $artifact->id, 'item_skill_id' => $childSkill->id]);
+        $character = $this->character->inventoryManagement()->giveItem($artifact)->getCharacter();
+        $slotId = $character->inventory->slots()->where('item_id', $artifact->id)->first()->id;
+
+        $response = $this->actingAs($character->user)
+            ->getJson('/api/character/'.$character->id.'/inventory/item?slot_id='.$slotId);
+
+        $response->assertOk();
+        $this->assertCount(1, $response->json('item_skills'));
+        $this->assertSame($rootSkill->id, $response->json('item_skills.0.id'));
+        $this->assertSame($childSkill->id, $response->json('item_skills.0.children.0.id'));
+        $this->assertEqualsCanonicalizing([$rootProgression->id, $childProgression->id], collect($response->json('item_skill_progressions'))->pluck('id')->all());
+        $this->assertSame([$artifact->id], collect($response->json('item_skill_progressions'))->pluck('item_id')->unique()->values()->all());
+        $this->assertEqualsCanonicalizing([$rootSkill->id, $childSkill->id], collect($response->json('item_skill_progressions'))->pluck('item_skill.id')->all());
+    }
+
+    public function test_item_details_marks_an_equipped_artifact_with_item_skills_as_manageable(): void
+    {
+        $skill = $this->createItemSkill();
+        $artifact = $this->createItem(['type' => 'artifact', 'item_skill_id' => $skill->id]);
+        $character = $this->character->inventoryManagement()->giveItem($artifact, true, 'artifact')->getCharacter();
+        $slotId = $character->inventory->slots()->where('item_id', $artifact->id)->first()->id;
+
+        $response = $this->actingAs($character->user)
+            ->getJson('/api/character/'.$character->id.'/inventory/item?slot_id='.$slotId);
+
+        $response->assertOk();
+        $this->assertTrue($response->json('is_equipped'));
+        $this->assertTrue($response->json('can_manage_item_skills'));
+    }
+
+    public function test_item_details_marks_an_unequipped_artifact_with_item_skills_as_not_manageable(): void
+    {
+        $skill = $this->createItemSkill();
+        $artifact = $this->createItem(['type' => 'artifact', 'item_skill_id' => $skill->id]);
+        $character = $this->character->inventoryManagement()->giveItem($artifact)->getCharacter();
+        $slotId = $character->inventory->slots()->where('item_id', $artifact->id)->first()->id;
+
+        $response = $this->actingAs($character->user)
+            ->getJson('/api/character/'.$character->id.'/inventory/item?slot_id='.$slotId);
+
+        $response->assertOk();
+        $this->assertFalse($response->json('is_equipped'));
+        $this->assertFalse($response->json('can_manage_item_skills'));
+    }
+
+    public function test_item_details_does_not_mark_an_equipped_non_artifact_as_skill_manageable(): void
+    {
+        $item = $this->createItem(['type' => 'body']);
+        $character = $this->character->inventoryManagement()->giveItem($item, true, 'body')->getCharacter();
+        $slotId = $character->inventory->slots()->where('item_id', $item->id)->first()->id;
+
+        $response = $this->actingAs($character->user)
+            ->getJson('/api/character/'.$character->id.'/inventory/item?slot_id='.$slotId);
+
+        $response->assertOk();
+        $this->assertTrue($response->json('is_equipped'));
+        $this->assertFalse($response->json('can_manage_item_skills'));
+    }
+
     public function test_item_details_returns_422_when_slot_does_not_exist(): void
     {
         $character = $this->character->getCharacter();
@@ -308,6 +376,31 @@ class CharacterInventoryControllerTest extends TestCase
 
         $response->assertOk();
         $this->assertTrue($character->inventory->slots()->where('id', $slotId)->first()->equipped);
+    }
+
+    public function test_equip_item_is_blocked_by_delve_automation(): void
+    {
+        $item = $this->createItem(['type' => 'body']);
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+        $slotId = $character->inventory->slots()->where('item_id', $item->id)->first()->id;
+
+        $this->createCharacterAutomation([
+            'character_id' => $character->id,
+            'type' => AutomationType::DELVE->value,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->postJson('/api/character/'.$character->id.'/inventory/equip-item', [
+                'position' => 'body',
+                'slot_id' => $slotId,
+                'equip_type' => 'body',
+            ]);
+
+        $response->assertStatus(422);
+        $this->assertSame('You cannot do that while Delve automation is running. Cancel it first.', $response->json('message'));
+        $this->assertFalse($character->inventory->slots()->where('id', $slotId)->first()->equipped);
     }
 
     public function test_save_equipped_as_set_moves_equipped_items_into_the_set(): void

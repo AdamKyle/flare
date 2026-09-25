@@ -18,7 +18,6 @@ use App\Game\Core\Combat\Values\AttackType;
 use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\SkillService;
-use App\Game\Tops\Services\BroadcastTopsUpdateService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
@@ -44,10 +43,6 @@ class DelveExplorationTest extends TestCase
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
-
-        $this->instance(BroadcastTopsUpdateService::class, Mockery::mock(BroadcastTopsUpdateService::class, function (MockInterface $mock) {
-            $mock->shouldReceive('broadcastDelveCurrentMonth');
-        }));
     }
 
     protected function tearDown(): void

@@ -14,6 +14,7 @@ use App\Game\Maps\Requests\QuestDataRequest;
 use App\Game\Maps\Requests\SetSailValidation;
 use App\Game\Maps\Requests\TeleportRequest;
 use App\Game\Maps\Requests\TraverseRequest;
+use App\Game\Maps\Services\GemWorldService;
 use App\Game\Maps\Services\LocationService;
 use App\Game\Maps\Services\MovementService;
 use App\Game\Maps\Services\PortService;
@@ -22,12 +23,22 @@ use App\Game\Maps\Services\TeleportService;
 use App\Game\Maps\Services\WalkingService;
 use App\Game\Maps\Transformers\GameMapDetailTransformer;
 use App\Http\Controllers\Controller;
-use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 
 class MapController extends Controller
 {
+    /**
+     * @param MovementService $movementService
+     * @param TeleportService $teleportService
+     * @param WalkingService $walkingService
+     * @param SetSailService $setSail
+     * @param DistanceCalculation $distanceCalculation
+     * @param LocationService $locationService
+     * @param PortService $portService
+     * @param GameMapDetailTransformer $gameMapDetailTransformer
+     * @param GemWorldService $gemWorldService
+     */
     public function __construct(
         private readonly MovementService $movementService,
         private readonly TeleportService $teleportService,
@@ -36,13 +47,17 @@ class MapController extends Controller
         private readonly DistanceCalculation $distanceCalculation,
         private readonly LocationService $locationService,
         private readonly PortService $portService,
-        private readonly GameMapDetailTransformer $gameMapDetailTransformer
+        private readonly GameMapDetailTransformer $gameMapDetailTransformer,
+        private readonly GemWorldService $gemWorldService,
     ) {
         $this->middleware('is.character.dead')->except(['mapInformation', 'fetchQuests']);
     }
 
     /**
-     * Return the Player-safe factual detail representation for the given Game Map.
+     * Return the Player-safe factual detail representation for the given Game Map, including its rolled Gem context.
+     *
+     * @param GameMap $gameMap
+     * @return JsonResponse
      */
     public function gameMapDetails(GameMap $gameMap): JsonResponse
     {
@@ -53,23 +68,40 @@ class MapController extends Controller
             'required_item' => $requiredItem,
             'required_quest' => is_null($requiredItem) ? null : Quest::where('reward_item', $requiredItem->id)->first(),
             'required_location' => $gameMap->requiredLocation,
+            'gem_context' => $this->gemWorldService->gameMapGemContext($gameMap),
         ];
 
         return response()->json($this->gameMapDetailTransformer->transform($detailData), 200);
     }
 
+    /**
+     * Return the character's current map data.
+     *
+     * @param Character $character
+     * @return JsonResponse
+     */
     public function mapInformation(Character $character): JsonResponse
     {
         return response()->json($this->locationService->getMapData($character));
     }
 
+    /**
+     * Return the location based events available at the character's position.
+     *
+     * @param Character $character
+     * @return JsonResponse
+     */
     public function updateLocationActions(Character $character): JsonResponse
     {
         return response()->json($this->locationService->locationBasedEvents($character));
     }
 
     /**
-     * @throws Exception
+     * Walk the character to the requested coordinates.
+     *
+     * @param MoveRequest $request
+     * @param Character $character
+     * @return JsonResponse
      */
     public function move(MoveRequest $request, Character $character): JsonResponse
     {
@@ -104,16 +136,33 @@ class MapController extends Controller
         return response()->json($response, $status);
     }
 
+    /**
+     * Return the maps the authenticated character can traverse to.
+     *
+     * @return JsonResponse
+     */
     public function traverseMaps(): JsonResponse
     {
         return response()->json(array_values($this->movementService->getMapsToTraverse(auth()->user()->character)));
     }
 
+    /**
+     * Return the locations the character can teleport to.
+     *
+     * @param Character $character
+     * @return JsonResponse
+     */
     public function fetchTeleportCoordinates(Character $character): JsonResponse
     {
         return response()->json($this->locationService->getTeleportLocations($character));
     }
 
+    /**
+     * Return the ports the character can set sail to from their current port.
+     *
+     * @param Character $character
+     * @return JsonResponse
+     */
     public function fetchSetSailPorts(Character $character): JsonResponse
     {
         $portDetails = $this->portService->getPortDetails($character);
@@ -125,6 +174,12 @@ class MapController extends Controller
         return response()->json($portDetails);
     }
 
+    /**
+     * Return the factual details of a location.
+     *
+     * @param Location $location
+     * @return JsonResponse
+     */
     public function getLocationInformation(Location $location): JsonResponse
     {
         return response()->json([
@@ -132,6 +187,13 @@ class MapController extends Controller
         ]);
     }
 
+    /**
+     * Paginate the quest items that can drop at a location.
+     *
+     * @param PaginationRequest $request
+     * @param Location $location
+     * @return JsonResponse
+     */
     public function getLocationDroppableQuestItems(PaginationRequest $request, Location $location): JsonResponse
     {
         return response()->json(
@@ -139,6 +201,13 @@ class MapController extends Controller
         );
     }
 
+    /**
+     * Move the character to another map.
+     *
+     * @param TraverseRequest $request
+     * @param Character $character
+     * @return JsonResponse
+     */
     public function traverse(TraverseRequest $request, Character $character): JsonResponse
     {
         if (! $character->can_move) {
@@ -155,7 +224,11 @@ class MapController extends Controller
     }
 
     /**
-     * @throws Exception
+     * Teleport the character to the requested coordinates.
+     *
+     * @param TeleportRequest $request
+     * @param Character $character
+     * @return JsonResponse
      */
     public function teleport(TeleportRequest $request, Character $character): JsonResponse
     {
@@ -185,6 +258,13 @@ class MapController extends Controller
         return response()->json($response, $status);
     }
 
+    /**
+     * Sail the character to another port.
+     *
+     * @param SetSailValidation $request
+     * @param Character $character
+     * @return JsonResponse
+     */
     public function setSail(SetSailValidation $request, Character $character): JsonResponse
     {
         if (! $character->can_move) {
@@ -205,6 +285,13 @@ class MapController extends Controller
         return response()->json($response, $status);
     }
 
+    /**
+     * Return the quests and the character's completed quests.
+     *
+     * @param QuestDataRequest $request
+     * @param Character $character
+     * @return JsonResponse
+     */
     public function fetchQuests(QuestDataRequest $request, Character $character): JsonResponse
     {
         if (! Cache::has('all-quests')) {

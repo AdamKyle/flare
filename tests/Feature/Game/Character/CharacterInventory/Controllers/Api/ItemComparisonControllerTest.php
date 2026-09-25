@@ -181,6 +181,19 @@ class ItemComparisonControllerTest extends TestCase
         $this->assertSame('spell', $response->json('type'));
     }
 
+    public function test_compare_item_returns_422_for_unknown_item_type(): void
+    {
+        $item = $this->createItem(['type' => 'not-a-real-type']);
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+        $slotId = $character->inventory->slots()->where('item_id', $item->id)->first()->id;
+
+        $response = $this->actingAs($character->user)
+            ->getJson('/api/character/'.$character->id.'/inventory/comparison?slot_id='.$slotId);
+
+        $response->assertStatus(422);
+        $this->assertSame('Unable to determine how this item can be equipped. Please report this as a bug.', $response->json('message'));
+    }
+
     public function test_compare_item_from_chat_normalizes_spell_healing_type_to_spell(): void
     {
         $item = $this->createItem(['type' => 'spell-healing']);
@@ -192,6 +205,19 @@ class ItemComparisonControllerTest extends TestCase
 
         $response->assertOk();
         $this->assertSame('spell', $response->json('comparison_data.type'));
+    }
+
+    public function test_compare_item_from_chat_returns_422_for_unknown_inventory_item_type(): void
+    {
+        $item = $this->createItem(['type' => 'not-a-real-type']);
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+        $slotId = $character->inventory->slots()->where('item_id', $item->id)->first()->id;
+
+        $response = $this->actingAs($character->user)
+            ->getJson('/api/character/'.$character->id.'/inventory/comparison-from-chat?id='.$slotId);
+
+        $response->assertStatus(422);
+        $this->assertSame('Unable to determine how this item can be equipped. Please report this as a bug.', $response->json('message'));
     }
 
     public function test_compare_item_from_chat_returns_gem_data_when_id_matches_a_gem_slot(): void

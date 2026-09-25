@@ -22,7 +22,7 @@ class MarketHistoryDailyPriceSeriesQueryBuilderTest extends TestCase
     {
         parent::setUp();
 
-        $this->builder = resolve(MarketHistoryDailyPriceSeriesQueryBuilder::class);
+        $this->builder = new MarketHistoryDailyPriceSeriesQueryBuilder;
     }
 
     protected function tearDown(): void

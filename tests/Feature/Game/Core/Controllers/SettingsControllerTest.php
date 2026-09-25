@@ -95,4 +95,47 @@ class SettingsControllerTest extends TestCase
         $this->assertSame($originalStats['agi'], $character->agi);
         $this->assertSame($originalStats['focus'], $character->focus);
     }
+
+    public function test_gem_progression_xp_message_settings_default_to_true(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+
+        $this->assertTrue($character->user->show_global_gem_progression_xp_messages);
+        $this->assertTrue($character->user->show_personal_gem_progression_xp_messages);
+    }
+
+    public function test_chat_settings_disables_both_gem_progression_xp_messages_when_checkboxes_are_missing(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+
+        $this->actingAs($character->user)->call(
+            'POST',
+            '/settings/'.$character->user->id.'/chat-settings',
+            [],
+        );
+
+        $user = $character->user->refresh();
+
+        $this->assertFalse($user->show_global_gem_progression_xp_messages);
+        $this->assertFalse($user->show_personal_gem_progression_xp_messages);
+    }
+
+    public function test_chat_settings_enables_both_gem_progression_xp_messages_when_checkboxes_are_checked(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+
+        $this->actingAs($character->user)->call(
+            'POST',
+            '/settings/'.$character->user->id.'/chat-settings',
+            [
+                'show_global_gem_progression_xp_messages' => '1',
+                'show_personal_gem_progression_xp_messages' => '1',
+            ],
+        );
+
+        $user = $character->user->refresh();
+
+        $this->assertTrue($user->show_global_gem_progression_xp_messages);
+        $this->assertTrue($user->show_personal_gem_progression_xp_messages);
+    }
 }

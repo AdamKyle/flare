@@ -1,5 +1,9 @@
 @extends('layouts.game')
 
 @section('content')
-    <div id="game-launcher" data-show-intro-page="{{ $user->show_intro_page }}"></div>
+    <div id="game-launcher"></div>
 @endsection
+
+@push('game-app')
+    @vite('resources/js/game.ts')
+@endpush

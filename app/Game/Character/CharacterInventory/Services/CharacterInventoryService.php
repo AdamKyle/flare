@@ -29,11 +29,11 @@ use App\Game\Shop\Events\SellItemEvent;
 use App\Game\Skills\Services\DisenchantService;
 use App\Game\Skills\Services\MassDisenchantService;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
-use Exception;
 use Facades\App\Game\Core\Items\Pricing\SellItemCalculator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection as LeagueCollection;
@@ -851,6 +851,8 @@ class CharacterInventoryService
             return [];
         }
 
+        $this->inventorySetService->normalizeEquippedSetSlotPositions($inventorySet);
+
         $this->isInventorySetIsEquipped = true;
 
         if (! is_null($inventorySet->name)) {
@@ -931,11 +933,29 @@ class CharacterInventoryService
      * Fetches the type of the item.
      *
      * @param Item $item The item to resolve the type for.
-     * @return string The resolved item type.
+     * @return string|null The resolved item type, or null when unsupported.
      */
-    public function getType(Item $item): string
+    public function getType(Item $item): ?string
     {
-        return $this->fetchType($item->type);
+        $type = $this->fetchType($item->type);
+
+        if (! is_null($type)) {
+            return $type;
+        }
+
+        $context = [
+            'item_id' => $item->id,
+            'item_name' => $item->name,
+            'item_type' => $item->type,
+        ];
+
+        if (isset($this->character)) {
+            $context['character_id'] = $this->character->id;
+        }
+
+        Log::error('Unable to normalize inventory item type.', $context);
+
+        return null;
     }
 
     /**
@@ -1237,9 +1257,9 @@ class CharacterInventoryService
      * Fetch type based on accepted types.
      *
      * @param string $type The raw item type to normalize.
-     * @return string The normalized, accepted item type.
+     * @return string|null The normalized item type, or null when unsupported.
      */
-    private function fetchType(string $type): string
+    private function fetchType(string $type): ?string
     {
         if (in_array($type, ArmourType::allTypes())) {
             $type = 'armour';
@@ -1262,7 +1282,7 @@ class CharacterInventoryService
         }
 
         if (! in_array($type, $acceptedTypes)) {
-            throw new Exception('Unknown Item type: '.$type);
+            return null;
         }
 
         return $type;

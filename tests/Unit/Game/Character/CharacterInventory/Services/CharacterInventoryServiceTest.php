@@ -6,7 +6,6 @@ use App\Flare\Models\InventorySet;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Core\Items\Values\ItemType;
 use App\Game\Skills\Values\SkillTypeValue;
-use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -314,6 +313,40 @@ class CharacterInventoryServiceTest extends TestCase
         $character = $this->character->inventorySetManagement()->createInventorySets()->getCharacter();
 
         $this->assertEmpty($this->characterInventoryService->setCharacter($character)->fetchEquipped());
+    }
+
+    public function test_fetch_equipped_repairs_legacy_equipped_set_positions_before_returning_items(): void
+    {
+        $character = $this->character->getCharacter();
+        $set = $this->createInventorySet(['character_id' => $character->id, 'is_equipped' => true]);
+        $trinketSlot = $this->createInventorySetSlot([
+            'inventory_set_id' => $set->id,
+            'item_id' => $this->createItem(['type' => 'trinket'])->id,
+            'equipped' => true,
+            'position' => 'trinket-one',
+        ]);
+        $artifactSlot = $this->createInventorySetSlot([
+            'inventory_set_id' => $set->id,
+            'item_id' => $this->createItem(['type' => 'artifact'])->id,
+            'equipped' => false,
+            'position' => null,
+        ]);
+
+        $result = $this->characterInventoryService->setCharacter($character->refresh())->fetchEquipped();
+
+        $returnedTrinket = collect($result['data'])->firstWhere('slot_id', $trinketSlot->id);
+        $returnedArtifact = collect($result['data'])->firstWhere('slot_id', $artifactSlot->id);
+        $trinketSlot = $trinketSlot->refresh();
+        $artifactSlot = $artifactSlot->refresh();
+
+        $this->assertSame('trinket', $returnedTrinket['type']);
+        $this->assertSame('trinket', $returnedTrinket['position']);
+        $this->assertSame('artifact', $returnedArtifact['type']);
+        $this->assertSame('artifact', $returnedArtifact['position']);
+        $this->assertTrue($trinketSlot->equipped);
+        $this->assertSame('trinket', $trinketSlot->position);
+        $this->assertTrue($artifactSlot->equipped);
+        $this->assertSame('artifact', $artifactSlot->position);
     }
 
     public function test_cannot_delete_item_that_doesnt_exist()
@@ -758,16 +791,15 @@ class CharacterInventoryServiceTest extends TestCase
         $this->assertSame('ring', $type);
     }
 
-    public function test_get_type_throws_exception_for_unknown_item_type(): void
+    public function test_get_type_returns_null_for_unknown_item_type(): void
     {
         $item = $this->createItem(['type' => 'not-a-real-type']);
 
         $character = $this->character->getCharacter();
 
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Unknown Item type: not-a-real-type');
+        $type = $this->characterInventoryService->setCharacter($character)->getType($item);
 
-        $this->characterInventoryService->setCharacter($character)->getType($item);
+        $this->assertNull($type);
     }
 
     public function test_get_set_items_filters_by_provided_set_id(): void

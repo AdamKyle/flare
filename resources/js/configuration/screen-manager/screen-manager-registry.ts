@@ -12,6 +12,7 @@ import CharacterStatTypeBreakDown from '../../game/components/character-sheet/pa
 import Donations from '../../game/components/donations/dontations';
 import GoblinShopScreen from '../../game/components/goblin-shop/goblin-shop-screen';
 import GuideQuest from '../../game/components/guide-quests/guide-quest';
+import Market from '../../game/components/market/market';
 import CharacterInventory from '../../game/components/partials/character-inventory';
 import QuestDetailScreen from '../../game/components/quests/quest-detail-screen';
 import QuestLogScreen from '../../game/components/quests/quest-log-screen';
@@ -22,6 +23,7 @@ export const appScreenRegistry: {
 } = {
   [Screens.CHARACTER_SHEET]: CharacterSheet,
   [Screens.SHOP]: ShopScreen,
+  [Screens.MARKET]: Market,
   [Screens.GOBLIN_SHOP]: GoblinShopScreen,
   [Screens.CHARACTER_INVENTORY]: CharacterInventory,
   [Screens.MONSTER_DETAILS]: MonsterStatSection,

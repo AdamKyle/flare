@@ -15,6 +15,7 @@ use App\Game\Automation\Events\AutomationTimeOut;
 use App\Game\Automation\Exploration\Services\ExplorationCreatureCountCalculator;
 use App\Game\Automation\Exploration\Services\ExplorationLogService;
 use App\Game\Automation\Exploration\Services\ExplorationWarningService;
+use App\Game\Automation\Exploration\Values\ExplorationPhase;
 use App\Game\Automation\Values\AutomationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Handlers\BattleEventHandler;
@@ -214,6 +215,10 @@ class Exploration implements ShouldQueue
 
             if ($this->encounter($automation, $params, $this->timeDelay, $randomNumberGenerator)) {
 
+                $time = now()->diffInMinutes($automation->completed_at);
+
+                $delay = $time >= $this->timeDelay ? $this->timeDelay : ($time > 1 ? $time : 0);
+
                 if (! is_null($this->explorationLog)) {
                     $this->explorationLogService->recordFightTotals($this->explorationLog, [
                         'fights' => 1,
@@ -222,12 +227,8 @@ class Exploration implements ShouldQueue
                         'spell_damage' => $this->battleData['spell_damage'],
                         'healing_done' => $this->battleData['healing_done'],
                         'damage_blocked' => $this->battleData['damage_blocked'],
-                    ], false);
+                    ], true, ExplorationPhase::PROCESSING_REWARDS);
                 }
-
-                $time = now()->diffInMinutes($automation->completed_at);
-
-                $delay = $time >= $this->timeDelay ? $this->timeDelay : ($time > 1 ? $time : 0);
 
                 if ($delay === 0) {
                     $rewardContext = [
@@ -324,7 +325,7 @@ class Exploration implements ShouldQueue
         $enemies = $this->explorationCreatureCountCalculator->calculate($this->character);
 
         if (! is_null($this->explorationLog)) {
-            $this->explorationLogService->recordCurrentRoundCreatures($this->explorationLog, $enemies, false);
+            $this->explorationLogService->recordCurrentRoundCreatures($this->explorationLog, $enemies, true, ExplorationPhase::FIGHTING);
         }
 
         $this->sendOutEventLogUpdate('"Chirst, child there are: '.$enemies.' of them ..."
@@ -717,7 +718,7 @@ class Exploration implements ShouldQueue
             $builtMonsterSnapshot = $this->builtMonsterSnapshot($snapshotData, $randomNumberGenerator);
 
             if (! is_null($builtMonsterSnapshot)) {
-                $this->explorationLogService->recordMonsterSnapshot($this->explorationLog, $builtMonsterSnapshot, false);
+                $this->explorationLogService->recordMonsterSnapshot($this->explorationLog, $builtMonsterSnapshot, true);
             }
 
             $this->runtimeMonsterSnapshotRecorded = true;

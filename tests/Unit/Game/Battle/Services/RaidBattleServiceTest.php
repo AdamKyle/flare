@@ -9,10 +9,15 @@ use App\Game\Battle\ServerFight\Monster\BuildMonster;
 use App\Game\Battle\ServerFight\Monster\ServerMonster;
 use App\Game\Battle\ServerFight\MonsterPlayerFight;
 use App\Game\Battle\Services\RaidBattleService;
+use App\Game\BattleRewardProcessing\Jobs\BattleAttackHandler;
+use App\Game\BattleRewardProcessing\Jobs\RaidBossRewardHandler;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Monsters\Services\BuildMonsterCacheService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Queue;
 use Mockery;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -98,6 +103,8 @@ class RaidBattleServiceTest extends TestCase
             Mockery::mock(MonsterPlayerFight::class),
             Mockery::mock(BuildMonsterCacheService::class),
             Mockery::mock(BattleEventHandler::class),
+            Mockery::mock(ChanceCalculator::class),
+            Mockery::mock(RandomNumberGenerator::class),
         );
 
         $result = $service->setUpRaidBossBattle($character, $raidBoss);
@@ -167,11 +174,6 @@ class RaidBattleServiceTest extends TestCase
             'is_raid_boss' => true,
         ]);
 
-        $fightDataServerMonster = Mockery::mock(ServerMonster::class);
-        $fightDataServerMonster->shouldReceive('setMonster')->with(['id' => $monster->id])->once()->andReturnSelf();
-        $fightDataServerMonster->shouldReceive('setHealth')->with(100)->once()->andReturnSelf();
-        $this->instance(ServerMonster::class, $fightDataServerMonster);
-
         $buildMonster = Mockery::mock(BuildMonster::class);
         $buildMonster->shouldReceive('buildMonster')->once()->andReturn($serverMonster);
         $characterCacheData = Mockery::mock(CharacterCacheData::class);
@@ -197,6 +199,8 @@ class RaidBattleServiceTest extends TestCase
             $monsterPlayerFight,
             Mockery::mock(BuildMonsterCacheService::class),
             Mockery::mock(BattleEventHandler::class),
+            Mockery::mock(ChanceCalculator::class),
+            Mockery::mock(RandomNumberGenerator::class),
         );
 
         $service->setRaidBossHealth(100)->fightRaidMonster($character, $monster->id, 'attack', true);
@@ -209,5 +213,196 @@ class RaidBattleServiceTest extends TestCase
         $this->assertSame($currentRaidBoss->id, $currentParticipation->raid_boss_id);
         $this->assertSame(4, $currentParticipation->attacks_left);
         $this->assertSame(0, $oldParticipation->refresh()->attacks_left);
+    }
+
+    public function test_normal_raid_critter_death_dispatches_battle_attack_handler_immediately(): void
+    {
+        Queue::fake();
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation(16, 16)->getCharacter();
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+            'is_raid_boss' => false,
+        ]);
+
+        Cache::put('raid-monsters', [
+            $character->map->gameMap->name => [
+                ['id' => $monster->id],
+            ],
+        ]);
+
+        Cache::put('character-'.$character->id.'-raid-monster-'.$monster->id, [
+            'monster_current_health' => 50,
+            'server_monster' => ['id' => $monster->id],
+            'fight_data' => ['health' => ['current_character_health' => 50]],
+        ], now()->addMinutes(20));
+
+        $serverMonster = Mockery::mock(ServerMonster::class);
+        $serverMonster->shouldReceive('setHealth')->with(50)->once()->andReturnSelf();
+        $serverMonster->shouldReceive('getMonster')->andReturn(['id' => $monster->id]);
+        $serverMonster->shouldReceive('getHealth')->andReturn(0);
+        $serverMonster->shouldReceive('getId')->andReturn($monster->id);
+        $serverMonster->shouldReceive('isRaidBossMonster')->andReturn(false);
+
+        $buildMonster = Mockery::mock(BuildMonster::class);
+        $buildMonster->shouldReceive('buildMonster')->once()->andReturn($serverMonster);
+        $characterCacheData = Mockery::mock(CharacterCacheData::class);
+        $characterCacheData->shouldReceive('getCachedCharacterData')->with($character, 'stat_affixes')->andReturn([]);
+        $characterCacheData->shouldReceive('getCachedCharacterData')->with($character, 'skill_reduction')->andReturn(0.0);
+        $characterCacheData->shouldReceive('getCachedCharacterData')->with($character, 'resistance_reduction')->andReturn(0.0);
+
+        $monsterPlayerFight = Mockery::mock(MonsterPlayerFight::class);
+        $monsterPlayerFight->shouldReceive('setUpRaidFight')->once()->andReturnSelf();
+        $monsterPlayerFight->shouldReceive('getBattleMessages')->andReturn([]);
+        $monsterPlayerFight->shouldReceive('processAttack')->once();
+        $monsterPlayerFight->shouldReceive('getCharacterHealth')->andReturn(50);
+        $monsterPlayerFight->shouldReceive('getMonsterHealth')->andReturn(0);
+
+        $service = new RaidBattleService(
+            $buildMonster,
+            $characterCacheData,
+            $monsterPlayerFight,
+            Mockery::mock(BuildMonsterCacheService::class),
+            Mockery::mock(BattleEventHandler::class),
+            Mockery::mock(ChanceCalculator::class),
+            Mockery::mock(RandomNumberGenerator::class),
+        );
+
+        $service->fightRaidMonster($character, $monster->id, 'attack', false);
+
+        Queue::assertPushed(BattleAttackHandler::class, function (BattleAttackHandler $job): bool {
+            return $job->queue === 'battle_reward_processing'
+                && $job->connection === 'battle_reward_processing'
+                && is_null($job->delay);
+        });
+    }
+
+    public function test_pre_attack_ambush_raid_critter_death_dispatches_battle_attack_handler_immediately(): void
+    {
+        Queue::fake();
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation(16, 16)->getCharacter();
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+            'is_raid_boss' => false,
+        ]);
+
+        Cache::put('raid-monsters', [
+            $character->map->gameMap->name => [
+                ['id' => $monster->id],
+            ],
+        ]);
+
+        $serverMonster = Mockery::mock(ServerMonster::class);
+        $serverMonster->shouldReceive('getMonster')->andReturn(['id' => $monster->id]);
+
+        $buildMonster = Mockery::mock(BuildMonster::class);
+        $buildMonster->shouldReceive('buildMonster')->once()->andReturn($serverMonster);
+        $characterCacheData = Mockery::mock(CharacterCacheData::class);
+        $characterCacheData->shouldReceive('getCachedCharacterData')->with($character, 'stat_affixes')->andReturn([]);
+        $characterCacheData->shouldReceive('getCachedCharacterData')->with($character, 'skill_reduction')->andReturn(0.0);
+        $characterCacheData->shouldReceive('getCachedCharacterData')->with($character, 'resistance_reduction')->andReturn(0.0);
+
+        $monsterPlayerFight = Mockery::mock(MonsterPlayerFight::class);
+        $monsterPlayerFight->shouldReceive('setUpRaidFight')->once()->andReturnSelf();
+        $monsterPlayerFight->shouldReceive('fightSetUp')->once()->andReturn([
+            'health' => [
+                'current_character_health' => 50,
+                'current_monster_health' => 0,
+            ],
+        ]);
+        $monsterPlayerFight->shouldReceive('getBattleMessages')->andReturn([]);
+        $monsterPlayerFight->shouldReceive('getMonster')->andReturn(['id' => $monster->id]);
+
+        $service = new RaidBattleService(
+            $buildMonster,
+            $characterCacheData,
+            $monsterPlayerFight,
+            Mockery::mock(BuildMonsterCacheService::class),
+            Mockery::mock(BattleEventHandler::class),
+            Mockery::mock(ChanceCalculator::class),
+            Mockery::mock(RandomNumberGenerator::class),
+        );
+
+        $service->fightRaidMonster($character, $monster->id, 'attack', false);
+
+        Queue::assertPushed(BattleAttackHandler::class, function (BattleAttackHandler $job): bool {
+            return $job->queue === 'battle_reward_processing'
+                && $job->connection === 'battle_reward_processing'
+                && is_null($job->delay);
+        });
+    }
+
+    public function test_pre_attack_ambush_raid_boss_kill_still_dispatches_delayed_raid_boss_reward_handler(): void
+    {
+        Queue::fake();
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation(16, 16)->getCharacter();
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+            'is_raid_boss' => true,
+        ]);
+        $currentLocation = $this->createLocation([
+            'game_map_id' => $character->map->game_map_id,
+            'x' => 16,
+            'y' => 16,
+        ]);
+        $currentRaid = $this->createRaid([
+            'raid_boss_id' => $monster->id,
+            'raid_boss_location_id' => $currentLocation->id,
+        ]);
+        $currentLocation->update(['raid_id' => $currentRaid->id]);
+        RaidBoss::create([
+            'raid_id' => $currentRaid->id,
+            'raid_boss_id' => $monster->id,
+            'boss_max_hp' => 100,
+            'boss_current_hp' => 0,
+            'raid_boss_deatils' => ['id' => $monster->id],
+        ]);
+
+        Cache::put('raid-monsters', [
+            $character->map->gameMap->name => [
+                ['id' => $monster->id],
+            ],
+        ]);
+
+        $serverMonster = Mockery::mock(ServerMonster::class);
+        $serverMonster->shouldReceive('setHealth')->with(100)->once()->andReturnSelf();
+        $serverMonster->shouldReceive('getMonster')->andReturn(['id' => $monster->id]);
+
+        $buildMonster = Mockery::mock(BuildMonster::class);
+        $buildMonster->shouldReceive('buildMonster')->once()->andReturn($serverMonster);
+        $characterCacheData = Mockery::mock(CharacterCacheData::class);
+        $characterCacheData->shouldReceive('getCachedCharacterData')->with($character, 'stat_affixes')->andReturn([]);
+        $characterCacheData->shouldReceive('getCachedCharacterData')->with($character, 'skill_reduction')->andReturn(0.0);
+        $characterCacheData->shouldReceive('getCachedCharacterData')->with($character, 'resistance_reduction')->andReturn(0.0);
+
+        $monsterPlayerFight = Mockery::mock(MonsterPlayerFight::class);
+        $monsterPlayerFight->shouldReceive('setUpRaidFight')->once()->andReturnSelf();
+        $monsterPlayerFight->shouldReceive('fightSetUp')->once()->andReturn([
+            'health' => [
+                'current_character_health' => 50,
+                'current_monster_health' => 100,
+            ],
+        ]);
+        $monsterPlayerFight->shouldReceive('getBattleMessages')->andReturn([]);
+
+        $service = new RaidBattleService(
+            $buildMonster,
+            $characterCacheData,
+            $monsterPlayerFight,
+            Mockery::mock(BuildMonsterCacheService::class),
+            Mockery::mock(BattleEventHandler::class),
+            Mockery::mock(ChanceCalculator::class),
+            Mockery::mock(RandomNumberGenerator::class),
+        );
+
+        $service->setRaidBossHealth(100)->fightRaidMonster($character, $monster->id, 'attack', true);
+
+        Queue::assertPushed(RaidBossRewardHandler::class, function (RaidBossRewardHandler $job): bool {
+            return $job->queue === 'battle_reward_processing'
+                && $job->connection === 'battle_reward_processing'
+                && ! is_null($job->delay);
+        });
     }
 }

@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="flex min-h-screen items-start justify-center px-4 pt-16">
-        <div class="w-full max-w-md space-y-8">
+    <div class="flex min-h-0 flex-1 items-center-safe justify-center px-4 py-4">
+        <div class="w-full max-w-md space-y-4">
             <header class="text-center">
                 <h1 class="text-3xl font-extrabold text-gray-900 dark:text-gray-100">Unban Request</h1>
                 <p class="mt-2 text-sm text-gray-600 uppercase dark:text-gray-400">Request Form</p>
@@ -11,7 +11,7 @@
             <form
                 method="POST"
                 action="{{ route('un.ban.request.submit') }}"
-                class="space-y-6 rounded-lg bg-white p-8 shadow-lg dark:bg-gray-800"
+                class="space-y-4 rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800"
             >
                 @csrf
                 <input type="hidden" name="token" value="{{ $token }}" />

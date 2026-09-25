@@ -2,6 +2,7 @@
 
 namespace App\Game\Character\Providers;
 
+use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Services\AttackTimerService;
 use App\Game\Character\Builders\AttackBuilders\AttackDetails\CharacterAttackBuilder;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ClassRanksWeaponMasteriesBuilder;
@@ -28,7 +29,7 @@ class ServiceProvider extends ApplicationServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->app->bind(CharacterDeletion::class, fn ($app) => new CharacterDeletion(
             $app->make(GiveKingdomsToNpcHandler::class),
@@ -56,6 +57,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CharacterStatBuilder::class),
                 $app->make(AttackTimerService::class),
                 $app->make(CharacterInventoryCountTransformer::class),
+                $app->make(AutomationRestrictionService::class),
             );
         });
 

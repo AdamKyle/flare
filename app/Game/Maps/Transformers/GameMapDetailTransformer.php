@@ -12,6 +12,9 @@ class GameMapDetailTransformer
 {
     /**
      * Transform the supplied internal Game Map detail data into its Player factual detail representation.
+     *
+     * @param array $detailData
+     * @return array
      */
     public function transform(array $detailData): array
     {
@@ -43,11 +46,15 @@ class GameMapDetailTransformer
             'character_attack_reduction' => $gameMap->character_attack_reduction,
             'required_location' => $this->transformRequiredLocation($requiredLocation),
             'required_quest_item' => $this->transformRequiredQuestItem($requiredItem, $requiredQuest),
+            'gem_context' => $detailData['gem_context'],
         ];
     }
 
     /**
      * Transform the required Location into display data.
+     *
+     * @param Location|null $requiredLocation
+     * @return array|null
      */
     private function transformRequiredLocation(?Location $requiredLocation): ?array
     {
@@ -63,6 +70,10 @@ class GameMapDetailTransformer
 
     /**
      * Transform the Game Map's required quest Item and its acquisition Quest, when present.
+     *
+     * @param Item|null $requiredItem
+     * @param Quest|null $requiredQuest
+     * @return array|null
      */
     private function transformRequiredQuestItem(?Item $requiredItem, ?Quest $requiredQuest): ?array
     {
@@ -79,6 +90,9 @@ class GameMapDetailTransformer
 
     /**
      * Transform the Quest that grants the required quest Item, when one exists.
+     *
+     * @param Quest|null $requiredQuest
+     * @return array|null
      */
     private function transformRequiredQuest(?Quest $requiredQuest): ?array
     {

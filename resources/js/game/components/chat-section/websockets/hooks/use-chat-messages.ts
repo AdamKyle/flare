@@ -1,11 +1,11 @@
 import { useCallback, useState } from 'react';
 
-import BaseWebSocketParams from './definitions/base-web-socket-params';
 import EventPayload from './definitions/event-payload-definition';
 import { GlobalMessagePayloadDefinition } from './definitions/global-message-payload-definition';
 import { NpcMessagePayloadDefinition } from './definitions/npc-message-payload-definition';
 import { PrivateMessagePayloadDefinition } from './definitions/private-message-payload-definition';
 import { UseChatMessagesDefinition } from './definitions/use-chat-messages-definition';
+import UseChatMessagesParams from './definitions/use-chat-messages-params';
 import { ChannelType } from '../../../../../websocket-handler/enums/channel-type';
 import { useWebsocket } from '../../../../../websocket-handler/hooks/use-websocket';
 import ChatType from '../../../../api-definitions/chat/chat-message-definition';
@@ -22,37 +22,44 @@ const MAX_CHAT_MESSAGES = 1000;
 
 export const useChatMessages = ({
   user_id,
-}: BaseWebSocketParams): UseChatMessagesDefinition => {
+  include_private_channels = true,
+}: UseChatMessagesParams): UseChatMessagesDefinition => {
   const [chatMessages, setChatMessages] = useState<ChatType[]>([]);
 
-  const pushChatMessage = useCallback((next: ChatType) => {
+  const canSubscribeToPrivateChannels = include_private_channels && user_id > 0;
+
+  const prependChatMessage = useCallback((next: ChatType) => {
     setChatMessages((previous) =>
       [next, ...previous].slice(0, MAX_CHAT_MESSAGES)
     );
   }, []);
 
+  const replaceChatMessages = useCallback((messages: ChatType[]) => {
+    setChatMessages(messages.slice(0, MAX_CHAT_MESSAGES));
+  }, []);
+
   const handlePublicMessage = useCallback(
     (event: EventPayload) =>
-      pushChatMessage(toChatTypeFromPublicMessage(event)),
-    [pushChatMessage]
+      prependChatMessage(toChatTypeFromPublicMessage(event)),
+    [prependChatMessage]
   );
 
   const handleGlobalMessage = useCallback(
     (event: GlobalMessagePayloadDefinition) =>
-      pushChatMessage(toChatTypeFromGlobalMessage(event)),
-    [pushChatMessage]
+      prependChatMessage(toChatTypeFromGlobalMessage(event)),
+    [prependChatMessage]
   );
 
   const handleNpcMessage = useCallback(
     (event: NpcMessagePayloadDefinition) =>
-      pushChatMessage(toChatTypeFromNpcMessage(event)),
-    [pushChatMessage]
+      prependChatMessage(toChatTypeFromNpcMessage(event)),
+    [prependChatMessage]
   );
 
   const handlePrivateMessage = useCallback(
     (event: PrivateMessagePayloadDefinition) =>
-      pushChatMessage(toChatTypeFromPrivateMessage(event)),
-    [pushChatMessage]
+      prependChatMessage(toChatTypeFromPrivateMessage(event)),
+    [prependChatMessage]
   );
 
   useWebsocket<EventPayload>({
@@ -77,7 +84,7 @@ export const useChatMessages = ({
     type: ChannelType.PRIVATE,
     channelName: ChatWebsocketEventNames.NPC_MESSAGE,
     onEvent: handleNpcMessage,
-    enabled: user_id > 0,
+    enabled: canSubscribeToPrivateChannels,
   });
 
   useWebsocket<PrivateMessagePayloadDefinition>({
@@ -86,8 +93,8 @@ export const useChatMessages = ({
     type: ChannelType.PRIVATE,
     channelName: ChatWebsocketEventNames.PRIVATE_MESSAGE,
     onEvent: handlePrivateMessage,
-    enabled: user_id > 0,
+    enabled: canSubscribeToPrivateChannels,
   });
 
-  return { chatMessages };
+  return { chatMessages, prependChatMessage, replaceChatMessages };
 };

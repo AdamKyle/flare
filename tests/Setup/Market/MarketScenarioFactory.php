@@ -25,7 +25,7 @@ class MarketScenarioFactory
     public function createScenario(array $buyerAttributes = [], array $listedItemAttributes = [], int $listedPrice = 100): MarketScenarioFactory
     {
         $this->buyer = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->updateCharacter($buyerAttributes);
-        $this->seller = (new CharacterFactory)->createBaseCharacter();
+        $this->seller = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
 
         $buyerCharacter = $this->buyer->getCharacter();
 

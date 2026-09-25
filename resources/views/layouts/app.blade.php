@@ -36,16 +36,18 @@
     @stack('head')
 </head>
 <body class="bg-gray-100 transition-colors duration-200 dark:bg-gray-800">
-    <x-core.page.content-area>
-        @include('layouts.partials.plain-header', [
-            'isLoggedIn' => ! is_null(auth()->user()),
-            'user' => auth()->user(),
-        ])
-        <main>
-            @include('layouts.partials.alerts')
-            @yield('content')
-        </main>
-    </x-core.page.content-area>
+    <x-core.page.page-wrapper>
+        <x-core.page.content-area>
+            @include('layouts.partials.plain-header', [
+                'isLoggedIn' => ! is_null(auth()->user()),
+                'user' => auth()->user(),
+            ])
+            <main class="flex min-h-0 flex-1 flex-col">
+                @include('layouts.partials.alerts')
+                @yield('content')
+            </main>
+        </x-core.page.content-area>
+    </x-core.page.page-wrapper>
     @if (! is_null(auth()->user()))
         @vite('resources/js/app.ts')
         <script>

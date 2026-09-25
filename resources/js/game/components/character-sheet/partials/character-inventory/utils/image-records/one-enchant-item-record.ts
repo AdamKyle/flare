@@ -32,6 +32,7 @@ export const oneEnchantItemRecord: Partial<
   [InventoryItemTypes.SCRATCH_AWL]: `${EquipmentImagePaths.ONE_ENCHANT_ITEMS}/scratch-awl-one-enchant.png`,
   [InventoryItemTypes.WAND]: `${EquipmentImagePaths.ONE_ENCHANT_ITEMS}/wand-one-enchant.png`,
   [InventoryItemTypes.CENSOR]: `${EquipmentImagePaths.ONE_ENCHANT_ITEMS}/censor-one-enchant.png`,
+  [InventoryItemTypes.CENSER]: `${EquipmentImagePaths.ONE_ENCHANT_ITEMS}/censor-one-enchant.png`,
   [InventoryItemTypes.SPELL_HEALING]: `${EquipmentImagePaths.ONE_ENCHANT_ITEMS}/spell-healing-one-enchant.png`,
   [InventoryItemTypes.SPELL_DAMAGE]: `${EquipmentImagePaths.ONE_ENCHANT_ITEMS}/spell-damage-one-enchant.png`,
   [InventoryItemTypes.RING]: `${EquipmentImagePaths.ONE_ENCHANT_ITEMS}/ring-one-enchant.png`,

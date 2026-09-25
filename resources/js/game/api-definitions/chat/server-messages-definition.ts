@@ -1,5 +1,8 @@
 export default interface ServerMessagesDefinition {
-  id: string | null;
+  id: number | null;
   message: string;
-  event_id: number;
+  source: string | null;
+  itemId: number | null;
+  linkText: string | null;
+  timeStamp: string;
 }
