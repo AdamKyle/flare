@@ -1,56 +1,25 @@
-import React from 'react';
+import React, { createElement, Fragment } from 'react';
 
 import TabsPanelsProps from 'ui/tabs/types/tab-panel-props';
-
-type PropsOf<C> = C extends (props: infer P) => React.ReactNode
-  ? P
-  : Record<never, never>;
 
 const TabsPanels = <PTuple extends readonly object[]>({
   tabs,
   activeIndex,
   tabIds,
   panelIds,
+  keep_panels_mounted = false,
 }: TabsPanelsProps<PTuple>) => {
-  const hasProps = <P extends object>(item: {
-    props?: P;
-  }): item is { props: P } => {
-    const exists = Object.prototype.hasOwnProperty.call(item, 'props');
+  const renderPanelContent = (tabIndex: number): React.ReactNode => {
+    const tabItem = tabs[tabIndex];
 
-    if (!exists) {
-      return false;
-    }
-
-    return item.props !== undefined;
+    return (
+      <Fragment key={panelIds[tabIndex]}>
+        {createElement(tabItem.component, tabItem.props)}
+      </Fragment>
+    );
   };
 
-  const renderTabPanels = () => {
-    const hasTabs = tabs.length > 0;
-
-    if (!hasTabs) {
-      return null;
-    }
-
-    const activeItem = tabs[activeIndex];
-
-    const ActiveComponent = activeItem.component;
-
-    type ActiveProps = PropsOf<typeof ActiveComponent>;
-
-    const maybeWithProps = activeItem as { props?: ActiveProps };
-
-    let content: React.ReactNode;
-
-    if (hasProps<ActiveProps>(maybeWithProps)) {
-      const provided = maybeWithProps.props;
-
-      content = <ActiveComponent {...provided} key={panelIds[activeIndex]} />;
-    } else {
-      const empty = {} as ActiveProps;
-
-      content = <ActiveComponent {...empty} key={panelIds[activeIndex]} />;
-    }
-
+  const renderActivePanel = () => {
     return (
       <div className="w-full">
         <div
@@ -60,10 +29,50 @@ const TabsPanels = <PTuple extends readonly object[]>({
           className="mt-4 outline-none"
           tabIndex={0}
         >
-          {content}
+          {renderPanelContent(activeIndex)}
         </div>
       </div>
     );
+  };
+
+  const renderMountedPanel = (tabIndex: number) => {
+    const isActive = tabIndex === activeIndex;
+
+    return (
+      <div
+        key={panelIds[tabIndex]}
+        id={panelIds[tabIndex]}
+        role="tabpanel"
+        aria-labelledby={tabIds[tabIndex]}
+        className="mt-4 outline-none"
+        tabIndex={isActive ? 0 : -1}
+        hidden={!isActive}
+      >
+        {renderPanelContent(tabIndex)}
+      </div>
+    );
+  };
+
+  const renderMountedPanels = () => {
+    return (
+      <div className="w-full">
+        {Array.from(tabs.keys()).map(renderMountedPanel)}
+      </div>
+    );
+  };
+
+  const renderTabPanels = () => {
+    const hasTabs = tabs.length > 0;
+
+    if (!hasTabs) {
+      return null;
+    }
+
+    if (keep_panels_mounted) {
+      return renderMountedPanels();
+    }
+
+    return renderActivePanel();
   };
 
   return renderTabPanels();

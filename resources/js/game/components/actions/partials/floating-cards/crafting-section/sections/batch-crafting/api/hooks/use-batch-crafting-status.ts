@@ -10,15 +10,13 @@ import {
 import BatchCraftingStatusDefinition from '../definitions/batch-crafting-status-definition';
 import BatchCraftingStatusUpdatedDefinition from '../definitions/batch-crafting-status-updated-definition';
 import { BatchCraftingApiUrls } from '../enums/batch-crafting-api-urls';
+import { BatchCraftingWebSocketChannels } from '../enums/batch-crafting-web-socket-channels';
+import { BatchCraftingWebSocketEventNames } from '../enums/batch-crafting-web-socket-event-names';
 import UseBatchCraftingStatusDefinition from './definitions/use-batch-crafting-status-definition';
 import UseBatchCraftingStatusParams from './definitions/use-batch-crafting-status-params';
 
 import { ChannelType } from 'websockets/enums/channel-type';
 import { useWebsocket } from 'websockets/hooks/use-websocket';
-
-const BATCH_CRAFTING_STATUS_UPDATED_CHANNEL =
-  'batch-crafting-status-updated-{userId}';
-const BATCH_CRAFTING_STATUS_UPDATED_EVENT = '.batch-crafting.status.updated';
 
 export const useBatchCraftingStatus = ({
   characterId,
@@ -30,6 +28,7 @@ export const useBatchCraftingStatus = ({
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [liveUpdateCount, setLiveUpdateCount] = useState(0);
   const abortControllerRef = useRef<AbortController | null>(null);
   const requestGenerationRef = useRef(0);
   const initialStatusResolvedRef = useRef(false);
@@ -127,18 +126,25 @@ export const useBatchCraftingStatus = ({
       );
       setError(null);
       setLoading(false);
+      setLiveUpdateCount((currentCount) => currentCount + 1);
     },
     []
   );
 
   useWebsocket<BatchCraftingStatusUpdatedDefinition>({
-    url: BATCH_CRAFTING_STATUS_UPDATED_CHANNEL,
+    url: BatchCraftingWebSocketChannels.STATUS_UPDATED,
     params: { userId },
     type: ChannelType.PRIVATE,
-    channelName: BATCH_CRAFTING_STATUS_UPDATED_EVENT,
+    channelName: BatchCraftingWebSocketEventNames.STATUS_UPDATED,
     onEvent: handleStatusUpdatedEvent,
     enabled: userId > 0,
   });
 
-  return { status, loading, error };
+  return {
+    status,
+    loading,
+    error,
+    live_update_count: liveUpdateCount,
+    refresh_status: fetchStatus,
+  };
 };

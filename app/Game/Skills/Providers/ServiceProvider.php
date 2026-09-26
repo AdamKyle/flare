@@ -25,6 +25,7 @@ use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Npcs\Actions\QueenOfHearts\Services\RandomEnchantmentService;
 use App\Game\Skills\Builders\BaseSkillBuilder;
 use App\Game\Skills\Console\Commands\AssignNewSkillsToPlayers;
+use App\Game\Skills\Contracts\SkillBonusQuery;
 use App\Game\Skills\Handlers\HandleUpdatingCraftingGlobalEventGoal;
 use App\Game\Skills\Handlers\HandleUpdatingEnchantingGlobalEventGoal;
 use App\Game\Skills\Handlers\UpdateCraftingTasksForFactionLoyalty;
@@ -41,6 +42,7 @@ use App\Game\Skills\Services\ItemListCostTransformerService;
 use App\Game\Skills\Services\ItemSkillService;
 use App\Game\Skills\Services\MassDisenchantService;
 use App\Game\Skills\Services\SkillBonusContextService;
+use App\Game\Skills\Services\SkillBonusService;
 use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Services\SkillService;
 use App\Game\Skills\Services\TrinketCraftingService;
@@ -67,6 +69,8 @@ class ServiceProvider extends ApplicationServiceProvider
     {
         $this->app->bind(SkillBonusContextService::class);
 
+        $this->app->bind(SkillBonusQuery::class, SkillBonusService::class);
+
         $this->app->bind(BaseSkillBuilder::class, function ($app) {
             return new BaseSkillBuilder($app->make(RandomNumberGenerator::class));
         });
@@ -80,7 +84,10 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(SkillCheckService::class, function ($app) {
-            return new SkillCheckService($app->make(RandomNumberGenerator::class));
+            return new SkillCheckService(
+                $app->make(RandomNumberGenerator::class),
+                $app->make(SkillBonusService::class),
+            );
         });
 
         $this->app->bind(EnchantItemService::class, function ($app) {
@@ -141,6 +148,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(SkillCheckService::class),
                 $app->make(RandomNumberGenerator::class),
                 $app->make(ChanceCalculator::class),
+                $app->make(SkillBonusService::class),
             );
         });
 
@@ -154,6 +162,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(PlainDataSerializer::class),
                 $app->make(RandomNumberGenerator::class),
                 $app->make(CharacterAreaGemEffectService::class),
+                $app->make(SkillBonusService::class),
             );
         });
 
@@ -197,6 +206,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(GemTransformer::class),
                 $app->make(ServerMessageBuilder::class),
                 $app->make(CharacterGemSlotsTransformer::class),
+                $app->make(SkillBonusService::class),
             );
         });
 

@@ -33,6 +33,8 @@ use App\Game\Market\Services\MarketRealtimePublisher;
 use App\Game\Market\Transformers\MarketItemsTransformer;
 use App\Game\Skills\Services\DisenchantService;
 use App\Game\Skills\Services\MassDisenchantService;
+use App\Game\Skills\Services\SkillBonusContextService;
+use App\Game\Skills\Services\SkillBonusService;
 use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -59,6 +61,7 @@ class MarketBoardBatchCraftingTest extends TestCase
         $questItemTransformer = new QuestItemTransformer;
         $apiUsableItemTransformer = new ApiUsableItemTransformer;
         $inventorySetService = new InventorySetService(new SetHandsValidation);
+        $skillBonusService = new SkillBonusService(new SkillBonusContextService);
         $equipItemService = new EquipItemService($manager, new CharacterAttackTransformer, $inventorySetService);
 
         $itemEnricherFactory = new ItemEnricherFactory(
@@ -79,7 +82,7 @@ class MarketBoardBatchCraftingTest extends TestCase
                 $apiUsableItemTransformer,
                 new InventoryTransformer($itemEnricherFactory),
                 $inventorySetService,
-                new MassDisenchantService(new SkillCheckService($randomNumberGenerator), $randomNumberGenerator, new ChanceCalculator($randomNumberGenerator)),
+                new MassDisenchantService(new SkillCheckService($randomNumberGenerator, $skillBonusService), $randomNumberGenerator, new ChanceCalculator($randomNumberGenerator), $skillBonusService),
                 Mockery::mock(UpdateCharacterSkillsService::class),
                 Mockery::mock(DisenchantService::class),
                 new Pagination($manager),

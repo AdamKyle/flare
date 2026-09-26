@@ -44,6 +44,8 @@ use App\Game\Skills\Events\UpdateSkillEvent;
 use App\Game\Skills\Services\DisenchantService;
 use App\Game\Skills\Services\EnchantingAffixService;
 use App\Game\Skills\Services\MassDisenchantService;
+use App\Game\Skills\Services\SkillBonusContextService;
+use App\Game\Skills\Services\SkillBonusService;
 use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -120,7 +122,7 @@ class DisenchantServiceTest extends TestCase
             fn (int $minimum, int $maximum): int => intdiv($minimum + $maximum, 2)
         );
 
-        $this->skillCheckService = new SkillCheckService($this->randomNumberGenerator);
+        $this->skillCheckService = new SkillCheckService($this->randomNumberGenerator, new SkillBonusService(new SkillBonusContextService));
         $this->chanceCalculator = new ChanceCalculator($this->randomNumberGenerator);
 
         $this->itemToDisenchant = $this->createItem([
@@ -217,7 +219,7 @@ class DisenchantServiceTest extends TestCase
         $slot = $character->inventory->slots->first();
 
         new DisenchantService(
-            new SkillCheckService($randomNumberGenerator),
+            new SkillCheckService($randomNumberGenerator, new SkillBonusService(new SkillBonusContextService)),
             $randomNumberGenerator,
             new ChanceCalculator($randomNumberGenerator),
             $this->enchantingAffixService,
@@ -245,7 +247,7 @@ class DisenchantServiceTest extends TestCase
         $slot = $character->inventory->slots->first();
 
         new DisenchantService(
-            new SkillCheckService($randomNumberGenerator),
+            new SkillCheckService($randomNumberGenerator, new SkillBonusService(new SkillBonusContextService)),
             $randomNumberGenerator,
             new ChanceCalculator($randomNumberGenerator),
             $this->enchantingAffixService,
@@ -274,7 +276,7 @@ class DisenchantServiceTest extends TestCase
         $slot = $character->inventory->slots->first();
 
         new DisenchantService(
-            new SkillCheckService($randomNumberGenerator),
+            new SkillCheckService($randomNumberGenerator, new SkillBonusService(new SkillBonusContextService)),
             $randomNumberGenerator,
             new ChanceCalculator($randomNumberGenerator),
             $this->enchantingAffixService,
@@ -303,7 +305,7 @@ class DisenchantServiceTest extends TestCase
         $slot = $character->inventory->slots->first();
 
         new DisenchantService(
-            new SkillCheckService($randomNumberGenerator),
+            new SkillCheckService($randomNumberGenerator, new SkillBonusService(new SkillBonusContextService)),
             $randomNumberGenerator,
             new ChanceCalculator($randomNumberGenerator),
             $this->enchantingAffixService,
@@ -329,7 +331,7 @@ class DisenchantServiceTest extends TestCase
         $slot = $character->inventory->slots->first();
 
         new DisenchantService(
-            new SkillCheckService($randomNumberGenerator),
+            new SkillCheckService($randomNumberGenerator, new SkillBonusService(new SkillBonusContextService)),
             $randomNumberGenerator,
             new ChanceCalculator($randomNumberGenerator),
             $this->enchantingAffixService,
@@ -364,7 +366,7 @@ class DisenchantServiceTest extends TestCase
         $slot = $character->inventory->slots->first();
 
         new DisenchantService(
-            new SkillCheckService($randomNumberGenerator),
+            new SkillCheckService($randomNumberGenerator, new SkillBonusService(new SkillBonusContextService)),
             $randomNumberGenerator,
             new ChanceCalculator($randomNumberGenerator),
             $this->enchantingAffixService,
@@ -399,7 +401,7 @@ class DisenchantServiceTest extends TestCase
         $slot = $character->inventory->slots->first();
 
         new DisenchantService(
-            new SkillCheckService($randomNumberGenerator),
+            new SkillCheckService($randomNumberGenerator, new SkillBonusService(new SkillBonusContextService)),
             $randomNumberGenerator,
             new ChanceCalculator($randomNumberGenerator),
             $this->enchantingAffixService,
@@ -437,7 +439,7 @@ class DisenchantServiceTest extends TestCase
         $slot = $character->inventory->slots->first();
 
         new DisenchantService(
-            new SkillCheckService($randomNumberGenerator),
+            new SkillCheckService($randomNumberGenerator, new SkillBonusService(new SkillBonusContextService)),
             $randomNumberGenerator,
             new ChanceCalculator($randomNumberGenerator),
             $this->enchantingAffixService,
@@ -471,7 +473,7 @@ class DisenchantServiceTest extends TestCase
         $slot = $character->inventory->slots->first();
 
         new DisenchantService(
-            new SkillCheckService($randomNumberGenerator),
+            new SkillCheckService($randomNumberGenerator, new SkillBonusService(new SkillBonusContextService)),
             $randomNumberGenerator,
             new ChanceCalculator($randomNumberGenerator),
             $this->enchantingAffixService,
@@ -571,7 +573,7 @@ class DisenchantServiceTest extends TestCase
         $character = $this->character->getCharacter();
 
         new DisenchantService(
-            new SkillCheckService($randomNumberGenerator),
+            new SkillCheckService($randomNumberGenerator, new SkillBonusService(new SkillBonusContextService)),
             $randomNumberGenerator,
             new ChanceCalculator($randomNumberGenerator),
             $this->enchantingAffixService,
@@ -601,7 +603,7 @@ class DisenchantServiceTest extends TestCase
         ]);
 
         new DisenchantService(
-            new SkillCheckService($randomNumberGenerator),
+            new SkillCheckService($randomNumberGenerator, new SkillBonusService(new SkillBonusContextService)),
             $randomNumberGenerator,
             new ChanceCalculator($randomNumberGenerator),
             $this->enchantingAffixService,
@@ -625,7 +627,7 @@ class DisenchantServiceTest extends TestCase
         });
 
         new DisenchantService(
-            new SkillCheckService($randomNumberGenerator),
+            new SkillCheckService($randomNumberGenerator, new SkillBonusService(new SkillBonusContextService)),
             $randomNumberGenerator,
             new ChanceCalculator($randomNumberGenerator),
             $this->enchantingAffixService,
@@ -686,7 +688,7 @@ class DisenchantServiceTest extends TestCase
         $slot = $character->inventory->slots->first();
 
         $result = new DisenchantService(
-            new SkillCheckService($randomNumberGenerator),
+            new SkillCheckService($randomNumberGenerator, new SkillBonusService(new SkillBonusContextService)),
             $randomNumberGenerator,
             new ChanceCalculator($randomNumberGenerator),
             $this->enchantingAffixService,
@@ -783,7 +785,7 @@ class DisenchantServiceTest extends TestCase
         $goldDustBefore = $character->gold_dust;
 
         new DisenchantService(
-            new SkillCheckService($randomNumberGenerator),
+            new SkillCheckService($randomNumberGenerator, new SkillBonusService(new SkillBonusContextService)),
             $randomNumberGenerator,
             new ChanceCalculator($randomNumberGenerator),
             $this->enchantingAffixService,
@@ -808,7 +810,7 @@ class DisenchantServiceTest extends TestCase
         $goldDustBefore = $character->gold_dust;
 
         new DisenchantService(
-            new SkillCheckService($randomNumberGenerator),
+            new SkillCheckService($randomNumberGenerator, new SkillBonusService(new SkillBonusContextService)),
             $randomNumberGenerator,
             new ChanceCalculator($randomNumberGenerator),
             $this->enchantingAffixService,

@@ -9,4 +9,5 @@ export default interface PillTabsProps<PTuple extends readonly object[]> {
   additional_tab_css?: string;
   onActiveIndexChange?: (index: number) => void;
   alignment?: PillTabsAlignment;
+  keep_panels_mounted?: boolean;
 }

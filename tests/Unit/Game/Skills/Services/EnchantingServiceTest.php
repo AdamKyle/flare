@@ -50,6 +50,8 @@ use App\Game\Skills\Handlers\HandleUpdatingEnchantingGlobalEventGoal;
 use App\Game\Skills\Services\EnchantingAffixService;
 use App\Game\Skills\Services\EnchantingService;
 use App\Game\Skills\Services\EnchantItemService;
+use App\Game\Skills\Services\SkillBonusContextService;
+use App\Game\Skills\Services\SkillBonusService;
 use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Transformers\EnchantingAffixTransformer;
 use App\Game\Skills\Transformers\EnchantingItemTransformer;
@@ -187,7 +189,7 @@ class EnchantingServiceTest extends TestCase
         );
 
         $enchantItemService = new EnchantItemService(
-            new SkillCheckService($randomNumberGenerator),
+            new SkillCheckService($randomNumberGenerator, new SkillBonusService(new SkillBonusContextService)),
             $this->handleUpdatingEnchantingGlobalEventGoal,
         );
 

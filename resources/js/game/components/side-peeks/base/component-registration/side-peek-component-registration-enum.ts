@@ -57,6 +57,11 @@ export enum SidePeekComponentRegistrationEnum {
   CHARACTER_CLASS_SPECIALTY_DETAIL = 'CHARACTER_CLASS_SPECIALTY_DETAIL',
 
   /**
+   * Character Skills
+   */
+  CHARACTER_SKILL_DETAIL = 'CHARACTER_SKILL_DETAIL',
+
+  /**
    * Admin Monitoring
    */
   ADMIN_LOG_ENTRY = 'ADMIN_LOG_ENTRY',

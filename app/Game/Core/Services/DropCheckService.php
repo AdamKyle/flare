@@ -13,13 +13,12 @@ use App\Game\Gems\Progression\Contracts\CharacterAreaGemEffects;
 use App\Game\Gems\Values\AreaGemRewardEffect;
 use App\Game\Gems\Values\ResolvedAreaGemEffects;
 use App\Game\Maps\Values\LocationType;
+use App\Game\Skills\Contracts\SkillBonusQuery;
 use Facades\App\Game\Core\Chance\DropCheckCalculator;
 use Illuminate\Support\Facades\Log;
 
 class DropCheckService
 {
-    private BattleDrop $battleDrop;
-
     private Monster $monster;
 
     private ?Location $locationWithEffect = null;
@@ -34,8 +33,6 @@ class DropCheckService
 
     private ?Location $cachedManualQuestItemLocation = null;
 
-    private BuildMythicItem $buildMythicItem;
-
     private float $lootingChance = 0.0;
 
     private float $gameMapBonus = 0.0;
@@ -48,15 +45,14 @@ class DropCheckService
      * @param BattleDrop $battleDrop
      * @param BuildMythicItem $buildMythicItem
      * @param CharacterAreaGemEffects $characterAreaGemEffects
+     * @param SkillBonusQuery $skillBonusQuery
      */
     public function __construct(
-        BattleDrop $battleDrop,
-        BuildMythicItem $buildMythicItem,
+        private BattleDrop $battleDrop,
+        private readonly BuildMythicItem $buildMythicItem,
         private readonly CharacterAreaGemEffects $characterAreaGemEffects,
-    ) {
-        $this->battleDrop = $battleDrop;
-        $this->buildMythicItem = $buildMythicItem;
-    }
+        private readonly SkillBonusQuery $skillBonusQuery,
+    ) {}
 
     /**
      * Process the drop check.
@@ -71,7 +67,7 @@ class DropCheckService
     {
         $this->gameMapBonus = 0.0;
 
-        $this->lootingChance = $lootingChance ?? $character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
+        $this->lootingChance = $lootingChance ?? $this->skillBonusQuery->skillBonus($character->skills->where('name', '=', 'Looting')->first());
         $this->monster = $monster;
 
         $characterMap = $character->map;
@@ -135,7 +131,7 @@ class DropCheckService
         $startedAtNs = hrtime(true);
 
         $this->gameMapBonus = 0.0;
-        $this->lootingChance = $lootingChance ?? $character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
+        $this->lootingChance = $lootingChance ?? $this->skillBonusQuery->skillBonus($character->skills->where('name', '=', 'Looting')->first());
         $this->monster = $monster;
 
         $characterMap = $character->map;

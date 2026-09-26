@@ -4,9 +4,12 @@ namespace Tests\Unit\Game\Skills\Services;
 
 use App\Game\Character\CharacterInventory\Transformers\CharacterInventoryCountTransformer;
 use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\PhpRandomNumberGenerator;
 use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Skills\Services\DisenchantManyService;
+use App\Game\Skills\Services\SkillBonusContextService;
+use App\Game\Skills\Services\SkillBonusService;
 use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -24,14 +27,11 @@ class DisenchantManyServiceTest extends TestCase
 
     private ?CharacterFactory $character;
 
-    private ?DisenchantManyService $disenchantManyService;
-
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
-        $this->disenchantManyService = resolve(DisenchantManyService::class);
     }
 
     protected function tearDown(): void
@@ -39,16 +39,22 @@ class DisenchantManyServiceTest extends TestCase
         parent::tearDown();
 
         $this->character = null;
-        $this->disenchantManyService = null;
     }
 
     public function test_disenchant_many_returns_no_eligible_items_when_nothing_matches(): void
     {
         $character = $this->character->getCharacter();
+        $randomNumberGenerator = new PhpRandomNumberGenerator();
 
-        $result = $this->disenchantManyService->disenchantMany(
-            resolve(Manager::class),
-            resolve(CharacterInventoryCountTransformer::class),
+        $disenchantManyService = new DisenchantManyService(
+            new SkillCheckService($randomNumberGenerator, new SkillBonusService(new SkillBonusContextService())),
+            $randomNumberGenerator,
+            new ChanceCalculator($randomNumberGenerator),
+        );
+
+        $result = $disenchantManyService->disenchantMany(
+            new Manager(),
+            new CharacterInventoryCountTransformer(),
             $character,
             []
         );
@@ -62,10 +68,17 @@ class DisenchantManyServiceTest extends TestCase
     {
         $item = $this->createItem();
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+        $randomNumberGenerator = new PhpRandomNumberGenerator();
 
-        $result = $this->disenchantManyService->disenchantMany(
-            resolve(Manager::class),
-            resolve(CharacterInventoryCountTransformer::class),
+        $disenchantManyService = new DisenchantManyService(
+            new SkillCheckService($randomNumberGenerator, new SkillBonusService(new SkillBonusContextService())),
+            $randomNumberGenerator,
+            new ChanceCalculator($randomNumberGenerator),
+        );
+
+        $result = $disenchantManyService->disenchantMany(
+            new Manager(),
+            new CharacterInventoryCountTransformer(),
             $character,
             []
         );
@@ -89,16 +102,18 @@ class DisenchantManyServiceTest extends TestCase
         $randomNumberGenerator = Mockery::mock(RandomNumberGenerator::class);
         $randomNumberGenerator->shouldReceive('numberBetween')->once()->with(1, 400)->andReturn(400);
         $randomNumberGenerator->shouldReceive('numberBetween')->once()->with(1, 400)->andReturn(1);
+        $randomNumberGenerator->shouldReceive('numberBetween')->once()->with(2, 1150)->andReturn(1000);
+        $randomNumberGenerator->shouldReceive('numberBetween')->once()->with(1, 10000)->andReturn(10000);
 
         $disenchantManyService = new DisenchantManyService(
-            new SkillCheckService($randomNumberGenerator),
-            resolve(RandomNumberGenerator::class),
-            resolve(ChanceCalculator::class),
+            new SkillCheckService($randomNumberGenerator, new SkillBonusService(new SkillBonusContextService())),
+            $randomNumberGenerator,
+            new ChanceCalculator($randomNumberGenerator),
         );
 
         $result = $disenchantManyService->disenchantMany(
-            resolve(Manager::class),
-            resolve(CharacterInventoryCountTransformer::class),
+            new Manager(),
+            new CharacterInventoryCountTransformer(),
             $character,
             ['ids' => [$slotId]]
         );
@@ -128,14 +143,14 @@ class DisenchantManyServiceTest extends TestCase
         $randomNumberGenerator->shouldReceive('numberBetween')->once()->with(1, 400)->andReturn(400);
 
         $disenchantManyService = new DisenchantManyService(
-            new SkillCheckService($randomNumberGenerator),
-            resolve(RandomNumberGenerator::class),
-            resolve(ChanceCalculator::class),
+            new SkillCheckService($randomNumberGenerator, new SkillBonusService(new SkillBonusContextService())),
+            $randomNumberGenerator,
+            new ChanceCalculator($randomNumberGenerator),
         );
 
         $result = $disenchantManyService->disenchantMany(
-            resolve(Manager::class),
-            resolve(CharacterInventoryCountTransformer::class),
+            new Manager(),
+            new CharacterInventoryCountTransformer(),
             $character,
             ['ids' => [$slotId]]
         );
@@ -160,10 +175,17 @@ class DisenchantManyServiceTest extends TestCase
             ->getCharacter();
         $keepSlotId = $character->inventory->slots()->where('item_id', $keepItem->id)->first()->id;
         $destroySlotId = $character->inventory->slots()->where('item_id', $destroyItem->id)->first()->id;
+        $randomNumberGenerator = new PhpRandomNumberGenerator();
 
-        $result = $this->disenchantManyService->disenchantMany(
-            resolve(Manager::class),
-            resolve(CharacterInventoryCountTransformer::class),
+        $disenchantManyService = new DisenchantManyService(
+            new SkillCheckService($randomNumberGenerator, new SkillBonusService(new SkillBonusContextService())),
+            $randomNumberGenerator,
+            new ChanceCalculator($randomNumberGenerator),
+        );
+
+        $result = $disenchantManyService->disenchantMany(
+            new Manager(),
+            new CharacterInventoryCountTransformer(),
             $character,
             ['exclude' => [$keepSlotId]]
         );
@@ -190,16 +212,18 @@ class DisenchantManyServiceTest extends TestCase
 
         $randomNumberGenerator = Mockery::mock(RandomNumberGenerator::class);
         $randomNumberGenerator->shouldReceive('numberBetween')->with(1, 400)->andReturn(400, 1, 400, 1);
+        $randomNumberGenerator->shouldReceive('numberBetween')->with(2, 1150)->andReturn(1000);
+        $randomNumberGenerator->shouldReceive('numberBetween')->with(1, 10000)->andReturn(10000);
 
         $disenchantManyService = new DisenchantManyService(
-            new SkillCheckService($randomNumberGenerator),
-            resolve(RandomNumberGenerator::class),
-            resolve(ChanceCalculator::class),
+            new SkillCheckService($randomNumberGenerator, new SkillBonusService(new SkillBonusContextService())),
+            $randomNumberGenerator,
+            new ChanceCalculator($randomNumberGenerator),
         );
 
         $result = $disenchantManyService->disenchantMany(
-            resolve(Manager::class),
-            resolve(CharacterInventoryCountTransformer::class),
+            new Manager(),
+            new CharacterInventoryCountTransformer(),
             $character->fresh(),
             ['ids' => [$firstSlotId, $secondSlotId]]
         );
@@ -225,24 +249,23 @@ class DisenchantManyServiceTest extends TestCase
         $randomNumberGenerator = Mockery::mock(RandomNumberGenerator::class);
         $randomNumberGenerator->shouldReceive('numberBetween')->once()->with(1, 400)->andReturn(400);
         $randomNumberGenerator->shouldReceive('numberBetween')->once()->with(1, 400)->andReturn(1);
-        $randomNumberGenerator->shouldReceive('numberBetween')->with(2, 1150)->andReturn(1000);
+        $randomNumberGenerator->shouldReceive('numberBetween')->once()->with(2, 1150)->andReturn(1000);
+        $randomNumberGenerator->shouldReceive('numberBetween')->once()->with(1, 10000)->andReturn(1);
 
-        $disenchantManyService = Mockery::mock(
-            DisenchantManyService::class,
-            [new SkillCheckService($randomNumberGenerator), $randomNumberGenerator, resolve(ChanceCalculator::class)]
-        )->makePartial();
-        $disenchantManyService->shouldAllowMockingProtectedMethods();
-        $disenchantManyService->shouldReceive('passesInterest')->once()->andReturn(true);
+        $disenchantManyService = new DisenchantManyService(
+            new SkillCheckService($randomNumberGenerator, new SkillBonusService(new SkillBonusContextService())),
+            $randomNumberGenerator,
+            new ChanceCalculator($randomNumberGenerator),
+        );
 
         $result = $disenchantManyService->disenchantMany(
-            resolve(Manager::class),
-            resolve(CharacterInventoryCountTransformer::class),
+            new Manager(),
+            new CharacterInventoryCountTransformer(),
             $character,
             ['ids' => [$slotId]]
         );
 
         $this->assertSame('passed', $result['disenchanted_item'][0]['status']);
-        // Base award was 1000, +5% interest brings the character's stored total to 1050.
         $this->assertSame(1050, $character->fresh()->gold_dust);
     }
 }

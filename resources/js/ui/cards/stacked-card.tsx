@@ -21,6 +21,7 @@ import StackedCardProps from './types/stacked-card-props';
 const StackedCard = ({
   children,
   on_close: onClose,
+  back_action: backAction,
   aria_label: ariaLabel,
   content_mode: contentMode = StackedCardContentMode.PADDED,
 }: StackedCardProps) => {
@@ -102,14 +103,35 @@ const StackedCard = ({
     },
   };
 
+  const renderBackButton = (): ReactNode => {
+    if (!backAction) {
+      return null;
+    }
+
+    return (
+      <button
+        type="button"
+        onClick={backAction}
+        aria-label="Go back"
+        title="Go back"
+        className="focus-visible:ring-danube-500 dark:focus-visible:ring-danube-300 flex h-9 w-9 items-center justify-center rounded-full text-gray-600 hover:bg-gray-100 focus:outline-none focus-visible:ring-2 dark:text-gray-300 dark:hover:bg-gray-700"
+      >
+        <i className="fas fa-arrow-left" aria-hidden="true" />
+      </button>
+    );
+  };
+
   const renderFullBleedHeader = (): ReactNode => (
     <div className="flex items-center justify-between bg-white px-4 py-3 dark:bg-gray-800">
-      <h2
-        id={titleId}
-        className="text-glacier-900 dark:text-glacier-100 text-base font-semibold"
-      >
-        {displayTitle}
-      </h2>
+      <div className="flex min-w-0 items-center gap-2">
+        {renderBackButton()}
+        <h2
+          id={titleId}
+          className="text-glacier-900 dark:text-glacier-100 text-base font-semibold"
+        >
+          {displayTitle}
+        </h2>
+      </div>
       <button
         type="button"
         onClick={onClose}

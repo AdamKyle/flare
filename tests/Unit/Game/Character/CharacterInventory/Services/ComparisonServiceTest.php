@@ -28,6 +28,8 @@ use App\Game\Gems\Services\GemComparison;
 use App\Game\Gems\Services\ItemAtonements;
 use App\Game\Skills\Services\DisenchantService;
 use App\Game\Skills\Services\MassDisenchantService;
+use App\Game\Skills\Services\SkillBonusContextService;
+use App\Game\Skills\Services\SkillBonusService;
 use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -59,6 +61,7 @@ class ComparisonServiceTest extends TestCase
         $questItemTransformer = new QuestItemTransformer;
         $apiUsableItemTransformer = new ApiUsableItemTransformer;
         $inventorySetService = new InventorySetService(new SetHandsValidation);
+        $skillBonusService = new SkillBonusService(new SkillBonusContextService);
 
         $itemEnricherFactory = new ItemEnricherFactory(
             new EquippableEnricher,
@@ -78,7 +81,7 @@ class ComparisonServiceTest extends TestCase
                 $apiUsableItemTransformer,
                 new InventoryTransformer($itemEnricherFactory),
                 $inventorySetService,
-                new MassDisenchantService(new SkillCheckService($randomNumberGenerator), $randomNumberGenerator, new ChanceCalculator($randomNumberGenerator)),
+                new MassDisenchantService(new SkillCheckService($randomNumberGenerator, $skillBonusService), $randomNumberGenerator, new ChanceCalculator($randomNumberGenerator), $skillBonusService),
                 Mockery::mock(UpdateCharacterSkillsService::class),
                 Mockery::mock(DisenchantService::class),
                 new Pagination($manager),

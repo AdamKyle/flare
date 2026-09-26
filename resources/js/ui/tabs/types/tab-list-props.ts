@@ -1,7 +1,7 @@
-import { TabTupleFromProps } from 'ui/tabs/types/tab-item';
+import { TabItemPresentation } from 'ui/tabs/types/tab-item';
 
-export default interface TabsListProps<PTuple extends readonly object[]> {
-  tabs: Readonly<TabTupleFromProps<PTuple>>;
+export default interface TabsListProps {
+  tabs: readonly TabItemPresentation[];
   ariaLabel: string;
   activeIndex: number;
   onSelect: (index: number) => void;

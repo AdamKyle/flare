@@ -6,33 +6,41 @@ import { baseStyle } from 'ui/alerts/styles/base-style';
 import { variantStyle } from 'ui/alerts/styles/variant-style';
 import AlertProps from 'ui/alerts/types/alert-props';
 
-export const Alert = (props: AlertProps) => {
+export const Alert = ({
+  variant,
+  children,
+  closable,
+  on_close,
+  force_close,
+}: AlertProps) => {
   const [visible, setVisible] = useState(true);
 
+  const isDanger = variant === AlertVariant.DANGER;
+
   useEffect(() => {
-    if (props.force_close) {
+    if (force_close) {
       setVisible(false);
 
-      if (props.on_close) {
-        props.on_close();
+      if (on_close) {
+        on_close();
       }
 
       return;
     }
 
     setVisible(true);
-  }, [props.force_close, props.on_close, props.children]);
+  }, [force_close, on_close, children]);
 
   const handleClose = (): void => {
     setVisible(false);
 
-    if (props.on_close) {
-      props.on_close();
+    if (on_close) {
+      on_close();
     }
   };
 
   const renderCloseButton = () => {
-    if (!props.closable) {
+    if (!closable) {
       return null;
     }
 
@@ -41,7 +49,7 @@ export const Alert = (props: AlertProps) => {
         type="button"
         aria-label="Close alert"
         onClick={handleClose}
-        className="ml-4 rounded p-1 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+        className="focus:ring-danube-500 dark:focus:ring-danube-300 ml-4 rounded p-1 focus:ring-2 focus:outline-none"
       >
         <i className="fas fa-times" aria-hidden="true" />
       </button>
@@ -55,18 +63,16 @@ export const Alert = (props: AlertProps) => {
 
     return (
       <div
-        role={props.variant === AlertVariant.DANGER ? 'alert' : 'status'}
-        aria-live={
-          props.variant === AlertVariant.DANGER ? 'assertive' : 'polite'
-        }
+        role={isDanger ? 'alert' : 'status'}
+        aria-live={isDanger ? 'assertive' : 'polite'}
         aria-atomic="true"
         className={clsx(
           baseStyle(),
-          variantStyle(props.variant),
+          variantStyle(variant),
           'flex items-start justify-between'
         )}
       >
-        <div className="flex-1">{props.children}</div>
+        <div className="flex-1">{children}</div>
         {renderCloseButton()}
       </div>
     );

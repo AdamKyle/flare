@@ -4,7 +4,6 @@ import BatchCraftingScreenManager from './component-mapping/batch-crafting-scree
 import { batchCraftingScreenRegistry } from './component-mapping/batch-crafting-screen-registry';
 import BatchCraftingEntry from './components/batch-crafting-entry';
 import { BatchCraftingScreenNames } from './enums/batch-crafting-screen-names';
-import BatchCraftingStatusProvider from './providers/batch-crafting-status-provider';
 import { CraftingTypes } from '../../enums/crafting-types';
 import CraftingSectionScreenProps from '../../types/crafting-section-screen-props';
 
@@ -61,16 +60,14 @@ const BatchCraftingSection = ({
   registerBackHandler,
 }: CraftingSectionScreenProps): ReactNode => {
   return (
-    <BatchCraftingStatusProvider>
-      <BatchCraftingScreenManager.ScreenManagerProvider
-        registry={batchCraftingScreenRegistry}
-      >
-        <BatchCraftingStack
-          setActiveCraftingType={setActiveCraftingType}
-          registerBackHandler={registerBackHandler}
-        />
-      </BatchCraftingScreenManager.ScreenManagerProvider>
-    </BatchCraftingStatusProvider>
+    <BatchCraftingScreenManager.ScreenManagerProvider
+      registry={batchCraftingScreenRegistry}
+    >
+      <BatchCraftingStack
+        setActiveCraftingType={setActiveCraftingType}
+        registerBackHandler={registerBackHandler}
+      />
+    </BatchCraftingScreenManager.ScreenManagerProvider>
   );
 };
 

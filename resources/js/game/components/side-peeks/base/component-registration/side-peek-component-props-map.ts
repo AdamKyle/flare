@@ -48,6 +48,7 @@ import UsableItemsProps from '../../character-inventory/usable-items/types/usabl
 import CraftedItemProps from '../../crafted-item/types/crafted-item-props';
 import CharacterClassRankDetailSidePeekProps from '../../game-data/types/character-class-rank-detail-side-peek-props';
 import CharacterClassSpecialtyDetailSidePeekProps from '../../game-data/types/character-class-specialty-detail-side-peek-props';
+import CharacterSkillDetailSidePeekProps from '../../game-data/types/character-skill-detail-side-peek-props';
 import ClassDetailSidePeekProps from '../../game-data/types/class-detail-side-peek-props';
 import ClassMasteryDetailSidePeekProps from '../../game-data/types/class-mastery-detail-side-peek-props';
 import PlayerGameMapDetailSidePeekProps from '../../game-data/types/player-game-map-detail-side-peek-props';
@@ -91,6 +92,7 @@ export type SidePeekComponentPropsMap = {
   [SidePeekComponentRegistrationEnum.CLASS_MASTERY_DETAIL]: ClassMasteryDetailSidePeekProps;
   [Registration.CHARACTER_CLASS_RANK_DETAIL]: CharacterClassRankDetailSidePeekProps;
   [Registration.CHARACTER_CLASS_SPECIALTY_DETAIL]: CharacterClassSpecialtyDetailSidePeekProps;
+  [Registration.CHARACTER_SKILL_DETAIL]: CharacterSkillDetailSidePeekProps;
   [SidePeekComponentRegistrationEnum.ADMIN_LOG_ENTRY]: LogEntrySidePeekProps;
   [SidePeekComponentRegistrationEnum.ADMIN_BUG_REPORT]: BugReportSidePeekProps;
   [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_COORDINATE]: GameMapCoordinateSidePeekProps;

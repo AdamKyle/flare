@@ -14,6 +14,7 @@ import { BatchCraftingScreenNames } from '../enums/batch-crafting-screen-names';
 import { CraftSetPosition } from '../enums/craft-set-position';
 import { CraftAndEnchantSetEnchantmentsScreenProps } from '../types/batch-crafting-screen-map';
 import { craftSetPositionLabel } from '../utils/batch-crafting-labels';
+import { isCraftSetPosition } from '../utils/batch-crafting-mode-guards';
 import { buildCraftAndEnchantSetRequest } from '../utils/build-craft-and-enchant-set-request';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
@@ -44,7 +45,7 @@ const CraftAndEnchantSetEnchantmentsScreen = ({
   const navigation = BatchCraftingScreenManager.useScreenNavigation();
 
   const includedPositions = useMemo(
-    () => Object.keys(set_selection.selected_items) as CraftSetPosition[],
+    () => Object.keys(set_selection.selected_items).filter(isCraftSetPosition),
     [set_selection.selected_items]
   );
 
@@ -52,17 +53,33 @@ const CraftAndEnchantSetEnchantmentsScreen = ({
   const [bulkPrefix, setBulkPrefix] = useState<DropdownItem | null>(null);
   const [bulkSuffix, setBulkSuffix] = useState<DropdownItem | null>(null);
 
-  const { affixes: prefixAffixes, loadedAffixes: loadedPrefixAffixes } =
-    useEnchantingAffixesApi({
-      character_id: characterId,
-      type: 'prefix',
-    });
+  const {
+    affixes: prefixAffixes,
+    loadedAffixes: loadedPrefixAffixes,
+    loading: prefixLoading,
+    isLoadingMore: prefixIsLoadingMore,
+    canLoadMore: prefixCanLoadMore,
+    searchText: prefixSearchText,
+    setSearchText: setPrefixSearchText,
+    onEndReached: prefixOnEndReached,
+  } = useEnchantingAffixesApi({
+    character_id: characterId,
+    type: 'prefix',
+  });
 
-  const { affixes: suffixAffixes, loadedAffixes: loadedSuffixAffixes } =
-    useEnchantingAffixesApi({
-      character_id: characterId,
-      type: 'suffix',
-    });
+  const {
+    affixes: suffixAffixes,
+    loadedAffixes: loadedSuffixAffixes,
+    loading: suffixLoading,
+    isLoadingMore: suffixIsLoadingMore,
+    canLoadMore: suffixCanLoadMore,
+    searchText: suffixSearchText,
+    setSearchText: setSuffixSearchText,
+    onEndReached: suffixOnEndReached,
+  } = useEnchantingAffixesApi({
+    character_id: characterId,
+    type: 'suffix',
+  });
 
   const {
     preview,
@@ -269,7 +286,9 @@ const CraftAndEnchantSetEnchantmentsScreen = ({
             items={prefixAffixes}
             on_select={setBulkPrefix}
             pre_selected_item={bulkPrefix ?? undefined}
-            selection_placeholder="Select a Prefix"
+            selection_placeholder={
+              prefixLoading ? 'Loading…' : 'Select a Prefix'
+            }
             force_clear={bulkPrefix === null}
             render_item_content={(option) => (
               <EnchantingAffixOption
@@ -277,6 +296,14 @@ const CraftAndEnchantSetEnchantmentsScreen = ({
                 affixes={loadedPrefixAffixes}
               />
             )}
+            searchable
+            search_value={prefixSearchText}
+            on_search={setPrefixSearchText}
+            can_load_more={prefixCanLoadMore}
+            is_loading_more={prefixIsLoadingMore}
+            on_end_reached={prefixOnEndReached}
+            empty_message="No affixes are available."
+            disabled={prefixLoading}
           />
         </fieldset>
 
@@ -292,7 +319,9 @@ const CraftAndEnchantSetEnchantmentsScreen = ({
             items={suffixAffixes}
             on_select={setBulkSuffix}
             pre_selected_item={bulkSuffix ?? undefined}
-            selection_placeholder="Select a Suffix"
+            selection_placeholder={
+              suffixLoading ? 'Loading…' : 'Select a Suffix'
+            }
             force_clear={bulkSuffix === null}
             render_item_content={(option) => (
               <EnchantingAffixOption
@@ -300,6 +329,14 @@ const CraftAndEnchantSetEnchantmentsScreen = ({
                 affixes={loadedSuffixAffixes}
               />
             )}
+            searchable
+            search_value={suffixSearchText}
+            on_search={setSuffixSearchText}
+            can_load_more={suffixCanLoadMore}
+            is_loading_more={suffixIsLoadingMore}
+            on_end_reached={suffixOnEndReached}
+            empty_message="No affixes are available."
+            disabled={suffixLoading}
           />
         </fieldset>
 
@@ -327,6 +364,18 @@ const CraftAndEnchantSetEnchantmentsScreen = ({
               suffix_items={suffixAffixes}
               prefix_affixes={loadedPrefixAffixes}
               suffix_affixes={loadedSuffixAffixes}
+              prefix_loading={prefixLoading}
+              prefix_search_text={prefixSearchText}
+              on_prefix_search={setPrefixSearchText}
+              prefix_can_load_more={prefixCanLoadMore}
+              prefix_is_loading_more={prefixIsLoadingMore}
+              on_prefix_end_reached={prefixOnEndReached}
+              suffix_loading={suffixLoading}
+              suffix_search_text={suffixSearchText}
+              on_suffix_search={setSuffixSearchText}
+              suffix_can_load_more={suffixCanLoadMore}
+              suffix_is_loading_more={suffixIsLoadingMore}
+              on_suffix_end_reached={suffixOnEndReached}
               selected_prefix={enchantments[position]?.prefix ?? null}
               selected_suffix={enchantments[position]?.suffix ?? null}
               on_prefix_select={(dropdownItem) =>

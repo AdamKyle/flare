@@ -4,14 +4,11 @@ namespace Tests\Unit\Game\Skills\Services;
 
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\GemBagSlot;
-use App\Game\Character\CharacterInventory\Transformers\CharacterGemSlotsTransformer;
 use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Gems\Builders\GemBuilder;
-use App\Game\Gems\Transformers\GemTransformer;
 use App\Game\Gems\Values\GemTierValue;
 use App\Game\Gems\Values\GemTypeValue;
-use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Events\UpdateSkillEvent;
 use App\Game\Skills\Services\GemService;
@@ -22,6 +19,7 @@ use Illuminate\Support\Facades\Event;
 use Mockery;
 use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\Setup\Skills\GemServiceFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateGameSkill;
@@ -53,7 +51,7 @@ class GemServiceTest extends TestCase
             $this->gemSkill
         )->givePlayerLocation();
 
-        $this->gemService = resolve(GemService::class);
+        $this->gemService = (new GemServiceFactory)->build();
     }
 
     protected function tearDown(): void
@@ -106,7 +104,6 @@ class GemServiceTest extends TestCase
 
     public function test_cannot_craft_when_skill_level_required_to_high()
     {
-
         $character = $this->character->getCharacter();
 
         $character->update([
@@ -118,6 +115,8 @@ class GemServiceTest extends TestCase
         $result = $this->gemService->generateGem($character, 4);
 
         $this->assertEquals(200, $result['status']);
+        $this->assertFalse($result['craft_succeeded']);
+        $this->assertSame('This gem tier is too hard. You lost your investment and start to cry.', $result['message']);
     }
 
     public function test_gem_tier_chances_produce_expected_dcs()
@@ -149,18 +148,11 @@ class GemServiceTest extends TestCase
             'copper_coins' => CurrencyLimit::MAX_COPPER,
         ]);
 
-        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class), resolve(ChanceCalculator::class), resolve(GemTransformer::class), resolve(ServerMessageBuilder::class), resolve(CharacterGemSlotsTransformer::class)], function (MockInterface $mock) {
-            $mock->makePartial()
-                ->shouldAllowMockingProtectedMethods()
-                ->shouldReceive('canCraft')
-                ->once()
-                ->with(Mockery::on(function ($skill) {
-                    return min(1.0, .25 + $skill->skill_bonus) === 1.0;
-                }), .25)
-                ->andReturn(true);
+        $chanceCalculator = Mockery::mock(ChanceCalculator::class, function (MockInterface $mock) {
+            $mock->shouldReceive('passesPercentage')->once()->with(100.0)->andReturn(true);
         });
 
-        $result = $gemService->generateGem($character->refresh(), 4);
+        $result = (new GemServiceFactory)->build($chanceCalculator)->generateGem($character->refresh(), 4);
 
         $character = $character->refresh();
 
@@ -184,18 +176,11 @@ class GemServiceTest extends TestCase
             'copper_coins' => CurrencyLimit::MAX_COPPER,
         ]);
 
-        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class), resolve(ChanceCalculator::class), resolve(GemTransformer::class), resolve(ServerMessageBuilder::class), resolve(CharacterGemSlotsTransformer::class)], function (MockInterface $mock) {
-            $mock->makePartial()
-                ->shouldAllowMockingProtectedMethods()
-                ->shouldReceive('canCraft')
-                ->once()
-                ->with(Mockery::on(function ($skill) {
-                    return min(1.0, .75 + $skill->skill_bonus) === 1.0;
-                }), .75)
-                ->andReturn(true);
+        $chanceCalculator = Mockery::mock(ChanceCalculator::class, function (MockInterface $mock) {
+            $mock->shouldReceive('passesPercentage')->once()->with(100.0)->andReturn(true);
         });
 
-        $result = $gemService->generateGem($character->refresh(), 1);
+        $result = (new GemServiceFactory)->build($chanceCalculator)->generateGem($character->refresh(), 1);
 
         $character = $character->refresh();
 
@@ -223,18 +208,11 @@ class GemServiceTest extends TestCase
             'copper_coins' => CurrencyLimit::MAX_COPPER,
         ]);
 
-        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class), resolve(ChanceCalculator::class), resolve(GemTransformer::class), resolve(ServerMessageBuilder::class), resolve(CharacterGemSlotsTransformer::class)], function (MockInterface $mock) {
-            $mock->makePartial()
-                ->shouldAllowMockingProtectedMethods()
-                ->shouldReceive('canCraft')
-                ->once()
-                ->with(Mockery::on(function ($skill) {
-                    return min(1.0, .25 + $skill->skill_bonus) === .25;
-                }), .25)
-                ->andReturn(false);
+        $chanceCalculator = Mockery::mock(ChanceCalculator::class, function (MockInterface $mock) {
+            $mock->shouldReceive('passesPercentage')->once()->with(25.0)->andReturn(false);
         });
 
-        $result = $gemService->generateGem($character->refresh(), 4);
+        $result = (new GemServiceFactory)->build($chanceCalculator)->generateGem($character->refresh(), 4);
 
         $character = $character->refresh();
 
@@ -246,40 +224,12 @@ class GemServiceTest extends TestCase
         });
     }
 
-    public function test_fail_to_craft_the_gem()
+    public function test_failed_gem_craft_still_charges_the_tier_cost()
     {
         Event::fake();
 
-        $this->instance(
-            GemService::class,
-            Mockery::mock(GemService::class, function (MockInterface $mock) {
-                $mock->makePartial()->shouldAllowMockingProtectedMethods()->shouldReceive('canCraft')->once()->andReturn(false);
-            })
-        );
-
-        $character = $this->character->getCharacter();
-
-        $character->update([
-            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
-            'shards' => CurrencyLimit::MAX_SHARDS,
-            'copper_coins' => CurrencyLimit::MAX_COPPER,
-        ]);
-
-        $result = resolve(GemService::class)->generateGem($character, 1);
-
-        $this->assertEquals(200, $result['status']);
-
-        Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message === 'You failed to craft the gem, the item explodes before you into a pile of wasted effort and time.';
-        });
-    }
-
-    public function test_attempt_to_craft_the_gem()
-    {
-        Event::fake();
-
-        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class), resolve(ChanceCalculator::class), resolve(GemTransformer::class), resolve(ServerMessageBuilder::class), resolve(CharacterGemSlotsTransformer::class)], function (MockInterface $mock) {
-            $mock->makePartial()->shouldAllowMockingProtectedMethods()->shouldReceive('canCraft')->once()->andReturn(false);
+        $chanceCalculator = Mockery::mock(ChanceCalculator::class, function (MockInterface $mock) {
+            $mock->shouldReceive('passesPercentage')->once()->andReturn(false);
         });
 
         $character = $this->character->getCharacter();
@@ -290,31 +240,23 @@ class GemServiceTest extends TestCase
             'copper_coins' => CurrencyLimit::MAX_COPPER,
         ]);
 
-        $result = $gemService->generateGem($character, 1);
+        $result = (new GemServiceFactory)->build($chanceCalculator)->generateGem($character, 1);
 
         $character = $character->refresh();
 
+        $this->assertEquals(200, $result['status']);
         $this->assertLessThan(CurrencyLimit::MAX_GOLD_DUST, $character->gold_dust);
         $this->assertLessThan(CurrencyLimit::MAX_COPPER, $character->copper_coins);
         $this->assertLessThan(CurrencyLimit::MAX_SHARDS, $character->shards);
-
-        $this->assertEquals(200, $result['status']);
     }
 
     public function test_craft_the_gem()
     {
         Event::fake();
 
-        $mock = Mockery::mock(GemService::class, function (MockInterface $mock) {
-            $mock->makePartial()->shouldAllowMockingProtectedMethods()->shouldReceive('canCraft')->once()->andReturn(true);
+        $chanceCalculator = Mockery::mock(ChanceCalculator::class, function (MockInterface $mock) {
+            $mock->shouldReceive('passesPercentage')->once()->andReturn(true);
         });
-
-        $mock->__construct(resolve(GemBuilder::class), resolve(ChanceCalculator::class), resolve(GemTransformer::class), resolve(ServerMessageBuilder::class), resolve(CharacterGemSlotsTransformer::class));
-
-        $this->instance(
-            GemService::class,
-            $mock,
-        );
 
         $character = $this->character->getCharacter();
 
@@ -324,12 +266,11 @@ class GemServiceTest extends TestCase
             'copper_coins' => CurrencyLimit::MAX_COPPER,
         ]);
 
-        $result = resolve(GemService::class)->generateGem($character, 1);
+        $result = (new GemServiceFactory)->build($chanceCalculator)->generateGem($character, 1);
 
         $character = $character->refresh();
 
         $this->assertEquals(1, $character->gemBag->gemSlots->first()->amount);
-
         $this->assertEquals(200, $result['status']);
 
         Event::assertDispatched(UpdateSkillEvent::class);
@@ -352,12 +293,11 @@ class GemServiceTest extends TestCase
             'copper_coins' => CurrencyLimit::MAX_COPPER,
         ]);
 
-        $result = resolve(GemService::class)->generateGem($character, 1);
+        $result = $this->gemService->generateGem($character, 1);
 
         $character = $character->refresh();
 
         $this->assertEquals(1, $character->gemBag->gemSlots->first()->amount);
-
         $this->assertEquals(200, $result['status']);
 
         Event::assertNotDispatched(UpdateSkillEvent::class);
@@ -380,14 +320,12 @@ class GemServiceTest extends TestCase
         ]);
 
         $gemBuilder = Mockery::mock(GemBuilder::class, function (MockInterface $mock) use ($gem) {
-            $mock->makePartial()->shouldAllowMockingProtectedMethods()->shouldReceive('buildGem')->once()->andReturn($gem);
+            $mock->shouldReceive('buildGem')->once()->andReturn($gem);
         });
 
-        $gemService = Mockery::mock(GemService::class, function (MockInterface $mock) {
-            $mock->makePartial()->shouldAllowMockingProtectedMethods()->shouldReceive('canCraft')->once()->andReturn(true);
+        $chanceCalculator = Mockery::mock(ChanceCalculator::class, function (MockInterface $mock) {
+            $mock->shouldReceive('passesPercentage')->once()->andReturn(true);
         });
-
-        $gemService->__construct($gemBuilder, resolve(ChanceCalculator::class), resolve(GemTransformer::class), resolve(ServerMessageBuilder::class), resolve(CharacterGemSlotsTransformer::class));
 
         $character = $this->character->getCharacter();
 
@@ -403,7 +341,7 @@ class GemServiceTest extends TestCase
             'copper_coins' => CurrencyLimit::MAX_COPPER,
         ]);
 
-        $result = $gemService->generateGem($character, 1);
+        $result = (new GemServiceFactory)->build($chanceCalculator, $gemBuilder)->generateGem($character, 1);
 
         $character = $character->refresh();
 

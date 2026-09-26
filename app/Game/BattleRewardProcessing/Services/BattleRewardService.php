@@ -34,6 +34,7 @@ use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Types\CharacterMessageTypes;
 use App\Game\Messages\Types\CurrenciesMessageTypes;
 use App\Game\Monsters\Services\MonsterListService;
+use App\Game\Skills\Contracts\SkillBonusQuery;
 use App\Game\Skills\Services\SkillService;
 use Closure;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
@@ -75,6 +76,7 @@ class BattleRewardService
      * @param MonsterListService $monsterListService
      * @param BattleRewardMessageOutboxService $battleRewardMessageOutboxService
      * @param ServerMessageBuilder $serverMessageBuilder
+     * @param SkillBonusQuery $skillBonusQuery
      */
     public function __construct(
         private readonly BattleMessageHandler $battleMessageHandler,
@@ -96,6 +98,7 @@ class BattleRewardService
         private readonly MonsterListService $monsterListService,
         private readonly BattleRewardMessageOutboxService $battleRewardMessageOutboxService,
         private readonly ServerMessageBuilder $serverMessageBuilder,
+        private readonly SkillBonusQuery $skillBonusQuery,
     ) {}
 
     /**
@@ -705,7 +708,7 @@ class BattleRewardService
         $payload = $step->payload_json ?? [];
 
         if (! isset($payload['plan'])) {
-            $lootingChance = $this->character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
+            $lootingChance = $this->skillBonusQuery->skillBonus($this->character->skills->where('name', '=', 'Looting')->first());
             $payload['plan'] = $this->dropCheckService->planDrops($this->character, $this->monster, $totalKills, $lootingChance, $this->sharedContext?->resolvedAreaGemEffects());
             $payload['planned_at'] = now()->toIso8601String();
             $step = $this->battleRewardLedgerService->updateStepPayload($step, $payload);
@@ -1249,7 +1252,7 @@ class BattleRewardService
             $totalKills = $this->context['total_creatures'];
         }
 
-        $lootingChance = $this->character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
+        $lootingChance = $this->skillBonusQuery->skillBonus($this->character->skills->where('name', '=', 'Looting')->first());
 
         if ($totalKills > 1) {
             for ($i = 0; $i < $totalKills; $i++) {

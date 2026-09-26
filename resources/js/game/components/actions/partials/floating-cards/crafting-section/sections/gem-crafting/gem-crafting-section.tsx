@@ -1,8 +1,8 @@
 import React, { ReactNode } from 'react';
 
 import GemCraftingFlow from './components/gem-crafting-flow';
+import ScreenTransition from '../../../../../../../reusable-components/screen-transition/screen-transition';
 import CraftingDisciplineIntroduction from '../../shared/components/crafting-discipline-introduction';
-import CraftingScreenTransition from '../../shared/crafting-screen-transition';
 import { CraftingIntroductionStorageKey } from '../../shared/enums/crafting-introduction-storage-key';
 import { useCraftingDisciplineIntroduction } from '../../shared/hooks/use-crafting-discipline-introduction';
 
@@ -30,7 +30,7 @@ const GemCraftingSection = (): ReactNode => {
   };
 
   return (
-    <CraftingScreenTransition
+    <ScreenTransition
       screenKey={
         introductionAcknowledged ? 'gem-crafting-items' : 'introduction'
       }
@@ -41,7 +41,7 @@ const GemCraftingSection = (): ReactNode => {
       }
     >
       {renderContent()}
-    </CraftingScreenTransition>
+    </ScreenTransition>
   );
 };
 

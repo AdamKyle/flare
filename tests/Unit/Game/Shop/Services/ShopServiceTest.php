@@ -26,6 +26,8 @@ use App\Game\Shop\Events\BuyItemEvent;
 use App\Game\Shop\Services\ShopService;
 use App\Game\Skills\Services\DisenchantService;
 use App\Game\Skills\Services\MassDisenchantService;
+use App\Game\Skills\Services\SkillBonusContextService;
+use App\Game\Skills\Services\SkillBonusService;
 use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -61,6 +63,7 @@ class ShopServiceTest extends TestCase
         $equippableItemTransformer = new EquippableItemTransformer;
         $questItemTransformer = new QuestItemTransformer;
         $inventorySetService = new InventorySetService(new SetHandsValidation);
+        $skillBonusService = new SkillBonusService(new SkillBonusContextService);
 
         $itemEnricherFactory = new ItemEnricherFactory(
             new EquippableEnricher,
@@ -80,7 +83,7 @@ class ShopServiceTest extends TestCase
                 new ApiUsableItemTransformer,
                 new InventoryTransformer($itemEnricherFactory),
                 $inventorySetService,
-                new MassDisenchantService(new SkillCheckService($randomNumberGenerator), $randomNumberGenerator, new ChanceCalculator($randomNumberGenerator)),
+                new MassDisenchantService(new SkillCheckService($randomNumberGenerator, $skillBonusService), $randomNumberGenerator, new ChanceCalculator($randomNumberGenerator), $skillBonusService),
                 Mockery::mock(UpdateCharacterSkillsService::class),
                 Mockery::mock(DisenchantService::class),
                 new Pagination($manager),

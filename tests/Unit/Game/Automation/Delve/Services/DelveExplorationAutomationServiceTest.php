@@ -12,6 +12,7 @@ use App\Game\Maps\Values\LocationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
+use Tests\Setup\Automation\DelveExplorationAutomationServiceFactory;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterAutomation;
@@ -32,7 +33,7 @@ class DelveExplorationAutomationServiceTest extends TestCase
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
-        $this->delveExplorationAutomationService = resolve(DelveExplorationAutomationService::class);
+        $this->delveExplorationAutomationService = (new DelveExplorationAutomationServiceFactory)->build();
     }
 
     protected function tearDown(): void
@@ -82,6 +83,7 @@ class DelveExplorationAutomationServiceTest extends TestCase
 
         $result = $this->delveExplorationAutomationService->stopExploration($character);
 
+        $this->assertSame(422, $result['status']);
         $this->assertSame('Nope. You don\'t own that.', $result['message']);
     }
 

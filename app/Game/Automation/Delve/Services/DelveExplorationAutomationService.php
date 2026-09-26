@@ -26,7 +26,7 @@ class DelveExplorationAutomationService
     private int $timeDelay = 5;
 
     /**
-     * @param CharacterCacheData $characterCacheData The character cache data service.
+     * @param CharacterCacheData $characterCacheData
      */
     public function __construct(
         private readonly CharacterCacheData $characterCacheData,
@@ -35,23 +35,14 @@ class DelveExplorationAutomationService
     /**
      * Start Delve automation for the character at the given location with the given options.
      *
-     * @param Character $character The character starting Delve.
-     * @param Location $location The Delve location.
-     * @param array $params The Delve start options.
+     * @param Character $character
+     * @param Location $location
+     * @param array $params
      * @return void
      */
-    public function beginAutomation(Character $character, Location $location, array $params)
+    public function beginAutomation(Character $character, Location $location, array $params): void
     {
-
-        $monsterId = Monster::where('is_celestial_entity', false)
-            ->where('is_raid_monster', false)
-            ->where('is_raid_boss', false)
-            ->where('game_map_id', $character->map->game_map_id)
-            ->whereIn('only_for_location_type', [LocationType::CAVE_OF_SHADOWS->value])
-            ->whereNull('raid_special_attack_type')
-            ->inRandomOrder()
-            ->first()
-            ->id;
+        $monsterId = $this->resolveDelveMonsterId($character);
 
         $automation = CharacterAutomation::create([
             'character_id' => $character->id,
@@ -87,10 +78,10 @@ class DelveExplorationAutomationService
     /**
      * Stop the character's active Delve automation.
      *
-     * @param Character $character The character stopping Delve.
-     * @return array|void
+     * @param Character $character
+     * @return array
      */
-    public function stopExploration(Character $character)
+    public function stopExploration(Character $character): array
     {
         $characterAutomation = CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::DELVE->value)->first();
 
@@ -117,15 +108,36 @@ class DelveExplorationAutomationService
         event(new UpdateCharacterStatus($character));
         event(new AutomationLogUpdate($character->user->id, 'Delve has been stopped at player request.'));
         event(new DelveStatusUpdated($character->user->id));
+
+        return $this->successResult();
+    }
+
+    /**
+     * Pick a random Cave of Shadows monster on the character's map for the Delve.
+     *
+     * @param Character $character
+     * @return int
+     */
+    private function resolveDelveMonsterId(Character $character): int
+    {
+        return Monster::where('is_celestial_entity', false)
+            ->where('is_raid_monster', false)
+            ->where('is_raid_boss', false)
+            ->where('game_map_id', $character->map->game_map_id)
+            ->whereIn('only_for_location_type', [LocationType::CAVE_OF_SHADOWS->value])
+            ->whereNull('raid_special_attack_type')
+            ->inRandomOrder()
+            ->first()
+            ->id;
     }
 
     /**
      * Set the delay, in minutes, between Delve fight rounds for the location.
      *
-     * @param Location $location The Delve location.
-     * @return void This method does not return a value.
+     * @param Location $location
+     * @return void
      */
-    public function setTimeDelay(Location $location): void
+    private function setTimeDelay(Location $location): void
     {
         $this->timeDelay = $location->minutes_between_delve_fights;
     }
@@ -133,14 +145,14 @@ class DelveExplorationAutomationService
     /**
      * Dispatch the delayed Delve exploration job for the character's automation.
      *
-     * @param Character $character The character delving.
-     * @param Location $location The Delve location.
-     * @param int $automationId The character automation id.
-     * @param int $delveAutomationId The Delve exploration record id.
-     * @param array $params The Delve fight parameters.
+     * @param Character $character
+     * @param Location $location
+     * @param int $automationId
+     * @param int $delveAutomationId
+     * @param array $params
      * @return void
      */
-    protected function startAutomation(Character $character, Location $location, int $automationId, int $delveAutomationId, array $params)
+    private function startAutomation(Character $character, Location $location, int $automationId, int $delveAutomationId, array $params): void
     {
         DelveExplorationProcessing::dispatch($character->id, $location->id, $automationId, $delveAutomationId, $params, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onConnection('long_running')->onQueue('delve');
     }

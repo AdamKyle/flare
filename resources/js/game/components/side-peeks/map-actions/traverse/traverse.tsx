@@ -8,14 +8,13 @@ import useTraverseMapsApi from './api/hooks/use-traverse-maps-api';
 import TraversePropsDefinition from './definitions/traverse-props-definition';
 import { EquippableItemWithBase } from '../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
 import BaseQuestItemDefinition from '../../../../api-definitions/items/quest-item-definitions/base-quest-item-definition';
-import QuestItem from '../../character-inventory/inventory-item/quest-item';
+import QuestItemDetailStack from '../../character-inventory/inventory-item/quest-item-detail-stack';
 import GenericItem from '../../components/items/generic-item';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
-import StackedCard from 'ui/cards/stacked-card';
 import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
@@ -160,9 +159,10 @@ export const Traverse = ({ character_data }: TraversePropsDefinition) => {
     }
 
     return (
-      <StackedCard on_close={handleCloseQuestItemToView}>
-        <QuestItem quest_item={questItemToView} />
-      </StackedCard>
+      <QuestItemDetailStack
+        quest_item={questItemToView}
+        on_close={handleCloseQuestItemToView}
+      />
     );
   };
 

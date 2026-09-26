@@ -5,4 +5,5 @@ export default interface TabsPanelsProps<PTuple extends readonly object[]> {
   activeIndex: number;
   tabIds: string[];
   panelIds: string[];
+  keep_panels_mounted?: boolean;
 }

@@ -92,12 +92,14 @@ import CraftedItem from '../../crafted-item/crafted-item';
 import CraftedItemProps from '../../crafted-item/types/crafted-item-props';
 import CharacterClassRankDetailSidePeek from '../../game-data/character-class-rank-detail-side-peek';
 import CharacterClassSpecialtyDetailSidePeek from '../../game-data/character-class-specialty-detail-side-peek';
+import CharacterSkillDetailSidePeek from '../../game-data/character-skill-detail-side-peek';
 import ClassDetailSidePeek from '../../game-data/class-detail-side-peek';
 import ClassMasteryDetailSidePeek from '../../game-data/class-mastery-detail-side-peek';
 import PlayerGameMapDetailSidePeek from '../../game-data/player-game-map-detail-side-peek';
 import PlayerNpcDetailSidePeek from '../../game-data/player-npc-detail-side-peek';
 import CharacterClassRankDetailSidePeekProps from '../../game-data/types/character-class-rank-detail-side-peek-props';
 import CharacterClassSpecialtyDetailSidePeekProps from '../../game-data/types/character-class-specialty-detail-side-peek-props';
+import CharacterSkillDetailSidePeekProps from '../../game-data/types/character-skill-detail-side-peek-props';
 import ClassDetailSidePeekProps from '../../game-data/types/class-detail-side-peek-props';
 import ClassMasteryDetailSidePeekProps from '../../game-data/types/class-mastery-detail-side-peek-props';
 import PlayerGameMapDetailSidePeekProps from '../../game-data/types/player-game-map-detail-side-peek-props';
@@ -241,6 +243,10 @@ export const SidePeekComponentRegistry: {
     component: CharacterClassRankDetailSidePeek,
     props: {} as CharacterClassRankDetailSidePeekProps,
     content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
+  },
+  [SidePeekComponentRegistrationEnum.CHARACTER_SKILL_DETAIL]: {
+    component: CharacterSkillDetailSidePeek,
+    props: {} as CharacterSkillDetailSidePeekProps,
   },
   [SidePeekComponentRegistrationEnum.CHARACTER_CLASS_SPECIALTY_DETAIL]: {
     component: CharacterClassSpecialtyDetailSidePeek,

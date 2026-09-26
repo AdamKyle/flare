@@ -19,6 +19,7 @@ use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Types\CurrenciesMessageTypes;
 use App\Game\Monsters\Values\MonsterCacheKey;
+use App\Game\Skills\Contracts\SkillBonusQuery;
 use Exception;
 use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
@@ -33,12 +34,14 @@ class PurgatorySmithHouseRewardHandler
      * @param BattleMessageHandler $battleMessageHandler
      * @param RandomNumberGenerator $randomNumberGenerator
      * @param ChanceCalculator $chanceCalculator
+     * @param SkillBonusQuery $skillBonusQuery
      */
     public function __construct(
-        private RandomAffixGenerator $randomAffixGenerator,
-        private BattleMessageHandler $battleMessageHandler,
+        private readonly RandomAffixGenerator $randomAffixGenerator,
+        private readonly BattleMessageHandler $battleMessageHandler,
         private readonly RandomNumberGenerator $randomNumberGenerator,
         private readonly ChanceCalculator $chanceCalculator,
+        private readonly SkillBonusQuery $skillBonusQuery,
     ) {}
 
     /**
@@ -317,7 +320,7 @@ class PurgatorySmithHouseRewardHandler
      */
     private function attemptItemReward(Character $character, Monster $monster, bool $isMythic, ?Event $event): bool
     {
-        $lootingChance = $character->skills->where('baseSkill.name', 'Looting')->first()->skill_bonus;
+        $lootingChance = $this->skillBonusQuery->skillBonus($character->skills->where('baseSkill.name', 'Looting')->first());
         $maxRoll = $isMythic ? 1_000 : 5_00;
         $maximumChance = 0.30;
 
@@ -607,7 +610,7 @@ class PurgatorySmithHouseRewardHandler
      */
     private function planItemRewardAttempt(Character $character, Monster $monster, bool $isMythic, ?Event $event): ?array
     {
-        $lootingChance = $character->skills->where('baseSkill.name', 'Looting')->first()->skill_bonus;
+        $lootingChance = $this->skillBonusQuery->skillBonus($character->skills->where('baseSkill.name', 'Looting')->first());
         $maxRoll = $isMythic ? 1_000 : 5_00;
         $maximumChance = 0.30;
 

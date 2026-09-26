@@ -24,6 +24,17 @@ class SkillService
 
     private ?Skill $skillInTraining;
 
+    /**
+     * @param Manager $manager
+     * @param BasicSkillsTransformer $basicSkillsTransformer
+     * @param SkillsTransformer $skillsTransformer
+     * @param UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes
+     * @param BattleMessageHandler $battleMessageHandler
+     * @param PlainDataSerializer $plainDataSerializer
+     * @param RandomNumberGenerator $randomNumberGenerator
+     * @param CharacterAreaGemEffectService $characterAreaGemEffectService
+     * @param SkillBonusService $skillBonusService
+     */
     public function __construct(
         private readonly Manager $manager,
         private readonly BasicSkillsTransformer $basicSkillsTransformer,
@@ -33,6 +44,7 @@ class SkillService
         private readonly PlainDataSerializer $plainDataSerializer,
         private readonly RandomNumberGenerator $randomNumberGenerator,
         private readonly CharacterAreaGemEffectService $characterAreaGemEffectService,
+        private readonly SkillBonusService $skillBonusService,
     ) {}
 
     /**
@@ -205,11 +217,11 @@ class SkillService
     }
 
     /**
-     * Get the xp for the skill in training
+     * Return the XP the Skill in training earns from the base XP after its training and map bonuses.
      *
-     * @param Character $character The character whose training skill and game map bonuses apply.
-     * @param int $xp The base XP amount before training-specific adjustments.
-     * @return int The resolved XP for the skill in training.
+     * @param Character $character
+     * @param int $xp
+     * @return int
      */
     public function getXpForSkillIntraining(Character $character, int $xp): int
     {
@@ -229,7 +241,7 @@ class SkillService
         }
 
         $skillXp = $xp + ($xp * $this->skillInTraining->xp_towards);
-        $skillXp = $skillXp + $skillXp * ($this->skillInTraining->skill_training_bonus + $character->map->gameMap->skill_training_bonus);
+        $skillXp = $skillXp + $skillXp * ($this->skillBonusService->skillTrainingBonus($this->skillInTraining) + $character->map->gameMap->skill_training_bonus);
         $skillXp += 5;
 
         return $skillXp;
@@ -263,15 +275,11 @@ class SkillService
     }
 
     /**
-     * Assign XP to crafting skills and report the factual amount of XP actually awarded.
+     * Assign a base 25 XP, raised by the Skill's training, map, and area gem bonuses, and return the XP actually kept.
      *
-     * - Uses a base of 25
-     * - Applies skill training bonuses
-     * - Applies Game Map Bonuses
-     *
-     * @param GameMap $gameMap The character's current game map, for the map skill training bonus.
-     * @param Skill $skill The crafting skill being trained.
-     * @return int The factual XP actually awarded by this call, discarding any excess lost by hitting max level.
+     * @param GameMap $gameMap
+     * @param Skill $skill
+     * @return int
      */
     public function assignXpToCraftingSkill(GameMap $gameMap, Skill $skill): int
     {
@@ -290,7 +298,7 @@ class SkillService
             ->craftingSkillBonusFor($skill->game_skill_id);
 
         $xp = 25;
-        $xp = $xp + $xp * ($skill->skill_training_bonus + $gameMap->skill_training_bonus + $craftingSkillBonus);
+        $xp = $xp + $xp * ($this->skillBonusService->skillTrainingBonus($skill) + $gameMap->skill_training_bonus + $craftingSkillBonus);
 
         $newXp = $skill->xp + $xp;
         $discardedXp = 0;
@@ -366,10 +374,10 @@ class SkillService
     }
 
     /**
-     * Level a skill.
+     * Raise the Skill one level when its XP has filled, stopping training once it reaches its max level.
      *
-     * @param Skill $skill The skill being leveled up.
-     * @return Skill The leveled-up skill.
+     * @param Skill $skill
+     * @return Skill
      */
     private function levelUpSkill(Skill $skill): Skill
     {
@@ -384,35 +392,24 @@ class SkillService
             return $skill->refresh();
         }
 
-        if ($skill->xp >= $skill->xp_max) {
+        if ($skill->xp < $skill->xp_max) {
+            return $skill->refresh();
+        }
 
-            $level = min($skill->level + 1, $skill->baseSkill->max_level);
+        $level = min($skill->level + 1, $skill->baseSkill->max_level);
 
-            $bonus = $skill->skill_bonus + $skill->baseSkill->skill_bonus_per_level;
+        $skill->update([
+            'level' => $level,
+            'xp_max' => $skill->can_train ? $level * 10 : $this->randomNumberGenerator->numberBetween(100, 350),
+            'xp' => 0,
+        ]);
 
-            if ($skill->baseSkill->max_level === $level) {
-                $bonus = 1.0;
-            }
+        $character = $skill->character->refresh();
 
-            $skill->update([
-                'level' => $level,
-                'xp_max' => $skill->can_train ? $level * 10 : $this->randomNumberGenerator->numberBetween(100, 350),
-                'base_damage_mod' => $skill->base_damage_mod + $skill->baseSkill->base_damage_mod_bonus_per_level,
-                'base_healing_mod' => $skill->base_healing_mod + $skill->baseSkill->base_healing_mod_bonus_per_level,
-                'base_ac_mod' => $skill->base_ac_mod + $skill->baseSkill->base_ac_mod_bonus_per_level,
-                'fight_time_out_mod' => $skill->fight_time_out_mod + $skill->baseSkill->fight_time_out_mod_bonus_per_level,
-                'move_time_out_mod' => $skill->mov_time_out_mod + $skill->baseSkill->mov_time_out_mod_bonus_per_level,
-                'skill_bonus' => $bonus,
-                'xp' => 0,
-            ]);
+        event(new SkillLeveledUpServerMessageEvent($skill->character->user, $skill->refresh()));
 
-            $character = $skill->character->refresh();
-
-            event(new SkillLeveledUpServerMessageEvent($skill->character->user, $skill->refresh()));
-
-            if ($skill->can_train) {
-                $this->updateCharacterAttackTypes->updateCache($character);
-            }
+        if ($skill->can_train) {
+            $this->updateCharacterAttackTypes->updateCache($character);
         }
 
         return $skill->refresh();

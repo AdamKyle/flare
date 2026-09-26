@@ -30,6 +30,7 @@ use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Gems\Progression\Contracts\CharacterAreaGemEffects;
 use App\Game\Gems\Services\AreaGemEffectService;
 use App\Game\GuideQuests\Services\GuideQuestService;
+use App\Game\Skills\Contracts\SkillBonusQuery;
 use App\Game\Skills\Services\SkillService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
@@ -100,6 +101,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(BattleMessageHandler::class),
                 $app->make(RandomNumberGenerator::class),
                 $app->make(ChanceCalculator::class),
+                $app->make(SkillBonusQuery::class),
             );
         });
 
@@ -109,6 +111,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(BattleMessageHandler::class),
                 $app->make(RandomNumberGenerator::class),
                 $app->make(ChanceCalculator::class),
+                $app->make(SkillBonusQuery::class),
             );
         });
 
@@ -118,6 +121,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(BattleMessageHandler::class),
                 $app->make(RandomNumberGenerator::class),
                 $app->make(ChanceCalculator::class),
+                $app->make(SkillBonusQuery::class),
             );
         });
 
@@ -126,6 +130,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(RandomAffixGenerator::class),
                 $app->make(RandomNumberGenerator::class),
                 $app->make(ChanceCalculator::class),
+                $app->make(SkillBonusQuery::class),
             );
         });
 

@@ -8,6 +8,7 @@ use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\CharacterAttack\Transformers\CharacterAttackDataTransformer;
 use App\Game\Core\Items\Values\ItemType;
+use App\Game\Skills\Contracts\SkillBonusQuery;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use League\Fractal\Manager;
@@ -21,12 +22,14 @@ class CharacterCacheData
      * @param PlainDataSerializer $plainDataSerializer
      * @param CharacterAttackDataTransformer $characterAttackDataTransformer
      * @param CharacterStatBuilder $characterStatBuilder
+     * @param SkillBonusQuery $skillBonusQuery
      */
     public function __construct(
         private readonly Manager $manager,
         private readonly PlainDataSerializer $plainDataSerializer,
         private readonly CharacterAttackDataTransformer $characterAttackDataTransformer,
-        private readonly CharacterStatBuilder $characterStatBuilder
+        private readonly CharacterStatBuilder $characterStatBuilder,
+        private readonly SkillBonusQuery $skillBonusQuery,
     ) {}
 
     /**
@@ -166,10 +169,10 @@ class CharacterCacheData
         $skills = $character->skills;
 
         $characterSheet['skills'] = [
-            'accuracy' => $skills->where('name', 'Accuracy')->first()->skill_bonus,
-            'casting_accuracy' => $skills->where('name', 'Casting Accuracy')->first()->skill_bonus,
-            'dodge' => $skills->where('name', 'Dodge')->first()->skill_bonus,
-            'criticality' => $skills->where('name', 'Criticality')->first()->skill_bonus,
+            'accuracy' => $this->skillBonusQuery->skillBonus($skills->where('name', 'Accuracy')->first()),
+            'casting_accuracy' => $this->skillBonusQuery->skillBonus($skills->where('name', 'Casting Accuracy')->first()),
+            'dodge' => $this->skillBonusQuery->skillBonus($skills->where('name', 'Dodge')->first()),
+            'criticality' => $this->skillBonusQuery->skillBonus($skills->where('name', 'Criticality')->first()),
         ];
 
         $characterSheet['elemental_atonement'] = $this->characterStatBuilder->buildElementalAtonement();

@@ -17,13 +17,13 @@ const BatchCraftingStatusProvider = ({
   const characterId = gameData?.character?.id ?? 0;
   const userId = gameData?.character?.user_id ?? 0;
 
-  const { status, loading, error } = useBatchCraftingStatus({
+  const batchCraftingStatus = useBatchCraftingStatus({
     characterId,
     userId,
   });
 
   return (
-    <BatchCraftingStatusContext.Provider value={{ status, loading, error }}>
+    <BatchCraftingStatusContext.Provider value={batchCraftingStatus}>
       {children}
     </BatchCraftingStatusContext.Provider>
   );

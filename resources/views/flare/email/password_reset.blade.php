@@ -6,58 +6,52 @@
 >
 <head>
     <title></title>
-    <!--[if !mso
-        ]><!-- -->
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <!--<![endif]-->
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <style type="text/css">
-            #outlook a {
-                padding: 0;
-            }
+    <!--[if !mso]><!-->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!--<![endif]-->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type="text/css">
+        #outlook a {
+            padding: 0;
+        }
 
-            body {
-                margin: 0;
-                padding: 0;
-                -webkit-text-size-adjust: 100%;
-                -ms-text-size-adjust: 100%;
-            }
+        body {
+            margin: 0;
+            padding: 0;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
 
-            table,
-            td {
-                border-collapse: collapse;
-                mso-table-lspace: 0pt;
-                mso-table-rspace: 0pt;
-            }
+        table,
+        td {
+            border-collapse: collapse;
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
 
-            img {
-                border: 0;
-                height: auto;
-                line-height: 100%;
-                outline: none;
-                text-decoration: none;
-                -ms-interpolation-mode: bicubic;
-            }
+        img {
+            border: 0;
+            height: auto;
+            line-height: 100%;
+            outline: none;
+            text-decoration: none;
+            -ms-interpolation-mode: bicubic;
+        }
 
-            p {
-                display: block;
-                margin: 13px 0;
-            }
-        </style>
-        <!--[if mso]>
-            <xml>
-                <o:OfficeDocumentSettings>
-                    <o:AllowPNG />
-                    <o:PixelsPerInch>96</o:PixelsPerInch>
-                </o:OfficeDocumentSettings>
-            </xml>
-        <![endif]--><!
-    [endif]-->
-    <! [endif]--> <! [endif]--> <! [endif]--> <! [endif]--> <! [endif]--> <! [endif]--> <! [endif]--> <! [endif]--> <!
-    [endif]--> <! [endif]--> <! [endif]--> <! [endif]--> <! [endif]--> <! [endif]--> <! [endif]--> <! [endif]--> <!
-    [endif]--> <! [endif]--> <! [endif]--> <! [endif]--> <! [endif]--> <! [endif]--> <! [endif]--> <! [endif]--> <!
-    [endif]--> <! [endif]--> <! [endif]--> <! [endif]--> <! [endif]--> <! [endif]--> <! [endif]-->
+        p {
+            display: block;
+            margin: 13px 0;
+        }
+    </style>
+    <!--[if mso]>
+        <xml>
+            <o:OfficeDocumentSettings>
+                <o:AllowPNG />
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+            </o:OfficeDocumentSettings>
+        </xml>
+    <![endif]-->
     <!--[if lte mso 11]>
         <style type="text/css">
             .mj-outlook-group-fix {
@@ -90,12 +84,10 @@
 <body>
     <div style="">
         <!--[if mso | IE]>
-      <table
-         align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:600px;" width="600"
-      >
-        <tr>
-          <td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;">
-      <![endif]-->
+            <table align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:600px;" width="600">
+                <tr>
+                    <td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;">
+        <![endif]-->
         <div style="background: #8db9e0; background-color: #8db9e0; margin: 0px auto; max-width: 600px">
             <table
                 align="center"
@@ -109,14 +101,10 @@
                     <tr>
                         <td style="direction: ltr; font-size: 0px; padding: 20px 0; text-align: center">
                             <!--[if mso | IE]>
-                  <table role="presentation" border="0" cellpadding="0" cellspacing="0">
-
-        <tr>
-
-            <td
-               class="" style="vertical-align:top;width:600px;"
-            >
-          <![endif]-->
+                                <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td class="" style="vertical-align:top;width:600px;">
+                            <![endif]-->
                             <div
                                 class="mj-column-per-100 mj-outlook-group-fix"
                                 style="
@@ -157,27 +145,20 @@
                                     </tr>
                                 </table>
                             </div>
-                            <!--[if mso | IE]> <![endif]-->
+                            <!--[if mso | IE]></td></tr></table><![endif]-->
                         </td>
                     </tr>
-            </table>
-
-            </td>
-            </tr>
-            </tbody>
+                </tbody>
             </table>
         </div>
         <!--[if mso | IE]>
-          </td>
-        </tr>
-      </table>
-
-      <table
-         align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:600px;" width="600"
-      >
-        <tr>
-          <td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;">
-      <![endif]-->
+                    </td>
+                </tr>
+            </table>
+            <table align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:600px;" width="600">
+                <tr>
+                    <td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;">
+        <![endif]-->
         <div style="background: #1a62a1; background-color: #1a62a1; margin: 0px auto; max-width: 600px">
             <table
                 align="center"
@@ -191,14 +172,10 @@
                     <tr>
                         <td style="direction: ltr; font-size: 0px; padding: 20px 0; text-align: center">
                             <!--[if mso | IE]>
-                  <table role="presentation" border="0" cellpadding="0" cellspacing="0">
-
-        <tr>
-
-            <td
-               class="" style="vertical-align:top;width:400px;"
-            >
-          <![endif]-->
+                                <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td class="" style="vertical-align:top;width:400px;">
+                            <![endif]-->
                             <div
                                 class="mj-column-px-400 mj-outlook-group-fix"
                                 style="
@@ -310,21 +287,17 @@
                                     </tr>
                                 </table>
                             </div>
-                            <!--[if mso | IE]> <![endif]-->
+                            <!--[if mso | IE]></td></tr></table><![endif]-->
                         </td>
                     </tr>
-            </table>
-
-            </td>
-            </tr>
-            </tbody>
+                </tbody>
             </table>
         </div>
         <!--[if mso | IE]>
-          </td>
-        </tr>
-      </table>
-      <![endif]-->
+                    </td>
+                </tr>
+            </table>
+        <![endif]-->
     </div>
 </body>
 </html>

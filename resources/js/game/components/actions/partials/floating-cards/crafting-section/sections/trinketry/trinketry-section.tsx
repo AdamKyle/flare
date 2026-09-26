@@ -1,8 +1,8 @@
 import React, { ReactNode } from 'react';
 
 import TrinketryFlow from './components/trinketry-flow';
+import ScreenTransition from '../../../../../../../reusable-components/screen-transition/screen-transition';
 import CraftingDisciplineIntroduction from '../../shared/components/crafting-discipline-introduction';
-import CraftingScreenTransition from '../../shared/crafting-screen-transition';
 import { CraftingIntroductionStorageKey } from '../../shared/enums/crafting-introduction-storage-key';
 import { useCraftingDisciplineIntroduction } from '../../shared/hooks/use-crafting-discipline-introduction';
 
@@ -28,14 +28,14 @@ const TrinketrySection = (): ReactNode => {
   };
 
   return (
-    <CraftingScreenTransition
+    <ScreenTransition
       screenKey={introductionAcknowledged ? 'trinketry-items' : 'introduction'}
       label={
         introductionAcknowledged ? 'Trinketry items' : 'Trinketry introduction'
       }
     >
       {renderContent()}
-    </CraftingScreenTransition>
+    </ScreenTransition>
   );
 };
 

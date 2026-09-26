@@ -1,8 +1,8 @@
 import React, { ReactNode } from 'react';
 
 import CraftItemsFlow from './components/craft-items-flow';
+import ScreenTransition from '../../../../../../../reusable-components/screen-transition/screen-transition';
 import CraftingDisciplineIntroduction from '../../shared/components/crafting-discipline-introduction';
-import CraftingScreenTransition from '../../shared/crafting-screen-transition';
 import { CraftingIntroductionStorageKey } from '../../shared/enums/crafting-introduction-storage-key';
 import { useCraftingDisciplineIntroduction } from '../../shared/hooks/use-crafting-discipline-introduction';
 import CraftingSectionScreenProps from '../../types/crafting-section-screen-props';
@@ -31,12 +31,12 @@ const CraftingSection = ({
   };
 
   return (
-    <CraftingScreenTransition
+    <ScreenTransition
       screenKey={introductionAcknowledged ? 'craft-items' : 'introduction'}
       label={introductionAcknowledged ? 'Craft items' : 'Crafting introduction'}
     >
       {renderContent()}
-    </CraftingScreenTransition>
+    </ScreenTransition>
   );
 };
 

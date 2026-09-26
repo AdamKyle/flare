@@ -1,0 +1,1 @@
+export const FACTION_LIST_BATCH_SIZE = 10;

@@ -5,6 +5,7 @@ namespace Tests\Feature\Game\Automation\Delve\Controllers\Api;
 use App\Flare\Models\CharacterAutomation;
 use App\Game\Automation\Values\AutomationType;
 use App\Game\Core\Combat\Values\AttackType;
+use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Maps\Values\LocationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -42,15 +43,18 @@ class DelveExplorationControllerTest extends TestCase
         $character = $this->character->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/delve/'.$character->id.'/start', [
+            ->json('POST', '/api/delve/'.$character->id.'/start', [
                 '_token' => csrf_token(),
                 'attack_type' => 'not-a-real-attack-type',
             ]);
 
+        $jsonData = json_decode($response->getContent(), true);
+
         $this->assertEquals(422, $response->getStatusCode());
+        $this->assertSame('Invalid attack type was selected. Please select from the drop down.', $jsonData['message']);
     }
 
-    public function test_begin_returns_422_when_another_automation_is_running(): void
+    public function test_begin_returns_automation_restriction_before_location_and_access_checks(): void
     {
         $character = $this->character->getCharacter();
 
@@ -66,7 +70,10 @@ class DelveExplorationControllerTest extends TestCase
                 'attack_type' => AttackType::ATTACK->value,
             ]);
 
+        $jsonData = json_decode($response->getContent(), true);
+
         $this->assertEquals(422, $response->getStatusCode());
+        $this->assertSame('You cannot do that while Faction Loyalty automation is running. Cancel it first.', $jsonData['message']);
     }
 
     public function test_begin_returns_422_when_character_is_not_in_a_delve_location(): void
@@ -85,12 +92,47 @@ class DelveExplorationControllerTest extends TestCase
         $this->assertSame('You may only delve in locations that allow such an action child.', $jsonData['message']);
     }
 
+    public function test_begin_returns_422_when_character_is_at_delve_location_without_delve_access_item(): void
+    {
+        $this->createItem([
+            'effect' => ItemEffectType::DELVE->value,
+            'type' => 'quest',
+        ]);
+
+        $character = $this->character->getCharacter();
+
+        $this->createLocation([
+            'type' => LocationType::CAVE_OF_SHADOWS->value,
+            'game_map_id' => $character->map->game_map_id,
+            'x' => $character->map->character_position_x,
+            'y' => $character->map->character_position_y,
+            'minutes_between_delve_fights' => 3,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/delve/'.$character->id.'/start', [
+                '_token' => csrf_token(),
+                'attack_type' => AttackType::ATTACK->value,
+                'pack_size' => 1,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertSame('You do not have access to Delve at this location child.', $jsonData['message']);
+    }
+
     public function test_begin_starts_the_delve_when_character_is_in_a_delve_location(): void
     {
         Queue::fake();
         Event::fake();
 
-        $character = $this->character->getCharacter();
+        $delveAccessItem = $this->createItem([
+            'effect' => ItemEffectType::DELVE->value,
+            'type' => 'quest',
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($delveAccessItem)->getCharacter();
 
         $this->createLocation([
             'type' => LocationType::CAVE_OF_SHADOWS->value,
@@ -184,6 +226,21 @@ class DelveExplorationControllerTest extends TestCase
 
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertNotNull($delve->fresh()->panel_dismissed_at);
+    }
+
+    public function test_stop_returns_422_when_character_has_no_running_delve(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/delve/'.$character->id.'/stop', [
+                '_token' => csrf_token(),
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertSame('Nope. You don\'t own that.', $jsonData['message']);
     }
 
     public function test_stop_stops_the_running_delve(): void

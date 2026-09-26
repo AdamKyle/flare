@@ -85,6 +85,9 @@ const GameDataProvider = (props: GameDataProviderProps) => {
       is_faction_loyalty_automation_running:
         data.characterStatuses.is_faction_loyalty_automation_running,
       is_delve_running: data.characterStatuses.is_delve_running,
+      is_delve_visible: data.characterStatuses.is_delve_visible,
+      is_at_delve_location: data.characterStatuses.is_at_delve_location,
+      can_set_delve_pack: data.characterStatuses.can_set_delve_pack,
       active_automation: data.characterStatuses.active_automation,
       automation_completed_at: data.characterStatuses.automation_completed_at,
     });

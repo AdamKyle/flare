@@ -1,4 +1,5 @@
 import ActiveBoonDefinition from '../../../game/components/actions/partials/floating-cards/crafting-section/sections/alchemy/active-boons/api/definitions/active-boon-definition';
+import FactionLoyaltyWarningNoticeDefinition from '../../../game/components/factions/api/definitions/faction-loyalty-warning-notice-definition';
 
 import ActiveAutomationDefinition from 'game-data/api-data-definitions/character/active-automation-definition';
 import CurrencyLimitsDefinition from 'game-data/api-data-definitions/character/currency-limits-definition';
@@ -77,6 +78,9 @@ export default interface CharacterSheetDefinition {
   can_craft_again_at?: number;
   is_faction_loyalty_automation_running?: boolean;
   is_delve_running?: boolean;
+  is_delve_visible?: boolean;
+  is_at_delve_location?: boolean;
+  can_set_delve_pack?: boolean;
   active_automation?: ActiveAutomationDefinition | null;
   automation_completed_at?: number;
   is_alchemy_locked?: boolean;
@@ -85,6 +89,10 @@ export default interface CharacterSheetDefinition {
   can_access_purgatory_chains?: boolean;
   can_access_labyrinth_oracle?: boolean;
   can_access_seer_camp?: boolean;
+  can_see_pledge_tab?: boolean;
+  pledged_to_faction_id?: number | null;
+  has_faction_loyalty_warning?: boolean;
+  faction_loyalty_warning_notices?: FactionLoyaltyWarningNoticeDefinition[];
   current_fame_tasks?: Array<{
     type?: string;
     item_name?: string;

@@ -3,6 +3,8 @@
 namespace Tests\Unit\Game\Skills\Events;
 
 use App\Game\Skills\Events\UpdateSkillEvent;
+use App\Game\Skills\Services\SkillBonusContextService;
+use App\Game\Skills\Services\SkillBonusService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -110,6 +112,6 @@ class UpdateSkillEventTest extends TestCase
 
         $this->assertEquals($gameSkill->max_level, $skill->level);
         $this->assertEquals(0, $skill->xp);
-        $this->assertEquals(0.50, $skill->base_damage_mod);
+        $this->assertEquals(0.50, (new SkillBonusService(new SkillBonusContextService))->baseDamageMod($skill));
     }
 }

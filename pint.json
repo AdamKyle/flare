@@ -1,5 +1,8 @@
 {
   "preset": "laravel",
+  "notPath": [
+    "resources/views/flare/email/password_reset.blade.php"
+  ],
   "rules": {
     "new_with_parentheses": false,
     "ordered_imports": { "imports_order": ["class", "function", "const"], "sort_algorithm": "alpha" },

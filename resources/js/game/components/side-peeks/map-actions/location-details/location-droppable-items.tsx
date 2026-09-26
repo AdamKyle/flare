@@ -6,7 +6,7 @@ import React, { useMemo, useState } from 'react';
 import LocationDroppableItemProps from './types/location-droppable-items-props';
 import BaseQuestItemDefinition from '../../../../api-definitions/items/quest-item-definitions/base-quest-item-definition';
 import { useInfiniteScroll } from '../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
-import QuestItem from '../../character-inventory/inventory-item/quest-item';
+import QuestItemDetailStack from '../../character-inventory/inventory-item/quest-item-detail-stack';
 import GenericItemList from '../../components/items/generic-item-list';
 import { LocationApiUrls } from '../api/enums/location-api-urls';
 
@@ -14,7 +14,6 @@ import { GameDataError } from 'game-data/components/game-data-error';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
-import StackedCard from 'ui/cards/stacked-card';
 import Input from 'ui/input/input';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
@@ -85,9 +84,10 @@ const LocationDroppableItems = ({
     }
 
     return (
-      <StackedCard on_close={close_quest_item_details}>
-        <QuestItem quest_item={itemToView} />
-      </StackedCard>
+      <QuestItemDetailStack
+        quest_item={itemToView}
+        on_close={close_quest_item_details}
+      />
     );
   };
 

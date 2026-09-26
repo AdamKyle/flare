@@ -2,14 +2,17 @@ import React, { ReactNode, useState } from 'react';
 
 import OtherClassCard from './other-class-card';
 import OtherClassesPanelProps from './types/other-classes-panel-props';
-import { CLASS_BROWSER_INITIAL_COUNT } from '../constants/class-rank-list-constants';
+import {
+  CLASS_BROWSER_INITIAL_COUNT,
+  CLASS_RANK_INFINITE_SCROLL_BATCH_SIZE,
+} from '../constants/class-rank-list-constants';
 import { ClassRankProgressFilter } from '../enums/class-rank-progress-filter';
-import { useProgressiveClassRankList } from '../hooks/use-progressive-class-rank-list';
 import { resolveClassRankProgressFilter } from '../utils/resolve-class-rank-progress-filter';
 import { sortClassRanksForBrowser } from '../utils/sort-class-ranks-for-browser';
 
 import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
+import { useProgressiveList } from 'ui/infinite-scroll/hooks/use-progressive-list';
 import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
 
 const progressFilterOptions: DropdownItem[] = [
@@ -41,8 +44,9 @@ const OtherClassesPanel = ({
     .join('-')}`;
 
   const { visible_count: visibleCount, handle_scroll: handleScroll } =
-    useProgressiveClassRankList({
+    useProgressiveList({
       total_items: filteredClasses.length,
+      batch_size: CLASS_RANK_INFINITE_SCROLL_BATCH_SIZE,
       reset_key: resetKey,
       initial_count: CLASS_BROWSER_INITIAL_COUNT,
     });

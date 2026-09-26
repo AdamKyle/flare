@@ -5,25 +5,28 @@ namespace App\Game\Character\Builders\AttackBuilders\Services;
 use App\Flare\Models\Character;
 use App\Game\Character\Builders\AttackBuilders\AttackDetails\CharacterAttackBuilder;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
-use App\Game\Skills\Transformers\Traits\SkillsTransformerTrait;
-use Exception;
 use Illuminate\Support\Facades\Cache;
-use Psr\SimpleCache\InvalidArgumentException;
 
 class BuildCharacterAttackTypes
 {
-    use SkillsTransformerTrait;
-
-    public function __construct(private readonly CharacterAttackBuilder $characterAttackBuilder, private readonly CharacterCacheData $characterCacheData) {}
+    /**
+     * @param CharacterAttackBuilder $characterAttackBuilder
+     * @param CharacterCacheData $characterCacheData
+     */
+    public function __construct(
+        private readonly CharacterAttackBuilder $characterAttackBuilder,
+        private readonly CharacterCacheData $characterCacheData,
+    ) {}
 
     /**
-     * Build character attack data cache
+     * Build and cache every attack type's data for the Character, then return the cached attack data.
      *
-     * @throws Exception|InvalidArgumentException
+     * @param Character $character
+     * @param bool $ignoreReductions
+     * @return array
      */
     public function buildCache(Character $character, bool $ignoreReductions = false): array
     {
-
         $damageStatAmount = $character->getInformation()->statMod($character->damage_stat);
 
         $characterAttack = $this->characterAttackBuilder->setCharacter($character, $ignoreReductions, $damageStatAmount);

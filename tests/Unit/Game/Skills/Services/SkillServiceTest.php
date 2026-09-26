@@ -3,11 +3,26 @@
 namespace Tests\Unit\Game\Skills\Services;
 
 use App\Flare\Models\GameSkill;
+use App\Flare\Transformers\Serializer\PlainDataSerializer;
+use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
+use App\Game\Character\Builders\AttackBuilders\AttackDetails\CharacterAttackBuilder;
+use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
+use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
+use App\Game\Core\Chance\PhpRandomNumberGenerator;
+use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
+use App\Game\Gems\Progression\Services\GemProgressionEffectService;
+use App\Game\Gems\Services\AreaGemEffectService;
 use App\Game\Skills\Events\SkillLeveledUpServerMessageEvent;
+use App\Game\Skills\Services\SkillBonusContextService;
+use App\Game\Skills\Services\SkillBonusService;
 use App\Game\Skills\Services\SkillService;
+use App\Game\Skills\Transformers\BasicSkillsTransformer;
+use App\Game\Skills\Transformers\SkillsTransformer;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use League\Fractal\Manager;
+use Tests\Setup\Character\CharacterCacheDataFactory;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;
@@ -39,7 +54,24 @@ class SkillServiceTest extends TestCase
             $this->skill
         )->givePlayerLocation();
 
-        $this->skillService = resolve(SkillService::class);
+        $characterCacheDataFactory = new CharacterCacheDataFactory;
+        $skillBonusService = new SkillBonusService(new SkillBonusContextService);
+        $characterAreaGemEffectService = new CharacterAreaGemEffectService(new AreaGemEffectService, new GemProgressionEffectService);
+
+        $this->skillService = new SkillService(
+            new Manager,
+            new BasicSkillsTransformer,
+            new SkillsTransformer($skillBonusService),
+            new UpdateCharacterAttackTypesHandler(new BuildCharacterAttackTypes(
+                new CharacterAttackBuilder($characterCacheDataFactory->buildCharacterStatBuilder(), $characterAreaGemEffectService),
+                $characterCacheDataFactory->build(),
+            )),
+            new BattleMessageHandler,
+            new PlainDataSerializer,
+            new PhpRandomNumberGenerator,
+            $characterAreaGemEffectService,
+            $skillBonusService,
+        );
     }
 
     protected function tearDown(): void
@@ -204,7 +236,6 @@ class SkillServiceTest extends TestCase
         $skill->update([
             'currently_training' => true,
             'xp_towards' => 0.10,
-            'skill_bonus' => 1.0,
             'level' => $skill->baseSkill->max_level - 1,
         ]);
 
@@ -213,7 +244,7 @@ class SkillServiceTest extends TestCase
         $skill = $character->refresh()->skills->first();
 
         $this->assertEquals($skill->baseSkill->max_level, $skill->level);
-        $this->assertEquals(1, $skill->skill_bonus);
+        $this->assertEquals(1, (new SkillBonusService(new SkillBonusContextService))->skillBonus($skill));
 
         Event::assertDispatched(SkillLeveledUpServerMessageEvent::class);
     }

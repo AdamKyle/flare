@@ -1,12 +1,12 @@
 import React, { ReactNode, useState } from 'react';
 
+import ScreenTransition from '../../../../../reusable-components/screen-transition/screen-transition';
 import { useManageGoblinShopVisibility } from '../../../../goblin-shop/hooks/use-manage-goblin-shop-visibility';
 import { useEmitCharacterPosition } from '../../../../map-section/hooks/use-emit-character-position';
 import { useMarketAccess } from '../../../../market/api/hooks/use-market-access';
 import { useManageShopSectionVisibility } from '../../../../shop/hooks/use-manage-shop-section-visibility';
 import Slots from '../../../../shop/slots/slots';
 import FloatingCard from '../../../components/icon-section/floating-card';
-import CraftingScreenTransition from '../crafting-section/shared/crafting-screen-transition';
 import { useManageMarketVisibility } from '../map-section/hooks/use-manage-market-visibility';
 import { useManageShopVisibility } from '../map-section/hooks/use-manage-shop-visibility';
 
@@ -84,12 +84,12 @@ const ShopCard = (): ReactNode => {
       close_action={closeShop}
       back_action={showSlots ? handleCloseSlots : undefined}
     >
-      <CraftingScreenTransition
+      <ScreenTransition
         screenKey={showSlots ? 'slots' : 'shops'}
         label={showSlots ? 'Slots screen' : 'Shops screen'}
       >
         {renderActiveScreen()}
-      </CraftingScreenTransition>
+      </ScreenTransition>
     </FloatingCard>
   );
 };

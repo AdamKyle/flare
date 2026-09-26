@@ -1,5 +1,5 @@
 import { useEventSystem } from 'event-system/hooks/use-event-system';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import UseOwnGameMapMoveDefinition from './definitions/use-own-game-map-move-definition';
 import UseOwnGameMapMoveOptions from './types/use-own-game-map-move-options';
@@ -16,31 +16,43 @@ export const useOwnGameMapMove = ({
   const commands = useGameMapMoveEmitter();
   const move = useGameMapMoveOrchestration();
 
+  const {
+    start_move_location: startMoveLocation,
+    start_move_npc: startMoveNpc,
+    select_move_target: selectMoveTarget,
+    confirm_move: confirmMove,
+    cancel_move: cancelMove,
+    clear_move_error: clearMoveError,
+    moving_record: movingRecord,
+    pending_move_target: pendingMoveTarget,
+    is_moving: isMoving,
+    move_error: moveError,
+  } = move;
+
   const handleStartLocation = useCallback(
     (command: GameMapMoveEventMap[GameMapMoveEvent.START_LOCATION]): void => {
-      move.start_move_location(
+      startMoveLocation(
         command.record_id,
         command.label,
         command.origin_x,
         command.origin_y
       );
     },
-    [move.start_move_location]
+    [startMoveLocation]
   );
   const handleStartNpc = useCallback(
     (command: GameMapMoveEventMap[GameMapMoveEvent.START_NPC]): void => {
-      move.start_move_npc(
+      startMoveNpc(
         command.record_id,
         command.label,
         command.origin_x,
         command.origin_y
       );
     },
-    [move.start_move_npc]
+    [startMoveNpc]
   );
   const handleConfirm = useCallback(async (): Promise<void> => {
-    const movingRecord = move.moving_record;
-    const moved = await move.confirm_move(gameMapId);
+    const moved = await confirmMove(gameMapId);
 
     if (!moved || !movingRecord) {
       return;
@@ -48,13 +60,7 @@ export const useOwnGameMapMove = ({
 
     await onMoveSucceeded();
     commands.emit_succeeded({ moving_record: movingRecord });
-  }, [
-    commands,
-    gameMapId,
-    move.confirm_move,
-    move.moving_record,
-    onMoveSucceeded,
-  ]);
+  }, [commands, confirmMove, gameMapId, movingRecord, onMoveSucceeded]);
 
   useEffect(() => {
     const emitter = eventSystem.fetchOrCreateEventEmitter<GameMapMoveEventMap>(
@@ -63,43 +69,37 @@ export const useOwnGameMapMove = ({
 
     emitter.on(GameMapMoveEvent.START_LOCATION, handleStartLocation);
     emitter.on(GameMapMoveEvent.START_NPC, handleStartNpc);
-    emitter.on(GameMapMoveEvent.SELECT_TARGET, move.select_move_target);
+    emitter.on(GameMapMoveEvent.SELECT_TARGET, selectMoveTarget);
     emitter.on(GameMapMoveEvent.CONFIRM, handleConfirm);
-    emitter.on(GameMapMoveEvent.CANCEL, move.cancel_move);
-    emitter.on(GameMapMoveEvent.CLEAR_ERROR, move.clear_move_error);
+    emitter.on(GameMapMoveEvent.CANCEL, cancelMove);
+    emitter.on(GameMapMoveEvent.CLEAR_ERROR, clearMoveError);
 
     return () => {
       emitter.off(GameMapMoveEvent.START_LOCATION, handleStartLocation);
       emitter.off(GameMapMoveEvent.START_NPC, handleStartNpc);
-      emitter.off(GameMapMoveEvent.SELECT_TARGET, move.select_move_target);
+      emitter.off(GameMapMoveEvent.SELECT_TARGET, selectMoveTarget);
       emitter.off(GameMapMoveEvent.CONFIRM, handleConfirm);
-      emitter.off(GameMapMoveEvent.CANCEL, move.cancel_move);
-      emitter.off(GameMapMoveEvent.CLEAR_ERROR, move.clear_move_error);
+      emitter.off(GameMapMoveEvent.CANCEL, cancelMove);
+      emitter.off(GameMapMoveEvent.CLEAR_ERROR, clearMoveError);
     };
   }, [
     eventSystem,
     handleConfirm,
     handleStartLocation,
     handleStartNpc,
-    move.cancel_move,
-    move.clear_move_error,
-    move.select_move_target,
+    cancelMove,
+    clearMoveError,
+    selectMoveTarget,
   ]);
 
   useEffect(() => {
     commands.emit_state({
-      moving_record: move.moving_record,
-      pending_move_target: move.pending_move_target,
-      is_moving: move.is_moving,
-      move_error: move.move_error,
+      moving_record: movingRecord,
+      pending_move_target: pendingMoveTarget,
+      is_moving: isMoving,
+      move_error: moveError,
     });
-  }, [
-    commands,
-    move.is_moving,
-    move.move_error,
-    move.moving_record,
-    move.pending_move_target,
-  ]);
+  }, [commands, isMoving, moveError, movingRecord, pendingMoveTarget]);
 
-  return useMemo(() => move, [move]);
+  return move;
 };

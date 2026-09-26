@@ -4,9 +4,9 @@ import React, { ReactNode, useState } from 'react';
 import CharacterQuestHandInActions from './character-quest-hand-in-actions';
 import CharacterQuestDetailStackProps from './types/character-quest-detail-stack-props';
 import QuestDetail from '../../../../reusable-components/quest/components/quest-detail';
-import { SidePeekComponentRegistrationEnum } from '../../../side-peeks/base/component-registration/side-peek-component-registration-enum';
-import { SidePeek } from '../../../side-peeks/base/event-types/side-peek';
-import { useSidePeekEmitter } from '../../../side-peeks/base/hooks/use-side-peek-emitter';
+import PlayerGameMapDetailStack from '../../../side-peeks/game-data/components/player-game-map-detail-stack';
+import PlayerNpcDetailStack from '../../../side-peeks/game-data/components/player-npc-detail-stack';
+import ItemDetailsStack from '../../../side-peeks/item-details/components/item-details-stack';
 import { useCharacterQuestDetail } from '../api/hooks/use-character-quest-detail';
 import { useHandInCharacterQuest } from '../api/hooks/use-hand-in-character-quest';
 
@@ -21,9 +21,10 @@ const CharacterQuestDetailStack = ({
   on_close: onClose,
   on_completed_quests_change: onCompletedQuestsChange,
 }: CharacterQuestDetailStackProps): ReactNode => {
-  const sidePeekEmitter = useSidePeekEmitter();
-
   const [nestedQuestId, setNestedQuestId] = useState<number | null>(null);
+  const [nestedNpcId, setNestedNpcId] = useState<number | null>(null);
+  const [nestedGameMapId, setNestedGameMapId] = useState<number | null>(null);
+  const [nestedItemId, setNestedItemId] = useState<number | null>(null);
 
   const {
     quest,
@@ -57,42 +58,58 @@ const CharacterQuestDetailStack = ({
     refresh();
   };
 
-  const handleOpenNpc = (npcId: number): void => {
-    sidePeekEmitter.emit(
-      SidePeek.SIDE_PEEK,
-      SidePeekComponentRegistrationEnum.PLAYER_NPC_DETAIL,
-      {
-        is_open: true,
-        title: 'NPC Details',
-        allow_clicking_outside: true,
-        npc_id: npcId,
-      }
+  const renderNestedQuest = (): ReactNode => {
+    if (nestedQuestId === null) {
+      return null;
+    }
+
+    return (
+      <CharacterQuestDetailStack
+        character_id={characterId}
+        quest_id={nestedQuestId}
+        completed_quest_ids={detailCompletedQuestIds}
+        on_close={() => setNestedQuestId(null)}
+        on_completed_quests_change={onCompletedQuestsChange}
+      />
     );
   };
 
-  const handleOpenMap = (gameMapId: number): void => {
-    sidePeekEmitter.emit(
-      SidePeek.SIDE_PEEK,
-      SidePeekComponentRegistrationEnum.PLAYER_GAME_MAP_DETAIL,
-      {
-        is_open: true,
-        title: 'Game Map Details',
-        allow_clicking_outside: true,
-        game_map_id: gameMapId,
-      }
+  const renderNestedNpc = (): ReactNode => {
+    if (nestedNpcId === null) {
+      return null;
+    }
+
+    return (
+      <PlayerNpcDetailStack
+        npc_id={nestedNpcId}
+        on_close={() => setNestedNpcId(null)}
+      />
     );
   };
 
-  const handleOpenItem = (itemId: number): void => {
-    sidePeekEmitter.emit(
-      SidePeek.SIDE_PEEK,
-      SidePeekComponentRegistrationEnum.ITEM_DETAILS,
-      {
-        is_open: true,
-        title: 'Item Details',
-        allow_clicking_outside: true,
-        item_id: itemId,
-      }
+  const renderNestedGameMap = (): ReactNode => {
+    if (nestedGameMapId === null) {
+      return null;
+    }
+
+    return (
+      <PlayerGameMapDetailStack
+        game_map_id={nestedGameMapId}
+        on_close={() => setNestedGameMapId(null)}
+      />
+    );
+  };
+
+  const renderNestedItem = (): ReactNode => {
+    if (nestedItemId === null) {
+      return null;
+    }
+
+    return (
+      <ItemDetailsStack
+        item_id={nestedItemId}
+        on_close={() => setNestedItemId(null)}
+      />
     );
   };
 
@@ -125,9 +142,9 @@ const CharacterQuestDetailStack = ({
           presentation="side-peek"
           navigation={{
             on_open_quest: setNestedQuestId,
-            on_open_npc: handleOpenNpc,
-            on_open_map: handleOpenMap,
-            on_open_item: handleOpenItem,
+            on_open_npc: setNestedNpcId,
+            on_open_map: setNestedGameMapId,
+            on_open_item: setNestedItemId,
           }}
           quest_item_ownership={questItemOwnership}
         />
@@ -146,15 +163,10 @@ const CharacterQuestDetailStack = ({
           {renderContent()}
         </div>
 
-        {nestedQuestId !== null && (
-          <CharacterQuestDetailStack
-            character_id={characterId}
-            quest_id={nestedQuestId}
-            completed_quest_ids={detailCompletedQuestIds}
-            on_close={() => setNestedQuestId(null)}
-            on_completed_quests_change={onCompletedQuestsChange}
-          />
-        )}
+        {renderNestedQuest()}
+        {renderNestedNpc()}
+        {renderNestedGameMap()}
+        {renderNestedItem()}
       </div>
     </StackedCard>
   );

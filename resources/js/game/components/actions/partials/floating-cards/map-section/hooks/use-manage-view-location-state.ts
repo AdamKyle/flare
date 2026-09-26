@@ -37,8 +37,7 @@ export const useManageViewLocationState =
           manageButtonState
         );
       };
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [manageViewLocationStateEmitter]);
 
     const canViewLocationData = (
       isEnabled: boolean,

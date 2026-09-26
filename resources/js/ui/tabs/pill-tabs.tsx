@@ -14,6 +14,7 @@ const PillTabs = <PTuple extends readonly object[]>({
   additional_tab_css,
   onActiveIndexChange,
   alignment = PillTabsAlignment.CENTER,
+  keep_panels_mounted = false,
 }: PillTabsProps<PTuple>) => {
   const [internalActiveIndex, setInternalActiveIndex] =
     useState<number>(initialIndex);
@@ -80,6 +81,7 @@ const PillTabs = <PTuple extends readonly object[]>({
           activeIndex={resolvedActiveIndex}
           tabIds={tabIds}
           panelIds={panelIds}
+          keep_panels_mounted={keep_panels_mounted}
         />
       </div>
     );

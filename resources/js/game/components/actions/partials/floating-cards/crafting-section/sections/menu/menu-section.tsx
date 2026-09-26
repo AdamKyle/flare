@@ -3,7 +3,7 @@ import React from 'react';
 import MenuSectionProps from './types/menu-section-props';
 import { CraftingTypes } from '../../enums/crafting-types';
 import { getLocationRestrictedCraftingAction } from '../../shared/utils/get-location-restricted-crafting-action';
-import { useBatchCraftingStatus } from '../batch-crafting/api/hooks/use-batch-crafting-status';
+import { useBatchCraftingStatusContext } from '../batch-crafting/hooks/use-batch-crafting-status-context';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
 
@@ -21,10 +21,7 @@ const MenuSection = ({
   const { gameData } = useGameData();
   const character = gameData?.character ?? null;
 
-  const { status: batchCraftingStatus } = useBatchCraftingStatus({
-    characterId: character?.id ?? 0,
-    userId: character?.user_id ?? 0,
-  });
+  const { status: batchCraftingStatus } = useBatchCraftingStatusContext();
   const isBatchCraftingVisible = Boolean(
     batchCraftingStatus?.active || batchCraftingStatus?.is_visible
   );

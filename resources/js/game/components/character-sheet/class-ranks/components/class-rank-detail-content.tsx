@@ -1,8 +1,8 @@
 import React, { ReactNode } from 'react';
 
 import CompactWeaponMastery from './compact-weapon-mastery';
+import { CLASS_RANK_INFINITE_SCROLL_BATCH_SIZE } from '../constants/class-rank-list-constants';
 import { ClassRankVisualState } from '../enums/class-rank-visual-state';
-import { useProgressiveClassRankList } from '../hooks/use-progressive-class-rank-list';
 import { resolveClassRankProgressVariant } from '../utils/resolve-class-rank-progress-variant';
 import { resolveClassRankVisualState } from '../utils/resolve-class-rank-visual-state';
 import ClassRankDetailContentProps from './types/class-rank-detail-content-props';
@@ -13,6 +13,7 @@ import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
+import { useProgressiveList } from 'ui/infinite-scroll/hooks/use-progressive-list';
 import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
 import { ProgressBarSize } from 'ui/progress/enums/progress-bar-size';
 import ProgressBar from 'ui/progress/progress-bar';
@@ -49,8 +50,9 @@ const ClassRankDetailContent = ({
 
   const isSwitching = switchingClassId === selectedRank.game_class_id;
 
-  const weaponMasteries = useProgressiveClassRankList({
+  const weaponMasteries = useProgressiveList({
     total_items: selectedRank.weapon_masteries.length,
+    batch_size: CLASS_RANK_INFINITE_SCROLL_BATCH_SIZE,
     reset_key: selectedRank.game_class_id,
   });
 
@@ -59,8 +61,9 @@ const ClassRankDetailContent = ({
     weaponMasteries.visible_count
   );
 
-  const specialties = useProgressiveClassRankList({
+  const specialties = useProgressiveList({
     total_items: belongingSpecialties.length,
+    batch_size: CLASS_RANK_INFINITE_SCROLL_BATCH_SIZE,
     reset_key: selectedRank.game_class_id,
   });
 

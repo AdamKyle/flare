@@ -31,6 +31,7 @@ const MapTabContent = ({
   on_view_location: onViewLocation,
   is_kingdoms_enabled: isKingdomsEnabled,
   on_open_kingdoms: onOpenKingdoms,
+  on_open_factions: onOpenFactions,
   is_character_dead: isCharacterDead,
   gem_world_actions_props: gemWorldActionsProps,
 }: MapTabContentProps): ReactNode => {
@@ -146,6 +147,14 @@ const MapTabContent = ({
               ? undefined
               : 'Revive your Character before performing Map actions.'
           }
+        />
+      </div>
+      <div className="my-2 w-full p-2">
+        <Button
+          on_click={onOpenFactions}
+          label={'Factions'}
+          variant={ButtonVariant.PRIMARY}
+          additional_css={'w-full'}
         />
       </div>
       <GemWorldActions {...gemWorldActionsProps} />

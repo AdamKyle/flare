@@ -20,6 +20,7 @@ export default interface MapTabContentProps {
   on_view_location: () => void;
   is_kingdoms_enabled: boolean;
   on_open_kingdoms: () => void;
+  on_open_factions: () => void;
   is_character_dead: boolean;
   gem_world_actions_props: GemWorldActionsProps;
 }

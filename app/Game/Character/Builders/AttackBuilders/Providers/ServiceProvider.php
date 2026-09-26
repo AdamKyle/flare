@@ -9,6 +9,7 @@ use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackType
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\CharacterAttack\Transformers\CharacterAttackDataTransformer;
+use App\Game\Skills\Contracts\SkillBonusQuery;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 
@@ -19,14 +20,15 @@ class ServiceProvider extends ApplicationServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->app->bind(CharacterCacheData::class, function ($app) {
             return new CharacterCacheData(
                 $app->make(Manager::class),
                 $app->make(PlainDataSerializer::class),
                 $app->make(CharacterAttackDataTransformer::class),
-                $app->make(CharacterStatBuilder::class)
+                $app->make(CharacterStatBuilder::class),
+                $app->make(SkillBonusQuery::class),
             );
         });
 
@@ -47,5 +49,5 @@ class ServiceProvider extends ApplicationServiceProvider
      *
      * @return void
      */
-    public function boot() {}
+    public function boot(): void {}
 }

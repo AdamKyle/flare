@@ -2,8 +2,8 @@ import React, { ReactNode } from 'react';
 
 import ActiveBoons from './active-boons/components/active-boons';
 import AlchemyFlow from './components/alchemy-flow';
+import ScreenTransition from '../../../../../../../reusable-components/screen-transition/screen-transition';
 import CraftingDisciplineIntroduction from '../../shared/components/crafting-discipline-introduction';
-import CraftingScreenTransition from '../../shared/crafting-screen-transition';
 import { CraftingIntroductionStorageKey } from '../../shared/enums/crafting-introduction-storage-key';
 import { useCraftingDisciplineIntroduction } from '../../shared/hooks/use-crafting-discipline-introduction';
 
@@ -42,14 +42,14 @@ const AlchemySection = (): ReactNode => {
   };
 
   return (
-    <CraftingScreenTransition
+    <ScreenTransition
       screenKey={introductionAcknowledged ? 'alchemy-items' : 'introduction'}
       label={
         introductionAcknowledged ? 'Alchemy items' : 'Alchemy introduction'
       }
     >
       {renderContent()}
-    </CraftingScreenTransition>
+    </ScreenTransition>
   );
 };
 

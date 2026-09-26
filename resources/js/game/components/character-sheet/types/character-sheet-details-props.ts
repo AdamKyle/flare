@@ -6,6 +6,7 @@ export default interface CharacterSheetDetailsProps {
   openReincarnationSystem: () => void;
   openClassRanksSystem: () => void;
   openCharacterInventory: () => void;
+  openSkillsSystem: () => void;
   characterData: CharacterSheetDefinition;
   showAttackType: boolean;
   attackType: AttackTypes | null;

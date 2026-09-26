@@ -34,20 +34,26 @@ class MassDisenchantService
 
     private Skill $enchantingSkill;
 
-    private SkillCheckService $skillCheckService;
-
     private ?InventorySlot $questSlot = null;
 
+    /**
+     * @param SkillCheckService $skillCheckService
+     * @param RandomNumberGenerator $randomNumberGenerator
+     * @param ChanceCalculator $chanceCalculator
+     * @param SkillBonusService $skillBonusService
+     */
     public function __construct(
-        SkillCheckService $skillCheckService,
+        private readonly SkillCheckService $skillCheckService,
         private readonly RandomNumberGenerator $randomNumberGenerator,
         private readonly ChanceCalculator $chanceCalculator,
-    ) {
-        $this->skillCheckService = $skillCheckService;
-    }
+        private readonly SkillBonusService $skillBonusService,
+    ) {}
 
     /**
-     * Set up the service.
+     * Prepare the Character's disenchanting and enchanting Skills, gold dust rush slot, and base Skill XP.
+     *
+     * @param Character $character
+     * @return MassDisenchantService
      */
     public function setUp(Character $character): MassDisenchantService
     {
@@ -65,7 +71,7 @@ class MassDisenchantService
             return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectType::GOLD_DUST_RUSH->value;
         })->first();
 
-        $this->baseSkillXP = 25 + 25 * $this->disenchantingSkill->skill_training_bonus;
+        $this->baseSkillXP = 25 + 25 * $this->skillBonusService->skillTrainingBonus($this->disenchantingSkill);
 
         return $this;
     }
@@ -161,7 +167,14 @@ class MassDisenchantService
         return $this->refreshSkillForLeveledType($skill, $leveledType);
     }
 
-    protected function levelUpSkill(Skill $skill, string $leveledType): void
+    /**
+     * Raise the Skill one level, resetting its XP, and count the level up for the leveled Skill type.
+     *
+     * @param Skill $skill
+     * @param string $leveledType
+     * @return void
+     */
+    private function levelUpSkill(Skill $skill, string $leveledType): void
     {
         if ($skill->level >= $skill->baseSkill->max_level) {
             $this->normalizeMaxLevelSkill($skill, $leveledType);
@@ -171,21 +184,9 @@ class MassDisenchantService
 
         $level = min($skill->level + 1, $skill->baseSkill->max_level);
 
-        $bonus = $skill->skill_bonus + $skill->baseSkill->skill_bonus_per_level;
-
-        if ($skill->baseSkill->max_level === $level) {
-            $bonus = 1.0;
-        }
-
         $skill->update([
             'level' => $level,
             'xp_max' => $skill->can_train ? $level * 10 : $this->randomNumberGenerator->numberBetween(100, 350),
-            'base_damage_mod' => $skill->base_damage_mod + $skill->baseSkill->base_damage_mod_bonus_per_level,
-            'base_healing_mod' => $skill->base_healing_mod + $skill->baseSkill->base_healing_mod_bonus_per_level,
-            'base_ac_mod' => $skill->base_ac_mod + $skill->baseSkill->base_ac_mod_bonus_per_level,
-            'fight_time_out_mod' => $skill->fight_time_out_mod + $skill->baseSkill->fight_time_out_mod_bonus_per_level,
-            'move_time_out_mod' => $skill->mov_time_out_mod + $skill->baseSkill->mov_time_out_mod_bonus_per_level,
-            'skill_bonus' => $bonus,
             'xp' => 0,
         ]);
 

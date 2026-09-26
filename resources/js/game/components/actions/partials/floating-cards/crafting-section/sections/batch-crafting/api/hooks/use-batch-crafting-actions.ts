@@ -4,12 +4,14 @@ import { useEffect, useRef, useState } from 'react';
 
 import { BatchCraftingApiUrls } from '../enums/batch-crafting-api-urls';
 import UseBatchCraftingActionsDefinition from './definitions/use-batch-crafting-actions-definition';
+import { useBatchCraftingStatusContext } from '../../hooks/use-batch-crafting-status-context';
 import { extractBatchCraftingApiError } from '../../utils/extract-batch-crafting-api-error';
 
 export const useBatchCraftingActions = (
   characterId: number
 ): UseBatchCraftingActionsDefinition => {
   const { apiHandler, getUrl } = useApiHandler();
+  const { refresh_status: refreshStatus } = useBatchCraftingStatusContext();
   const [cancelling, setCancelling] = useState(false);
   const [dismissing, setDismissing] = useState(false);
   const [acknowledging, setAcknowledging] = useState(false);
@@ -66,10 +68,16 @@ export const useBatchCraftingActions = (
     setCancelling(true);
 
     try {
-      return await post(
+      const cancelled = await post(
         BatchCraftingApiUrls.CANCEL,
         'Unable to cancel Batch Crafting.'
       );
+
+      if (cancelled) {
+        await refreshStatus();
+      }
+
+      return cancelled;
     } finally {
       setCancelling(false);
     }
@@ -83,10 +91,16 @@ export const useBatchCraftingActions = (
     setDismissing(true);
 
     try {
-      return await post(
+      const dismissed = await post(
         BatchCraftingApiUrls.DISMISS,
         'Unable to dismiss Batch Crafting.'
       );
+
+      if (dismissed) {
+        await refreshStatus();
+      }
+
+      return dismissed;
     } finally {
       setDismissing(false);
     }

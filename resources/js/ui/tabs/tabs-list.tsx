@@ -1,10 +1,10 @@
 import clsx from 'clsx';
-import React from 'react';
+import React, { ReactNode } from 'react';
 
-import { TabTupleFromProps } from 'ui/tabs/types/tab-item';
+import { TabItemPresentation } from 'ui/tabs/types/tab-item';
 import TabsListProps from 'ui/tabs/types/tab-list-props';
 
-const TabsList = <PTuple extends readonly object[]>({
+const TabsList = ({
   tabs,
   ariaLabel,
   activeIndex,
@@ -12,11 +12,7 @@ const TabsList = <PTuple extends readonly object[]>({
   tabIds,
   panelIds,
   additional_tab_css,
-}: TabsListProps<PTuple>) => {
-  const tabItemAt = (index: number): TabTupleFromProps<PTuple>[number] => {
-    return tabs[index] as TabTupleFromProps<PTuple>[number];
-  };
-
+}: TabsListProps) => {
   const handleTabListKeyDown = (
     event: React.KeyboardEvent<HTMLDivElement>
   ): void => {
@@ -41,26 +37,19 @@ const TabsList = <PTuple extends readonly object[]>({
     }
   };
 
-  const handleClickTab = (index: number): void => {
-    onSelect(index);
-  };
+  const renderIconSpacer = (): ReactNode => (
+    <span className="block w-4 shrink-0 sm:w-5" aria-hidden="true" />
+  );
 
-  const renderIconLeft = (tabIndex: number) => {
-    const tabItem = tabItemAt(tabIndex);
-
+  const renderActivityIcon = (tabItem: TabItemPresentation): ReactNode => {
     if (!tabItem.activity_icon) {
-      return (
-        <span
-          className="invisible block h-[1em] max-sm:w-[1rem] sm:w-[1.25rem]"
-          aria-hidden="true"
-        />
-      );
+      return renderIconSpacer();
     }
 
     return (
       <i
         className={clsx(
-          'text-center leading-none max-sm:w-[1rem] sm:w-[1.25rem]',
+          'w-4 shrink-0 text-center leading-none sm:w-5',
           tabItem.icon_styles,
           tabItem.activity_icon
         )}
@@ -69,18 +58,9 @@ const TabsList = <PTuple extends readonly object[]>({
     );
   };
 
-  const renderIconRightSpacer = () => {
-    return (
-      <span
-        className="invisible block h-[1em] max-sm:w-[1rem] sm:w-[1.25rem]"
-        aria-hidden="true"
-      />
-    );
-  };
-
-  const renderSrOnlyNew = (tabIndex: number) => {
-    const tabItem = tabItemAt(tabIndex);
-
+  const renderActivityScreenReaderText = (
+    tabItem: TabItemPresentation
+  ): ReactNode => {
     if (!tabItem.activity_icon) {
       return null;
     }
@@ -88,75 +68,60 @@ const TabsList = <PTuple extends readonly object[]>({
     return <span className="sr-only">(new)</span>;
   };
 
-  const renderLabel = (tabIndex: number) => {
-    const tabItem = tabItemAt(tabIndex);
-
-    return (
-      <span className="inline-grid min-w-0 items-center justify-center max-sm:grid-cols-[1rem_1fr_1rem] max-sm:gap-1 sm:grid-cols-[1.25rem_1fr_1.25rem] sm:gap-1.5">
-        {renderIconLeft(tabIndex)}
-        <span
-          className="min-w-0 text-center leading-tight break-normal whitespace-normal max-sm:text-xs sm:text-sm"
-          style={{ overflowWrap: 'normal', wordBreak: 'normal' }}
-        >
-          {tabItem.label}
-        </span>
-        {renderIconRightSpacer()}
-        {renderSrOnlyNew(tabIndex)}
+  const renderLabel = (tabItem: TabItemPresentation): ReactNode => (
+    <span className="flex min-w-0 items-center justify-center gap-1 sm:gap-1.5">
+      {renderActivityIcon(tabItem)}
+      <span className="min-w-0 flex-1 text-center leading-tight whitespace-normal">
+        {tabItem.label}
       </span>
-    );
-  };
+      {renderIconSpacer()}
+      {renderActivityScreenReaderText(tabItem)}
+    </span>
+  );
 
-  const renderTabsList = () => {
-    const hasTabs = tabs.length > 0;
-
-    if (!hasTabs) {
-      return null;
-    }
+  const renderTab = (tabItem: TabItemPresentation, tabIndex: number) => {
+    const isSelected = tabIndex === activeIndex;
 
     return (
-      <div
-        role="tablist"
-        aria-label={ariaLabel}
-        aria-orientation="horizontal"
-        onKeyDown={handleTabListKeyDown}
+      <button
+        key={tabIds[tabIndex]}
+        id={tabIds[tabIndex]}
+        role="tab"
+        aria-selected={isSelected}
+        aria-controls={panelIds[tabIndex]}
+        tabIndex={isSelected ? 0 : -1}
         className={clsx(
-          'flex rounded-md border border-gray-300 bg-gray-100 p-1 dark:border-gray-600 dark:bg-gray-700',
-          additional_tab_css
+          'focus-visible:ring-brand-600 dark:focus-visible:ring-brand-400 flex-1 rounded-md border border-transparent px-2 py-1 text-center text-xs font-medium transition-colors focus:outline-none focus-visible:ring-2 sm:px-3 sm:py-1.5 sm:text-sm',
+          isSelected
+            ? 'border-danube-500 text-danube-700 dark:border-danube-300 dark:text-danube-200 bg-gray-300 shadow-sm dark:bg-gray-500'
+            : 'text-gray-800 dark:text-gray-200'
         )}
+        onClick={() => onSelect(tabIndex)}
+        type="button"
       >
-        {tabs.map((_, tabIndex) => {
-          const isSelected = tabIndex === activeIndex;
-
-          const className = clsx(
-            'flex-1 rounded-md border border-transparent text-center font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 dark:focus-visible:ring-brand-400 max-sm:px-2 max-sm:py-1 sm:px-3 sm:py-1.5 max-sm:text-xs sm:text-sm',
-            isSelected
-              ? 'border-danube-500 bg-gray-300 text-danube-700 shadow-sm dark:border-danube-300 dark:bg-gray-500 dark:text-danube-200'
-              : 'text-gray-800 dark:text-gray-200'
-          );
-
-          return (
-            <button
-              key={tabIds[tabIndex]}
-              id={tabIds[tabIndex]}
-              role="tab"
-              aria-selected={isSelected}
-              aria-controls={panelIds[tabIndex]}
-              tabIndex={isSelected ? 0 : -1}
-              className={className}
-              onClick={() => {
-                handleClickTab(tabIndex);
-              }}
-              type="button"
-            >
-              {renderLabel(tabIndex)}
-            </button>
-          );
-        })}
-      </div>
+        {renderLabel(tabItem)}
+      </button>
     );
   };
 
-  return renderTabsList();
+  if (tabs.length === 0) {
+    return null;
+  }
+
+  return (
+    <div
+      role="tablist"
+      aria-label={ariaLabel}
+      aria-orientation="horizontal"
+      onKeyDown={handleTabListKeyDown}
+      className={clsx(
+        'flex rounded-md border border-gray-300 bg-gray-100 p-1 dark:border-gray-600 dark:bg-gray-700',
+        additional_tab_css
+      )}
+    >
+      {tabs.map(renderTab)}
+    </div>
+  );
 };
 
 export default TabsList;

@@ -3,8 +3,8 @@ import React, { ReactNode, useCallback, useRef, useState } from 'react';
 import { ScreenMapper } from './component-mapping/screen-registry';
 import { CraftingTypes } from './enums/crafting-types';
 import { useManageCraftingCardVisibility } from './hooks/use-manage-crafting-card-visibility';
-import CraftingScreenTransition from './shared/crafting-screen-transition';
 import { useLocationRestrictedCraftingAction } from './shared/hooks/use-location-restricted-crafting-action';
+import ScreenTransition from '../../../../../reusable-components/screen-transition/screen-transition';
 import FloatingCard from '../../../components/icon-section/floating-card';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
@@ -56,7 +56,7 @@ const CraftingCard = (): ReactNode => {
         activeCraftingType === CraftingTypes.HOME ? undefined : handleBackAction
       }
     >
-      <CraftingScreenTransition
+      <ScreenTransition
         screenKey={activeCraftingType}
         label={`${activeCraftingType} crafting screen`}
       >
@@ -66,7 +66,7 @@ const CraftingCard = (): ReactNode => {
           clearLocationRestrictionWarning={clearLocationRestrictionWarning}
           registerBackHandler={registerBackHandler}
         />
-      </CraftingScreenTransition>
+      </ScreenTransition>
     </FloatingCard>
   );
 };

@@ -1,8 +1,8 @@
 import React, { ReactNode } from 'react';
 
 import EnchantingFlow from './components/enchanting-flow';
+import ScreenTransition from '../../../../../../../reusable-components/screen-transition/screen-transition';
 import CraftingDisciplineIntroduction from '../../shared/components/crafting-discipline-introduction';
-import CraftingScreenTransition from '../../shared/crafting-screen-transition';
 import { CraftingIntroductionStorageKey } from '../../shared/enums/crafting-introduction-storage-key';
 import { useCraftingDisciplineIntroduction } from '../../shared/hooks/use-crafting-discipline-introduction';
 
@@ -30,14 +30,14 @@ const EnchantingSection = (): ReactNode => {
   };
 
   return (
-    <CraftingScreenTransition
+    <ScreenTransition
       screenKey={introductionAcknowledged ? 'enchant-items' : 'introduction'}
       label={
         introductionAcknowledged ? 'Enchant items' : 'Enchanting introduction'
       }
     >
       {renderContent()}
-    </CraftingScreenTransition>
+    </ScreenTransition>
   );
 };
 

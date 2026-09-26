@@ -8,6 +8,7 @@ use App\Flare\Models\FactionLoyalty;
 use App\Flare\Models\FactionLoyaltyAutomationWarning;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\Item;
+use App\Flare\Models\Location;
 use App\Flare\Transformers\BaseTransformer;
 use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Automation\Values\AutomationType;
@@ -17,6 +18,7 @@ use App\Game\Character\CharacterAttack\Builders\ClassAttackBuilder;
 use App\Game\Character\CharacterInventory\Transformers\CharacterInventoryCountTransformer;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Maps\Values\LocationBasedCraftingOptions;
+use App\Game\Maps\Values\LocationType;
 use Carbon\Carbon;
 
 class CharacterSheetBaseInfoTransformer extends BaseTransformer
@@ -118,6 +120,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
                 ->exists(),
             'is_delve_visible' => $this->isDelveVisible($character),
             'can_set_delve_pack' => $this->canSetPactOptionsForDelve($character),
+            'is_at_delve_location' => $this->isAtDelveLocation($character),
             'active_automation' => $this->activeAutomation($character),
             'automation_completed_at' => $this->getTimeLeftOnAutomation($character),
             'is_silenced' => $character->user->is_silenced,
@@ -276,6 +279,33 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
         return DelveExploration::where('character_id', $character->id)
             ->whereNotNull('completed_at')
             ->whereNull('panel_dismissed_at')
+            ->exists();
+    }
+
+    /**
+     * Determine whether the Character stands at a Cave of Shadows while holding the Delve access quest item.
+     *
+     * @param Character $character
+     * @return bool
+     */
+    private function isAtDelveLocation(Character $character): bool
+    {
+        $questItemForDelve = Item::where('effect', ItemEffectType::DELVE->value)->first();
+
+        if (is_null($questItemForDelve)) {
+            return false;
+        }
+
+        $characterHasItem = $character->inventory->slots->contains('item_id', $questItemForDelve->id);
+
+        if (! $characterHasItem) {
+            return false;
+        }
+
+        return Location::where('game_map_id', $character->map->game_map_id)
+            ->where('x', $character->map->character_position_x)
+            ->where('y', $character->map->character_position_y)
+            ->where('type', LocationType::CAVE_OF_SHADOWS->value)
             ->exists();
     }
 

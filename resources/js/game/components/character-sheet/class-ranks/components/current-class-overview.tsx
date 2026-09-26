@@ -2,9 +2,10 @@ import React, { ReactNode } from 'react';
 
 import CompactWeaponMastery from './compact-weapon-mastery';
 import EquippedSpecialtiesSummary from './equipped-specialties-summary';
-import { useProgressiveClassRankList } from '../hooks/use-progressive-class-rank-list';
+import { CLASS_RANK_INFINITE_SCROLL_BATCH_SIZE } from '../constants/class-rank-list-constants';
 import CurrentClassOverviewProps from './types/current-class-overview-props';
 
+import { useProgressiveList } from 'ui/infinite-scroll/hooks/use-progressive-list';
 import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
 import { ProgressBarSize } from 'ui/progress/enums/progress-bar-size';
 import { ProgressBarVariant } from 'ui/progress/enums/progress-bar-variant';
@@ -20,8 +21,9 @@ const CurrentClassOverview = ({
   on_manage_specialties: onManageSpecialties,
 }: CurrentClassOverviewProps): ReactNode => {
   const { visible_count: visibleCount, handle_scroll: handleScroll } =
-    useProgressiveClassRankList({
+    useProgressiveList({
       total_items: activeRank.weapon_masteries.length,
+      batch_size: CLASS_RANK_INFINITE_SCROLL_BATCH_SIZE,
       reset_key: activeRank.game_class_id,
     });
 

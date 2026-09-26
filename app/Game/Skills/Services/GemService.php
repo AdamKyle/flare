@@ -26,22 +26,32 @@ class GemService
 {
     use ResponseBuilder;
 
+    /**
+     * @param GemBuilder $gemBuilder
+     * @param ChanceCalculator $chanceCalculator
+     * @param GemTransformer $gemTransformer
+     * @param ServerMessageBuilder $serverMessageBuilder
+     * @param CharacterGemSlotsTransformer $characterGemSlotsTransformer
+     * @param SkillBonusService $skillBonusService
+     */
     public function __construct(
-        private GemBuilder $gemBuilder,
+        private readonly GemBuilder $gemBuilder,
         private readonly ChanceCalculator $chanceCalculator,
         private readonly GemTransformer $gemTransformer,
         private readonly ServerMessageBuilder $serverMessageBuilder,
         private readonly CharacterGemSlotsTransformer $characterGemSlotsTransformer,
+        private readonly SkillBonusService $skillBonusService,
     ) {}
 
     /**
-     * Generate the gem.
+     * Pay for and attempt to craft a gem of the tier, adding it to the Character's gem bag on success.
      *
-     * @throws Exception
+     * @param Character $character
+     * @param int $tier
+     * @return array
      */
     public function generateGem(Character $character, int $tier): array
     {
-
         if (! $this->canAffordCost($character, $tier)) {
             return $this->errorResult('You do not have the required currencies to craft this item.') + [
                 'craft_succeeded' => false,
@@ -65,30 +75,11 @@ class GemService
         $characterSkill = $this->getCraftingSkill($character);
 
         if ($this->skillLevelToHigh($characterSkill, $tier)) {
-
-            $message = 'This gem tier is too hard. You lost your investment and start to cry.';
-
-            ServerMessageHandler::sendBasicMessage($character->user, $message);
-
-            return $this->successResult([
-                'craft_succeeded' => false,
-                'crafted_gem' => null,
-                'crafted_gem_preview' => null,
-                'message' => $message,
-            ]);
+            return $this->failedCraftResult($character, 'This gem tier is too hard. You lost your investment and start to cry.');
         }
 
         if (! $this->canCraft($characterSkill, (new GemTierValue($tier))->maxForTier()['chance'])) {
-            $message = 'You failed to craft the gem, the item explodes before you into a pile of wasted effort and time.';
-
-            ServerMessageHandler::sendBasicMessage($character->user, $message);
-
-            return $this->successResult([
-                'craft_succeeded' => false,
-                'crafted_gem' => null,
-                'crafted_gem_preview' => null,
-                'message' => $message,
-            ]);
+            return $this->failedCraftResult($character, 'You failed to craft the gem, the item explodes before you into a pile of wasted effort and time.');
         }
 
         $gemBagEntry = $this->giveGem($character, $tier);
@@ -108,9 +99,10 @@ class GemService
     }
 
     /**
-     * Get tiers that are craftable.
+     * Return the gem tiers the Character's Gem Crafting level can craft.
      *
-     * @throws Exception
+     * @param Character $character
+     * @return array
      */
     public function getCraftableTiers(Character $character): array
     {
@@ -128,6 +120,12 @@ class GemService
         return $craftableTiers;
     }
 
+    /**
+     * Return the Character's Gem Crafting XP progress.
+     *
+     * @param Character $character
+     * @return array
+     */
     public function fetchSkillXP(Character $character): array
     {
         $skill = $this->getCraftingSkill($character);
@@ -141,27 +139,44 @@ class GemService
     }
 
     /**
-     * Skill level too high.
+     * Tell the Character the gem craft failed and build the failed craft result.
      *
-     * @throws Exception
+     * @param Character $character
+     * @param string $message
+     * @return array
      */
-    protected function skillLevelToHigh(Skill $skill, int $tier): bool
+    private function failedCraftResult(Character $character, string $message): array
     {
-        $data = (new GemTierValue($tier))->maxForTier();
+        ServerMessageHandler::sendBasicMessage($character->user, $message);
 
-        if ($skill->level < $data['min_level']) {
-            return true;
-        }
-
-        return false;
+        return $this->successResult([
+            'craft_succeeded' => false,
+            'crafted_gem' => null,
+            'crafted_gem_preview' => null,
+            'message' => $message,
+        ]);
     }
 
     /**
-     * Give the gem.
+     * Determine whether the Skill is below the minimum level required for the gem tier.
      *
-     * @throws Exception
+     * @param Skill $skill
+     * @param int $tier
+     * @return bool
      */
-    protected function giveGem(Character $character, int $tier): GemBagSlot
+    private function skillLevelToHigh(Skill $skill, int $tier): bool
+    {
+        return $skill->level < (new GemTierValue($tier))->maxForTier()['min_level'];
+    }
+
+    /**
+     * Build a gem of the tier and add it to the Character's gem bag.
+     *
+     * @param Character $character
+     * @param int $tier
+     * @return GemBagSlot
+     */
+    private function giveGem(Character $character, int $tier): GemBagSlot
     {
         $gem = $this->gemBuilder->buildGem($tier);
 
@@ -177,44 +192,36 @@ class GemService
     }
 
     /**
-     * Can player afford the gem?
+     * Determine whether the Character holds every currency the gem tier costs.
      *
-     * @throws Exception
+     * @param Character $character
+     * @param int $tier
+     * @return bool
      */
-    protected function canAffordCost(Character $character, int $tier): bool
+    private function canAffordCost(Character $character, int $tier): bool
     {
-        $data = (new GemTierValue($tier))->maxForTier();
+        $cost = (new GemTierValue($tier))->maxForTier()['cost'];
 
-        $goldDust = $character->gold_dust;
-        $shards = $character->shards;
-        $copperCoins = $character->copper_coins;
-
-        return $goldDust >= $data['cost']['gold_dust'] &&
-            $shards >= $data['cost']['shards'] &&
-            $copperCoins >= $data['cost']['copper_coins'];
+        return $character->gold_dust >= $cost['gold_dust'] &&
+            $character->shards >= $cost['shards'] &&
+            $character->copper_coins >= $cost['copper_coins'];
     }
 
     /**
-     * For the cost of the gem based on tier.
+     * Deduct the gem tier's cost from the Character's currencies.
      *
-     * @throws Exception
+     * @param Character $character
+     * @param int $tier
+     * @return Character
      */
-    protected function payForGem(Character $character, int $tier): Character
+    private function payForGem(Character $character, int $tier): Character
     {
-        $data = (new GemTierValue($tier))->maxForTier();
-
-        $goldDust = $character->gold_dust;
-        $shards = $character->shards;
-        $copperCoins = $character->copper_coins;
-
-        $newGoldDust = $goldDust - $data['cost']['gold_dust'];
-        $newShards = $shards - $data['cost']['shards'];
-        $newCopperCoins = $copperCoins - $data['cost']['copper_coins'];
+        $cost = (new GemTierValue($tier))->maxForTier()['cost'];
 
         $character->update([
-            'gold_dust' => $newGoldDust,
-            'shards' => $newShards,
-            'copper_coins' => $newCopperCoins,
+            'gold_dust' => $character->gold_dust - $cost['gold_dust'],
+            'shards' => $character->shards - $cost['shards'],
+            'copper_coins' => $character->copper_coins - $cost['copper_coins'],
         ]);
 
         $character = $character->refresh();
@@ -225,28 +232,32 @@ class GemService
     }
 
     /**
-     * Can player craft the gem?
+     * Roll whether the gem craft succeeds, using the tier chance raised by the Skill's bonus.
+     *
+     * @param Skill $skill
+     * @param float $chance
+     * @return bool
      */
-    protected function canCraft(Skill $skill, float $chance): bool
+    private function canCraft(Skill $skill, float $chance): bool
     {
-
         if ($skill->level >= $skill->baseSkill->max_level) {
             return true;
         }
 
-        $effectiveChance = min(1.0, $chance + $skill->skill_bonus);
+        $effectiveChance = min(1.0, $chance + $this->skillBonusService->skillBonus($skill));
 
         return $this->chanceCalculator->passesPercentage(floor($effectiveChance * 100));
     }
 
     /**
-     * Get the skill for crafting.
+     * Return the Character's Gem Crafting Skill.
      *
-     * @throws Exception
+     * @param Character $character
+     * @return Skill
      */
-    protected function getCraftingSkill(Character $character): Skill
+    private function getCraftingSkill(Character $character): Skill
     {
-        $name = SkillTypeValue::tryFrom(SkillTypeValue::GEM_CRAFTING->value)->getNamedValue();
+        $name = SkillTypeValue::GEM_CRAFTING->getNamedValue();
         $gameSkill = GameSkill::where('name', $name)->first();
         $skill = $character->skills()->where('game_skill_id', $gameSkill->id)->first();
 

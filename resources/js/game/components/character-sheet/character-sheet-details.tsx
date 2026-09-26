@@ -336,6 +336,12 @@ const CharacterSheetDetails = (
             variant={ButtonVariant.SUCCESS}
             additional_css="w-full my-2"
           />
+          <Button
+            on_click={props.openSkillsSystem}
+            label="Manage Skills"
+            variant={ButtonVariant.SUCCESS}
+            additional_css="w-full my-2"
+          />
         </div>
       </div>
     </>

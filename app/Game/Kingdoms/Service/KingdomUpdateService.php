@@ -17,6 +17,7 @@ use App\Game\Kingdoms\Values\KingdomLogStatus;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Skills\Contracts\SkillBonusQuery;
 use App\Game\Skills\Values\SkillTypeValue;
 use Facades\App\Flare\Services\UserOnlineService;
 
@@ -28,20 +29,18 @@ class KingdomUpdateService
 
     private ?Character $character;
 
-    private GiveKingdomsToNpcHandler $giveKingdomsToNpcHandler;
-
-    private TooMuchPopulationHandler $tooMuchPopulationHandler;
-
-    private UpdateKingdom $updateKingdom;
-
-    public function __construct(GiveKingdomsToNpcHandler $giveKingdomsToNpcHandler,
-        TooMuchPopulationHandler $tooMuchPopulationHandler,
-        UpdateKingdom $updateKingdom)
-    {
-        $this->giveKingdomsToNpcHandler = $giveKingdomsToNpcHandler;
-        $this->tooMuchPopulationHandler = $tooMuchPopulationHandler;
-        $this->updateKingdom = $updateKingdom;
-    }
+    /**
+     * @param GiveKingdomsToNpcHandler $giveKingdomsToNpcHandler
+     * @param TooMuchPopulationHandler $tooMuchPopulationHandler
+     * @param UpdateKingdom $updateKingdom
+     * @param SkillBonusQuery $skillBonusQuery
+     */
+    public function __construct(
+        private readonly GiveKingdomsToNpcHandler $giveKingdomsToNpcHandler,
+        private readonly TooMuchPopulationHandler $tooMuchPopulationHandler,
+        private readonly UpdateKingdom $updateKingdom,
+        private readonly SkillBonusQuery $skillBonusQuery,
+    ) {}
 
     /**
      * Sets the kingdom.
@@ -162,9 +161,16 @@ class KingdomUpdateService
         $this->updateKingdomProtectedUntil();
     }
 
-    private function createKingdomLog(Character $character, array $additionalData, int $status)
+    /**
+     * Record a kingdom log entry for the Character with the given status and details.
+     *
+     * @param Character $character
+     * @param array $additionalData
+     * @param int $status
+     * @return void
+     */
+    private function createKingdomLog(Character $character, array $additionalData, int $status): void
     {
-
         $log = [
             'to_kingdom_id' => null,
             'from_kingdom_id' => null,
@@ -208,6 +214,11 @@ class KingdomUpdateService
         $this->kingdom = $this->kingdom->refresh();
     }
 
+    /**
+     * Destroy the NPC owned kingdom being updated.
+     *
+     * @return void
+     */
     private function destroyNPCKingdom(): void
     {
         $this->destroyKingdom($this->kingdom);
@@ -322,11 +333,9 @@ class KingdomUpdateService
     }
 
     /**
-     * Update the kingdom's treasury.
+     * Grow the kingdom's treasury by its owner's kingdom Skill bonus plus a keep level bonus while morale holds.
      *
-     * - If the treasury is maxed or the morale is 0.0, we skip this.
-     * - We add the kingmanship (or skill that effects kingdoms) skill bonus to the amount to give.
-     * - We also divide the keep level by 100 to give an additional bonus.
+     * @return void
      */
     private function updateKingdomTreasury(): void
     {
@@ -334,25 +343,21 @@ class KingdomUpdateService
             return;
         }
 
-        $character = $this->kingdom->character;
-
-        if ($this->kingdom->current_morale >= 0.50) {
-            $skill = $this->getCharacterSkillThatEffectsKingdoms($character);
-            $keep = $this->getTheKeepBuilding();
-            $currentTreasury = $this->kingdom->treasury;
-
-            $total = (int) ceil($currentTreasury + $currentTreasury * ($skill->skill_bonus + ($keep->level / 100)));
-
-            if ($total === 0) {
-                $total = 1;
-            }
-
-            $this->kingdom->update([
-                'treasury' => min($total, KingdomMaxValue::MAX_TREASURY),
-            ]);
-
-            $this->kingdom = $this->kingdom->refresh();
+        if ($this->kingdom->current_morale < 0.50) {
+            return;
         }
+
+        $skill = $this->getCharacterSkillThatEffectsKingdoms($this->kingdom->character);
+        $keep = $this->getTheKeepBuilding();
+        $currentTreasury = $this->kingdom->treasury;
+
+        $total = max(1, ceil($currentTreasury + $currentTreasury * ($this->skillBonusQuery->skillBonus($skill) + ($keep->level / 100))));
+
+        $this->kingdom->update([
+            'treasury' => min($total, KingdomMaxValue::MAX_TREASURY),
+        ]);
+
+        $this->kingdom = $this->kingdom->refresh();
     }
 
     /**
@@ -504,6 +509,11 @@ class KingdomUpdateService
         $this->updateKingdom->updateKingdom($this->kingdom);
     }
 
+    /**
+     * Tell the online owner that their kingdom has lost its protection.
+     *
+     * @return void
+     */
     private function alertUserToLossOfProtection(): void
     {
         $user = $this->kingdom->character->user;

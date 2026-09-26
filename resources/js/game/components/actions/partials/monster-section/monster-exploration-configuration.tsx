@@ -4,7 +4,7 @@ import React, { ReactNode, useEffect, useRef, useState } from 'react';
 
 import useBeginExplorationApi from './api/hooks/use-begin-exploration-api';
 import ExplorationBusyWarning from './exploration/components/exploration-busy-warning';
-import { ExplorationAttackType } from './exploration/enums/exploration-attack-type';
+import { explorationAttackTypeOptions } from './exploration/utils/exploration-attack-type-options';
 import MonsterExplorationConfigurationProps from './types/monster-exploration-configuration-props';
 import { ChatStreamEvent } from '../../../chat-section/events/enums/chat-stream-event';
 import { useExplorationMessageEmitter } from '../../../chat-section/events/hooks/use-exploration-message-emitter';
@@ -22,20 +22,6 @@ const timeSelection: DropdownItem[] = [
   { label: 'Two Hours', value: 2 },
   { label: 'Four Hours', value: 4 },
   { label: 'Eight Hours', value: 8 },
-];
-
-const attackTypes: DropdownItem[] = [
-  { label: 'Attack', value: ExplorationAttackType.ATTACK },
-  { label: 'Cast', value: ExplorationAttackType.CAST },
-  {
-    label: 'Cast and Attack',
-    value: ExplorationAttackType.CAST_AND_ATTACK,
-  },
-  {
-    label: 'Attack and Cast',
-    value: ExplorationAttackType.ATTACK_AND_CAST,
-  },
-  { label: 'Defend', value: ExplorationAttackType.DEFEND },
 ];
 
 const MonsterExplorationConfiguration = ({
@@ -166,7 +152,7 @@ const MonsterExplorationConfiguration = ({
         />
         <Dropdown
           aria_label="Attack Type"
-          items={attackTypes}
+          items={explorationAttackTypeOptions}
           on_select={handleAttackTypeSelected}
           selection_placeholder="Select the attack type"
           disabled={!!blockingAutomation}

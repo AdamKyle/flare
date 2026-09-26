@@ -80,17 +80,33 @@ const CraftAndEnchantAmountScreen = ({
     itemType: null,
   });
 
-  const { affixes: prefixAffixes, loadedAffixes: loadedPrefixAffixes } =
-    useEnchantingAffixesApi({
-      character_id: characterId,
-      type: 'prefix',
-    });
+  const {
+    affixes: prefixAffixes,
+    loadedAffixes: loadedPrefixAffixes,
+    loading: prefixLoading,
+    isLoadingMore: prefixIsLoadingMore,
+    canLoadMore: prefixCanLoadMore,
+    searchText: prefixSearchText,
+    setSearchText: setPrefixSearchText,
+    onEndReached: prefixOnEndReached,
+  } = useEnchantingAffixesApi({
+    character_id: characterId,
+    type: 'prefix',
+  });
 
-  const { affixes: suffixAffixes, loadedAffixes: loadedSuffixAffixes } =
-    useEnchantingAffixesApi({
-      character_id: characterId,
-      type: 'suffix',
-    });
+  const {
+    affixes: suffixAffixes,
+    loadedAffixes: loadedSuffixAffixes,
+    loading: suffixLoading,
+    isLoadingMore: suffixIsLoadingMore,
+    canLoadMore: suffixCanLoadMore,
+    searchText: suffixSearchText,
+    setSearchText: setSuffixSearchText,
+    onEndReached: suffixOnEndReached,
+  } = useEnchantingAffixesApi({
+    character_id: characterId,
+    type: 'suffix',
+  });
 
   const {
     preview,
@@ -400,7 +416,7 @@ const CraftAndEnchantAmountScreen = ({
           items={prefixAffixes}
           on_select={handlePrefixSelect}
           pre_selected_item={prefix ?? undefined}
-          selection_placeholder="Select a Prefix"
+          selection_placeholder={prefixLoading ? 'Loading…' : 'Select a Prefix'}
           force_clear={prefix === null}
           render_item_content={(option) => (
             <EnchantingAffixOption
@@ -408,6 +424,14 @@ const CraftAndEnchantAmountScreen = ({
               affixes={loadedPrefixAffixes}
             />
           )}
+          searchable
+          search_value={prefixSearchText}
+          on_search={setPrefixSearchText}
+          can_load_more={prefixCanLoadMore}
+          is_loading_more={prefixIsLoadingMore}
+          on_end_reached={prefixOnEndReached}
+          empty_message="No affixes are available."
+          disabled={prefixLoading}
         />
       </fieldset>
 
@@ -423,7 +447,7 @@ const CraftAndEnchantAmountScreen = ({
           items={suffixAffixes}
           on_select={handleSuffixSelect}
           pre_selected_item={suffix ?? undefined}
-          selection_placeholder="Select a Suffix"
+          selection_placeholder={suffixLoading ? 'Loading…' : 'Select a Suffix'}
           force_clear={suffix === null}
           render_item_content={(option) => (
             <EnchantingAffixOption
@@ -431,6 +455,14 @@ const CraftAndEnchantAmountScreen = ({
               affixes={loadedSuffixAffixes}
             />
           )}
+          searchable
+          search_value={suffixSearchText}
+          on_search={setSuffixSearchText}
+          can_load_more={suffixCanLoadMore}
+          is_loading_more={suffixIsLoadingMore}
+          on_end_reached={suffixOnEndReached}
+          empty_message="No affixes are available."
+          disabled={suffixLoading}
         />
       </fieldset>
 

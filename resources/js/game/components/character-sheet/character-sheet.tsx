@@ -5,11 +5,13 @@ import CharacterClassRanks from './character-class-ranks';
 import CharacterInventoryManagement from './character-inventory-management';
 import CharacterReincarnation from './character-reincarnation';
 import CharacterSheetDetails from './character-sheet-details';
+import CharacterSkills from './character-skills';
 import { AttackTypes } from './enums/attack-types';
 import { useAttackDetailsVisibility } from './hooks/use-attack-details-visibility';
 import { useManageCharacterInventoryVisibility } from './hooks/use-manage-character-inventory-visibility';
 import { useManageClassRanksVisibility } from './hooks/use-manage-class-ranks-visibility';
 import { useManageReincarnationVisibility } from './hooks/use-manage-reincarnation-visibility';
+import { useManageSkillsVisibility } from './hooks/use-manage-skills-visibility';
 import CharacterSheetProps from './types/character-sheet-props';
 
 import { GameDataError } from 'game-data/components/game-data-error';
@@ -25,6 +27,7 @@ const CharacterSheet = (props: CharacterSheetProps): ReactNode => {
     useManageClassRanksVisibility();
   const { showInventory, openInventory, closeInventory } =
     useManageCharacterInventoryVisibility();
+  const { showSkills, openSkills, closeSkills } = useManageSkillsVisibility();
   const { showAttackType, attackType, closeAttackDetails } =
     useAttackDetailsVisibility();
 
@@ -50,6 +53,7 @@ const CharacterSheet = (props: CharacterSheetProps): ReactNode => {
       showReincarnation,
       showClassRanks,
       showInventory,
+      showSkills,
     })
       .with({ showReincarnation: true }, () => (
         <CharacterReincarnation
@@ -60,11 +64,13 @@ const CharacterSheet = (props: CharacterSheetProps): ReactNode => {
       .with({ showInventory: true }, () => (
         <CharacterInventoryManagement character_id={characterData.id} />
       ))
+      .with({ showSkills: true }, () => <CharacterSkills />)
       .otherwise(() => (
         <CharacterSheetDetails
           openReincarnationSystem={openReincarnation}
           openClassRanksSystem={openClassRanks}
           openCharacterInventory={openInventory}
+          openSkillsSystem={openSkills}
           characterData={characterData}
           showAttackType={showAttackType}
           attackType={attackType}
@@ -77,6 +83,7 @@ const CharacterSheet = (props: CharacterSheetProps): ReactNode => {
       showReincarnation,
       showClassRanks,
       showInventory,
+      showSkills,
       showAttackType,
       attackType,
     })
@@ -86,6 +93,7 @@ const CharacterSheet = (props: CharacterSheetProps): ReactNode => {
       )
       .with({ showClassRanks: true }, () => `${characterData.name} Class Ranks`)
       .with({ showInventory: true }, () => `${characterData.name} Inventory`)
+      .with({ showSkills: true }, () => `${characterData.name} Skills`)
       .with(
         { showAttackType: true, attackType: AttackTypes.WEAPON },
         () => `${characterData.name}: Weapon Attack Details`
@@ -118,12 +126,14 @@ const CharacterSheet = (props: CharacterSheetProps): ReactNode => {
       showReincarnation,
       showClassRanks,
       showInventory,
+      showSkills,
       showAttackType,
       attackType,
     })
       .with({ showReincarnation: true }, () => closeReincarnation)
       .with({ showClassRanks: true }, () => closeClassRanks)
       .with({ showInventory: true }, () => closeInventory)
+      .with({ showSkills: true }, () => closeSkills)
       .with(
         {
           showAttackType: true,

@@ -11,6 +11,7 @@ use App\Game\Core\Services\CharacterStatRepairService;
 use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\GoldRush;
 use App\Game\Gems\Progression\Contracts\CharacterAreaGemEffects;
+use App\Game\Skills\Contracts\SkillBonusQuery;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 
@@ -40,6 +41,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(BattleDrop::class),
                 $app->make(BuildMythicItem::class),
                 $app->make(CharacterAreaGemEffects::class),
+                $app->make(SkillBonusQuery::class),
             );
         });
 

@@ -3,20 +3,25 @@ import React from 'react';
 
 import InfiniteScrollProps from 'ui/infinite-scroll/types/infinite-scroll-props';
 
-const InfiniteScroll = (props: InfiniteScrollProps) => {
+const InfiniteScroll = ({
+  handle_scroll: handleScroll,
+  children,
+  additional_css: additionalCss,
+  height_class: heightClass,
+}: InfiniteScrollProps) => {
   return (
     <div
       className={clsx(
-        props.height_class ?? 'h-full',
+        heightClass ?? 'h-full',
         'overflow-y-auto px-2',
         'scrollbar-thumb-primary-300 scrollbar-track-primary-100 scrollbar-thin',
         'dark:scrollbar-thumb-primary-400 dark:scrollbar-track-primary-200',
         'scrollbar-thumb-rounded-md',
-        props.additional_css
+        additionalCss
       )}
-      onScroll={props.handle_scroll}
+      onScroll={handleScroll}
     >
-      <div className="pb-8">{props.children}</div>
+      <div className="pb-2">{children}</div>
     </div>
   );
 };

@@ -70,6 +70,7 @@ use App\Game\Kingdoms\Validators\BuildingUpgradeRequestValidator;
 use App\Game\Kingdoms\Validators\MoveUnitsValidator;
 use App\Game\Maps\Calculations\DistanceCalculation;
 use App\Game\Maps\Services\LocationService;
+use App\Game\Skills\Contracts\SkillBonusQuery;
 use App\Game\Tops\Services\BroadcastTopsUpdateService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
@@ -287,7 +288,8 @@ class ServiceProvider extends ApplicationServiceProvider
             return new KingdomUpdateService(
                 $app->make(GiveKingdomsToNpcHandler::class),
                 $app->make(TooMuchPopulationHandler::class),
-                $app->make(UpdateKingdom::class)
+                $app->make(UpdateKingdom::class),
+                $app->make(SkillBonusQuery::class),
             );
         });
 

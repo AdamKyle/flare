@@ -12,6 +12,18 @@ const CraftAndEnchantSetEnchantmentRow = ({
   suffix_items,
   prefix_affixes,
   suffix_affixes,
+  prefix_loading,
+  prefix_search_text,
+  on_prefix_search,
+  prefix_can_load_more,
+  prefix_is_loading_more,
+  on_prefix_end_reached,
+  suffix_loading,
+  suffix_search_text,
+  on_suffix_search,
+  suffix_can_load_more,
+  suffix_is_loading_more,
+  on_suffix_end_reached,
   selected_prefix,
   selected_suffix,
   on_prefix_select,
@@ -41,11 +53,21 @@ const CraftAndEnchantSetEnchantmentRow = ({
             items={prefix_items}
             on_select={on_prefix_select}
             pre_selected_item={selected_prefix ?? undefined}
-            selection_placeholder="Select a Prefix"
+            selection_placeholder={
+              prefix_loading ? 'Loading…' : 'Select a Prefix'
+            }
             force_clear={selected_prefix === null}
             render_item_content={(option) => (
               <EnchantingAffixOption option={option} affixes={prefix_affixes} />
             )}
+            searchable
+            search_value={prefix_search_text}
+            on_search={on_prefix_search}
+            can_load_more={prefix_can_load_more}
+            is_loading_more={prefix_is_loading_more}
+            on_end_reached={on_prefix_end_reached}
+            empty_message="No affixes are available."
+            disabled={prefix_loading}
           />
         </fieldset>
 
@@ -61,11 +83,21 @@ const CraftAndEnchantSetEnchantmentRow = ({
             items={suffix_items}
             on_select={on_suffix_select}
             pre_selected_item={selected_suffix ?? undefined}
-            selection_placeholder="Select a Suffix"
+            selection_placeholder={
+              suffix_loading ? 'Loading…' : 'Select a Suffix'
+            }
             force_clear={selected_suffix === null}
             render_item_content={(option) => (
               <EnchantingAffixOption option={option} affixes={suffix_affixes} />
             )}
+            searchable
+            search_value={suffix_search_text}
+            on_search={on_suffix_search}
+            can_load_more={suffix_can_load_more}
+            is_loading_more={suffix_is_loading_more}
+            on_end_reached={on_suffix_end_reached}
+            empty_message="No affixes are available."
+            disabled={suffix_loading}
           />
         </fieldset>
       </div>

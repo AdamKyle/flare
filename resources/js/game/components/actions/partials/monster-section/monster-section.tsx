@@ -10,6 +10,10 @@ import React, {
 } from 'react';
 
 import { useAttackMonster } from './api/hooks/use-attack-monster';
+import { useDelveStatus } from './delve/api/hooks/use-delve-status';
+import DelveConfiguration from './delve/components/delve-configuration';
+import DelveStatusPanel from './delve/components/delve-status-panel';
+import { isVisibleDelveStatus } from './delve/utils/is-visible-delve-status';
 import { AttackType } from './enums/attack-type';
 import { BattleType } from './enums/battle-type';
 import MonsterImageProgression from './enums/monster-images';
@@ -18,6 +22,8 @@ import ExplorationSection from './exploration/components/exploration-section';
 import MonsterExplorationConfiguration from './monster-exploration-configuration';
 import MonsterSectionProps from './types/monster-section-props';
 import { getImageTierByIndex } from './util/monster-image-tier';
+import FactionLoyaltyAutomationStatus from '../../../factions/components/faction-loyalty-automation-status';
+import { useFactionLoyaltyContext } from '../../../factions/hooks/use-faction-loyalty-context';
 import AttackButtonsContainer from '../../components/fight-section/attack-buttons-container';
 import AttackCooldownTimer from '../../components/fight-section/attack-cooldown-timer';
 import AttackMessages from '../../components/fight-section/attack-messages';
@@ -27,6 +33,11 @@ import { HealthBarType } from '../../components/fight-section/enums/health-bar-t
 import HealthBar from '../../components/fight-section/health-bar';
 import HealthBarContainer from '../../components/fight-section/health-bar-container';
 import MonsterTopSection from '../../components/fight-section/monster-top-section';
+import AutomationStatus from '../automation-status/automation-status';
+import { AutomationStatusTab } from '../automation-status/enums/automation-status-tab';
+import AutomationStatusPanelDefinition from '../automation-status/types/automation-status-panel-definition';
+import BatchCraftingStatusPanel from '../floating-cards/crafting-section/sections/batch-crafting/components/batch-crafting-status-panel';
+import { useBatchCraftingStatusContext } from '../floating-cards/crafting-section/sections/batch-crafting/hooks/use-batch-crafting-status-context';
 
 import { AutomationType } from 'game-data/api-data-definitions/character/automation-type';
 import MonsterDefinition from 'game-data/api-data-definitions/monsters/monster-definition';
@@ -62,9 +73,13 @@ const MonsterSection = ({
   const [monsterToFight, setMonsterToFight] = useState<number | null>(null);
   const [showExplorationConfiguration, setShowExplorationConfiguration] =
     useState(false);
+  const [showDelveConfiguration, setShowDelveConfiguration] = useState(false);
 
   const characterId = gameData?.character?.id ?? 0;
+  const userId = gameData?.character?.user_id ?? 0;
   const activeAutomation = gameData?.character?.active_automation ?? null;
+  const isAtDelveLocation = gameData?.character?.is_at_delve_location ?? false;
+  const canSetDelvePack = gameData?.character?.can_set_delve_pack ?? false;
 
   const {
     data: explorationStatus,
@@ -72,6 +87,20 @@ const MonsterSection = ({
     error: explorationStatusError,
     refetch: refetchExplorationStatus,
   } = useExplorationStatus(characterId);
+
+  const {
+    status: delveStatus,
+    live_update_count: delveLiveUpdateCount,
+    refetch: refetchDelveStatus,
+  } = useDelveStatus({ character_id: characterId, user_id: userId });
+
+  const {
+    status: batchCraftingStatus,
+    live_update_count: batchCraftingLiveUpdateCount,
+  } = useBatchCraftingStatusContext();
+
+  const { live_update_count: factionLoyaltyLiveUpdateCount } =
+    useFactionLoyaltyContext();
 
   const hasExplorationOutput =
     !isNil(explorationStatus) && !isNil(explorationStatus.type);
@@ -82,6 +111,17 @@ const MonsterSection = ({
   const showFullExplorationPanel =
     hasExplorationOutput || hasActiveExplorationAutomationWithoutOutput;
 
+  const visibleDelveStatus = isVisibleDelveStatus(delveStatus)
+    ? delveStatus
+    : null;
+  const activeFactionLoyaltyAutomation =
+    activeAutomation?.type === AutomationType.FACTION_LOYALTY
+      ? activeAutomation
+      : null;
+  const isBatchCraftingVisible =
+    !isNil(batchCraftingStatus) &&
+    (batchCraftingStatus.active || batchCraftingStatus.is_visible);
+
   const explorationRegionRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -89,6 +129,12 @@ const MonsterSection = ({
       setShowExplorationConfiguration(false);
     }
   }, [hasExplorationOutput, showExplorationConfiguration]);
+
+  useEffect(() => {
+    if (visibleDelveStatus !== null && showDelveConfiguration) {
+      setShowDelveConfiguration(false);
+    }
+  }, [visibleDelveStatus, showDelveConfiguration]);
 
   useEffect(() => {
     if (showFullExplorationPanel) {
@@ -199,6 +245,10 @@ const MonsterSection = ({
     setShowExplorationConfiguration(false);
   }, []);
 
+  const handleCloseDelveConfiguration = useCallback(() => {
+    setShowDelveConfiguration(false);
+  }, []);
+
   if (!gameData) {
     return <GameDataError />;
   }
@@ -224,6 +274,32 @@ const MonsterSection = ({
 
   const handleSetupExploration = () => {
     setShowExplorationConfiguration(true);
+  };
+
+  const handleSetupDelve = () => {
+    setShowDelveConfiguration(true);
+  };
+
+  const renderAutomationSetupButton = (): ReactNode => {
+    if (isAtDelveLocation) {
+      return (
+        <Button
+          on_click={handleSetupDelve}
+          label="Start Delve"
+          variant={ButtonVariant.SUCCESS}
+          additional_css="block mx-auto w-48 mt-4"
+        />
+      );
+    }
+
+    return (
+      <Button
+        on_click={handleSetupExploration}
+        label="Setup Exploration"
+        variant={ButtonVariant.SUCCESS}
+        additional_css="block mx-auto w-48 mt-4"
+      />
+    );
   };
 
   const getMonsterImage = () => {
@@ -271,6 +347,18 @@ const MonsterSection = ({
       );
     }
 
+    if (showDelveConfiguration) {
+      return (
+        <DelveConfiguration
+          character_id={characterId}
+          can_set_pack_size={canSetDelvePack}
+          active_automation={activeAutomation}
+          on_close={handleCloseDelveConfiguration}
+          on_started={refetchDelveStatus}
+        />
+      );
+    }
+
     if (loading) {
       return <InfiniteLoaderRoseDanube />;
     }
@@ -290,12 +378,7 @@ const MonsterSection = ({
             additional_css="block mx-auto w-48"
             disabled={isFightCooldownActive}
           />
-          <Button
-            on_click={handleSetupExploration}
-            label="Setup Exploration"
-            variant={ButtonVariant.SUCCESS}
-            additional_css="block mx-auto w-48 mt-4"
-          />
+          {renderAutomationSetupButton()}
         </div>
       );
     }
@@ -422,19 +505,88 @@ const MonsterSection = ({
     );
   };
 
-  if (showFullExplorationPanel && !isCharacterDead) {
+  const resolvePrimaryAutomationPanel =
+    (): AutomationStatusPanelDefinition | null => {
+      if (showFullExplorationPanel) {
+        return {
+          tab: AutomationStatusTab.EXPLORATION,
+          label: 'Exploration',
+          live_update_token: gameData.explorationOutput,
+          content: (
+            <div
+              ref={explorationRegionRef}
+              tabIndex={-1}
+              className="focus:outline-none"
+            >
+              <ExplorationSection
+                character_id={characterId}
+                status={explorationStatus}
+                on_refetch={refetchExplorationStatus}
+              />
+            </div>
+          ),
+        };
+      }
+
+      if (visibleDelveStatus !== null) {
+        return {
+          tab: AutomationStatusTab.DELVE,
+          label: 'Delve',
+          live_update_token: delveLiveUpdateCount,
+          content: (
+            <DelveStatusPanel
+              character_id={characterId}
+              status={visibleDelveStatus}
+              on_refetch={refetchDelveStatus}
+            />
+          ),
+        };
+      }
+
+      if (activeFactionLoyaltyAutomation !== null) {
+        return {
+          tab: AutomationStatusTab.FACTION_LOYALTY,
+          label: 'Faction Loyalty',
+          live_update_token: factionLoyaltyLiveUpdateCount,
+          content: (
+            <FactionLoyaltyAutomationStatus
+              character_id={characterId}
+              active_automation={activeFactionLoyaltyAutomation}
+            />
+          ),
+        };
+      }
+
+      return null;
+    };
+
+  const resolveBatchCraftingPanel = (
+    primaryPanel: AutomationStatusPanelDefinition
+  ): AutomationStatusPanelDefinition | null => {
+    if (!isBatchCraftingVisible) {
+      return null;
+    }
+
+    if (primaryPanel.tab === AutomationStatusTab.FACTION_LOYALTY) {
+      return null;
+    }
+
+    return {
+      tab: AutomationStatusTab.BATCH_CRAFTING,
+      label: 'Batch Crafting',
+      live_update_token: batchCraftingLiveUpdateCount,
+      content: <BatchCraftingStatusPanel />,
+    };
+  };
+
+  const primaryAutomationPanel = resolvePrimaryAutomationPanel();
+
+  if (primaryAutomationPanel !== null && !isCharacterDead) {
     return (
-      <div
-        ref={explorationRegionRef}
-        tabIndex={-1}
-        className="focus:outline-none"
-      >
-        <ExplorationSection
-          character_id={characterId}
-          status={explorationStatus}
-          on_refetch={refetchExplorationStatus}
-        />
-      </div>
+      <AutomationStatus
+        primary_panel={primaryAutomationPanel}
+        batch_crafting_panel={resolveBatchCraftingPanel(primaryAutomationPanel)}
+      />
     );
   }
 

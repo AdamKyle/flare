@@ -1,6 +1,7 @@
 import { isNil } from 'lodash';
-import React, { useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 
+import { MapCardScreen } from './enums/map-card-screen';
 import { useDirectionallyMoveCharacter } from './hooks/use-directionally-move-character';
 import { useFetchMovementTimeoutData } from './hooks/use-fetch-movement-timeout-data';
 import { useManageConjureButtonState } from './hooks/use-manage-conjure-button-state';
@@ -9,9 +10,14 @@ import { useManageMapSectionVisibility } from './hooks/use-manage-map-section-vi
 import { useManagePlayerKingdomManagementVisibility } from './hooks/use-manage-player-kingdom-management-visibility';
 import { useManageSetSailButtonState } from './hooks/use-manage-set-sail-button-state';
 import { useManageViewLocationState } from './hooks/use-manage-view-location-state';
+import { useMapFactionScreenNavigation } from './hooks/use-map-faction-screen-navigation';
+import MapCardScreenContent from './map-card-screen-content';
 import MapCardTabs from './map-card-tabs';
 import { MapMovementTypes } from './map-movement-types/map-movement-types';
 import MapTabContent from './map-tab-content';
+import { resolveMapCardScreenTitle } from './utils/resolve-map-card-screen-title';
+import ScreenTransition from '../../../../../reusable-components/screen-transition/screen-transition';
+import { useFactionLoyaltyContext } from '../../../../factions/hooks/use-faction-loyalty-context';
 import { CharacterPosition } from '../../../../map-section/api/hooks/definitions/base-map-api-definition';
 import { useExitGemWorld } from '../../../../map-section/api/hooks/use-exit-gem-world';
 import { useGemWorldContext } from '../../../../map-section/api/hooks/use-gem-world-context';
@@ -72,8 +78,22 @@ const MapCard = () => {
   const { openGemProgressHistory } = useOpenGemProgressHistorySidePeek();
   const { openAllActiveGemScrolls } = useOpenAllActiveGemScrollsSidePeek();
   const { emitShouldRefreshMap } = useEmitMapRefresh();
+  const { info: factionLoyaltyInfo } = useFactionLoyaltyContext();
+
+  const factionScreenNavigation = useMapFactionScreenNavigation({
+    pledged_faction_id: gameData?.character?.pledged_to_faction_id ?? null,
+  });
+  const {
+    active_screen: activeScreen,
+    selected_faction: selectedFaction,
+    selected_npc_id: selectedNpcId,
+  } = factionScreenNavigation;
 
   const characterId = gameData?.character?.id ?? 0;
+  const selectedNpc =
+    factionLoyaltyInfo?.faction_loyalty.faction_loyalty_npcs.find(
+      (factionLoyaltyNpc) => factionLoyaltyNpc.id === selectedNpcId
+    ) ?? null;
   const gemWorldGameMapId = gameData?.character?.game_map_id ?? 0;
   const gemWorldIntroductionAcknowledgedAt =
     gameData?.character?.gem_world_introduction_acknowledged_at ?? null;
@@ -209,6 +229,7 @@ const MapCard = () => {
     on_view_location: handleViewLocationDetails,
     is_kingdoms_enabled: !isCharacterDead,
     on_open_kingdoms: openPlayerKingdoms,
+    on_open_factions: factionScreenNavigation.open_factions,
     is_character_dead: isCharacterDead,
     gem_world_actions_props: {
       status: gemWorldStatus,
@@ -226,19 +247,52 @@ const MapCard = () => {
     },
   };
 
-  return (
-    <FloatingCard
-      title={`Map: ${characterData.map_name}`}
-      close_action={closeMapCard}
-    >
-      {insideGemWorld ? (
+  const renderMapScreen = (): ReactNode => {
+    if (insideGemWorld) {
+      return (
         <MapCardTabs
           character_id={characterId}
           map_tab_content_props={mapTabContentProps}
         />
-      ) : (
-        <MapTabContent {...mapTabContentProps} />
-      )}
+      );
+    }
+
+    return <MapTabContent {...mapTabContentProps} />;
+  };
+
+  const screenTitle = resolveMapCardScreenTitle({
+    active_screen: activeScreen,
+    map_name: characterData.map_name,
+    selected_faction_map_name: selectedFaction?.map_name ?? null,
+    selected_npc_real_name: selectedNpc?.npc.real_name ?? null,
+  });
+
+  return (
+    <FloatingCard
+      title={screenTitle}
+      close_action={closeMapCard}
+      back_action={
+        activeScreen === MapCardScreen.MAP
+          ? undefined
+          : factionScreenNavigation.go_back
+      }
+    >
+      <ScreenTransition
+        screenKey={activeScreen}
+        label={`${screenTitle} screen`}
+      >
+        <MapCardScreenContent
+          active_screen={activeScreen}
+          character_id={characterId}
+          selected_faction={selectedFaction}
+          selected_npc_id={selectedNpcId}
+          map_content={renderMapScreen()}
+          on_open_faction={factionScreenNavigation.open_faction}
+          on_faction_updated={factionScreenNavigation.update_selected_faction}
+          on_open_faction_loyalty={factionScreenNavigation.open_faction_loyalty}
+          on_open_npc={factionScreenNavigation.open_npc}
+        />
+      </ScreenTransition>
     </FloatingCard>
   );
 };

@@ -6,12 +6,14 @@ import BatchCraftingStartRequestDefinition from '../definitions/batch-crafting-s
 import BatchCraftingStartResponseDefinition from '../definitions/batch-crafting-start-response-definition';
 import { BatchCraftingApiUrls } from '../enums/batch-crafting-api-urls';
 import UseStartBatchCraftingDefinition from './definitions/use-start-batch-crafting-definition';
+import { useBatchCraftingStatusContext } from '../../hooks/use-batch-crafting-status-context';
 import { extractBatchCraftingApiError } from '../../utils/extract-batch-crafting-api-error';
 
 export const useStartBatchCrafting = (
   characterId: number
 ): UseStartBatchCraftingDefinition => {
   const { apiHandler, getUrl } = useApiHandler();
+  const { refresh_status: refreshStatus } = useBatchCraftingStatusContext();
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -45,6 +47,8 @@ export const useStartBatchCrafting = (
         request,
         { signal: controller.signal }
       );
+
+      await refreshStatus();
 
       return true;
     } catch (requestError) {

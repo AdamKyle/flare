@@ -6,6 +6,7 @@ use App\Game\Automation\Values\AutomationType;
 use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Maps\Values\LocationBasedCraftingOptions;
+use App\Game\Maps\Values\LocationType;
 use App\Game\Maps\Values\MapName;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -18,11 +19,12 @@ use Tests\Traits\CreateDelveExploration;
 use Tests\Traits\CreateFactionLoyaltyAutomationWarning;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateItem;
+use Tests\Traits\CreateLocation;
 use Tests\Traits\CreateRole;
 
 class CharacterSheetBaseInfoTransformerTest extends TestCase
 {
-    use CreateCharacterAutomation, CreateDelveExploration, CreateFactionLoyaltyAutomationWarning, CreateGameMap, CreateItem, CreateRole, RefreshDatabase;
+    use CreateCharacterAutomation, CreateDelveExploration, CreateFactionLoyaltyAutomationWarning, CreateGameMap, CreateItem, CreateLocation, CreateRole, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -251,6 +253,45 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
         $data = $this->transformer->transform($character);
 
         $this->assertFalse($data['can_set_delve_pack']);
+    }
+
+    public function test_is_at_delve_location_when_standing_at_a_cave_of_shadows_with_the_delve_item(): void
+    {
+        $item = $this->createItem(['effect' => ItemEffectType::DELVE->value, 'type' => 'quest']);
+
+        $character = $this->character->givePlayerLocation(16, 16)
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->getCharacter();
+
+        $this->createLocation([
+            'game_map_id' => $character->map->game_map_id,
+            'x' => 16,
+            'y' => 16,
+            'type' => LocationType::CAVE_OF_SHADOWS->value,
+        ]);
+
+        $data = $this->transformer->transform($character);
+
+        $this->assertTrue($data['is_at_delve_location']);
+    }
+
+    public function test_is_not_at_delve_location_when_the_character_lacks_the_delve_item(): void
+    {
+        $this->createItem(['effect' => ItemEffectType::DELVE->value, 'type' => 'quest']);
+
+        $character = $this->character->givePlayerLocation(16, 16)->getCharacter();
+
+        $this->createLocation([
+            'game_map_id' => $character->map->game_map_id,
+            'x' => 16,
+            'y' => 16,
+            'type' => LocationType::CAVE_OF_SHADOWS->value,
+        ]);
+
+        $data = $this->transformer->transform($character);
+
+        $this->assertFalse($data['is_at_delve_location']);
     }
 
     public function test_faction_loyalty_warning_notices_are_included_when_present(): void
