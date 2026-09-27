@@ -600,6 +600,7 @@ const MonsterSection = ({
         monster_name={monsterName}
         monsters={monsters}
         select_action={handleMonsterSelected}
+        monster_selection_disabled={isAtDelveLocation}
       />
       {renderMonsterFightSection()}
     </>

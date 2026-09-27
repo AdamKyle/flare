@@ -9,6 +9,7 @@ import './bootstrap';
  * - Used for editing and creating Guide Quests.
  */
 import './admin/guide-quests/manage-guide-quest-base';
+import './admin/guide-quests/guide-quests-app';
 
 if (document.getElementById('administrator-chat')) {
   void import('./admin/chat/admin-chat');

@@ -108,6 +108,7 @@ const FormWizardNav = ({
           label={finish_label ?? 'Finish'}
           variant={ButtonVariant.PRIMARY}
           disabled={!!is_loading}
+          aria_busy={!!is_loading}
           on_click={on_next_click}
         />
       );
@@ -118,6 +119,7 @@ const FormWizardNav = ({
     return (
       <IconButton
         disabled={!!is_loading}
+        aria_busy={is_last_step && !!is_loading}
         on_click={on_next_click}
         label={action_label}
         variant={action_variant}

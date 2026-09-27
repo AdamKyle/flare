@@ -66,6 +66,7 @@ const Messages = ({
   push_error_message,
   on_send,
   can_start_private_message = true,
+  full_width = false,
 }: MessagesProps) => {
   const [text, setText] = useState('');
   const listRef = useRef<HTMLDivElement>(null);
@@ -205,7 +206,7 @@ const Messages = ({
   };
 
   return (
-    <div className="mx-auto my-4 w-full lg:w-3/4">
+    <div className={clsx('mx-auto my-4 w-full', !full_width && 'lg:w-3/4')}>
       <Card>
         <div className="mb-2 flex items-center">
           <Button

@@ -1,6 +1,9 @@
 import DelveCurrentFoeDefinition from './delve-current-foe-definition';
 import DelveQuestItemDefinition from './delve-quest-item-definition';
 import DelveRewardCheckpointDefinition from './delve-reward-checkpoint-definition';
+import DelveChartPointDefinition from '../../types/delve-chart-point-definition';
+import DelveDamageDefinition from '../../types/delve-damage-definition';
+import DelveTotalsDefinition from '../../types/delve-totals-definition';
 
 export interface DelveInactiveStatusDefinition {
   active: false;
@@ -10,6 +13,7 @@ export interface DelveInactiveStatusDefinition {
 interface DelveRunStatusDefinition {
   started_at: string;
   elapsed_seconds: number;
+  pack_size: number;
   increase_enemy_strength: number | null;
   increase_percentage: number;
   quest_items: DelveQuestItemDefinition[];
@@ -17,6 +21,11 @@ interface DelveRunStatusDefinition {
   monster_name: string | null;
   enemy_stats_available: boolean;
   current_foe: DelveCurrentFoeDefinition;
+  totals: DelveTotalsDefinition;
+  damage: DelveDamageDefinition;
+  healing: number;
+  blocked: number;
+  chart_points: DelveChartPointDefinition[];
 }
 
 export interface DelveActiveStatusDefinition extends DelveRunStatusDefinition {

@@ -5,4 +5,5 @@ export default interface MonsterNamePickerProps {
   monsters: MonsterNameListDefinition[];
   current_index: number;
   on_select: (index: number) => void;
+  disabled?: boolean;
 }

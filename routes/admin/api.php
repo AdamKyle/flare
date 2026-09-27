@@ -1,6 +1,10 @@
 <?php
 
 Route::middleware(['auth', 'is.admin'])->group(function () {
+    Route::get('/admin/guide-quests', ['uses' => 'Api\GuideQuests\GuideQuestsController@index']);
+    Route::get('/admin/guide-quests/{guideQuest}', ['uses' => 'Api\GuideQuests\GuideQuestsController@show']);
+    Route::get('/admin/manage-guide-quest', ['uses' => 'Api\GuideQuests\GuideQuestsController@guideQuest']);
+    Route::post('/admin/store-guide-quest', ['uses' => 'Api\GuideQuests\GuideQuestsController@storeFormResponse']);
     Route::get('/admin/chat-messages', ['uses' => 'Api\AdminMessagesController@index']);
 
     Route::get('/admin/site-statistics/all-time-sign-in', ['uses' => 'Api\SiteAccessStatisticsController@fetchLoggedInAllTime']);

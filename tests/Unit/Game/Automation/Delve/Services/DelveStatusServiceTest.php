@@ -2,9 +2,20 @@
 
 namespace Tests\Unit\Game\Automation\Delve\Services;
 
+use App\Flare\Transformers\Serializer\PlainDataSerializer;
+use App\Game\Automation\Calculations\BattleMessageTotalsCalculator;
+use App\Game\Automation\Delve\Enums\DelveOutcome;
 use App\Game\Automation\Delve\Services\DelveStatusService;
+use App\Game\Automation\Delve\Services\DelveTelemetryService;
+use App\Game\Core\Items\Enricher\EquippableEnricher;
+use App\Game\Core\Items\Enricher\ItemEnricherFactory;
+use App\Game\Core\Items\Transformers\EquippableItemTransformer;
+use App\Game\Core\Items\Transformers\ItemTransformer;
+use App\Game\Core\Items\Transformers\QuestItemTransformer;
+use App\Game\Core\Items\Transformers\UsableItemTransformer;
 use App\Game\Maps\Values\LocationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use League\Fractal\Manager;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateDelveAutomation;
@@ -28,7 +39,20 @@ class DelveStatusServiceTest extends TestCase
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
-        $this->delveStatusService = resolve(DelveStatusService::class);
+        $manager = new Manager;
+        $itemTransformer = new ItemTransformer(new ItemEnricherFactory(
+            new EquippableEnricher,
+            new EquippableItemTransformer,
+            new UsableItemTransformer,
+            new QuestItemTransformer,
+            new PlainDataSerializer,
+            $manager,
+        ));
+
+        $this->delveStatusService = new DelveStatusService(
+            $itemTransformer,
+            new DelveTelemetryService(new BattleMessageTotalsCalculator),
+        );
     }
 
     protected function tearDown(): void
@@ -98,6 +122,57 @@ class DelveStatusServiceTest extends TestCase
         $this->assertTrue($result['completed']);
         $this->assertSame($delve->id, $result['id']);
         $this->assertSame('died', $result['reason']);
+    }
+
+    public function test_status_for_character_reports_configured_pack_size_before_the_first_round(): void
+    {
+        $character = $this->character->getCharacter();
+        $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+
+        $this->createDelveExploration([
+            'character_id' => $character->id,
+            'monster_id' => $monster->id,
+            'started_at' => now()->subMinute(),
+            'completed_at' => null,
+            'pack_size' => 10,
+        ]);
+
+        $result = $this->delveStatusService->statusForCharacter($character);
+
+        $this->assertSame(10, $result['pack_size']);
+        $this->assertSame(10, $result['current_foe']['pack_size']);
+        $this->assertSame(10, $result['totals']['pack_size']);
+    }
+
+    public function test_status_for_character_retains_telemetry_for_completed_delve(): void
+    {
+        $character = $this->character->getCharacter();
+        $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+
+        $delve = $this->createDelveExploration([
+            'character_id' => $character->id,
+            'monster_id' => $monster->id,
+            'started_at' => now()->subHour(),
+            'completed_at' => now(),
+            'ended_reason' => 'player_stopped',
+            'panel_dismissed_at' => null,
+            'pack_size' => 5,
+        ]);
+
+        $this->createDelveAutomationLog([
+            'character_id' => $character->id,
+            'delve_exploration_id' => $delve->id,
+            'pack_size' => 5,
+            'outcome' => DelveOutcome::SURVIVED->value,
+            'fight_data' => ['attack_messages' => [['message' => 'Your weapon hits Goblin for: 500']]],
+        ]);
+
+        $result = $this->delveStatusService->statusForCharacter($character);
+
+        $this->assertTrue($result['completed']);
+        $this->assertCount(2, $result['chart_points']);
+        $this->assertSame(1, $result['totals']['wins']);
+        $this->assertSame(500, $result['damage']['weapon']);
     }
 
     public function test_status_for_character_ignores_dismissed_completed_delve(): void

@@ -2,7 +2,6 @@
 
 namespace App\Game\Automation\Delve\Events;
 
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -13,23 +12,19 @@ class DelveStatusUpdated implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    private int $userId;
-
-    private string $occurredAt;
-
     /**
-     * @param int $userId The user id to broadcast the Delve status update to.
+     * @param int $userId
+     * @param array $status
      */
-    public function __construct(int $userId)
-    {
-        $this->userId = $userId;
-        $this->occurredAt = now()->toJSON();
-    }
+    public function __construct(
+        private readonly int $userId,
+        private readonly array $status,
+    ) {}
 
     /**
      * Get the broadcast event name.
      *
-     * @return string The broadcast event name.
+     * @return string
      */
     public function broadcastAs(): string
     {
@@ -37,22 +32,24 @@ class DelveStatusUpdated implements ShouldBroadcast
     }
 
     /**
-     * Get the data to broadcast with the event.
+     * Get the Delve status snapshot to broadcast with the event.
      *
-     * @return array The broadcast payload.
+     * @return array
      */
     public function broadcastWith(): array
     {
         return [
             'user_id' => $this->userId,
-            'occurred_at' => $this->occurredAt,
+            'status' => $this->status,
         ];
     }
 
     /**
-     * @return Channel|array
+     * Get the private channel the Delve status is broadcast on.
+     *
+     * @return PrivateChannel
      */
-    public function broadcastOn()
+    public function broadcastOn(): PrivateChannel
     {
         return new PrivateChannel('delve-status-updated-'.$this->userId);
     }

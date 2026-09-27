@@ -38,6 +38,12 @@ import AdminItemDetailSidePeekProps from '../../../../../admin/items/components/
 import ItemExportSidePeekProps from '../../../../../admin/items/components/side-peeks/types/item-export-side-peek-props';
 import ItemFormSidePeekProps from '../../../../../admin/items/components/side-peeks/types/item-form-side-peek-props';
 import ItemImportSidePeekProps from '../../../../../admin/items/components/side-peeks/types/item-import-side-peek-props';
+import AdminBuildingDetailSidePeek from '../../../../../admin/kingdoms/buildings/components/side-peeks/admin-building-detail-side-peek';
+import AdminBuildingDetailSidePeekProps from '../../../../../admin/kingdoms/buildings/components/side-peeks/types/admin-building-detail-side-peek-props';
+import KingdomImportSidePeek from '../../../../../admin/kingdoms/shared/components/kingdom-import-side-peek';
+import KingdomImportSidePeekProps from '../../../../../admin/kingdoms/shared/components/types/kingdom-import-side-peek-props';
+import AdminUnitDetailSidePeek from '../../../../../admin/kingdoms/units/components/side-peeks/admin-unit-detail-side-peek';
+import AdminUnitDetailSidePeekProps from '../../../../../admin/kingdoms/units/components/side-peeks/types/admin-unit-detail-side-peek-props';
 import AdminLocationGemDetailSidePeek from '../../../../../admin/location-gems/components/side-peeks/admin-location-gem-detail-side-peek';
 import AdminLocationGemRollDetailSidePeek from '../../../../../admin/location-gems/components/side-peeks/admin-location-gem-roll-detail-side-peek';
 import LocationGemBulkRollResultSidePeek from '../../../../../admin/location-gems/components/side-peeks/location-gem-bulk-roll-result-side-peek';
@@ -72,10 +78,16 @@ import NpcImportSidePeek from '../../../../../admin/npcs/components/side-peeks/n
 import AdminNpcDetailSidePeekProps from '../../../../../admin/npcs/components/side-peeks/types/admin-npc-detail-side-peek-props';
 import NpcFormSidePeekProps from '../../../../../admin/npcs/components/side-peeks/types/npc-form-side-peek-props';
 import NpcImportSidePeekProps from '../../../../../admin/npcs/components/side-peeks/types/npc-import-side-peek-props';
+import AdminPassiveSkillDetailSidePeek from '../../../../../admin/passive-skills/components/side-peeks/admin-passive-skill-detail-side-peek';
+import PassiveSkillImportSidePeek from '../../../../../admin/passive-skills/components/side-peeks/passive-skill-import-side-peek';
+import AdminPassiveSkillDetailSidePeekProps from '../../../../../admin/passive-skills/components/side-peeks/types/admin-passive-skill-detail-side-peek-props';
+import PassiveSkillImportSidePeekProps from '../../../../../admin/passive-skills/components/side-peeks/types/passive-skill-import-side-peek-props';
 import AdminQuestDetailSidePeek from '../../../../../admin/quests/components/side-peeks/admin-quest-detail-side-peek';
 import AdminQuestDetailSidePeekProps from '../../../../../admin/quests/components/side-peeks/types/admin-quest-detail-side-peek-props';
 import RaceImportSidePeek from '../../../../../admin/races/components/side-peeks/race-import-side-peek';
 import RaceImportSidePeekProps from '../../../../../admin/races/components/side-peeks/types/race-import-side-peek-props';
+import SkillImportSidePeek from '../../../../../admin/skills/components/side-peeks/skill-import-side-peek';
+import SkillImportSidePeekProps from '../../../../../admin/skills/components/side-peeks/types/skill-import-side-peek-props';
 import ActivitySidePeek from '../../activity/activity-side-peek';
 import ActivitySidePeekProps from '../../activity/types/activity-side-peek-props';
 import BackPack from '../../character-inventory/backpack/backpack';
@@ -381,6 +393,33 @@ export const SidePeekComponentRegistry: {
   [SidePeekComponentRegistrationEnum.ADMIN_CLASS_MASTERY_IMPORT]: {
     component: ClassMasteryImportSidePeek,
     props: {} as ClassMasteryImportSidePeekProps,
+  },
+  [SidePeekComponentRegistrationEnum.ADMIN_SKILL_IMPORT]: {
+    component: SkillImportSidePeek,
+    props: {} as SkillImportSidePeekProps,
+  },
+  [SidePeekComponentRegistrationEnum.ADMIN_PASSIVE_SKILL_IMPORT]: {
+    component: PassiveSkillImportSidePeek,
+    props: {} as PassiveSkillImportSidePeekProps,
+  },
+  [SidePeekComponentRegistrationEnum.ADMIN_PASSIVE_SKILL_DETAIL]: {
+    component: AdminPassiveSkillDetailSidePeek,
+    props: {} as AdminPassiveSkillDetailSidePeekProps,
+    content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
+  },
+  [SidePeekComponentRegistrationEnum.ADMIN_KINGDOM_IMPORT]: {
+    component: KingdomImportSidePeek,
+    props: {} as KingdomImportSidePeekProps,
+  },
+  [SidePeekComponentRegistrationEnum.ADMIN_KINGDOM_BUILDING_DETAIL]: {
+    component: AdminBuildingDetailSidePeek,
+    props: {} as AdminBuildingDetailSidePeekProps,
+    content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
+  },
+  [SidePeekComponentRegistrationEnum.ADMIN_KINGDOM_UNIT_DETAIL]: {
+    component: AdminUnitDetailSidePeek,
+    props: {} as AdminUnitDetailSidePeekProps,
+    content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
   },
   [SidePeekComponentRegistrationEnum.ADMIN_MAP_GEM_IMPORT]: {
     component: MapGemImportSidePeek,

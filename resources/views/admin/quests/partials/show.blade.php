@@ -254,15 +254,7 @@
                 <dd>
                     @auth
                         @if (auth()->user()->hasRole('Admin'))
-                            <a
-                                href="{{
-                                    route('skills.skill', [
-                                        'skill' => $lockedSkill->id,
-                                    ])
-                                }}"
-                            >
-                                {{ $lockedSkill->name }}
-                            </a>
+                            <a href="{{ route('admin.skills.index') }}"> {{ $lockedSkill->name }} </a>
                         @else
                             <a
                                 href="{{

@@ -1,7 +1,9 @@
 import clsx from 'clsx';
 import React, { ReactNode, useId } from 'react';
 
+import DelveCombatSummarySection from './delve-combat-summary-section';
 import DelveCurrentFoeSection from './delve-current-foe-section';
+import DelveProgressSection from './delve-progress-section';
 import DelveQuestItemsSection from './delve-quest-items-section';
 import DelveRewardCheckpointsSection from './delve-reward-checkpoints-section';
 import DelveStatusPanelProps from './types/delve-status-panel-props';
@@ -161,14 +163,22 @@ const DelveStatusPanel = ({
           {renderCompletedAt()}
           <Dt>Elapsed (as of last update)</Dt>
           <Dd>{formatExplorationDuration(status.elapsed_seconds)}</Dd>
-          <Dt>Enemy Strength Increase</Dt>
-          <Dd>{status.increase_percentage}%</Dd>
         </Dl>
       </ExplorationDetailSection>
 
-      {renderQuestItemCountdown()}
+      <DelveProgressSection
+        chart_points={status.chart_points}
+        totals={status.totals}
+      />
 
-      <DelveCurrentFoeSection current_foe={status.current_foe} />
+      <DelveCombatSummarySection
+        chart_points={status.chart_points}
+        damage={status.damage}
+        healing={status.healing}
+        blocked={status.blocked}
+      />
+
+      {renderQuestItemCountdown()}
 
       <DelveQuestItemsSection
         quest_items={status.quest_items}
@@ -178,6 +188,8 @@ const DelveStatusPanel = ({
       <DelveRewardCheckpointsSection
         reward_checkpoints={status.reward_checkpoints}
       />
+
+      <DelveCurrentFoeSection current_foe={status.current_foe} />
 
       {renderError()}
       {renderAction()}

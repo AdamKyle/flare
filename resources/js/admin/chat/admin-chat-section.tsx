@@ -4,6 +4,7 @@ import React, { ReactNode, useEffect } from 'react';
 import { useFetchAdminChatHistory } from './api/hooks/use-fetch-admin-chat-history';
 import { useSendChatMessage } from '../../game/components/chat-section/api/hooks/use-send-chat-message';
 import { useSendPrivateChatMessage } from '../../game/components/chat-section/api/hooks/use-send-private-chat-message';
+import { useSendPublicEntityCommand } from '../../game/components/chat-section/api/hooks/use-send-public-entity-command';
 import Chat from '../../game/components/chat-section/chat';
 import useChatActions from '../../game/components/chat-section/hooks/use-chat-actions';
 import { toChatTypeFromHistory } from '../../game/components/chat-section/utils/to-chat-type-from-history';
@@ -21,6 +22,7 @@ const AdminChatSection = (): ReactNode => {
   const { setRequestParams } = useSendChatMessage();
   const { sendPrivateMessage, error: privateMessageError } =
     useSendPrivateChatMessage();
+  const { send_public_entity_command } = useSendPublicEntityCommand();
 
   const {
     combinedChat,
@@ -34,6 +36,7 @@ const AdminChatSection = (): ReactNode => {
     replaceChatMessages,
     setRequestParams,
     sendPrivateMessage,
+    sendPublicEntityCommand: send_public_entity_command,
   });
 
   useEffect(() => {
@@ -71,6 +74,7 @@ const AdminChatSection = (): ReactNode => {
         push_error_message={pushErrorMessage}
         on_send={onSend}
         can_start_private_message
+        full_width
       />
     </section>
   );

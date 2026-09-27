@@ -7,7 +7,6 @@ use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\DelveExploration;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
-use App\Game\Automation\Delve\Events\DelveStatusUpdated;
 use App\Game\Automation\Delve\Jobs\DelveExploration as DelveExplorationProcessing;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Events\AutomationStatus;
@@ -27,9 +26,11 @@ class DelveExplorationAutomationService
 
     /**
      * @param CharacterCacheData $characterCacheData
+     * @param DelveStatusBroadcastService $delveStatusBroadcastService
      */
     public function __construct(
         private readonly CharacterCacheData $characterCacheData,
+        private readonly DelveStatusBroadcastService $delveStatusBroadcastService,
     ) {}
 
     /**
@@ -60,6 +61,7 @@ class DelveExplorationAutomationService
             'ended_reason' => null,
             'panel_dismissed_at' => null,
             'attack_type' => $params['attack_type'],
+            'pack_size' => $params['pack_size'] ?? 1,
         ]);
 
         $this->setTimeDelay($location);
@@ -70,7 +72,7 @@ class DelveExplorationAutomationService
 
         event(new AutomationTimeOut($character->user, now()->diffInSeconds($automation->completed_at)));
 
-        event(new DelveStatusUpdated($character->user->id));
+        $this->delveStatusBroadcastService->broadcast($character);
 
         $this->startAutomation($character, $location, $automation->id, $delveExploration->id, $params);
     }
@@ -107,7 +109,7 @@ class DelveExplorationAutomationService
         event(new AutomationStatus($character->user, false));
         event(new UpdateCharacterStatus($character));
         event(new AutomationLogUpdate($character->user->id, 'Delve has been stopped at player request.'));
-        event(new DelveStatusUpdated($character->user->id));
+        $this->delveStatusBroadcastService->broadcast($character);
 
         return $this->successResult();
     }

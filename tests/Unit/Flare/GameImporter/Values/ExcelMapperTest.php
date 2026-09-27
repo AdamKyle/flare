@@ -4,7 +4,7 @@ namespace Tests\Unit\Flare\GameImporter\Values;
 
 use App\Admin\Import\ItemSkills\ItemSkillsImport;
 use App\Admin\Import\Raids\RaidsImport;
-use App\Admin\Import\Skills\SkillsImport;
+use App\Admin\Skills\Imports\SkillsImport;
 use App\Flare\GameImporter\Values\ExcelMapper;
 use Maatwebsite\Excel\Facades\Excel;
 use Mockery;

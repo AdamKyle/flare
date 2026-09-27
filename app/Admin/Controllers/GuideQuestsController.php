@@ -7,7 +7,6 @@ use App\Admin\Import\GuideQuests\GuideQuests;
 use App\Admin\Requests\GuideQuestManagement;
 use App\Admin\Requests\GuideQuestsImport;
 use App\Admin\Services\GuideQuestService;
-use App\Flare\Github\Services\Markdown;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameSkill;
@@ -37,12 +36,9 @@ class GuideQuestsController extends Controller
 
     private GuideQuestService $guideQuestService;
 
-    private Markdown $markdown;
-
-    public function __construct(GuideQuestService $guideQuestService, Markdown $markdown)
+    public function __construct(GuideQuestService $guideQuestService)
     {
         $this->guideQuestService = $guideQuestService;
-        $this->markdown = $markdown;
     }
 
     public function index()
@@ -77,12 +73,7 @@ class GuideQuestsController extends Controller
 
     public function show(GuideQuest $guideQuest)
     {
-        return view('admin.guide-quests.show', [
-            'guideQuest' => $guideQuest,
-            'introBlocks' => $this->markdown->renderBlocks($guideQuest->intro_text),
-            'desktopInstructions' => $this->markdown->renderBlocks($guideQuest->desktop_instructions),
-            'mobileInstructions' => $this->markdown->renderBlocks($guideQuest->mobile_instructions),
-        ]);
+        return view('admin.guide-quests.show', ['guideQuest' => $guideQuest]);
     }
 
     public function create()

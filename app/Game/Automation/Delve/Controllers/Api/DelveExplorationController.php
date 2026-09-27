@@ -7,6 +7,7 @@ use App\Flare\Models\Item;
 use App\Game\Automation\Delve\Requests\DelveExplorationRequest;
 use App\Game\Automation\Delve\Services\DelveExplorationAutomationService;
 use App\Game\Automation\Delve\Services\DelveStartService;
+use App\Game\Automation\Delve\Services\DelveStatusBroadcastService;
 use App\Game\Automation\Delve\Services\DelveStatusService;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Http\Controllers\Controller;
@@ -18,11 +19,13 @@ class DelveExplorationController extends Controller
      * @param DelveExplorationAutomationService $delveExplorationAutomationService
      * @param DelveStartService $delveStartService
      * @param DelveStatusService $delveStatusService
+     * @param DelveStatusBroadcastService $delveStatusBroadcastService
      */
     public function __construct(
         private readonly DelveExplorationAutomationService $delveExplorationAutomationService,
         private readonly DelveStartService $delveStartService,
         private readonly DelveStatusService $delveStatusService,
+        private readonly DelveStatusBroadcastService $delveStatusBroadcastService,
     ) {}
 
     /**
@@ -81,7 +84,11 @@ class DelveExplorationController extends Controller
     {
         $this->delveStatusService->dismissForCharacter($character);
 
-        event(new UpdateCharacterStatus($character->refresh()));
+        $character = $character->refresh();
+
+        event(new UpdateCharacterStatus($character));
+
+        $this->delveStatusBroadcastService->broadcast($character);
 
         return response()->json($this->delveStatusService->statusForCharacter($character));
     }

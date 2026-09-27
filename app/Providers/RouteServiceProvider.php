@@ -87,6 +87,9 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapAdminClassMasteriesWebRoutes();
         $this->mapAdminMapGemsWebRoutes();
         $this->mapAdminLocationGemsWebRoutes();
+        $this->mapAdminSkillsWebRoutes();
+        $this->mapAdminPassiveSkillsWebRoutes();
+        $this->mapAdminKingdomsWebRoutes();
         $this->mapQuestRoutes();
         $this->mapGuideQuestsRoutes();
         $this->mapCharacterPassiveSkillsRoutes();
@@ -109,6 +112,9 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapAdminClassMasteriesApiRoutes();
         $this->mapAdminMapGemsApiRoutes();
         $this->mapAdminLocationGemsApiRoutes();
+        $this->mapAdminSkillsApiRoutes();
+        $this->mapAdminPassiveSkillsApiRoutes();
+        $this->mapAdminKingdomsApiRoutes();
         $this->mapInformationApiRoutes();
 
         // Game Core Api Routes:
@@ -656,6 +662,81 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Admin\LocationGems\Controllers')
             ->group(base_path('routes/admin/location-gems/api.php'));
+    }
+
+    /**
+     * Define the Admin Skills web routes.
+     *
+     * @return void
+     */
+    private function mapAdminSkillsWebRoutes(): void
+    {
+        Route::middleware('web')
+            ->namespace('App\Admin\Skills\Controllers')
+            ->group(base_path('routes/admin/skills/web.php'));
+    }
+
+    /**
+     * Define the Admin Skills api routes.
+     *
+     * @return void
+     */
+    private function mapAdminSkillsApiRoutes(): void
+    {
+        Route::prefix('api')
+            ->middleware(['web', 'update.player-activity'])
+            ->namespace('App\Admin\Skills\Controllers')
+            ->group(base_path('routes/admin/skills/api.php'));
+    }
+
+    /**
+     * Define the Admin Passive Skills web routes.
+     *
+     * @return void
+     */
+    private function mapAdminPassiveSkillsWebRoutes(): void
+    {
+        Route::middleware('web')
+            ->namespace('App\Admin\PassiveSkills\Controllers')
+            ->group(base_path('routes/admin/passive-skills/web.php'));
+    }
+
+    /**
+     * Define the Admin Passive Skills api routes.
+     *
+     * @return void
+     */
+    private function mapAdminPassiveSkillsApiRoutes(): void
+    {
+        Route::prefix('api')
+            ->middleware(['web', 'update.player-activity'])
+            ->namespace('App\Admin\PassiveSkills\Controllers')
+            ->group(base_path('routes/admin/passive-skills/api.php'));
+    }
+
+    /**
+     * Define the Admin Kingdom Buildings, Units, and workbook web routes.
+     *
+     * @return void
+     */
+    private function mapAdminKingdomsWebRoutes(): void
+    {
+        Route::middleware('web')
+            ->namespace('App\Admin\Kingdoms\Controllers')
+            ->group(base_path('routes/admin/kingdoms/web.php'));
+    }
+
+    /**
+     * Define the Admin Kingdom Buildings, Units, and workbook api routes.
+     *
+     * @return void
+     */
+    private function mapAdminKingdomsApiRoutes(): void
+    {
+        Route::prefix('api')
+            ->middleware(['web', 'update.player-activity'])
+            ->namespace('App\Admin\Kingdoms\Controllers')
+            ->group(base_path('routes/admin/kingdoms/api.php'));
     }
 
     /**

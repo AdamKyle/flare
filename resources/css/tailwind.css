@@ -211,6 +211,45 @@
   --color-glacier-900: #2c3e4d;
   --color-glacier-950: #192733;
 
+  /*- Ferra -*/
+  --color-ferra-50: #faf6f6;
+  --color-ferra-100: #f5ebeb;
+  --color-ferra-200: #eddcdb;
+  --color-ferra-300: #dfc3c2;
+  --color-ferra-400: #cba09e;
+  --color-ferra-500: #b67f7d;
+  --color-ferra-600: #a06562;
+  --color-ferra-700: #855250;
+  --color-ferra-800: #794d4b;
+  --color-ferra-900: #5e3f3e;
+  --color-ferra-950: #311f1e;
+
+  /*- Taupe Gray -*/
+  --color-taupe-gray-50: #f7f7f3;
+  --color-taupe-gray-100: #e7e6de;
+  --color-taupe-gray-200: #cdccba;
+  --color-taupe-gray-300: #afac8f;
+  --color-taupe-gray-400: #a29d7d;
+  --color-taupe-gray-500: #948b6c;
+  --color-taupe-gray-600: #82765d;
+  --color-taupe-gray-700: #6d6150;
+  --color-taupe-gray-800: #5b5045;
+  --color-taupe-gray-900: #4d443a;
+  --color-taupe-gray-950: #2a241e;
+
+  /*- Daintree -*/
+  --color-daintree-50: #effbfc;
+  --color-daintree-100: #d7f3f6;
+  --color-daintree-200: #b4e6ed;
+  --color-daintree-300: #81d3df;
+  --color-daintree-400: #46b7ca;
+  --color-daintree-500: #2b9aaf;
+  --color-daintree-600: #267d94;
+  --color-daintree-700: #256679;
+  --color-daintree-800: #265464;
+  --color-daintree-900: #244755;
+  --color-daintree-950: #0d2028;
+
   /*- Terracotta -*/
   --color-terracotta-50: #fdf4f3;
   --color-terracotta-100: #fce7e4;
@@ -236,8 +275,6 @@
   --color-mulled-wine-800: #544365;
   --color-mulled-wine-900: #483a55;
   --color-mulled-wine-950: #2a1e34;
-
-
 
   /*— Spacing (Aspect-Ratio keys) —*/
   --spacing-1\/1:    100%;

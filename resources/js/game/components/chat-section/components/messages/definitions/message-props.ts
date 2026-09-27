@@ -9,4 +9,5 @@ export default interface MessagesProps {
   push_error_message: (message: string) => void;
   on_send: (text: string) => void;
   can_start_private_message?: boolean;
+  full_width?: boolean;
 }

@@ -9,6 +9,7 @@ use App\Game\Messages\Services\PublicEntityCommand;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\Setup\Maps\PctServiceFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCelestials;
 use Tests\Traits\CreateItem;
@@ -28,7 +29,7 @@ class PublicEntityCommandTest extends TestCase
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
-        $this->publicEntityCommand = resolve(PublicEntityCommand::class);
+        $this->publicEntityCommand = new PublicEntityCommand((new PctServiceFactory)->build());
     }
 
     protected function tearDown(): void
@@ -174,37 +175,9 @@ class PublicEntityCommandTest extends TestCase
         $this->publicEntityCommand->setCharacter($character->refresh()->user)->usePCTCommand();
 
         Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message === 'Sorry child, you are exhausted from yuor last move, wait for the timer';
+            return $event->message === 'Sorry child, you are exhausted from your last move, wait for the timer';
         });
         $this->assertSame($x, $character->map->refresh()->character_position_x);
         $this->assertSame($y, $character->map->refresh()->character_position_y);
-    }
-
-    public function test_use_the_pct_command()
-    {
-        Event::fake();
-
-        $character = $this->character->inventoryManagement()->giveItem($this->createItem([
-            'type' => 'quest',
-            'effect' => ItemEffectType::TELEPORT_TO_CELESTIAL->value,
-        ]))->getCharacter();
-
-        $this->publicEntityCommand->setCharacter($character->user)->usePCTCommand();
-
-        $this->createCelestialFight([
-            'monster_id' => $this->createMonster()->id,
-            'character_id' => $character->id,
-            'conjured_at' => now(),
-            'x_position' => 0,
-            'y_position' => 0,
-            'damaged_kingdom' => false,
-            'stole_treasury' => false,
-            'weakened_morale' => false,
-            'current_health' => 1000,
-            'max_health' => 1000,
-            'type' => CelestialConjureType::PUBLIC,
-        ]);
-
-        Event::assertDispatched(ServerMessageEvent::class);
     }
 }

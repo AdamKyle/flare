@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import { useFetchChatHistory } from './api/hooks/use-fetch-chat-history';
 import { useSendChatMessage } from './api/hooks/use-send-chat-message';
 import { useSendPrivateChatMessage } from './api/hooks/use-send-private-chat-message';
+import { useSendPublicEntityCommand } from './api/hooks/use-send-public-entity-command';
 import Chat from './chat';
 import ExplorationMessages from './components/exploration-messages/exploration-messages';
 import ServerMessages from './components/server-messages/server-messages';
@@ -43,6 +44,7 @@ const GameChat = () => {
   const { setRequestParams } = useSendChatMessage();
   const { sendPrivateMessage, error: privateMessageError } =
     useSendPrivateChatMessage();
+  const { send_public_entity_command } = useSendPublicEntityCommand();
 
   const {
     combinedChat,
@@ -57,6 +59,7 @@ const GameChat = () => {
     replaceChatMessages,
     setRequestParams,
     sendPrivateMessage,
+    sendPublicEntityCommand: send_public_entity_command,
   });
 
   useEffect(() => {

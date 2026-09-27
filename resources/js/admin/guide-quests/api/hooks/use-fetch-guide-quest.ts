@@ -1,71 +1,77 @@
 import { useActivityTimeout } from 'api-handler/hooks/use-activity-timeout';
 import { useApiHandler } from 'api-handler/hooks/use-api-handler';
-import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { useCallback, useEffect, useState } from 'react';
+import axios from 'axios';
+import { useEffect, useRef, useState } from 'react';
 
-import UseFetchGuideQuestsDefinition from './definitions/use-fetch-guide-quests-definition';
-import { GuideQuestApiUrls } from '../enums/guide-quest-api-urls';
 import UseFetchGuideQuestParamsDefinition from './definitions/use-fetch-guide-quest-params-definition';
+import UseFetchGuideQuestsDefinition from './definitions/use-fetch-guide-quests-definition';
 import GuideQuestResponseDefinition from '../definitions/guide-quest-response-defintion';
+import { GuideQuestApiUrls } from '../enums/guide-quest-api-urls';
 
 export const useFetchGuideQuest = ({
   id,
 }: UseFetchGuideQuestParamsDefinition): UseFetchGuideQuestsDefinition => {
   const { apiHandler, getUrl } = useApiHandler();
   const { handleInactivity } = useActivityTimeout();
-
   const [data, setData] = useState<GuideQuestResponseDefinition | null>(null);
   const [error, setError] =
     useState<UseFetchGuideQuestsDefinition['error']>(null);
   const [loading, setLoading] = useState(true);
-
-  const url = getUrl(GuideQuestApiUrls.FETCH_GUIDE_QUEST);
-
-  const fetchGuideQuest = useCallback(async () => {
-    try {
-      const result = await apiHandler.get<
-        GuideQuestResponseDefinition,
-        AxiosRequestConfig<AxiosResponse<GuideQuestResponseDefinition>>
-      >(url, {
-        params: {
-          guide_quest_id: id,
-        },
-      });
-
-      setData(result);
-    } catch (err) {
-      if (err instanceof AxiosError) {
-        handleInactivity({
-          response: err,
-          setError,
-        });
-
-        setError(err.response?.data || null);
-      }
-    } finally {
-      setLoading(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [url]);
+  const requestGenerationRef = useRef(0);
 
   useEffect(() => {
-    fetchGuideQuest().catch(() => {});
-  }, [fetchGuideQuest]);
+    requestGenerationRef.current += 1;
+    const requestGeneration = requestGenerationRef.current;
+    const controller = new AbortController();
 
-  const updateGuideQuest = (data: GuideQuestResponseDefinition) => {
-    setData((previous) => {
-      if (!previous) {
-        return previous;
+    const fetchGuideQuest = async (): Promise<void> => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const result = await apiHandler.get<
+          GuideQuestResponseDefinition,
+          { guide_quest_id: number }
+        >(getUrl(GuideQuestApiUrls.FETCH_GUIDE_QUEST), {
+          params: { guide_quest_id: id },
+          signal: controller.signal,
+        });
+
+        if (requestGenerationRef.current === requestGeneration) {
+          setData(result);
+        }
+      } catch (errorInstance) {
+        if (
+          axios.isCancel(errorInstance) ||
+          requestGenerationRef.current !== requestGeneration
+        ) {
+          return;
+        }
+
+        if (axios.isAxiosError(errorInstance)) {
+          handleInactivity({ response: errorInstance, setError });
+          setError(errorInstance.response?.data ?? null);
+        }
+      } finally {
+        if (requestGenerationRef.current === requestGeneration) {
+          setLoading(false);
+        }
       }
+    };
 
-      return { ...previous, guide_quest: data.guide_quest };
-    });
+    void fetchGuideQuest();
+    return () => controller.abort();
+  }, [apiHandler, getUrl, handleInactivity, id]);
+
+  const updateGuideQuest = (
+    updatedData: GuideQuestResponseDefinition
+  ): void => {
+    setData((previous) =>
+      previous
+        ? { ...previous, guide_quest: updatedData.guide_quest }
+        : previous
+    );
   };
 
-  return {
-    data,
-    error,
-    loading,
-    updateGuideQuest,
-  };
+  return { data, error, loading, updateGuideQuest };
 };

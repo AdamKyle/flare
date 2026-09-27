@@ -11,7 +11,7 @@ use App\Flare\Models\Inventory;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Game\Automation\Delve\Enums\DelveOutcome;
-use App\Game\Automation\Delve\Events\DelveStatusUpdated;
+use App\Game\Automation\Delve\Services\DelveStatusBroadcastService;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Events\AutomationTimeOut;
 use App\Game\Automation\Values\AutomationType;
@@ -56,6 +56,8 @@ class DelveExploration implements ShouldQueue
 
     private SkillService $skillService;
 
+    private DelveStatusBroadcastService $delveStatusBroadcastService;
+
     private MonsterFightService $monsterFightService;
 
     private ?Monster $monster = null;
@@ -79,12 +81,12 @@ class DelveExploration implements ShouldQueue
     private array $lastFightData = [];
 
     /**
-     * @param int $characterId The character id delving.
-     * @param int $locationId The Delve location id.
-     * @param int $automationId The character automation id.
-     * @param int $delveExplorationId The Delve exploration record id.
-     * @param array $params The Delve fight parameters.
-     * @param int $timeDelay The delay, in minutes, before this round runs.
+     * @param int $characterId
+     * @param int $locationId
+     * @param int $automationId
+     * @param int $delveExplorationId
+     * @param array $params
+     * @param int $timeDelay
      */
     public function __construct(int $characterId, int $locationId, int $automationId, int $delveExplorationId, array $params, int $timeDelay)
     {
@@ -100,12 +102,13 @@ class DelveExploration implements ShouldQueue
     /**
      * Run one Delve automation round: fight the encounter, apply rewards, and re-dispatch or end the run.
      *
-     * @param MonsterFightService $monsterFightService The monster fight service.
-     * @param BattleEventHandler $battleEventHandler The battle event handler.
-     * @param CharacterCacheData $characterCacheData The character cache data service.
-     * @param CharacterRewardService $characterRewardService The character reward service.
-     * @param SkillService $skillService The skill service.
-     * @return void This method does not return a value.
+     * @param MonsterFightService $monsterFightService
+     * @param BattleEventHandler $battleEventHandler
+     * @param CharacterCacheData $characterCacheData
+     * @param CharacterRewardService $characterRewardService
+     * @param SkillService $skillService
+     * @param DelveStatusBroadcastService $delveStatusBroadcastService
+     * @return void
      */
     public function handle(
         MonsterFightService $monsterFightService,
@@ -113,7 +116,10 @@ class DelveExploration implements ShouldQueue
         CharacterCacheData $characterCacheData,
         CharacterRewardService $characterRewardService,
         SkillService $skillService,
+        DelveStatusBroadcastService $delveStatusBroadcastService,
     ): void {
+
+        $this->delveStatusBroadcastService = $delveStatusBroadcastService;
 
         $this->characterRewardService = $characterRewardService;
 
@@ -187,6 +193,8 @@ class DelveExploration implements ShouldQueue
 
                 $delveAutomation = $delveAutomation->refresh();
 
+                $this->delveStatusBroadcastService->broadcast($this->character);
+
                 $this->deletePackCache();
 
                 $params['selected_monster_id'] = $this->monster?->id ?? $delveAutomation->monster_id;
@@ -209,6 +217,8 @@ class DelveExploration implements ShouldQueue
                 'ended_reason' => DelveOutcome::TIMEOUT->value,
                 'panel_dismissed_at' => null,
             ]);
+
+            $this->delveStatusBroadcastService->broadcast($this->character);
 
             $this->sendOutEventLogUpdate('Seems the fight went on too long child. You are exhausted. Best to flee with what you managed to gain!');
 
@@ -239,7 +249,7 @@ class DelveExploration implements ShouldQueue
     /**
      * Delete the cached pack fight data for the current monster.
      *
-     * @return void This method does not return a value.
+     * @return void
      */
     private function deletePackCache(): void
     {
@@ -249,8 +259,8 @@ class DelveExploration implements ShouldQueue
     /**
      * Select and store the next monster to fight for the Delve automation.
      *
-     * @param DelveExplorationModel $delveExploration The Delve exploration record.
-     * @return void This method does not return a value.
+     * @param DelveExplorationModel $delveExploration
+     * @return void
      */
     private function updateMonsterForNextFight(DelveExplorationModel $delveExploration): void
     {
@@ -272,9 +282,9 @@ class DelveExploration implements ShouldQueue
     /**
      * Persist the given attributes onto the Delve automation record.
      *
-     * @param DelveExplorationModel $delveExploration The Delve exploration record.
-     * @param array $data The attributes to persist.
-     * @return void This method does not return a value.
+     * @param DelveExplorationModel $delveExploration
+     * @param array $data
+     * @return void
      */
     private function updateDelveAutomation(DelveExplorationModel $delveExploration, array $data): void
     {
@@ -284,10 +294,10 @@ class DelveExploration implements ShouldQueue
     /**
      * Handle an encounter.
      *
-     * @param DelveExplorationModel $delveExploration The Delve exploration record.
-     * @param array $params The encounter parameters.
-     * @param int $timeDelay The delay, in minutes, before the next round.
-     * @return bool True when the encounter was survived.
+     * @param DelveExplorationModel $delveExploration
+     * @param array $params
+     * @param int $timeDelay
+     * @return bool
      *
      * @throws InvalidArgumentException
      */
@@ -313,9 +323,9 @@ class DelveExploration implements ShouldQueue
      *
      * - Uses a cached version to make this faster.
      *
-     * @param DelveExplorationModel $delveExploration The Delve exploration record.
-     * @param array $params The fight parameters.
-     * @return bool True when the fight was survived.
+     * @param DelveExplorationModel $delveExploration
+     * @param array $params
+     * @return bool
      *
      * @throws InvalidArgumentException
      */
@@ -337,9 +347,9 @@ class DelveExploration implements ShouldQueue
     /**
      * Fight through the entire monster pack for a Delve round, accumulating rewards.
      *
-     * @param DelveExplorationModel $delveExploration The Delve exploration record.
-     * @param array $params The fight parameters.
-     * @return bool True when the entire pack was survived.
+     * @param DelveExplorationModel $delveExploration
+     * @param array $params
+     * @return bool
      */
     private function fightMultipleEnemies(DelveExplorationModel $delveExploration, array $params): bool
     {
@@ -377,9 +387,9 @@ class DelveExploration implements ShouldQueue
     /**
      * Apply the pack-size xp bonus multiplier to a base xp amount.
      *
-     * @param int $packSize The monster pack size.
-     * @param int $xp The base xp amount.
-     * @return int The xp amount after the pack-size bonus.
+     * @param int $packSize
+     * @param int $xp
+     * @return int
      */
     private function getPackSizeXp(int $packSize, int $xp): int
     {
@@ -395,9 +405,9 @@ class DelveExploration implements ShouldQueue
     /**
      * Fight monster through automation.
      *
-     * @param DelveExplorationModel $delveExploration The Delve exploration record.
-     * @param array $params The fight parameters.
-     * @return bool True when the fight was survived.
+     * @param DelveExplorationModel $delveExploration
+     * @param array $params
+     * @return bool
      *
      * @throws InvalidArgumentException
      */
@@ -438,10 +448,10 @@ class DelveExploration implements ShouldQueue
     /**
      * Send the flavor log messages that introduce the current Delve encounter.
      *
-     * @param float $increaseAmount The enemy strength increase applied.
-     * @param string $monsterName The current monster's name.
-     * @param int $packSize The monster pack size.
-     * @return void This method does not return a value.
+     * @param float $increaseAmount
+     * @param string $monsterName
+     * @param int $packSize
+     * @return void
      */
     private function showEverBurningMessages(float $increaseAmount, string $monsterName, int $packSize): void
     {
@@ -468,9 +478,9 @@ class DelveExploration implements ShouldQueue
     /**
      * Handle when a character dies in automation.
      *
-     * @param DelveExplorationModel $delveExploration The Delve exploration record.
-     * @param array $data The fight result data.
-     * @return bool True when the character died and the Delve was ended.
+     * @param DelveExplorationModel $delveExploration
+     * @param array $data
+     * @return bool
      *
      * @throws Exception
      */
@@ -487,7 +497,7 @@ class DelveExploration implements ShouldQueue
                 'panel_dismissed_at' => null,
             ]);
 
-            event(new DelveStatusUpdated($this->character->user->id));
+            $this->delveStatusBroadcastService->broadcast($this->character);
 
             CharacterAutomation::where('character_id', $delveExploration->character_id)->where('type', AutomationType::DELVE->value)->delete();
 
@@ -508,8 +518,8 @@ class DelveExploration implements ShouldQueue
     /**
      * Determine whether the fight should continue based on the character's and monster's health.
      *
-     * @param array $data The fight result data.
-     * @return bool True when another attack should be attempted.
+     * @param array $data
+     * @return bool
      */
     private function shouldAttackAgain(array $data): bool
     {
@@ -528,9 +538,9 @@ class DelveExploration implements ShouldQueue
     /**
      * Should we bail?
      *
-     * @param CharacterAutomation|null $automation The character's Delve automation record, if any.
-     * @param DelveExplorationModel|null $delveExploration The Delve exploration record, if any.
-     * @return bool True when the job should bail without fighting.
+     * @param CharacterAutomation|null $automation
+     * @param DelveExplorationModel|null $delveExploration
+     * @return bool
      */
     private function shouldBail(?CharacterAutomation $automation = null, ?DelveExplorationModel $delveExploration = null): bool
     {
@@ -561,10 +571,10 @@ class DelveExploration implements ShouldQueue
     /**
      * End automation.
      *
-     * @param CharacterAutomation|null $automation The character's Delve automation record, if any.
-     * @param DelveExplorationModel|null $delveExploration The Delve exploration record, if any.
-     * @param CharacterCacheData $characterCacheData The character cache data service.
-     * @return void This method does not return a value.
+     * @param CharacterAutomation|null $automation
+     * @param DelveExplorationModel|null $delveExploration
+     * @param CharacterCacheData $characterCacheData
+     * @return void
      *
      * @throws Exception
      */
@@ -594,7 +604,7 @@ class DelveExploration implements ShouldQueue
                 'panel_dismissed_at' => null,
             ]);
 
-            event(new DelveStatusUpdated($this->character->user->id));
+            $this->delveStatusBroadcastService->broadcast($this->character);
 
             $this->sendOutEventLogUpdate('You climb from the depths of the delve exploration, covered in blood, grime, dirt. Carrying the treasures you went searching for. Maybe now you have more answers about the darkness, or maybe you have more trauma.', true);
 
@@ -611,8 +621,8 @@ class DelveExploration implements ShouldQueue
     /**
      * Fight the monster.
      *
-     * @param DelveExplorationModel $delveExploration The Delve exploration record.
-     * @return array The fight result data.
+     * @param DelveExplorationModel $delveExploration
+     * @return array
      *
      * @throws InvalidArgumentException
      */
@@ -640,10 +650,10 @@ class DelveExploration implements ShouldQueue
     /**
      * Record a Delve round outcome log and broadcast the updated Delve status.
      *
-     * @param DelveExplorationModel $delveExploration The Delve exploration record.
-     * @param DelveOutcome $outcome The round outcome.
-     * @param array $fightData The fight result data.
-     * @return void This method does not return a value.
+     * @param DelveExplorationModel $delveExploration
+     * @param DelveOutcome $outcome
+     * @param array $fightData
+     * @return void
      */
     private function createDelveLog(DelveExplorationModel $delveExploration, DelveOutcome $outcome, array $fightData): void
     {
@@ -656,16 +666,16 @@ class DelveExploration implements ShouldQueue
             'fight_data' => $fightData,
         ]);
         event(new DelveMonitoringUpdated($this->character->id));
-        event(new DelveStatusUpdated($this->character->user->id));
+        $this->delveStatusBroadcastService->broadcast($this->character);
     }
 
     /**
      * Send out event log updates
      *
-     * @param string $message The log message text.
-     * @param bool $makeItalic Whether the message should render italicized.
-     * @param bool $isReward Whether the message represents a reward.
-     * @return void This method does not return a value.
+     * @param string $message
+     * @param bool $makeItalic
+     * @param bool $isReward
+     * @return void
      */
     private function sendOutEventLogUpdate(string $message, bool $makeItalic = false, bool $isReward = false): void
     {
@@ -677,9 +687,9 @@ class DelveExploration implements ShouldQueue
     /**
      * Send a server message to the character about a Delve reward drop.
      *
-     * @param string $message The server message text.
-     * @param int $itemId The rewarded item's inventory slot id.
-     * @return void This method does not return a value.
+     * @param string $message
+     * @param int $itemId
+     * @return void
      */
     private function sendServerMessage(string $message, int $itemId): void
     {
@@ -692,9 +702,9 @@ class DelveExploration implements ShouldQueue
     /**
      * Reward the player for automation completion.
      *
-     * @param Character $character The character to reward.
-     * @param DelveExplorationModel $delveExploration The completed Delve exploration record.
-     * @return void This method does not return a value.
+     * @param Character $character
+     * @param DelveExplorationModel $delveExploration
+     * @return void
      *
      * @throws Exception
      */
@@ -788,8 +798,8 @@ class DelveExploration implements ShouldQueue
     /**
      * Handle the job's terminal queue failure by reporting and finalizing the Delve automation.
      *
-     * @param Throwable $throwable The exception that failed the job.
-     * @return void This method does not return a value.
+     * @param Throwable $throwable
+     * @return void
      */
     public function failed(Throwable $throwable): void
     {

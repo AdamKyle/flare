@@ -6,6 +6,7 @@ use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\DelveLog;
 use App\Flare\Models\Session;
 use App\Game\Automation\Delve\Enums\DelveOutcome;
+use App\Game\Automation\Delve\Events\DelveStatusUpdated;
 use App\Game\Automation\Delve\Jobs\DelveExploration;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Values\AutomationType;
@@ -249,6 +250,57 @@ class DelveExplorationTest extends TestCase
 
         $this->assertNotNull(CharacterAutomation::find($automation->id));
         $this->assertSame(0.05, $delveAutomation->fresh()->increase_enemy_strength);
+    }
+
+    public function test_handle_broadcasts_status_snapshot_containing_the_persisted_round(): void
+    {
+        Event::fake();
+        config(['queue.connections.long_running.driver' => 'null']);
+
+        $character = $this->character->getCharacter();
+        $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+
+        $location = $this->createLocation();
+
+        $automation = $this->createCharacterAutomation([
+            'character_id' => $character->id,
+            'type' => AutomationType::DELVE->value,
+            'monster_id' => $monster->id,
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $delveAutomation = $this->createDelveExploration([
+            'character_id' => $character->id,
+            'monster_id' => $monster->id,
+            'started_at' => now()->subHour(),
+            'completed_at' => null,
+            'increase_enemy_strength' => 0,
+        ]);
+
+        $this->instance(MonsterFightService::class, Mockery::mock(MonsterFightService::class, function (MockInterface $mock) use ($monster) {
+            $mock->shouldReceive('setupMonster')->andReturn([
+                'health' => ['current_character_health' => 10, 'current_monster_health' => 0],
+            ]);
+            $mock->shouldReceive('fightMonster')->andReturn([
+                'health' => ['current_character_health' => 10, 'current_monster_health' => 0],
+            ]);
+            $mock->shouldReceive('getMonster')->andReturn($monster);
+        }));
+
+        $this->instance(BattleEventHandler::class, Mockery::mock(BattleEventHandler::class, function (MockInterface $mock) {
+            $mock->shouldReceive('processMonsterDeath')->once();
+        }));
+
+        DelveExploration::dispatch($character->id, $location->id, $automation->id, $delveAutomation->id, ['attack_type' => AttackType::ATTACK->value], 3);
+
+        Event::assertDispatched(DelveStatusUpdated::class, function (DelveStatusUpdated $event): bool {
+            $status = $event->broadcastWith()['status'];
+
+            return $status['active'] === true
+                && $status['totals']['rounds'] === 1
+                && $status['totals']['wins'] === 1
+                && count($status['chart_points']) === 2;
+        });
     }
 
     public function test_handle_caps_enemy_strength_increase_at_maximum_and_skips_redundant_update(): void

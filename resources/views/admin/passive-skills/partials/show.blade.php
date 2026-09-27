@@ -1,7 +1,4 @@
-<x-core.buttons.link-buttons.primary-button
-    href="{{ route('passive.skill.edit', ['passiveSkill' => $skill->id]) }}"
-    css="ml-2"
->
+<x-core.buttons.link-buttons.primary-button href="{{ route('admin.passive-skills.index') }}" css="ml-2">
     Edit Passive
 </x-core.buttons.link-buttons.primary-button>
 

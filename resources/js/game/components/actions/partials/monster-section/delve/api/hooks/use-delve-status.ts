@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import UseDelveStatusDefinition from './definitions/use-delve-status-definition';
 import UseDelveStatusParams from './definitions/use-delve-status-params';
 import { DelveStatusDefinition } from '../definitions/delve-status-definition';
+import DelveStatusUpdatedEventDefinition from '../definitions/delve-status-updated-event-definition';
 import { DelveApiUrls } from '../enums/delve-api-urls';
 import { DelveWebSocketChannels } from '../enums/delve-web-socket-channels';
 import { DelveWebSocketEventNames } from '../enums/delve-web-socket-event-names';
@@ -13,10 +14,6 @@ import { DelveWebSocketEventNames } from '../enums/delve-web-socket-event-names'
 import { ChannelType } from 'websockets/enums/channel-type';
 import { useWebsocket } from 'websockets/hooks/use-websocket';
 
-/**
- * `DelveStatusUpdated` only carries the user id and a timestamp, so each
- * broadcast triggers one status read; the REST read is never timer driven.
- */
 export const useDelveStatus = ({
   character_id: characterId,
   user_id: userId,
@@ -81,13 +78,20 @@ export const useDelveStatus = ({
     };
   }, [fetchStatus]);
 
-  const handleStatusUpdated = useCallback(() => {
-    setLiveUpdateCount((currentCount) => currentCount + 1);
+  const handleStatusUpdated = useCallback(
+    (payload: DelveStatusUpdatedEventDefinition) => {
+      if (payload.user_id !== userId) {
+        return;
+      }
 
-    void fetchStatus();
-  }, [fetchStatus]);
+      setStatus(payload.status);
+      setError(null);
+      setLiveUpdateCount((currentCount) => currentCount + 1);
+    },
+    [userId]
+  );
 
-  useWebsocket<Record<string, unknown>>({
+  useWebsocket<DelveStatusUpdatedEventDefinition>({
     url: DelveWebSocketChannels.STATUS_UPDATED,
     params: { userId },
     type: ChannelType.PRIVATE,

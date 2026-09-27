@@ -11,6 +11,7 @@ const MonsterNamePicker = ({
   monsters,
   current_index,
   on_select,
+  disabled = false,
 }: MonsterNamePickerProps) => {
   const [openSnapshot, setOpenSnapshot] = useState<
     MonsterNameListDefinition[] | null
@@ -47,6 +48,10 @@ const MonsterNamePicker = ({
   };
 
   const handleSelect = (item: DropdownItem) => {
+    if (disabled) {
+      return;
+    }
+
     const selectedId =
       typeof item.value === 'number' ? item.value : Number(item.value);
 
@@ -65,12 +70,21 @@ const MonsterNamePicker = ({
     on_select(liveIndex);
   };
 
+  const handleClear = () => {
+    if (disabled) {
+      return;
+    }
+
+    on_select(0);
+  };
+
   return (
     <Dropdown
       key={selectedMonsterId ?? 'none'}
       items={dropdownItems}
       on_select={handleSelect}
-      on_clear={() => on_select(0)}
+      on_clear={handleClear}
+      disabled={disabled}
       pre_selected_item={preSelectedItem}
       selection_placeholder={display_name}
       focus_selected_on_open

@@ -7,7 +7,7 @@
                 Can be recruited from:
                 <a
                     href="{{
-                        route('game.buildings.building', [
+                        route('info.page.building', [
                             'building' => $building->id,
                         ])
                     }}"
@@ -24,7 +24,7 @@
                     Can be recruited from:
                     <a
                         href="{{
-                            route('buildings.building', [
+                            route('info.page.building', [
                                 'building' => $building->id,
                             ])
                         }}"
@@ -40,7 +40,7 @@
                     Can be recruited from:
                     <a
                         href="{{
-                            route('game.buildings.building', [
+                            route('info.page.building', [
                                 'building' => $building->id,
                             ])
                         }}"

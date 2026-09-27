@@ -1,8 +1,6 @@
 <?php
 
 Route::get('/affixes/{affix}', ['as' => 'game.affixes.affix', 'uses' => 'AffixesController@show']);
-Route::get('/game/kingdoms/units/{gameUnit}', ['as' => 'game.units.unit', 'uses' => 'UnitsController@show']);
-Route::get('/game/kingdoms/buildings/{building}', ['as' => 'game.buildings.building', 'uses' => 'BuildingsController@show']);
 Route::get('/game/quests/{quest}', ['as' => 'game.quests.show', 'uses' => 'QuestsController@show']);
 
 Route::middleware(['auth', 'is.admin'])->group(function () {
@@ -49,53 +47,13 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::post('/admin/users/{user}/ignore-unban-request', ['as' => 'user.ignore.unban.request', 'uses' => 'UsersController@ignoreUnBanRequest']);
     Route::post('/admin/users/{user}/force-name-change', ['as' => 'user.force.name.change', 'uses' => 'UsersController@forceNameChange']);
 
-    Route::get('/admin/skills/export-skills', ['as' => 'skills.export', 'uses' => 'SkillsController@exportSkills']);
-    Route::get('/admin/skills/import-skills', ['as' => 'skills.import', 'uses' => 'SkillsController@importSkills']);
-    Route::post('/admin/skills/export-data', ['as' => 'skills.export-data', 'uses' => 'SkillsController@export']);
-    Route::post('/admin/skills/import-data', ['as' => 'skills.import-data', 'uses' => 'SkillsController@importData']);
-
-    Route::post('/admin/skills/store', ['as' => 'skills.store', 'uses' => 'SkillsController@store']);
-    Route::redirect('/admin/skills', '/admin')->name('skills.list');
-    Route::get('/admin/skill/{skill}', ['as' => 'skills.skill', 'uses' => 'SkillsController@show']);
-    Route::get('/admin/skills/create', ['as' => 'skills.create', 'uses' => 'SkillsController@create']);
-    Route::get('/admin/skill/{skill}/edit', ['as' => 'skill.edit', 'uses' => 'SkillsController@edit']);
-
-    Route::get('/admin/passive-skills/export-passive-skills', ['as' => 'passive.skills.export', 'uses' => 'PassiveSkillsController@exportPassives']);
-    Route::get('/admin/passive-skills/import-passive-skills', ['as' => 'passive.skills.import', 'uses' => 'PassiveSkillsController@importPassives']);
-    Route::post('/admin/passive-skills/export-data', ['as' => 'passive.skills.export-data', 'uses' => 'PassiveSkillsController@export']);
-    Route::post('/admin/passive-skills/import-data', ['as' => 'passive.skills.import-data', 'uses' => 'PassiveSkillsController@importData']);
-
-    Route::redirect('/admin/passive-skills', '/admin')->name('passive.skills.list');
-    Route::get('/admin/passive-skill/{passiveSkill}', ['as' => 'passive.skills.skill', 'uses' => 'PassiveSkillsController@show']);
-    Route::get('/admin/passive-skills/create', ['as' => 'passive.skills.create', 'uses' => 'PassiveSkillsController@create']);
-    Route::get('/admin/passive-skill/{passiveSkill}/edit', ['as' => 'passive.skill.edit', 'uses' => 'PassiveSkillsController@edit']);
-    Route::post('/admin/passive-skills/store', ['as' => 'passive.skill.store', 'uses' => 'PassiveSkillsController@store']);
-    Route::post('/admin/passive-skills/{passiveSkill}/update', ['as' => 'passive.skill.update', 'uses' => 'PassiveSkillsController@update']);
-
-    Route::get('/admin/kingdoms/buildings/create', ['as' => 'buildings.create', 'uses' => 'BuildingsController@create']);
-    Route::redirect('/admin/kingdoms/buildings', '/admin')->name('buildings.list');
-    Route::get('/admin/kingdoms/buildings/{building}', ['as' => 'buildings.building', 'uses' => 'BuildingsController@show']);
-    Route::get('/admin/kingdoms/buildings/edit/{building}', ['as' => 'buildings.edit', 'uses' => 'BuildingsController@edit']);
-    Route::post('/admin/kingdoms/buildings/store', ['as' => 'buildings.store', 'uses' => 'BuildingsController@store']);
-
-    Route::get('/admin/kingdoms/units/create', ['as' => 'units.create', 'uses' => 'UnitsController@create']);
-    Route::redirect('/admin/kingdoms/units', '/admin')->name('units.list');
-    Route::get('/admin/kingdoms/units/{gameUnit}', ['as' => 'units.unit', 'uses' => 'UnitsController@show']);
-    Route::get('/admin/kingdoms/units/edit/{gameUnit}', ['as' => 'units.edit', 'uses' => 'UnitsController@edit']);
-    Route::post('/amdin/kingdoms/units/store', ['as' => 'units.store', 'uses' => 'UnitsController@store']);
-
-    Route::get('/admin/kingdoms/export', ['as' => 'kingdoms.export', 'uses' => 'KingdomsController@index']);
-    Route::get('/admin/kingdoms/import', ['as' => 'kingdoms.import', 'uses' => 'KingdomsController@import']);
-    Route::post('/admin/kingdoms/export-data', ['as' => 'kingdoms.export-data', 'uses' => 'KingdomsController@export']);
-    Route::post('/admin/kingdoms/import-data', ['as' => 'kingdoms.import-data', 'uses' => 'KingdomsController@importData']);
-
     Route::post('/admin/guide-quests/store', ['as' => 'admin.guide-quests.store', 'uses' => 'GuideQuestsController@store']);
     Route::post('/admin/guide-quests/{guideQuest}/delete', ['as' => 'admin.guide-quests.delete', 'uses' => 'GuideQuestsController@delete']);
 
     Route::post('/admin/guide-quests/export-data', ['as' => 'admin.guide-quests.export-data', 'uses' => 'GuideQuestsController@export']);
     Route::post('/admin/guide-quests/import-data', ['as' => 'admin.guide-quests.import-data', 'uses' => 'GuideQuestsController@import']);
 
-    Route::redirect('/admin/guide-quests', '/admin')->name('admin.guide-quests');
+    Route::get('/admin/guide-quests', ['as' => 'admin.guide-quests', 'uses' => 'GuideQuestsController@index']);
     Route::get('/admin/guide-quests/create', ['as' => 'admin.guide-quests.create', 'uses' => 'GuideQuestsController@create']);
     Route::get('/admin/guide-quests/edit/{guideQuest}', ['as' => 'admin.guide-quests.edit', 'uses' => 'GuideQuestsController@edit']);
     Route::get('/admin/guide-quests/show/{guideQuest}', ['as' => 'admin.guide-quests.show', 'uses' => 'GuideQuestsController@show']);

@@ -2,10 +2,7 @@
     <x-core.page.title title="{{ $skill->name }}" route="{{ url()->previous() }}" color="success" link="Back">
         @auth
             @if (auth()->user()->hasRole('Admin'))
-                <x-core.buttons.link-buttons.primary-button
-                    href="{{ route('skill.edit', ['skill' => $skill]) }}"
-                    css="tw-ml-2"
-                >
+                <x-core.buttons.link-buttons.primary-button href="{{ route('admin.skills.index') }}" css="tw-ml-2">
                     Edit Skill
                 </x-core.buttons.link-buttons.primary-button>
             @endif

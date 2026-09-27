@@ -1,0 +1,36 @@
+export default interface BuildingRequestDefinition {
+  name: string;
+  description: string;
+  max_level: number;
+  base_durability: number;
+  base_defence: number;
+  required_population: number;
+  is_walls: boolean;
+  is_church: boolean;
+  is_farm: boolean;
+  is_resource_building: boolean;
+  trains_units: boolean;
+  is_locked: boolean;
+  is_special: boolean;
+  wood_cost: number;
+  clay_cost: number;
+  stone_cost: number;
+  iron_cost: number;
+  steel_cost: number | null;
+  increase_population_amount: number;
+  increase_morale_amount: number;
+  decrease_morale_amount: number;
+  increase_wood_amount: number;
+  increase_clay_amount: number;
+  increase_stone_amount: number;
+  increase_iron_amount: number;
+  increase_durability_amount: number;
+  increase_defence_amount: number;
+  time_to_build: number;
+  time_increase_amount: number;
+  units_per_level: number | null;
+  only_at_level: number | null;
+  passive_skill_id: number | null;
+  level_required: number | null;
+  unit_ids: number[];
+}

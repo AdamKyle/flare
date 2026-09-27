@@ -14,12 +14,15 @@ const MonsterTopSection = ({
   current_index,
   monsters,
   select_action,
+  monster_selection_disabled = false,
 }: MonsterTopSectionProps): ReactNode => {
   const isAtFirstMonster = current_index <= 0;
   const isAtLastMonster = current_index >= total_monsters;
+  const isPreviousDisabled = monster_selection_disabled || isAtFirstMonster;
+  const isNextDisabled = monster_selection_disabled || isAtLastMonster;
 
   const handleMoveNext = () => {
-    if (isAtLastMonster) {
+    if (isNextDisabled) {
       return;
     }
 
@@ -27,7 +30,7 @@ const MonsterTopSection = ({
   };
 
   const handleMovePrevious = () => {
-    if (isAtFirstMonster) {
+    if (isPreviousDisabled) {
       return;
     }
 
@@ -56,7 +59,7 @@ const MonsterTopSection = ({
           className="transform text-xl transition-all duration-300 ease-in-out hover:scale-105 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 dark:hover:text-gray-500"
           aria-label="Previous"
           onClick={handleMovePrevious}
-          disabled={isAtFirstMonster}
+          disabled={isPreviousDisabled}
           type="button"
         >
           <i className="fas fa-chevron-circle-left" aria-hidden="true"></i>
@@ -68,6 +71,7 @@ const MonsterTopSection = ({
             monsters={monsters}
             current_index={current_index}
             on_select={select_action}
+            disabled={monster_selection_disabled}
           />
         </div>
 
@@ -75,7 +79,7 @@ const MonsterTopSection = ({
           className="transform text-xl transition-all duration-300 ease-in-out hover:scale-105 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 dark:hover:text-gray-500"
           aria-label="Next"
           onClick={handleMoveNext}
-          disabled={isAtLastMonster}
+          disabled={isNextDisabled}
           type="button"
         >
           <i className="fas fa-chevron-circle-right" aria-hidden="true"></i>

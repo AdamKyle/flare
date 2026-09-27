@@ -1,0 +1,36 @@
+export default interface BuildingFormStateDefinition {
+  name: string;
+  description: string;
+  max_level: string;
+  required_population: string;
+  base_durability: string;
+  base_defence: string;
+  is_walls: boolean;
+  is_farm: boolean;
+  is_church: boolean;
+  is_resource_building: boolean;
+  is_special: boolean;
+  is_locked: boolean;
+  passive_skill_id: number | null;
+  level_required: string;
+  wood_cost: string;
+  clay_cost: string;
+  stone_cost: string;
+  iron_cost: string;
+  steel_cost: string;
+  time_to_build: string;
+  time_increase_amount: string;
+  increase_population_amount: string;
+  increase_morale_amount: string;
+  decrease_morale_amount: string;
+  increase_wood_amount: string;
+  increase_clay_amount: string;
+  increase_stone_amount: string;
+  increase_iron_amount: string;
+  increase_durability_amount: string;
+  increase_defence_amount: string;
+  trains_units: boolean;
+  unit_ids: number[];
+  units_per_level: string;
+  only_at_level: string;
+}

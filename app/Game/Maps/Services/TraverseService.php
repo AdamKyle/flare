@@ -239,7 +239,7 @@ class TraverseService
         }
 
         if ($gameMap->mapType()->isTwistedMemories()) {
-            $message = 'Your mind becomes a fog as you enter into a land where even your own thoughts become twisted into a darkness never before experienced by mortals before.';
+            $message = 'Your mind becomes a fog as you enter a land where even your own thoughts twist into a darkness never experienced by mortals.';
 
             event(new ServerMessageEvent($character->user, $message));
 

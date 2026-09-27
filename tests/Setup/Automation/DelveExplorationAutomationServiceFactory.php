@@ -3,6 +3,7 @@
 namespace Tests\Setup\Automation;
 
 use App\Game\Automation\Delve\Services\DelveExplorationAutomationService;
+use App\Game\Automation\Delve\Services\DelveStatusBroadcastService;
 use Tests\Setup\Character\CharacterCacheDataFactory;
 
 class DelveExplorationAutomationServiceFactory
@@ -12,6 +13,9 @@ class DelveExplorationAutomationServiceFactory
      */
     public function build(): DelveExplorationAutomationService
     {
-        return new DelveExplorationAutomationService((new CharacterCacheDataFactory)->build());
+        return new DelveExplorationAutomationService(
+            (new CharacterCacheDataFactory)->build(),
+            resolve(DelveStatusBroadcastService::class),
+        );
     }
 }

@@ -19,15 +19,19 @@ use League\Fractal\Resource\Item as FractalItem;
 class DelveStatusService
 {
     /**
-     * @param ItemTransformer $itemTransformer The item transformer.
+     * @param ItemTransformer $itemTransformer
+     * @param DelveTelemetryService $delveTelemetryService
      */
-    public function __construct(private readonly ItemTransformer $itemTransformer) {}
+    public function __construct(
+        private readonly ItemTransformer $itemTransformer,
+        private readonly DelveTelemetryService $delveTelemetryService,
+    ) {}
 
     /**
      * Transform a Delve quest item into its API representation.
      *
-     * @param Item $item The quest item to transform.
-     * @return array The transformed item data.
+     * @param Item $item
+     * @return array
      */
     public function questItemDetail(Item $item): array
     {
@@ -39,62 +43,39 @@ class DelveStatusService
     /**
      * Return the character's current Delve status panel: active or completed.
      *
-     * @param Character $character The character to resolve status for.
-     * @return array The current Delve status panel.
+     * @param Character $character
+     * @return array
      */
     public function statusForCharacter(Character $character): array
     {
-        $delve = DelveExploration::where('character_id', $character->id)
+        $activeDelve = DelveExploration::where('character_id', $character->id)
             ->whereNull('completed_at')
             ->with('monster')
             ->first();
 
-        if (is_null($delve)) {
-            $delve = DelveExploration::where('character_id', $character->id)
-                ->whereNotNull('completed_at')
-                ->whereNull('panel_dismissed_at')
-                ->with('monster')
-                ->latest('completed_at')
-                ->first();
-
-            if (is_null($delve)) {
-                return ['active' => false, 'completed' => false];
-            }
-
-            return $this->completedStatus($character, $delve);
+        if (! is_null($activeDelve)) {
+            return $this->activeStatus($character, $activeDelve);
         }
 
-        $latestLog = $delve->delveLogs()->latest()->first();
-        $elapsedSeconds = $delve->started_at->diffInSeconds(now());
-        $elapsedHours = $elapsedSeconds / 3600;
-        $location = $this->caveLocation($character);
-        $countdown = $this->questItemDropCountdown($delve, $location, $elapsedSeconds);
-        $currentFoe = $this->currentFoe($delve, $latestLog);
+        $completedDelve = DelveExploration::where('character_id', $character->id)
+            ->whereNotNull('completed_at')
+            ->whereNull('panel_dismissed_at')
+            ->with('monster')
+            ->latest('completed_at')
+            ->first();
 
-        return [
-            'active' => true,
-            'completed' => false,
-            'started_at' => $delve->started_at->toDateTimeString(),
-            'elapsed_seconds' => $elapsedSeconds,
-            'increase_enemy_strength' => $delve->increase_enemy_strength,
-            'increase_percentage' => round(($delve->increase_enemy_strength ?? 0) * 100, 2),
-            'quest_item_drop_hours_required' => $countdown['hours_required'],
-            'quest_item_drop_seconds_remaining' => $countdown['seconds_remaining'],
-            'quest_item_drop_available_at' => $countdown['available_at'],
-            'quest_item_drop_available' => $countdown['available'],
-            'quest_items' => is_null($location) ? [] : $this->questItems($character, $location),
-            'reward_checkpoints' => $this->rewardCheckpoints($elapsedHours),
-            'monster_name' => $delve->monster?->name,
-            'enemy_stats_available' => $currentFoe['stats_available'],
-            'current_foe' => $currentFoe,
-        ];
+        if (is_null($completedDelve)) {
+            return ['active' => false, 'completed' => false];
+        }
+
+        return $this->completedStatus($character, $completedDelve);
     }
 
     /**
      * Dismiss the character's completed Delve status panel.
      *
-     * @param Character $character The character dismissing the panel.
-     * @return void This method does not return a value.
+     * @param Character $character
+     * @return void
      */
     public function dismissForCharacter(Character $character): void
     {
@@ -105,108 +86,107 @@ class DelveStatusService
     }
 
     /**
+     * Build the status panel for an active Delve run.
+     *
+     * @param Character $character
+     * @param DelveExploration $delve
+     * @return array
+     */
+    private function activeStatus(Character $character, DelveExploration $delve): array
+    {
+        $latestLog = $delve->delveLogs()->latest()->first();
+        $elapsedSeconds = $delve->started_at->diffInSeconds(now());
+        $location = $this->caveLocation($character);
+        $countdown = $this->questItemDropCountdown($delve, $location, $elapsedSeconds);
+        $currentFoe = $this->currentFoe($delve, $latestLog);
+
+        return array_merge([
+            'active' => true,
+            'completed' => false,
+            'started_at' => $delve->started_at->toDateTimeString(),
+            'elapsed_seconds' => $elapsedSeconds,
+            'pack_size' => $delve->pack_size,
+            'increase_enemy_strength' => $delve->increase_enemy_strength,
+            'increase_percentage' => round(($delve->increase_enemy_strength ?? 0) * 100, 2),
+            'quest_item_drop_hours_required' => $countdown['hours_required'],
+            'quest_item_drop_seconds_remaining' => $countdown['seconds_remaining'],
+            'quest_item_drop_available_at' => $countdown['available_at'],
+            'quest_item_drop_available' => $countdown['available'],
+            'quest_items' => is_null($location) ? [] : $this->questItems($character, $location),
+            'reward_checkpoints' => $this->rewardCheckpoints($elapsedSeconds / 3600),
+            'monster_name' => $delve->monster?->name,
+            'enemy_stats_available' => $currentFoe['stats_available'],
+            'current_foe' => $currentFoe,
+        ], $this->delveTelemetryService->telemetry($delve));
+    }
+
+    /**
      * Build the status panel for a completed Delve run.
      *
-     * @param Character $character The character who completed the Delve run.
-     * @param DelveExploration $delve The completed Delve exploration record.
-     * @return array The completed Delve status panel.
+     * @param Character $character
+     * @param DelveExploration $delve
+     * @return array
      */
     private function completedStatus(Character $character, DelveExploration $delve): array
     {
         $latestLog = $delve->delveLogs()->latest()->first();
         $elapsedSeconds = $delve->started_at->diffInSeconds($delve->completed_at);
-        $elapsedHours = $elapsedSeconds / 3600;
         $location = $this->caveLocation($character);
         $currentFoe = $this->currentFoe($delve, $latestLog);
         $reason = $delve->ended_reason ?? $latestLog?->outcome ?? 'completed';
 
-        return [
+        return array_merge([
             'active' => false,
             'completed' => true,
             'id' => $delve->id,
             'started_at' => $delve->started_at->toDateTimeString(),
             'completed_at' => $delve->completed_at->toDateTimeString(),
             'elapsed_seconds' => $elapsedSeconds,
+            'pack_size' => $delve->pack_size,
             'increase_enemy_strength' => $delve->increase_enemy_strength,
             'increase_percentage' => round(($delve->increase_enemy_strength ?? 0) * 100, 2),
             'reason' => $reason,
             'message' => 'Delve ended.',
             'quest_items' => is_null($location) ? [] : $this->questItems($character, $location),
-            'reward_checkpoints' => $this->rewardCheckpoints($elapsedHours),
+            'reward_checkpoints' => $this->rewardCheckpoints($elapsedSeconds / 3600),
             'monster_name' => $delve->monster?->name,
             'enemy_stats_available' => $currentFoe['stats_available'],
             'current_foe' => $currentFoe,
-        ];
+        ], $this->delveTelemetryService->telemetry($delve));
     }
 
     /**
-     * Resolve the current foe's display stats from the latest Delve log or the active delve's monster.
+     * Resolve the current foe's display stats from the latest Delve log or the Delve's randomly selected monster.
      *
-     * @param DelveExploration $delve The active or completed Delve record.
-     * @param DelveLog|null $latestLog The most recent Delve round log, if any.
-     * @return array The current foe's display stats.
+     * @param DelveExploration $delve
+     * @param ?DelveLog $latestLog
+     * @return array
      */
     private function currentFoe(DelveExploration $delve, ?DelveLog $latestLog): array
     {
-        if (! is_null($latestLog)) {
-            $fightMonster = [];
+        $fightMonster = $latestLog?->fight_data['monster'] ?? [];
 
-            if (is_array($latestLog->fight_data) && ! empty($latestLog->fight_data['monster'])) {
-                $fightMonster = $latestLog->fight_data['monster'];
-            }
-
-            if (! empty($fightMonster)) {
-                $name = $fightMonster['name'] ?? null;
-                $packSize = $latestLog->pack_size;
-                $packPrefix = $packSize > 1 ? 'You are fighting '.$packSize.' of '.$name.'. ' : '';
-                $statDescription = 'Showing stats from the most recent Delve round. These stats may reflect a previous battle state and update every time a new round begins down here in the delve.';
-
-                return [
-                    'id' => $fightMonster['id'] ?? null,
-                    'name' => $name,
-                    'pack_size' => $packSize,
-                    'enemy_strength_boost' => $latestLog->increased_enemy_strength ?? 0,
-                    'stats_available' => true,
-                    'stats' => [
-                        'str' => $fightMonster['str'] ?? 0,
-                        'dur' => $fightMonster['dur'] ?? 0,
-                        'dex' => $fightMonster['dex'] ?? 0,
-                        'chr' => $fightMonster['chr'] ?? 0,
-                        'int' => $fightMonster['int'] ?? 0,
-                        'agi' => $fightMonster['agi'] ?? 0,
-                        'focus' => $fightMonster['focus'] ?? 0,
-                        'ac' => $fightMonster['ac'] ?? 0,
-                        'health_range' => $fightMonster['health_range'] ?? null,
-                        'attack_range' => $fightMonster['attack_range'] ?? null,
-                        'max_spell_damage' => $fightMonster['spell_damage'] ?? null,
-                        'healing_percentage' => $fightMonster['max_healing'] ?? null,
-                        'max_level' => $fightMonster['max_level'] ?? null,
-                    ],
-                    'source' => 'latest_log',
-                    'message' => $packPrefix.$statDescription,
-                ];
-            }
+        if (! empty($fightMonster)) {
+            return $this->latestLogFoe($latestLog, $fightMonster);
         }
 
         if (! is_null($delve->monster)) {
-            $monster = $delve->monster;
-
             return [
-                'id' => $monster->id,
-                'name' => $monster->name,
-                'pack_size' => 1,
+                'id' => $delve->monster->id,
+                'name' => $delve->monster->name,
+                'pack_size' => $delve->pack_size,
                 'enemy_strength_boost' => $delve->increase_enemy_strength ?? 0,
                 'stats_available' => true,
-                'stats' => $this->normalizeMonsterModelStats($monster),
+                'stats' => $this->normalizeMonsterModelStats($delve->monster),
                 'source' => 'active_delve',
-                'message' => 'Showing selected monster base stats. Combat-adjusted stats update after each Delve round.',
+                'message' => "Showing the randomly selected Delve monster's base stats. Combat-adjusted stats update after each Delve round.",
             ];
         }
 
         return [
             'id' => null,
             'name' => null,
-            'pack_size' => 1,
+            'pack_size' => $delve->pack_size,
             'enemy_strength_boost' => 0,
             'stats_available' => false,
             'stats' => [],
@@ -216,36 +196,70 @@ class DelveStatusService
     }
 
     /**
+     * Build the current foe's display stats from the monster recorded on the latest Delve round log.
+     *
+     * @param DelveLog $latestLog
+     * @param array $fightMonster
+     * @return array
+     */
+    private function latestLogFoe(DelveLog $latestLog, array $fightMonster): array
+    {
+        $name = $fightMonster['name'] ?? null;
+        $packSize = $latestLog->pack_size;
+        $packPrefix = $packSize > 1 ? 'You are fighting '.$packSize.' of '.$name.'. ' : '';
+        $statDescription = 'Showing stats from the most recent Delve round. These stats may reflect a previous battle state and update every time a new round begins down here in the delve.';
+
+        return [
+            'id' => $fightMonster['id'] ?? null,
+            'name' => $name,
+            'pack_size' => $packSize,
+            'enemy_strength_boost' => $latestLog->increased_enemy_strength ?? 0,
+            'stats_available' => true,
+            'stats' => [
+                'str' => $fightMonster['str'] ?? 0,
+                'dur' => $fightMonster['dur'] ?? 0,
+                'dex' => $fightMonster['dex'] ?? 0,
+                'chr' => $fightMonster['chr'] ?? 0,
+                'int' => $fightMonster['int'] ?? 0,
+                'agi' => $fightMonster['agi'] ?? 0,
+                'focus' => $fightMonster['focus'] ?? 0,
+                'ac' => $fightMonster['ac'] ?? 0,
+                'health_range' => $fightMonster['health_range'] ?? null,
+                'attack_range' => $fightMonster['attack_range'] ?? null,
+                'max_spell_damage' => $fightMonster['spell_damage'] ?? null,
+                'healing_percentage' => $fightMonster['max_healing'] ?? null,
+                'max_level' => $fightMonster['max_level'] ?? null,
+            ],
+            'source' => 'latest_log',
+            'message' => $packPrefix.$statDescription,
+        ];
+    }
+
+    /**
      * Normalize a monster model's stats into the Delve current-foe stats shape.
      *
-     * @param Monster $monster The monster model to normalize.
-     * @return array The normalized monster stats.
+     * @param Monster $monster
+     * @return array
      */
     private function normalizeMonsterModelStats(Monster $monster): array
     {
-        $stats = [];
         $statFields = [
             'str', 'dur', 'dex', 'chr', 'int', 'agi', 'focus', 'ac',
             'health_range', 'attack_range', 'max_spell_damage', 'healing_percentage',
             'xp', 'max_level', 'gold',
         ];
 
-        foreach ($statFields as $field) {
-            $value = $monster->{$field};
-
-            if (! is_null($value)) {
-                $stats[$field] = $value;
-            }
-        }
-
-        return $stats;
+        return collect($statFields)
+            ->mapWithKeys(fn (string $field): array => [$field => $monster->{$field}])
+            ->reject(fn ($value): bool => is_null($value))
+            ->all();
     }
 
     /**
      * Resolve the character's current Cave of Memories location, if standing in one.
      *
-     * @param Character $character The character to resolve the location for.
-     * @return Location|null The character's current Cave of Memories location, if any.
+     * @param Character $character
+     * @return ?Location
      */
     private function caveLocation(Character $character): ?Location
     {
@@ -260,10 +274,10 @@ class DelveStatusService
     /**
      * Calculate the countdown until the Delve location's quest item becomes available.
      *
-     * @param DelveExploration $delve The active Delve record.
-     * @param Location|null $location The character's current Delve location, if any.
-     * @param int $elapsedSeconds The number of seconds elapsed in the Delve run.
-     * @return array The quest item drop countdown data.
+     * @param DelveExploration $delve
+     * @param ?Location $location
+     * @param int $elapsedSeconds
+     * @return array
      */
     private function questItemDropCountdown(DelveExploration $delve, ?Location $location, int $elapsedSeconds): array
     {
@@ -301,9 +315,9 @@ class DelveStatusService
     /**
      * Build the character's Delve quest item availability list for the location.
      *
-     * @param Character $character The character to resolve availability for.
-     * @param Location $location The Delve location.
-     * @return array The quest item availability list.
+     * @param Character $character
+     * @param Location $location
+     * @return array
      */
     private function questItems(Character $character, Location $location): array
     {
@@ -319,40 +333,18 @@ class DelveStatusService
 
         $inventoryId = Inventory::where('character_id', $character->id)->value('id');
 
-        $ownedSlots = $inventoryId
-            ? InventorySlot::where('inventory_id', $inventoryId)
-                ->whereIn('item_id', $items->pluck('id'))
-                ->select(['item_id', 'id'])
-                ->get()
-                ->keyBy('item_id')
-            : collect();
+        $ownedSlots = InventorySlot::where('inventory_id', $inventoryId)
+            ->whereIn('item_id', $items->pluck('id'))
+            ->select(['item_id', 'id'])
+            ->get()
+            ->keyBy('item_id');
 
-        $completedQuestIds = $character->questsCompleted()
-            ->whereNotNull('quest_id')
-            ->pluck('quest_id')
-            ->all();
+        $hadItemIds = $this->previouslyHeldQuestItemIds($character);
 
-        $hadItemIds = [];
-
-        if (! empty($completedQuestIds)) {
-            $hadItemIds = Quest::query()
-                ->whereIn('id', $completedQuestIds)
-                ->get(['item_id', 'secondary_required_item'])
-                ->flatMap(function (Quest $quest): array {
-                    return [$quest->item_id, $quest->secondary_required_item];
-                })
-                ->filter()
-                ->unique()
-                ->values()
-                ->all();
-        }
-
-        $result = [];
-
-        foreach ($items as $item) {
+        return $items->map(function (Item $item) use ($ownedSlots, $hadItemIds): array {
             $slot = $ownedSlots->get($item->id);
 
-            $result[] = [
+            return [
                 'id' => $item->id,
                 'name' => $item->name,
                 'type' => $item->type,
@@ -362,16 +354,43 @@ class DelveStatusService
                 'have' => ! is_null($slot),
                 'had' => in_array($item->id, $hadItemIds, true),
             ];
+        })->values()->all();
+    }
+
+    /**
+     * Resolve the quest item ids the character has handed in for completed quests.
+     *
+     * @param Character $character
+     * @return array
+     */
+    private function previouslyHeldQuestItemIds(Character $character): array
+    {
+        $completedQuestIds = $character->questsCompleted()
+            ->whereNotNull('quest_id')
+            ->pluck('quest_id')
+            ->all();
+
+        if (empty($completedQuestIds)) {
+            return [];
         }
 
-        return $result;
+        return Quest::query()
+            ->whereIn('id', $completedQuestIds)
+            ->get(['item_id', 'secondary_required_item'])
+            ->flatMap(function (Quest $quest): array {
+                return [$quest->item_id, $quest->secondary_required_item];
+            })
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
     }
 
     /**
      * Build the Delve duration-based reward checkpoint list with their reached state.
      *
-     * @param float $elapsedHours The number of hours elapsed in the Delve run.
-     * @return array The reward checkpoint list.
+     * @param float $elapsedHours
+     * @return array
      */
     private function rewardCheckpoints(float $elapsedHours): array
     {

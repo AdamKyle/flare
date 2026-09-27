@@ -141,6 +141,10 @@ const DelveConfiguration = ({
           Delve Settings
         </legend>
 
+        <Alert variant={AlertVariant.INFO}>
+          Monsters are chosen at random while Delving in this location.
+        </Alert>
+
         <Dropdown
           aria_label="Attack Type"
           items={explorationAttackTypeOptions}

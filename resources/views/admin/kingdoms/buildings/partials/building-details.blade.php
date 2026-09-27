@@ -1,6 +1,6 @@
 <x-core.layout.info-container>
     @php
-        $backUrl = route('buildings.list');
+        $backUrl = route('admin.kingdoms.buildings.index');
 
         if (is_null(auth()->user())) {
             $backUrl = '/information/kingdoms';
@@ -21,7 +21,7 @@
         title="{{ $building->name }}"
         buttons="true"
         backUrl="{{ $backUrl }}"
-        editUrl="{{ route('buildings.edit', ['building' => $building->id]) }}"
+        editUrl="{{ route('admin.kingdoms.buildings.index') }}"
     >
         <div class="grid gap-4 md:grid-cols-2">
             <div>

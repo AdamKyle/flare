@@ -63,7 +63,7 @@ const CharacterSheetDetails = (
               <CurrencyDisplay
                 currency={CurrencyType.GOLD}
                 amount={characterData.gold}
-                display_mode={CurrencyDisplayMode.BALANCE}
+                display_mode={CurrencyDisplayMode.EXACT}
                 show_label={false}
               />
             </Dd>
@@ -72,7 +72,7 @@ const CharacterSheetDetails = (
               <CurrencyDisplay
                 currency={CurrencyType.GOLD_DUST}
                 amount={characterData.gold_dust}
-                display_mode={CurrencyDisplayMode.BALANCE}
+                display_mode={CurrencyDisplayMode.EXACT}
                 show_label={false}
               />
             </Dd>
@@ -81,7 +81,7 @@ const CharacterSheetDetails = (
               <CurrencyDisplay
                 currency={CurrencyType.SHARDS}
                 amount={characterData.shards}
-                display_mode={CurrencyDisplayMode.BALANCE}
+                display_mode={CurrencyDisplayMode.EXACT}
                 show_label={false}
               />
             </Dd>
@@ -90,7 +90,7 @@ const CharacterSheetDetails = (
               <CurrencyDisplay
                 currency={CurrencyType.COPPER_COINS}
                 amount={characterData.copper_coins}
-                display_mode={CurrencyDisplayMode.BALANCE}
+                display_mode={CurrencyDisplayMode.EXACT}
                 show_label={false}
               />
             </Dd>

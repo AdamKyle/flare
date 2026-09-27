@@ -8,4 +8,5 @@ export default interface MonsterTopSectionProps {
   select_action: (index: number) => void;
   view_monster_stats: (monsterId: number) => void;
   monsters: MonsterNameListDefinition[];
+  monster_selection_disabled?: boolean;
 }

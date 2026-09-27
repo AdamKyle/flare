@@ -6,12 +6,12 @@ use App\Flare\Models\Character;
 use App\Flare\Models\CharacterBattleRewardRequest;
 use App\Flare\Models\CharacterBattleRewardRequestMessage;
 use App\Game\Automation\Delve\Events\DelveStatusUpdated;
+use App\Game\Automation\Delve\Services\DelveStatusBroadcastService;
 use App\Game\Automation\Exploration\Services\ExplorationLogService;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepName;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepStatus;
 use App\Game\BattleRewardProcessing\Events\BattleRewardProgressionUpdated;
-use App\Game\Core\Traits\SafelyBroadcastsEvents;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Types\CharacterMessageTypes;
 use Closure;
@@ -21,14 +21,13 @@ use Throwable;
 
 class BattleRewardPresentationService
 {
-    use SafelyBroadcastsEvents;
-
     /**
      * @param BattleRewardLedgerService $battleRewardLedgerService
      * @param BattleRewardLiveUpdateService $battleRewardLiveUpdateService
      * @param BattleRewardMessageOutboxService $battleRewardMessageOutboxService
      * @param ExplorationLogService $explorationLogService
      * @param ServerMessageBuilder $serverMessageBuilder
+     * @param DelveStatusBroadcastService $delveStatusBroadcastService
      */
     public function __construct(
         private readonly BattleRewardLedgerService $battleRewardLedgerService,
@@ -36,6 +35,7 @@ class BattleRewardPresentationService
         private readonly BattleRewardMessageOutboxService $battleRewardMessageOutboxService,
         private readonly ExplorationLogService $explorationLogService,
         private readonly ServerMessageBuilder $serverMessageBuilder,
+        private readonly DelveStatusBroadcastService $delveStatusBroadcastService,
     ) {}
 
     /**
@@ -114,10 +114,27 @@ class BattleRewardPresentationService
         }
 
         if ($request->source_type === BattleRewardRequestSourceType::AUTOMATION) {
-            $this->safelyDispatchBroadcastEvent(
-                new DelveStatusUpdated($character->user_id),
-                ['character_id' => $character->id]
-            );
+            $this->broadcastDelveStatus($character);
+        }
+    }
+
+    /**
+     * Broadcast the Character's Delve status snapshot, logging instead of failing the presentation when it cannot be sent.
+     *
+     * @param Character $character
+     * @return void
+     */
+    private function broadcastDelveStatus(Character $character): void
+    {
+        try {
+            $this->delveStatusBroadcastService->broadcast($character);
+        } catch (Throwable $throwable) {
+            Log::warning('Non-critical broadcast event failed.', [
+                'event_class' => DelveStatusUpdated::class,
+                'exception_class' => $throwable::class,
+                'exception' => $throwable->getMessage(),
+                'character_id' => $character->id,
+            ]);
         }
     }
 

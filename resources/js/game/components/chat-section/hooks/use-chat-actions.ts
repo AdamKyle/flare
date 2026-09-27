@@ -7,7 +7,9 @@ import ChatType, {
   ChatMessageType,
 } from '../../../api-definitions/chat/chat-message-definition';
 import SendPrivateChatMessageRequest from '../api/hooks/definitions/send-private-chat-message-request';
+import { PublicEntityChatCommand } from '../enums/public-entity-chat-command';
 import { parsePrivateMessageCommand } from '../utils/parse-private-message-command';
+import { parsePublicEntityCommand } from '../utils/parse-public-entity-command';
 
 const buildLocalSystemChat = (
   message: string,
@@ -38,6 +40,7 @@ const useChatActions = (
     replaceChatMessages,
     setRequestParams,
     sendPrivateMessage,
+    sendPublicEntityCommand,
   } = params;
 
   const [initialAnnouncements, setInitialAnnouncements] = useState<
@@ -85,8 +88,33 @@ const useChatActions = (
     [pushPrivateMessageSent, sendPrivateMessage]
   );
 
+  const sendPublicEntity = useCallback(
+    async (command: PublicEntityChatCommand): Promise<void> => {
+      const commandAccepted = await sendPublicEntityCommand({
+        attempt_to_teleport: command === PublicEntityChatCommand.PCT,
+      });
+
+      if (commandAccepted) {
+        return;
+      }
+
+      pushErrorMessage('Unable to use that command right now.');
+    },
+    [pushErrorMessage, sendPublicEntityCommand]
+  );
+
   const onSend = useCallback(
     (text: string): void => {
+      const publicEntityCommand = parsePublicEntityCommand(text);
+
+      if (publicEntityCommand !== null) {
+        sendPublicEntity(publicEntityCommand).catch(() => {
+          pushErrorMessage('Unable to use that command right now.');
+        });
+
+        return;
+      }
+
       const privateMessageRequest = parsePrivateMessageCommand(text);
 
       if (privateMessageRequest === null) {
@@ -99,7 +127,7 @@ const useChatActions = (
         pushErrorMessage('Unable to send the private message.');
       });
     },
-    [pushErrorMessage, sendPrivate, setRequestParams]
+    [pushErrorMessage, sendPrivate, sendPublicEntity, setRequestParams]
   );
 
   const combinedChat = useMemo(() => {

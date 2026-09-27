@@ -20,11 +20,24 @@ use Illuminate\Http\Request;
 
 class InformationSectionRenderer
 {
+    /**
+     * Determine whether the Information section alias renders a data table.
+     *
+     * @param string $alias
+     * @return bool
+     */
     public function supports(string $alias): bool
     {
         return array_key_exists($alias, $this->resolvers());
     }
 
+    /**
+     * Render the Information section's paginated data table, or null when the alias is unknown.
+     *
+     * @param string $alias
+     * @param Request $request
+     * @return ?View
+     */
     public function render(string $alias, Request $request): ?View
     {
         $resolver = $this->resolvers()[$alias] ?? null;
@@ -46,7 +59,9 @@ class InformationSectionRenderer
     }
 
     /**
-     * @return array<string, array{builder: \Closure(Request): Builder, columns: \Closure(): TableColumn[], filters?: array}>
+     * Map each Information section alias to its query builder, table columns, and filters.
+     *
+     * @return array
      */
     private function resolvers(): array
     {
@@ -252,7 +267,10 @@ class InformationSectionRenderer
     }
 
     /**
-     * @return TableColumn[]
+     * Build the table columns for this Information section.
+     *
+     * @param bool $includeCosts
+     * @return array
      */
     private static function specialtyItemColumns(bool $includeCosts): array
     {
@@ -286,7 +304,9 @@ class InformationSectionRenderer
     }
 
     /**
-     * @return TableColumn[]
+     * Build the table columns for this Information section.
+     *
+     * @return array
      */
     private static function craftableItemsColumns(): array
     {
@@ -313,6 +333,11 @@ class InformationSectionRenderer
         ];
     }
 
+    /**
+     * Build the craftable item type filter options.
+     *
+     * @return array
+     */
     private static function craftableItemTypeOptions(): array
     {
         return array_merge(
@@ -331,7 +356,9 @@ class InformationSectionRenderer
     }
 
     /**
-     * @return TableColumn[]
+     * Build the table columns for this Information section.
+     *
+     * @return array
      */
     private static function questItemColumns(): array
     {
@@ -354,7 +381,10 @@ class InformationSectionRenderer
     }
 
     /**
-     * @return TableColumn[]
+     * Build the table columns for this Information section.
+     *
+     * @param bool $withEventStar
+     * @return array
      */
     private static function locationColumns(bool $withEventStar = false): array
     {
@@ -388,7 +418,9 @@ class InformationSectionRenderer
     }
 
     /**
-     * @return TableColumn[]
+     * Build the table columns for this Information section.
+     *
+     * @return array
      */
     private static function classSkillColumns(): array
     {
@@ -400,7 +432,7 @@ class InformationSectionRenderer
                 html: true,
                 render: function ($row) {
                     if (! is_null(auth()->user()) && auth()->user()->hasRole('Admin')) {
-                        return '<a href="/admin/skill/'.$row->id.'">'.e($row->name).'</a>';
+                        return '<a href="'.route('admin.skills.index').'">'.e($row->name).'</a>';
                     }
 
                     return '<a href="/information/skill/'.$row->id.'">'.e($row->name).'</a>';
@@ -445,7 +477,9 @@ class InformationSectionRenderer
     }
 
     /**
-     * @return TableColumn[]
+     * Build the table columns for this Information section.
+     *
+     * @return array
      */
     private static function alchemyItemColumns(): array
     {
@@ -464,6 +498,11 @@ class InformationSectionRenderer
         ];
     }
 
+    /**
+     * Build the alchemy item type filter options.
+     *
+     * @return array
+     */
     private static function alchemyItemTypeOptions(): array
     {
         return [

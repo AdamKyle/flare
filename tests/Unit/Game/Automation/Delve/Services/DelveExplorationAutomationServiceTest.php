@@ -4,6 +4,7 @@ namespace Tests\Unit\Game\Automation\Delve\Services;
 
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\DelveExploration;
+use App\Game\Automation\Delve\Events\DelveStatusUpdated;
 use App\Game\Automation\Delve\Jobs\DelveExploration as DelveExplorationProcessing;
 use App\Game\Automation\Delve\Services\DelveExplorationAutomationService;
 use App\Game\Automation\Values\AutomationType;
@@ -74,6 +75,70 @@ class DelveExplorationAutomationServiceTest extends TestCase
         $this->assertSame(1, DelveExploration::where('character_id', $character->id)->whereNull('completed_at')->count());
         Queue::assertPushed(DelveExplorationProcessing::class, function (DelveExplorationProcessing $job): bool {
             return $job->connection === 'long_running' && $job->queue === 'delve';
+        });
+    }
+
+    public function test_begin_automation_persists_the_configured_pack_size(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $character = $this->character->getCharacter();
+
+        $location = $this->createLocation([
+            'type' => LocationType::CAVE_OF_SHADOWS->value,
+            'game_map_id' => $character->map->game_map_id,
+            'minutes_between_delve_fights' => 3,
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+            'is_celestial_entity' => false,
+            'is_raid_monster' => false,
+            'is_raid_boss' => false,
+            'only_for_location_type' => LocationType::CAVE_OF_SHADOWS->value,
+        ]);
+
+        $this->delveExplorationAutomationService->beginAutomation($character, $location, [
+            'attack_type' => AttackType::ATTACK->value,
+            'pack_size' => 10,
+        ]);
+
+        $this->assertSame(10, DelveExploration::where('character_id', $character->id)->whereNull('completed_at')->first()->pack_size);
+    }
+
+    public function test_begin_automation_broadcasts_the_active_status_snapshot_with_the_configured_pack_size(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $character = $this->character->getCharacter();
+
+        $location = $this->createLocation([
+            'type' => LocationType::CAVE_OF_SHADOWS->value,
+            'game_map_id' => $character->map->game_map_id,
+            'minutes_between_delve_fights' => 3,
+        ]);
+
+        $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+            'is_celestial_entity' => false,
+            'is_raid_monster' => false,
+            'is_raid_boss' => false,
+            'only_for_location_type' => LocationType::CAVE_OF_SHADOWS->value,
+        ]);
+
+        $this->delveExplorationAutomationService->beginAutomation($character, $location, [
+            'attack_type' => AttackType::ATTACK->value,
+            'pack_size' => 5,
+        ]);
+
+        Event::assertDispatched(DelveStatusUpdated::class, function (DelveStatusUpdated $event): bool {
+            $status = $event->broadcastWith()['status'];
+
+            return $status['active'] === true
+                && $status['pack_size'] === 5
+                && count($status['chart_points']) === 1;
         });
     }
 

@@ -3,7 +3,7 @@
 @section('content')
     <x-core.layout.info-container>
         @php
-            $backUrl = route('units.list');
+            $backUrl = route('admin.kingdoms.units.index');
 
             if (is_null(auth()->user())) {
                 $backUrl = '/information/kingdoms';
@@ -34,7 +34,7 @@
             title="{{ $unit->name }}"
             buttons="true"
             backUrl="{{ $backUrl }}"
-            editUrl="{{ route('units.edit', ['gameUnit' => $unit->id]) }}"
+            editUrl="{{ route('admin.kingdoms.units.index') }}"
         >
             @include(
                 'admin.kingdoms.units.partials.unit-attributes',

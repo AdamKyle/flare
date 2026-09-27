@@ -21,7 +21,6 @@ use App\Game\Maps\Contracts\CoordinatesQuery;
 use App\Game\Maps\Services\CoordinatesQueryService;
 use App\Game\Maps\Services\LocationService;
 use App\Game\Maps\Services\MovementService;
-use App\Game\Maps\Services\PctService;
 use App\Game\Maps\Services\PortService;
 use App\Game\Maps\Services\SetSailService;
 use App\Game\Maps\Services\TeleportService;
@@ -118,13 +117,6 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(MapTileValue::class, function ($app) {
             return new MapTileValue;
-        });
-
-        $this->app->bind(PctService::class, function ($app) {
-            return new PctService(
-                $app->make(TraverseService::class),
-                $app->make(MapTileValue::class),
-            );
         });
 
         $this->app->bind(TraverseService::class, function ($app) {

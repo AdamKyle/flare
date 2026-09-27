@@ -94,6 +94,3 @@
 .sidebar:hover .menu-item-arrow {
   display: block;
 }
-.sidebar:hover .menu-dropdown {
-  display: flex;
-}

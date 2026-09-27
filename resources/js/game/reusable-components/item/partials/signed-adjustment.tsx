@@ -4,7 +4,7 @@ import SignedAdjustmentProps from '../types/partials/signed-adjustment-props';
 
 const resolveIconClassName = (value: number): string => {
   if (value > 0) {
-    return 'fas fa-chevron-up text-emerald-600 dark:text-emerald-400';
+    return 'fas fa-chevron-up text-emerald-600 dark:text-emerald-500';
   }
 
   if (value < 0) {
@@ -16,7 +16,7 @@ const resolveIconClassName = (value: number): string => {
 
 const resolveValueClassName = (value: number): string => {
   if (value > 0) {
-    return 'text-emerald-600 dark:text-emerald-400';
+    return 'text-emerald-600 dark:text-emerald-500';
   }
 
   if (value < 0) {

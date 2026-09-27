@@ -3,8 +3,6 @@
 namespace Tests\Unit\Game\Automation\Delve\Events;
 
 use App\Game\Automation\Delve\Events\DelveStatusUpdated;
-use Carbon\Carbon;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
@@ -13,18 +11,11 @@ class DelveStatusUpdatedTest extends TestCase
 {
     use CreateUser, RefreshDatabase;
 
-    protected function tearDown(): void
-    {
-        Carbon::setTestNow();
-
-        parent::tearDown();
-    }
-
     public function test_broadcast_as_returns_delve_status_updated(): void
     {
         $user = $this->createUser();
 
-        $event = new DelveStatusUpdated($user->id);
+        $event = new DelveStatusUpdated($user->id, ['active' => false, 'completed' => false]);
 
         $this->assertSame('delve.status.updated', $event->broadcastAs());
     }
@@ -33,48 +24,27 @@ class DelveStatusUpdatedTest extends TestCase
     {
         $user = $this->createUser();
 
-        $event = new DelveStatusUpdated($user->id);
+        $event = new DelveStatusUpdated($user->id, ['active' => false, 'completed' => false]);
 
-        $channel = $event->broadcastOn();
-
-        $this->assertInstanceOf(PrivateChannel::class, $channel);
-        $this->assertSame('private-delve-status-updated-'.$user->id, $channel->name);
+        $this->assertSame('private-delve-status-updated-'.$user->id, $event->broadcastOn()->name);
     }
 
-    public function test_broadcast_with_includes_user_id(): void
+    public function test_broadcast_with_carries_the_full_status_snapshot(): void
     {
         $user = $this->createUser();
 
-        $event = new DelveStatusUpdated($user->id);
+        $status = [
+            'active' => true,
+            'completed' => false,
+            'pack_size' => 5,
+            'totals' => ['rounds' => 2, 'wins' => 2, 'timeouts' => 0, 'pack_size' => 5, 'enemy_strength_increase' => 5.0],
+        ];
 
-        $payload = $event->broadcastWith();
+        $event = new DelveStatusUpdated($user->id, $status);
 
-        $this->assertSame($user->id, $payload['user_id']);
-    }
-
-    public function test_broadcast_with_includes_occurred_at(): void
-    {
-        Carbon::setTestNow(Carbon::parse('2026-06-23 12:00:00', 'UTC'));
-
-        $user = $this->createUser();
-
-        $event = new DelveStatusUpdated($user->id);
-
-        $payload = $event->broadcastWith();
-
-        $this->assertArrayHasKey('occurred_at', $payload);
-    }
-
-    public function test_broadcast_with_does_not_include_sensitive_fields(): void
-    {
-        $user = $this->createUser();
-
-        $event = new DelveStatusUpdated($user->id);
-
-        $payload = $event->broadcastWith();
-
-        $this->assertArrayNotHasKey('character_id', $payload);
-        $this->assertArrayNotHasKey('item_data', $payload);
-        $this->assertArrayNotHasKey('reward_data', $payload);
+        $this->assertSame([
+            'user_id' => $user->id,
+            'status' => $status,
+        ], $event->broadcastWith());
     }
 }
