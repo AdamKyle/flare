@@ -8,14 +8,15 @@ use App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty;
 use App\Console\AfterDeployment\BackfillCompletedPanelDismissals;
 use App\Console\AfterDeployment\CleanDanglingCharacterData;
 use App\Console\AfterDeployment\CleanDuplicateQuestInventorySlots;
+use App\Console\AfterDeployment\CreateGemWorlds;
 use App\Console\AfterDeployment\CreateMonsterCache;
 use App\Console\AfterDeployment\FlagUsersWithMissingCharacterInventories;
 use App\Console\AfterDeployment\MoveAlchemyAndGemsToBags;
+use App\Console\AfterDeployment\RemoveAllGemsForRebuild;
 use App\Console\AfterDeployment\RemoveRacialStatBonuses;
 use App\Console\AfterDeployment\RepairQuestFeatureRewards;
 use App\Console\AfterDeployment\RepairStuckExplorationLogs;
 use App\Console\AfterDeployment\ResumeInterruptedRewardProcessing;
-use App\Console\AfterDevelopment\CreateGemWorlds;
 use App\Console\DevelopmentCommands\AssignTopEndGearToPlayer;
 use App\Console\DevelopmentCommands\CompleteGuideQuestForCharacter;
 use App\Console\DevelopmentCommands\CreateCharacter;
@@ -33,12 +34,15 @@ use App\Console\DevelopmentCommands\TestExploration;
 use App\Console\DevelopmentCommands\UpdateUsersForDevelopment;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
     /**
-     * Register any application services.
+     * Register the after-deployment, after-development and development console commands.
+     *
+     * @return void
      */
     public function register(): void
     {
@@ -59,8 +63,7 @@ class AppServiceProvider extends ServiceProvider
             ResumeInterruptedRewardProcessing::class,
             FlagUsersWithMissingCharacterInventories::class,
             RemoveRacialStatBonuses::class,
-
-            // After Development Commands
+            RemoveAllGemsForRebuild::class,
             CreateGemWorlds::class,
 
             // Development Commands:
@@ -83,7 +86,9 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * Bootstrap any application services.
+     * Register the core Blade component namespace, local mail routing and the JSON attachment response macro.
+     *
+     * @return void
      */
     public function boot(): void
     {
@@ -94,14 +99,14 @@ class AppServiceProvider extends ServiceProvider
             Mail::alwaysTo(env('DEFAULT_LOCAL_EMAIL'));
         }
 
-        \Response::macro('attachment', function ($content, $fileName) {
+        Response::macro('attachment', function ($content, $fileName) {
 
             $headers = [
                 'Content-type' => 'text/json',
                 'Content-Disposition' => 'attachment; filename='.$fileName.'.json',
             ];
 
-            return \Response::make($content, 200, $headers);
+            return Response::make($content, 200, $headers);
         });
     }
 }

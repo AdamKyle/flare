@@ -8,4 +8,5 @@ export default interface ItemColorFieldsDefinition {
   usable: boolean;
   holy_level: number | null;
   damages_kingdoms: boolean;
+  currency_cache_type?: string | null;
 }

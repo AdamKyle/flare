@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 
 import UseGuideQuestDetailDefinition from './definitions/use-guide-quest-detail-definition';
-import GuideQuestDefinition from '../definitions/guide-quest-definition';
+import GuideQuestDetailDefinition from '../definitions/guide-quest-detail-definition';
 import { GuideQuestApiMessages } from '../enums/guide-quest-api-messages';
 import { GuideQuestApiUrls } from '../enums/guide-quest-api-urls';
 
@@ -12,9 +12,8 @@ export const useGuideQuestDetail = (
   guideQuestId: number
 ): UseGuideQuestDetailDefinition => {
   const { apiHandler, getUrl } = useApiHandler();
-  const [guideQuest, setGuideQuest] = useState<GuideQuestDefinition | null>(
-    null
-  );
+  const [guideQuest, setGuideQuest] =
+    useState<GuideQuestDetailDefinition | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<AxiosErrorDefinition | null>(null);
   const requestGenerationRef = useRef(0);
@@ -30,7 +29,7 @@ export const useGuideQuestDetail = (
 
       try {
         const result = await apiHandler.get<
-          GuideQuestDefinition,
+          GuideQuestDetailDefinition,
           Record<string, never>
         >(getUrl(GuideQuestApiUrls.SHOW, { guideQuest: guideQuestId }), {
           signal: controller.signal,

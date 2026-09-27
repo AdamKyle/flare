@@ -13,6 +13,9 @@ class UsableItemTransformer extends TransformerAbstract
 {
     /**
      * Transform a usable Item, or the inventory/Alchemy Bag/Set slot holding it, into its factual usable-item contract.
+     *
+     * @param InventorySlot|SetSlot|AlchemyBagSlot|Item $slot
+     * @return array
      */
     public function transform(InventorySlot|SetSlot|AlchemyBagSlot|Item $slot): array
     {
@@ -65,6 +68,8 @@ class UsableItemTransformer extends TransformerAbstract
             'gem_scroll_currency_type' => $item->gem_scroll_currency_type?->value,
             'gem_scroll_socket_chance' => $item->gem_scroll_socket_chance,
             'gem_scroll_pre_gem_chance' => $item->gem_scroll_pre_gem_chance,
+            'cache_amount' => $item->cache_amount,
+            'currency_cache_type' => $item->currency_cache_type?->value,
         ];
     }
 }

@@ -3,10 +3,34 @@
 namespace Tests\Unit\Game\Character\CharacterInventory\Services;
 
 use App\Flare\Models\InventorySet;
+use App\Flare\Pagination\Pagination;
+use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
+use App\Game\Character\CharacterInventory\Services\InventorySetService;
+use App\Game\Character\CharacterInventory\Transformers\InventorySetOptionTransformer;
+use App\Game\Character\CharacterInventory\Transformers\InventoryTransformer;
+use App\Game\Character\CharacterInventory\Validations\SetHandsValidation;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\PhpRandomNumberGenerator;
+use App\Game\Core\Currency\Values\CurrencyCacheType;
+use App\Game\Core\Items\Enricher\EquippableEnricher;
+use App\Game\Core\Items\Enricher\ItemEnricherFactory;
+use App\Game\Core\Items\Transformers\Api\UsableItemTransformer as ApiUsableItemTransformer;
+use App\Game\Core\Items\Transformers\EquippableItemTransformer;
+use App\Game\Core\Items\Transformers\QuestItemTransformer;
+use App\Game\Core\Items\Transformers\UsableItemTransformer;
 use App\Game\Core\Items\Values\ItemType;
+use App\Game\Skills\Services\DisenchantService;
+use App\Game\Skills\Services\MassDisenchantService;
+use App\Game\Skills\Services\SkillBonusContextService;
+use App\Game\Skills\Services\SkillBonusService;
+use App\Game\Skills\Services\SkillCheckService;
+use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use League\Fractal\Manager;
+use Mockery;
+use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateAlchemyBagSlot;
@@ -25,22 +49,74 @@ class CharacterInventoryServiceTest extends TestCase
 
     private ?CharacterInventoryService $characterInventoryService;
 
+    private ?MockInterface $updateCharacterSkillsService = null;
+
+    private ?MockInterface $disenchantService = null;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
 
-        $this->characterInventoryService = resolve(CharacterInventoryService::class);
+        $manager = new Manager;
+        $plainDataSerializer = new PlainDataSerializer;
+        $randomNumberGenerator = new PhpRandomNumberGenerator;
+        $equippableItemTransformer = new EquippableItemTransformer;
+        $questItemTransformer = new QuestItemTransformer;
+        $apiUsableItemTransformer = new ApiUsableItemTransformer;
+        $inventorySetService = new InventorySetService(new SetHandsValidation);
+        $skillBonusService = new SkillBonusService(new SkillBonusContextService);
+
+        $this->updateCharacterSkillsService = Mockery::mock(UpdateCharacterSkillsService::class);
+        $this->disenchantService = Mockery::mock(DisenchantService::class);
+
+        $itemEnricherFactory = new ItemEnricherFactory(
+            new EquippableEnricher,
+            $equippableItemTransformer,
+            new UsableItemTransformer,
+            $questItemTransformer,
+            $plainDataSerializer,
+            $manager,
+        );
+
+        $this->characterInventoryService = new CharacterInventoryService(
+            $itemEnricherFactory,
+            $equippableItemTransformer,
+            $questItemTransformer,
+            $apiUsableItemTransformer,
+            new InventoryTransformer($itemEnricherFactory),
+            $inventorySetService,
+            new MassDisenchantService(
+                new SkillCheckService(
+                    $randomNumberGenerator,
+                    $skillBonusService,
+                ),
+                $randomNumberGenerator,
+                new ChanceCalculator($randomNumberGenerator),
+                $skillBonusService,
+            ),
+            $this->updateCharacterSkillsService,
+            $this->disenchantService,
+            new Pagination($manager),
+            $manager,
+            new InventorySetOptionTransformer,
+        );
     }
 
     protected function tearDown(): void
     {
         parent::tearDown();
 
+        Mockery::close();
+
         $this->character = null;
 
         $this->characterInventoryService = null;
+
+        $this->updateCharacterSkillsService = null;
+
+        $this->disenchantService = null;
     }
 
     public function test_get_inventory_for_api()
@@ -185,6 +261,8 @@ class CharacterInventoryServiceTest extends TestCase
         ]);
 
         $character = $character->refresh();
+
+        $this->updateCharacterSkillsService->shouldReceive('updateCharacterCraftingSkills')->once();
 
         $result = $this->characterInventoryService->setCharacter($character)->disenchantAllItems($character->inventory->slots, $character);
 
@@ -468,6 +546,8 @@ class CharacterInventoryServiceTest extends TestCase
             'item_suffix_id' => $this->createItemAffix(['type' => 'suffix']),
         ]))->getCharacter();
 
+        $this->updateCharacterSkillsService->shouldReceive('updateCharacterCraftingSkills')->once();
+
         $result = $this->characterInventoryService->setCharacter($character)->disenchantAllItemsInInventory();
 
         $this->assertEquals(200, $result['status']);
@@ -660,6 +740,61 @@ class CharacterInventoryServiceTest extends TestCase
         $this->characterInventoryService->setCharacter($character)->destroyAllAlchemyItems();
 
         $this->assertEquals(2, $gemSlot->refresh()->amount);
+    }
+
+    public function test_compensation_cache_cannot_be_destroyed_individually(): void
+    {
+        $cacheItem = $this->createItem([
+            'type' => 'alchemy',
+            'usable' => true,
+            'currency_cache_type' => CurrencyCacheType::GOLD,
+            'cache_amount' => 1000,
+        ]);
+        $character = $this->character->getCharacter();
+        $slot = $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $cacheItem->id,
+            'amount' => 1,
+        ]);
+
+        $result = $this->characterInventoryService->setCharacter($character)->destroyAlchemyItem($slot->id);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Compensation Caches cannot be destroyed. They can only be used.', $result['message']);
+        $this->assertNotNull($slot->fresh());
+        $this->assertNotNull($cacheItem->fresh());
+    }
+
+    public function test_destroy_all_alchemy_items_preserves_compensation_caches(): void
+    {
+        $alchemyItem = $this->createItem([
+            'type' => 'alchemy',
+        ]);
+        $cacheItem = $this->createItem([
+            'type' => 'alchemy',
+            'usable' => true,
+            'currency_cache_type' => CurrencyCacheType::SHARDS,
+            'cache_amount' => 1000,
+        ]);
+        $character = $this->character->getCharacter();
+        $ordinarySlot = $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $alchemyItem->id,
+            'amount' => 3,
+        ]);
+        $cacheSlot = $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $cacheItem->id,
+            'amount' => 1,
+        ]);
+
+        $this->characterInventoryService->setCharacter($character)->destroyAllAlchemyItems();
+
+        $this->assertNull($ordinarySlot->fresh());
+        $this->assertNotNull($cacheSlot->fresh());
     }
 
     public function test_batch_crafting_set_appears_last_in_set_payload(): void
@@ -1264,6 +1399,8 @@ class CharacterInventoryServiceTest extends TestCase
             ->giveItem($questItem)
             ->getCharacter();
 
+        $this->updateCharacterSkillsService->shouldReceive('updateCharacterCraftingSkills')->once();
+
         $this->characterInventoryService->setCharacter($character)->disenchantAllItemsInInventory();
 
         $character = $character->refresh();
@@ -1307,7 +1444,7 @@ class CharacterInventoryServiceTest extends TestCase
         $this->assertEquals('No item found to disenchant.', $result['message']);
     }
 
-    public function test_can_disenchant_item_from_inventory(): void
+    public function test_disenchant_item_delegates_the_owned_inventory_slot_to_the_disenchant_service(): void
     {
         $prefix = $this->createItemAffix(['type' => 'prefix']);
         $item = $this->createItem(['item_prefix_id' => $prefix->id]);
@@ -1316,10 +1453,18 @@ class CharacterInventoryServiceTest extends TestCase
 
         $slotId = $character->inventory->slots()->where('item_id', $item->id)->first()->id;
 
+        $this->disenchantService->shouldReceive('setUp')
+            ->once()
+            ->with(Mockery::on(fn ($setUpCharacter) => $setUpCharacter->id === $character->id))
+            ->andReturnSelf();
+        $this->disenchantService->shouldReceive('disenchantItem')
+            ->once()
+            ->with(Mockery::on(fn ($slot) => $slot->id === $slotId))
+            ->andReturn(['status' => 200, 'message' => 'Disenchanted item.']);
+
         $result = $this->characterInventoryService->setCharacter($character)->disenchantItem($item->id);
 
         $this->assertEquals(200, $result['status']);
-        $this->assertSame(0, $character->inventory->slots()->where('id', $slotId)->count());
     }
 
     public function test_get_paginated_inventory_set_options_returns_lean_fields(): void

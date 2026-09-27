@@ -11,6 +11,7 @@ export interface BaseItemDetails {
   usable: boolean;
   holy_level: number | null;
   damages_kingdoms: boolean;
+  currency_cache_type?: string | null;
   name: string;
   description: string;
   type: InventoryItemTypes;

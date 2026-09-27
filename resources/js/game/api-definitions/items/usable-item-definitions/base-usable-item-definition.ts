@@ -35,4 +35,7 @@ export default interface BaseUsableItemDefinition extends BaseItemDetails {
   gem_scroll_currency_type: string | null;
   gem_scroll_socket_chance: number | null;
   gem_scroll_pre_gem_chance: number | null;
+  cache_amount: number | null;
+  currency_cache_type:
+    'gold' | 'gold_dust' | 'shards' | 'copper_coins' | 'gold_bars' | null;
 }

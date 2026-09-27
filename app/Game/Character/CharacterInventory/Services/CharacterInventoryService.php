@@ -54,6 +54,20 @@ class CharacterInventoryService
 
     private ?string $inventorySetEquippedName = null;
 
+    /**
+     * @param ItemEnricherFactory $itemEnricherFactory
+     * @param EquippableItemTransformer $equippableItemTransformer
+     * @param QuestItemTransformer $questItemTransformer
+     * @param UsableItemTransformer $usableItemTransformer
+     * @param InventoryTransformer $inventoryTransformer
+     * @param InventorySetService $inventorySetService
+     * @param MassDisenchantService $massDisenchantService
+     * @param UpdateCharacterSkillsService $updateCharacterSkillsService
+     * @param DisenchantService $disenchantService
+     * @param Pagination $pagination
+     * @param Manager $manager
+     * @param InventorySetOptionTransformer $inventorySetOptionTransformer
+     */
     public function __construct(
         private readonly ItemEnricherFactory $itemEnricherFactory,
         private readonly EquippableItemTransformer $equippableItemTransformer,
@@ -72,7 +86,8 @@ class CharacterInventoryService
     /**
      * Set the character used for subsequent inventory operations.
      *
-     * @param Character $character The character to operate on.
+     * @param Character $character
+     * @return CharacterInventoryService
      */
     public function setCharacter(Character $character): CharacterInventoryService
     {
@@ -84,7 +99,8 @@ class CharacterInventoryService
     /**
      * Set the inventory slot used for subsequent inventory operations.
      *
-     * @param InventorySlot $inventorySlot The inventory slot to operate on.
+     * @param InventorySlot $inventorySlot
+     * @return CharacterInventoryService
      */
     public function setInventorySlot(InventorySlot $inventorySlot): CharacterInventoryService
     {
@@ -96,7 +112,8 @@ class CharacterInventoryService
     /**
      * Set the inventory slot positions used to resolve the character's inventory.
      *
-     * @param array $positions The slot positions to resolve inventory from.
+     * @param array $positions
+     * @return CharacterInventoryService
      */
     public function setPositions(array $positions): CharacterInventoryService
     {
@@ -108,7 +125,7 @@ class CharacterInventoryService
     /**
      * Build the complete inventory API payload for the character.
      *
-     * @return array The full inventory, sets, quest items, usable items, and equipped-set payload.
+     * @return array
      */
     public function getInventoryForApi(): array
     {
@@ -131,7 +148,7 @@ class CharacterInventoryService
     /**
      * Return the currently equipped Inventory Set's name, when a set is equipped.
      *
-     * @return string|null The equipped Inventory Set's name, or null when no set is equipped.
+     * @return string|null
      */
     public function getSetName(): ?string
     {
@@ -141,48 +158,32 @@ class CharacterInventoryService
     /**
      * Return the character's inventory data for the requested inventory panel type.
      *
-     * @param string $type The requested inventory panel type.
-     * @return Collection|array The resolved inventory data for the requested type.
+     * @param string $type
+     * @return Collection|array
      */
     public function getInventoryForType(string $type): Collection|array
     {
-        switch ($type) {
-            case 'inventory':
-                return $this->fetchCharacterInventory();
-            case 'usable_sets':
-            case 'savable_sets':
-                return $this->getUsableSets();
-            case 'equipped':
-                $equipped = $this->fetchEquipped();
-
-                return ! is_null($equipped) ? $equipped : [];
-            case 'sets':
-                return [
-                    'sets' => $this->getCharacterInventorySets(),
-                    'set_equipped' => InventorySet::where('character_id', $this->character->id)->where('is_equipped', true)->count() > 0,
-                ];
-            case 'quest_items':
-                return $this->getQuestItems();
-            case 'usable_items':
-                return $this->getUsableItems();
-            default:
-                return $this->getInventoryForApi();
-        }
+        return match ($type) {
+            'inventory' => $this->fetchCharacterInventory(),
+            'usable_sets', 'savable_sets' => $this->getUsableSets(),
+            'equipped' => $this->fetchEquipped() ?? [],
+            'sets' => [
+                'sets' => $this->getCharacterInventorySets(),
+                'set_equipped' => InventorySet::where('character_id', $this->character->id)->where('is_equipped', true)->exists(),
+            ],
+            'quest_items' => $this->getQuestItems(),
+            'usable_items' => $this->getUsableItems(),
+            default => $this->getInventoryForApi(),
+        };
     }
 
     /**
-     * Resolves an exact SetSlot for item details, instead of the item_id-based
-     * lookup in getSlotForItemDetails() below, which picks the first slot it finds
-     * matching that item_id. When duplicate, non-enchanted items share the same
-     * catalog Item row across multiple SetSlots (e.g. several identical Batch
-     * Crafting outputs kept in the Crafted Items Set), that ambiguous lookup can
-     * resolve to the wrong physical slot. Callers that already know the specific
-     * SetSlot id (such as Batch Crafting action history) should use this instead.
+     * Resolve the exact owned SetSlot holding the Item, for callers that already know the SetSlot id.
      *
-     * @param Character $character The owning character.
-     * @param Item $item The catalog item the slot must contain.
-     * @param int $setSlotId The exact SetSlot id to resolve.
-     * @return SetSlot|null The matching SetSlot, or null when it does not exist for the character.
+     * @param Character $character
+     * @param Item $item
+     * @param int $setSlotId
+     * @return SetSlot|null
      */
     public function getSetSlotForItemDetails(Character $character, Item $item, int $setSlotId): ?SetSlot
     {
@@ -195,40 +196,36 @@ class CharacterInventoryService
     /**
      * Resolve the inventory or set slot holding the given item, for item detail display.
      *
-     * @param Character $character The owning character.
-     * @param int|Item $slotIdOrItem The slot id or item to resolve a slot for.
-     * @return InventorySlot|SetSlot|null The resolved slot, or null when none is found.
+     * @param Character $character
+     * @param int|Item $slotIdOrItem
+     * @return InventorySlot|SetSlot|null
      */
     public function getSlotForItemDetails(Character $character, int|Item $slotIdOrItem): InventorySlot|SetSlot|null
     {
-        $inventory = Inventory::where('character_id', $character->id)->first();
+        $slot = Inventory::where('character_id', $character->id)->first()?->slots()
+            ->when($slotIdOrItem instanceof Item, fn ($query) => $query->where('item_id', $slotIdOrItem->id))
+            ->when(! ($slotIdOrItem instanceof Item), fn ($query) => $query->where('id', $slotIdOrItem))
+            ->first();
 
-        if ($inventory) {
-            $slot = $inventory->slots()
-                ->when($slotIdOrItem instanceof Item, fn ($q) => $q->where('item_id', $slotIdOrItem->id))
-                ->when(! ($slotIdOrItem instanceof Item), fn ($q) => $q->where('id', $slotIdOrItem))
-                ->first();
-
-            if ($slot) {
-                return $slot;
-            }
+        if (! is_null($slot)) {
+            return $slot;
         }
 
         return SetSlot::query()
             ->join('inventory_sets', 'inventory_sets.id', '=', 'set_slots.inventory_set_id')
             ->where('inventory_sets.character_id', $character->id)
-            ->when($slotIdOrItem instanceof Item, fn ($q) => $q->where('set_slots.item_id', $slotIdOrItem->id))
-            ->when(! ($slotIdOrItem instanceof Item), fn ($q) => $q->where('set_slots.id', $slotIdOrItem))
+            ->when($slotIdOrItem instanceof Item, fn ($query) => $query->where('set_slots.item_id', $slotIdOrItem->id))
+            ->when(! ($slotIdOrItem instanceof Item), fn ($query) => $query->where('set_slots.id', $slotIdOrItem))
             ->select('set_slots.*')
             ->first();
     }
 
     /**
-     * Disenchant all items in an inventory.
+     * Disenchant every given slot for the Character and report the Gold Dust and skill levels gained.
      *
-     * @param Collection $slots The slots to disenchant.
-     * @param Character $character The character disenchanting the items.
-     * @return array The disenchant-all result.
+     * @param Collection $slots
+     * @param Character $character
+     * @return array
      */
     public function disenchantAllItems(Collection $slots, Character $character): array
     {
@@ -258,11 +255,11 @@ class CharacterInventoryService
     }
 
     /**
-     * Get character inventory sets.
+     * Build the paginated payload of the Character's Inventory Sets, with the Crafted Items Set last.
      *
-     * @param int $perPage The number of sets to return per page.
-     * @param int $page The page number to return.
-     * @return array The paginated inventory set payload.
+     * @param int $perPage
+     * @param int $page
+     * @return array
      */
     public function getCharacterInventorySets(int $perPage = 10, int $page = 1): array
     {
@@ -305,16 +302,12 @@ class CharacterInventoryService
     }
 
     /**
-     * Build the lean, database-paginated, searchable normal Inventory Set destination options for a Batch Crafting Craft Set output selector.
+     * Paginate the empty, unequipped, normal Inventory Sets eligible as a Batch Crafting Craft Set destination.
      *
-     * Only empty, unequipped, normal Inventory Sets are eligible. The special Crafted Items/Batch Crafting Set is excluded here
-     * because it has its own dedicated output destination. Each eligible set carries its real ordinal position among the
-     * character's normal Inventory Sets ordered by id, so fallback display names stay stable regardless of which sets are eligible.
-     *
-     * @param int $perPage The number of sets to return per page.
-     * @param int $page The page number to return.
-     * @param string $search The optional search text to filter sets by name.
-     * @return array The paginated, lean, eligible Inventory Set option payload.
+     * @param int $perPage
+     * @param int $page
+     * @param string $search
+     * @return array
      */
     public function getPaginatedInventorySetOptions(int $perPage = 10, int $page = 1, string $search = ''): array
     {
@@ -347,15 +340,12 @@ class CharacterInventoryService
     }
 
     /**
-     * Return the character's paginated selectable Inventory Sets that contain at least one
-     * currently eligible Holy Oil target item.
+     * Paginate the selectable Inventory Sets holding at least one currently eligible Holy Oil target Item.
      *
-     * Unlike getPaginatedInventorySetOptions(), a Set does not need to be empty to appear here.
-     *
-     * @param int $perPage The number of sets to return per page.
-     * @param int $page The page number to return.
-     * @param string $search The optional search text to filter sets by name.
-     * @return array The paginated Holy Oil target set option payload.
+     * @param int $perPage
+     * @param int $page
+     * @param string $search
+     * @return array
      */
     public function getPaginatedHolyOilTargetSetOptions(int $perPage = 10, int $page = 1, string $search = ''): array
     {
@@ -395,8 +385,8 @@ class CharacterInventoryService
     /**
      * Resolve a valid normal Inventory Set target belonging to the character, for a Batch Crafting destination.
      *
-     * @param int $setId The requested destination Inventory Set id.
-     * @return InventorySet|null The valid target set, or null when it is not a legal target.
+     * @param int $setId
+     * @return InventorySet|null
      */
     public function resolveValidTargetInventorySet(int $setId): ?InventorySet
     {
@@ -410,14 +400,10 @@ class CharacterInventoryService
     }
 
     /**
-     * Resolve a normal, unequipped, currently empty Inventory Set belonging to the character, for Batch Crafting start/preview validation only.
+     * Resolve a normal, unequipped, empty Inventory Set belonging to the character for Batch Crafting start validation.
      *
-     * Unlike resolveValidTargetInventorySet(), which resolves the already-selected destination
-     * during runtime placement after a Batch has begun filling it, this method enforces the
-     * empty-at-start contract required before a Batch Crafting run may begin.
-     *
-     * @param int $setId The requested destination Inventory Set id.
-     * @return InventorySet|null The eligible empty set, or null when it is not a legal start destination.
+     * @param int $setId
+     * @return InventorySet|null
      */
     public function resolveEmptyBatchCraftingDestinationSet(int $setId): ?InventorySet
     {
@@ -431,14 +417,10 @@ class CharacterInventoryService
     }
 
     /**
-     * Resolve an Inventory Set the character genuinely owns, for factual display purposes.
+     * Resolve any Inventory Set the character owns, including equipped and Crafted Items Sets, for factual display.
      *
-     * Unlike resolveValidTargetInventorySet(), this does not exclude equipped or Batch
-     * Crafting Sets, because a previously selected destination set may legitimately have
-     * become equipped after a Batch Crafting run started.
-     *
-     * @param int $setId The requested Inventory Set id.
-     * @return InventorySet|null The character's own set, or null when it does not belong to the character.
+     * @param int $setId
+     * @return InventorySet|null
      */
     public function findOwnedInventorySet(int $setId): ?InventorySet
     {
@@ -448,21 +430,19 @@ class CharacterInventoryService
     /**
      * Return the paginated items belonging to one of the character's Inventory Sets.
      *
-     * @param int $perPage The number of items to return per page.
-     * @param int $page The page number to return.
-     * @param string $search The optional search text to filter items by name.
-     * @param array $filters The optional filters, including a specific set id.
-     * @return array The paginated set item payload.
+     * @param int $perPage
+     * @param int $page
+     * @param string $search
+     * @param array $filters
+     * @return array
      */
     public function getSetItems(int $perPage = 10, int $page = 1, string $search = '', array $filters = []): array
     {
         $sets = $this->character->inventorySets();
 
-        if (isset($filters['set_id'])) {
-            $set = $sets->where('id', $filters['set_id'])->first();
-        } else {
-            $set = $sets->where('is_equipped', true)->first();
-        }
+        $set = isset($filters['set_id'])
+            ? $sets->where('id', $filters['set_id'])->first()
+            : $sets->where('is_equipped', true)->first();
 
         $slots = $set->slots;
 
@@ -489,13 +469,9 @@ class CharacterInventoryService
     }
 
     /**
-     * Get equipped inventory set name.
+     * Return the equipped Inventory Set's name, its fallback set number name, or null when none is equipped.
      *
-     * - Either null if none.
-     * - Equipped set name.
-     * - Equipped set string id + 1
-     *
-     * @return string|null The equipped set's name, or null when no set is equipped.
+     * @return string|null
      */
     public function getEquippedInventorySetName(): ?string
     {
@@ -515,11 +491,11 @@ class CharacterInventoryService
     }
 
     /**
-     * Returns the usable items.
+     * Build the transformed usable Alchemy Bag item payload for the Character.
      *
-     * @param string $searchText The optional search text to filter items by name.
-     * @param array $filters The optional usable-item filters.
-     * @return array The usable item payload.
+     * @param string $searchText
+     * @param array $filters
+     * @return array
      */
     public function getUsableItems(string $searchText = '', array $filters = []): array
     {
@@ -536,11 +512,11 @@ class CharacterInventoryService
     }
 
     /**
-     * Returns the usable items as an Eloquent collection, filtered by search text and filters.
+     * Return the Character's Alchemy Bag slots filtered by search text and usable-item filters.
      *
-     * @param string $searchText The optional search text to filter items by name.
-     * @param array $filters The optional usable-item filters.
-     * @return Collection The filtered usable item slots.
+     * @param string $searchText
+     * @param array $filters
+     * @return Collection
      */
     private function getUsableItemsCollection(string $searchText = '', array $filters = []): Collection
     {
@@ -575,9 +551,9 @@ class CharacterInventoryService
     /**
      * Determines whether a usable item matches any of the selected usable-item filters.
      *
-     * @param Item $item The item to test.
-     * @param array $filters The selected usable-item filters.
-     * @return bool Whether the item matches at least one selected filter.
+     * @param Item $item
+     * @param array $filters
+     * @return bool
      */
     private function usableItemMatchesFilters(Item $item, array $filters): bool
     {
@@ -630,10 +606,10 @@ class CharacterInventoryService
     }
 
     /**
-     * Returns the quest items.
+     * Return the quest Items in the Character's inventory, optionally filtered by name.
      *
-     * @param string $searchText The optional search text to filter items by name.
-     * @return Collection The matching quest items.
+     * @param string $searchText
+     * @return Collection
      */
     public function getQuestItems(string $searchText = ''): Collection
     {
@@ -651,12 +627,9 @@ class CharacterInventoryService
     }
 
     /**
-     * Gets a list of usable slot's
+     * List the unequipped normal Inventory Sets with their one-based set number and display name.
      *
-     * We return the index + 1 which refers to the slot number.
-     * ie, index of 0, is Slot 1 and so on.
-     *
-     * @return array The usable, non-equipped, non-Batch-Crafting inventory sets.
+     * @return array
      */
     public function getUsableSets(): array
     {
@@ -693,14 +666,10 @@ class CharacterInventoryService
     }
 
     /**
-     * Get inventory collection.
+     * Return the unequipped normal inventory slots, excluding quest, alchemy, gem and currently disenchanting Items.
      *
-     *  - Does not include equipped, usable or quest items.
-     *  - Only comes from inventory, does not include sets.
-     *  - If the character is currently disenchanting selected items, do not get those items.
-     *
-     * @param string $searchText The optional search text to filter items by name.
-     * @return Collection The matching inventory slots.
+     * @param string $searchText
+     * @return Collection
      */
     public function getInventorySlotsCollection(string $searchText = ''): Collection
     {
@@ -731,8 +700,8 @@ class CharacterInventoryService
     /**
      * Return the character's normal inventory, enriched and sorted by total damage stat bonus.
      *
-     * @param string $searchText The optional search text to filter items by name.
-     * @return Collection The enriched, sorted inventory slots.
+     * @param string $searchText
+     * @return Collection
      */
     public function getInventoryCollection(string $searchText = ''): Collection
     {
@@ -747,15 +716,12 @@ class CharacterInventoryService
     }
 
     /**
-     * Fetches the characters inventory.
+     * Paginate the Character's normal inventory, excluding equipped, usable, quest and set Items.
      *
-     * - Does not include equipped, usable or quest items.
-     * - Only comes from inventory, does not include sets.
-     *
-     * @param int $perPage The number of items to return per page.
-     * @param int $page The page number to return.
-     * @param string $searchText The optional search text to filter items by name.
-     * @return array The paginated inventory payload.
+     * @param int $perPage
+     * @param int $page
+     * @param string $searchText
+     * @return array
      */
     public function fetchCharacterInventory(int $perPage = 10, int $page = 1, string $searchText = ''): array
     {
@@ -765,12 +731,12 @@ class CharacterInventoryService
     }
 
     /**
-     * Returns all quest items - paginated.
+     * Paginate the Character's quest Items.
      *
-     * @param int $perPage The number of items to return per page.
-     * @param int $page The page number to return.
-     * @param string $searchText The optional search text to filter items by name.
-     * @return array The paginated quest item payload.
+     * @param int $perPage
+     * @param int $page
+     * @param string $searchText
+     * @return array
      */
     public function fetchCharacterQuestItems(int $perPage = 10, int $page = 1, string $searchText = ''): array
     {
@@ -780,13 +746,13 @@ class CharacterInventoryService
     }
 
     /**
-     * Returns all usable items - paginated
+     * Paginate the Character's usable Alchemy Bag Items.
      *
-     * @param int $perPage The number of items to return per page.
-     * @param int $page The page number to return.
-     * @param string $searchText The optional search text to filter items by name.
-     * @param array $filter The optional usable-item filters.
-     * @return array The paginated usable item payload.
+     * @param int $perPage
+     * @param int $page
+     * @param string $searchText
+     * @param array $filter
+     * @return array
      */
     public function fetchCharacterUsableItems(int $perPage = 10, int $page = 1, string $searchText = '', array $filter = []): array
     {
@@ -796,12 +762,9 @@ class CharacterInventoryService
     }
 
     /**
-     * Fetch inventory slot items.
+     * Return the ids of the Character's unequipped inventory slots, excluding quest, alchemy, gem and artifact Items.
      *
-     * - Does not include alchemy or quest items.
-     * - Items can also not be equipped.
-     *
-     * @return array The matching inventory slot ids.
+     * @return array
      */
     public function findCharacterInventorySlotIds(): array
     {
@@ -818,7 +781,7 @@ class CharacterInventoryService
     /**
      * Fetch equipped slots (InventorySlot or SetSlot) with each slot’s item enriched for the transformer.
      *
-     * @return array The transformed equipped slot payload.
+     * @return array
      */
     public function fetchEquipped(): array
     {
@@ -855,17 +818,9 @@ class CharacterInventoryService
 
         $this->isInventorySetIsEquipped = true;
 
-        if (! is_null($inventorySet->name)) {
-            $this->inventorySetEquippedName = $inventorySet->name;
-        } else {
-            $index = $this->character->inventorySets->search(function ($set) use ($inventorySet) {
-                return $set->id === $inventorySet->id;
-            });
+        $index = $this->character->inventorySets->search(fn (InventorySet $set) => $set->id === $inventorySet->id);
 
-            if ($index !== false) {
-                $this->inventorySetEquippedName = 'Set '.($index + 1);
-            }
-        }
+        $this->inventorySetEquippedName = $inventorySet->name ?? 'Set '.($index + 1);
 
         $setSlots = SetSlot::query()
             ->where('inventory_set_id', $inventorySet->id)
@@ -886,6 +841,8 @@ class CharacterInventoryService
 
     /**
      * Resolve and store the inventory for the previously set positions.
+     *
+     * @return CharacterInventoryService
      */
     public function setInventory(): CharacterInventoryService
     {
@@ -897,7 +854,7 @@ class CharacterInventoryService
     /**
      * Resolve the inventory slots for the previously set positions, falling back to the equipped set's slots.
      *
-     * @return Collection The resolved inventory slots.
+     * @return Collection
      */
     private function getInventory(): Collection
     {
@@ -922,7 +879,7 @@ class CharacterInventoryService
     /**
      * Return the previously resolved inventory.
      *
-     * @return Collection The resolved inventory slots.
+     * @return Collection
      */
     public function inventory(): Collection
     {
@@ -930,10 +887,10 @@ class CharacterInventoryService
     }
 
     /**
-     * Fetches the type of the item.
+     * Resolve the normalized inventory type of the Item, logging when it cannot be normalized.
      *
-     * @param Item $item The item to resolve the type for.
-     * @return string|null The resolved item type, or null when unsupported.
+     * @param Item $item
+     * @return string|null
      */
     public function getType(Item $item): ?string
     {
@@ -959,10 +916,10 @@ class CharacterInventoryService
     }
 
     /**
-     * Delete an item from the inventory.
+     * Destroy one unequipped, destroyable Item from the Character's inventory.
      *
-     * @param int $itemId The item id to delete.
-     * @return array The delete result.
+     * @param int $itemId
+     * @return array
      */
     public function deleteItem(int $itemId): array
     {
@@ -992,13 +949,9 @@ class CharacterInventoryService
     }
 
     /**
-     * Destroy all items in your inventory.
+     * Destroy every unequipped normal inventory Item, leaving sets, quest, usable, gem and artifact Items alone.
      *
-     * - Will not destroy sets or items in sets.
-     * - Will not destroy quest items or usable items.
-     * - Will not destroy artifact items either.
-     *
-     * @return array The destroy-all result.
+     * @return array
      */
     public function destroyAllItemsInInventory(): array
     {
@@ -1019,7 +972,7 @@ class CharacterInventoryService
     /**
      * Disenchant every disenchantable item in the character's normal inventory.
      *
-     * @return array The disenchant-all result.
+     * @return array
      */
     public function disenchantAllItemsInInventory(): array
     {
@@ -1044,10 +997,10 @@ class CharacterInventoryService
     }
 
     /**
-     * Unequip an item from the player.
+     * Unequip one inventory slot when the Character's inventory has room.
      *
-     * @param int $inventorySlotId The inventory slot id to unequip.
-     * @return array The unequip result.
+     * @param int $inventorySlotId
+     * @return array
      */
     public function unequipItem(int $inventorySlotId): array
     {
@@ -1086,9 +1039,9 @@ class CharacterInventoryService
     }
 
     /**
-     * Unequip all items.
+     * Unequip every inventory slot when the Character's inventory has room.
      *
-     * @return array The unequip-all result.
+     * @return array
      */
     public function unequipAllItems(): array
     {
@@ -1121,10 +1074,10 @@ class CharacterInventoryService
     }
 
     /**
-     * Destroy Alchemy item.
+     * Destroy one owned Alchemy Bag slot, refusing Compensation Caches.
      *
-     * @param int $slotId The alchemy bag slot id to destroy.
-     * @return array The destroy result.
+     * @param int $slotId
+     * @return array
      */
     public function destroyAlchemyItem(int $slotId): array
     {
@@ -1139,6 +1092,10 @@ class CharacterInventoryService
 
         if (is_null($slot)) {
             return $this->errorResult('No alchemy item found to destroy.');
+        }
+
+        if (! is_null($slot->item->currency_cache_type)) {
+            return $this->errorResult('Compensation Caches cannot be destroyed. They can only be used.');
         }
 
         $name = $slot->item->affix_name;
@@ -1160,9 +1117,9 @@ class CharacterInventoryService
     }
 
     /**
-     * Destroy all alchemy items.
+     * Destroy every owned Alchemy Bag slot except Compensation Caches.
      *
-     * @return array The destroy-all result.
+     * @return array
      */
     public function destroyAllAlchemyItems(): array
     {
@@ -1171,6 +1128,9 @@ class CharacterInventoryService
         if (! is_null($alchemyBag)) {
             AlchemyBagSlot::where('alchemy_bag_id', $alchemyBag->id)
                 ->where('character_id', $this->character->id)
+                ->whereDoesntHave('item', function ($query) {
+                    $query->whereNotNull('currency_cache_type');
+                })
                 ->delete();
         }
 
@@ -1188,10 +1148,10 @@ class CharacterInventoryService
     }
 
     /**
-     * Sell one inventory item for the character.
+     * Sell one unequipped, sellable inventory Item for the character.
      *
-     * @param int $itemId The item id to sell.
-     * @return array The sell result.
+     * @param int $itemId
+     * @return array
      */
     public function sellItem(int $itemId): array
     {
@@ -1220,10 +1180,10 @@ class CharacterInventoryService
     }
 
     /**
-     * Disenchant one inventory item for the character.
+     * Find the owned, disenchantable inventory slot for the Item and delegate its disenchanting.
      *
-     * @param int $itemId The item id to disenchant.
-     * @return array The disenchant result.
+     * @param int $itemId
+     * @return array
      */
     public function disenchantItem(int $itemId): array
     {
@@ -1244,9 +1204,10 @@ class CharacterInventoryService
     }
 
     /**
-     * Updates the character stats.
+     * Dispatch a rebuild of the Character's cached attack data.
      *
-     * @param Character $character The character to update attack data for.
+     * @param Character $character
+     * @return void
      */
     private function updateCharacterAttackDataCache(Character $character): void
     {
@@ -1254,10 +1215,10 @@ class CharacterInventoryService
     }
 
     /**
-     * Fetch type based on accepted types.
+     * Normalize a raw Item type to an accepted inventory type, or null when unsupported.
      *
-     * @param string $type The raw item type to normalize.
-     * @return string|null The normalized item type, or null when unsupported.
+     * @param string $type
+     * @return string|null
      */
     private function fetchType(string $type): ?string
     {

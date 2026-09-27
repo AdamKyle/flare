@@ -3,12 +3,17 @@
 namespace App\Flare\Models;
 
 use App\Flare\Models\Traits\CalculateSkillBonus;
+use App\Game\Core\Currency\Values\CurrencyCacheType;
 use App\Game\Gems\Progression\Values\GemScrollCurrencyType;
 use App\Game\Gems\Progression\Values\GemScrollType;
 use Bkwld\Cloner\Cloneable;
 use Database\Factories\ItemFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Item extends Model
 {
@@ -96,6 +101,8 @@ class Item extends Model
         'gem_scroll_currency_type',
         'gem_scroll_socket_chance',
         'gem_scroll_pre_gem_chance',
+        'cache_amount',
+        'currency_cache_type',
     ];
 
     protected $casts = [
@@ -164,6 +171,8 @@ class Item extends Model
         'gem_scroll_currency_type' => GemScrollCurrencyType::class,
         'gem_scroll_socket_chance' => 'float',
         'gem_scroll_pre_gem_chance' => 'float',
+        'cache_amount' => 'integer',
+        'currency_cache_type' => CurrencyCacheType::class,
     ];
 
     protected $appends = [
@@ -179,76 +188,151 @@ class Item extends Model
         'is_unique',
     ];
 
+    /**
+     * Get the Item Skill attached to this Item, including its child skills.
+     *
+     * @return HasOne
+     */
     public function itemSkill()
     {
         return $this->hasOne(ItemSkill::class, 'id', 'item_skill_id')->with('children');
     }
 
+    /**
+     * Get the Item Skill progression rows recorded for this Item.
+     *
+     * @return HasMany
+     */
     public function itemSkillProgressions()
     {
         return $this->hasMany(ItemSkillProgression::class, 'item_id', 'id');
     }
 
+    /**
+     * Get the inventory slots holding this Item.
+     *
+     * @return HasMany
+     */
     public function inventorySlots()
     {
         return $this->hasMany(InventorySlot::class, 'item_id', 'id');
     }
 
+    /**
+     * Get the inventory set slots holding this Item.
+     *
+     * @return HasMany
+     */
     public function inventorySetSlots()
     {
         return $this->hasMany(SetSlot::class, 'item_id', 'id');
     }
 
+    /**
+     * Get the Market Board listings for this Item.
+     *
+     * @return HasMany
+     */
     public function marketListings()
     {
         return $this->hasMany(MarketBoard::class, 'item_id', 'id');
     }
 
+    /**
+     * Get the Market Board sale history for this Item.
+     *
+     * @return HasMany
+     */
     public function marketHistory()
     {
         return $this->hasMany(MarketHistory::class, 'item_id', 'id');
     }
 
+    /**
+     * Get the suffix affix applied to this Item.
+     *
+     * @return HasOne
+     */
     public function itemSuffix()
     {
         return $this->hasOne(ItemAffix::class, 'id', 'item_suffix_id');
     }
 
+    /**
+     * Get the prefix affix applied to this Item.
+     *
+     * @return HasOne
+     */
     public function itemPrefix()
     {
         return $this->hasOne(ItemAffix::class, 'id', 'item_prefix_id');
     }
 
+    /**
+     * Get the Holy Stacks applied to this Item.
+     *
+     * @return HasMany
+     */
     public function appliedHolyStacks()
     {
         return $this->hasMany(HolyStack::class, 'item_id', 'id');
     }
 
+    /**
+     * Get the socket rows attached to this Item.
+     *
+     * @return HasMany
+     */
     public function sockets()
     {
         return $this->hasMany(ItemSocket::class, 'item_id', 'id');
     }
 
+    /**
+     * Get the Location this Item drops from, including its map.
+     *
+     * @return HasOne
+     */
     public function dropLocation()
     {
         return $this->hasOne(Location::class, 'id', 'drop_location_id')->with('map');
     }
 
+    /**
+     * Get the Game Class this Item unlocks.
+     *
+     * @return HasOne
+     */
     public function unlocksClass()
     {
         return $this->hasOne(GameClass::class, 'id', 'unlocks_class_id');
     }
 
+    /**
+     * Get the Items that use this Item as their parent, recursively including their children.
+     *
+     * @return HasMany
+     */
     public function children()
     {
         return $this->hasMany($this, 'parent_id')->with('children');
     }
 
+    /**
+     * Get the parent Item of this Item.
+     *
+     * @return BelongsTo
+     */
     public function parent()
     {
         return $this->belongsTo($this, 'parent_id');
     }
 
+    /**
+     * Build the display name with the prefix and suffix names wrapped around the base name.
+     *
+     * @return string
+     */
     public function getAffixNameAttribute()
     {
         $itemPrefix = $this->itemPrefix;
@@ -266,6 +350,11 @@ class Item extends Model
         return $itemName === '' ? $this->name : $itemName;
     }
 
+    /**
+     * Count how many of the prefix and suffix affixes are applied to this Item.
+     *
+     * @return int
+     */
     public function getAffixCountAttribute()
     {
         if (! is_null($this->item_prefix_id) && ! is_null($this->item_suffix_id)) {
@@ -278,26 +367,51 @@ class Item extends Model
         return 0;
     }
 
+    /**
+     * Determine whether either applied affix is a randomly generated unique affix.
+     *
+     * @return bool
+     */
     public function getIsUniqueAttribute()
     {
         return $this->itemPrefix?->randomly_generated || $this->itemSuffix?->randomly_generated;
     }
 
+    /**
+     * Return the Monster that drops this quest Item, or null for other Item types.
+     *
+     * @return ?Monster
+     */
     public function getRequiredMonsterAttribute()
     {
         return $this->type === 'quest' ? Monster::where('quest_item_id', $this->id)->with('gameMap')->first() : null;
     }
 
+    /**
+     * Return the Quest that rewards this quest Item, or null for other Item types.
+     *
+     * @return ?Quest
+     */
     public function getRequiredQuestAttribute()
     {
         return $this->type === 'quest' ? Quest::where('reward_item', $this->id)->with('npc', 'npc.gameMap', 'item')->first() : null;
     }
 
+    /**
+     * Return the Locations that reward this quest Item, or an empty array for other Item types.
+     *
+     * @return Collection|array
+     */
     public function getLocationsAttribute()
     {
         return $this->type === 'quest' ? Location::where('quest_reward_item_id', $this->id)->with('map')->get() : [];
     }
 
+    /**
+     * Build the factual drop source details for a quest Item.
+     *
+     * @return array
+     */
     public function getDropSourcesAttribute(): array
     {
         if ($this->type !== 'quest') {
@@ -330,6 +444,12 @@ class Item extends Model
         return [$source];
     }
 
+    /**
+     * Resolve the player-facing source type name for the Monster that drops this Item.
+     *
+     * @param Monster $monster
+     * @return string
+     */
     private function resolveMonsterSourceType(Monster $monster): string
     {
         if ($monster->is_celestial_entity) {
@@ -351,21 +471,42 @@ class Item extends Model
         return 'Normal Monster';
     }
 
+    /**
+     * Sum the Devouring Darkness bonus from every Holy Stack applied to this Item.
+     *
+     * @return float
+     */
     public function getHolyStackDevouringDarknessAttribute()
     {
         return $this->appliedHolyStacks->sum('devouring_darkness_bonus') ?? 0.0;
     }
 
+    /**
+     * Sum the stat increase bonus from every Holy Stack applied to this Item.
+     *
+     * @return float
+     */
     public function getHolyStackStatBonusAttribute()
     {
         return $this->appliedHolyStacks->sum('stat_increase_bonus') ?? 0.0;
     }
 
+    /**
+     * Count the Holy Stacks applied to this Item.
+     *
+     * @return int
+     */
     public function getHolyStacksAppliedAttribute()
     {
         return $this->appliedHolyStacks->count() ?? 0;
     }
 
+    /**
+     * Sum the given attribute across this Item's prefix and suffix affixes.
+     *
+     * @param string $attribute
+     * @return float
+     */
     public function getAffixAttribute(string $attribute): float
     {
         $base = 0.0;
@@ -381,16 +522,33 @@ class Item extends Model
         return $base;
     }
 
+    /**
+     * Return the skill training bonus this Item grants for the given Game Skill.
+     *
+     * @param GameSkill $gameSkill
+     * @return float
+     */
     public function getSkillTrainingBonus(GameSkill $gameSkill): float
     {
         return $this->calculateTrainingBonus($this, $gameSkill);
     }
 
+    /**
+     * Return the skill bonus this Item grants for the given Game Skill.
+     *
+     * @param GameSkill $gameSkill
+     * @return float
+     */
     public function getSkillBonus(GameSkill $gameSkill): float
     {
         return $this->calculateBonus($this, $gameSkill);
     }
 
+    /**
+     * Create the model factory used by Laravel for this Item.
+     *
+     * @return ItemFactory
+     */
     protected static function newFactory()
     {
         return ItemFactory::new();

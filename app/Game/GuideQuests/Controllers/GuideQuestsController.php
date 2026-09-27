@@ -12,17 +12,23 @@ use App\Flare\Tables\TableQueryBuilder;
 use App\Http\Controllers\Controller;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class GuideQuestsController extends Controller
 {
-    private Markdown $markdown;
+    /**
+     * @param Markdown $markdown
+     */
+    public function __construct(private readonly Markdown $markdown) {}
 
-    public function __construct(Markdown $markdown)
-    {
-        $this->markdown = $markdown;
-    }
-
-    public function index(Request $request, User $user)
+    /**
+     * Show the paginated list of Guide Quests the user's character has completed.
+     *
+     * @param Request $request
+     * @param User $user
+     * @return View
+     */
+    public function index(Request $request, User $user): View
     {
         $character = $user->character;
 
@@ -79,9 +85,16 @@ class GuideQuestsController extends Controller
         ]);
     }
 
-    public function show(Character $character, GuideQuest $guideQuest)
+    /**
+     * Show the player-facing details of a single completed Guide Quest.
+     *
+     * @param Character $character
+     * @param GuideQuest $guideQuest
+     * @return View
+     */
+    public function show(Character $character, GuideQuest $guideQuest): View
     {
-        return view('admin.guide-quests.show', [
+        return view('game.guide-quests.completed-guide-quest', [
             'guideQuest' => $guideQuest,
             'introBlocks' => $this->markdown->renderBlocks($guideQuest->intro_text),
             'desktopInstructions' => $this->markdown->renderBlocks($guideQuest->desktop_instructions),

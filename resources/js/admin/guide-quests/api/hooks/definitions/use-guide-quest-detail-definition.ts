@@ -1,9 +1,9 @@
 import { AxiosErrorDefinition } from 'api-handler/definitions/axios-error-definition';
 
-import GuideQuestDefinition from '../../definitions/guide-quest-definition';
+import GuideQuestDetailDefinition from '../../definitions/guide-quest-detail-definition';
 
 export default interface UseGuideQuestDetailDefinition {
-  guide_quest: GuideQuestDefinition | null;
+  guide_quest: GuideQuestDetailDefinition | null;
   loading: boolean;
   error: AxiosErrorDefinition | null;
 }

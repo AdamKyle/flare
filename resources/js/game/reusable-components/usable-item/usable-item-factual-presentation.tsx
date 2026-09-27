@@ -23,6 +23,7 @@ const UsableItemFactualPresentation = ({
       usable: item.usable,
       holy_level: item.holy_level,
       damages_kingdoms: item.damages_kingdoms,
+      currency_cache_type: item.currency_cache_type ?? null,
     });
 
   return (

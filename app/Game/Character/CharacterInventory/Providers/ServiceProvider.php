@@ -6,9 +6,11 @@ use App\Flare\Pagination\Pagination;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\Character\CharacterAttack\Transformers\CharacterAttackTransformer;
 use App\Game\Character\CharacterInventory\Builders\EquipManyBuilder;
+use App\Game\Character\CharacterInventory\Contracts\CurrencyCacheIssuer;
 use App\Game\Character\CharacterInventory\Services\BatchCraftingSetService;
 use App\Game\Character\CharacterInventory\Services\CharacterGemBagService;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
+use App\Game\Character\CharacterInventory\Services\CurrencyCacheGenerator;
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
 use App\Game\Character\CharacterInventory\Services\InventorySetService;
 use App\Game\Character\CharacterInventory\Services\MultiInventoryActionService;
@@ -33,13 +35,12 @@ use League\Fractal\Manager;
 class ServiceProvider extends ApplicationServiceProvider
 {
     /**
-     * Register any application services.
+     * Register the Character Inventory module services and public contracts.
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
-
         $this->app->bind(SetHandsValidation::class, function () {
             return new SetHandsValidation;
         });
@@ -105,12 +106,16 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(Pagination::class),
             );
         });
+
+        $this->app->bind(CurrencyCacheIssuer::class, function () {
+            return new CurrencyCacheGenerator;
+        });
     }
 
     /**
-     * Bootstrap any application services.
+     * Boot the Character Inventory module, which currently needs no boot-time setup.
      *
      * @return void
      */
-    public function boot() {}
+    public function boot(): void {}
 }

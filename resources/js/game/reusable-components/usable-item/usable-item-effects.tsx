@@ -1,5 +1,6 @@
 import React from 'react';
 
+import CompensationCacheSection from './compensation-cache-section';
 import UsableItemEffectsProps from './types/usable-item-effects-props';
 import ExperienceBonusesSection from '../../components/side-peeks/character-inventory/usable-items/partials/experience-bonus-section';
 import GeneralSection from '../../components/side-peeks/character-inventory/usable-items/partials/general-section';
@@ -93,6 +94,20 @@ const UsableItemEffects = ({ item }: UsableItemEffectsProps) => {
         />
       ));
     }
+  }
+
+  const currencyCacheType = item.currency_cache_type ?? null;
+  const cacheAmount = item.cache_amount ?? null;
+
+  if (currencyCacheType !== null && cacheAmount !== null) {
+    factories.push((showSeparator) => (
+      <CompensationCacheSection
+        key="cache"
+        currency_cache_type={currencyCacheType}
+        cache_amount={cacheAmount}
+        show_separator={showSeparator}
+      />
+    ));
   }
 
   if (item.damages_kingdoms) {

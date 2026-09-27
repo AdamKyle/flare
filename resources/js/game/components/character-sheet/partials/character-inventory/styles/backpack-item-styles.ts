@@ -33,6 +33,10 @@ export const backpackFocusRingStyles = (item: BaseItemDetails) => {
     .with({ type: InventoryItemTypes.QUEST }, () => 'focus:ring-marigold-800')
 
     .when(
+      (item) => item.currency_cache_type != null,
+      () => 'focus:ring-ferra-800'
+    )
+    .when(
       (item) =>
         item.usable || (item.holy_level ?? 0) > 0 || item.damages_kingdoms,
       () => 'focus:ring-wisp-pink-800'
@@ -71,6 +75,10 @@ export const backpackBorderStyles = (item: BaseItemDetails) => {
       () => 'border-marigold-800 dark:border-marigold-500'
     )
 
+    .when(
+      (item) => item.currency_cache_type != null,
+      () => 'border-ferra-800 dark:border-ferra-500'
+    )
     .when(
       (item) =>
         item.usable || (item.holy_level ?? 0) > 0 || item.damages_kingdoms,
@@ -128,6 +136,11 @@ export const backpackButtonBackground = (item: BaseItemDetails) => {
     )
 
     .when(
+      (item) => item.currency_cache_type != null,
+      () =>
+        'bg-ferra-100 hover:bg-ferra-200 dark:bg-ferra-100 dark:hover:bg-ferra-200'
+    )
+    .when(
       (item) =>
         item.usable || (item.holy_level ?? 0) > 0 || item.damages_kingdoms,
       () =>
@@ -165,6 +178,11 @@ export const backpackItemTextColors = (
 
     .when(
       (item) =>
+        'currency_cache_type' in item && item.currency_cache_type != null,
+      () => 'text-ferra-900 dark:text-ferra-900'
+    )
+    .when(
+      (item) =>
         item.usable || (item.holy_level ?? 0) > 0 || item.damages_kingdoms,
       () => 'text-wisp-pink-900 dark:text-wisp-pink-900'
     )
@@ -195,6 +213,10 @@ export const planeTextItemColors = (
     )
     .with({ type: 'quest' }, () => 'text-marigold-800 dark:text-marigold-500')
 
+    .when(
+      (item) => item.currency_cache_type != null,
+      () => 'text-ferra-700 dark:text-ferra-400'
+    )
     .when(
       (item) =>
         item.usable || (item.holy_level ?? 0) > 0 || item.damages_kingdoms,

@@ -3,16 +3,19 @@
 namespace Tests\Unit\Flare\Models;
 
 use App\Flare\Models\AlchemyBagSlot;
-use App\Flare\Models\GemBagSlot;
+use App\Game\Character\CharacterInventory\Services\CurrencyCacheGenerator;
+use App\Game\Core\Currency\Values\CurrencyCacheType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateAlchemyBagSlot;
 use Tests\Traits\CreateGem;
+use Tests\Traits\CreateGemBagSlot;
 use Tests\Traits\CreateItem;
 
 class CharacterInventoryCountTest extends TestCase
 {
-    use CreateGem, CreateItem, RefreshDatabase;
+    use CreateAlchemyBagSlot, CreateGem, CreateGemBagSlot, CreateItem, RefreshDatabase;
 
     public function test_inventory_count_excludes_alchemy_items(): void
     {
@@ -55,14 +58,14 @@ class CharacterInventoryCountTest extends TestCase
 
         $alchemyBag = $character->alchemyBag;
 
-        AlchemyBagSlot::create([
+        $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $this->createItem(['type' => 'alchemy'])->id,
             'amount' => 5,
         ]);
 
-        AlchemyBagSlot::create([
+        $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $this->createItem(['type' => 'alchemy'])->id,
@@ -70,6 +73,62 @@ class CharacterInventoryCountTest extends TestCase
         ]);
 
         $this->assertEquals(8, $character->refresh()->getAlchemyBagCount());
+    }
+
+    public function test_alchemy_bag_count_excludes_a_compensation_cache(): void
+    {
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $this->createItem(['type' => 'alchemy'])->id,
+            'amount' => 3,
+        ]);
+
+        (new CurrencyCacheGenerator)->give($character, CurrencyCacheType::GOLD, 500);
+
+        $this->assertEquals(3, $character->refresh()->getAlchemyBagCount());
+    }
+
+    public function test_alchemy_bag_count_excludes_multiple_compensation_caches(): void
+    {
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        (new CurrencyCacheGenerator)->give($character, CurrencyCacheType::GOLD_DUST, 2_500_000);
+
+        $this->assertEquals(3, AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag->id)->count());
+        $this->assertEquals(0, $character->refresh()->getAlchemyBagCount());
+    }
+
+    public function test_ordinary_alchemy_items_fill_the_bag_while_compensation_caches_exist(): void
+    {
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        $character->update(['alchemy_bag_limit' => 2]);
+        $character = $character->refresh();
+
+        (new CurrencyCacheGenerator)->give($character, CurrencyCacheType::SHARDS, 1_500_000);
+
+        $this->assertFalse($character->refresh()->isAlchemyBagFull());
+
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $this->createItem(['type' => 'alchemy'])->id,
+            'amount' => 2,
+        ]);
+
+        $this->assertTrue($character->refresh()->isAlchemyBagFull());
     }
 
     public function test_gem_bag_count_is_sum_of_slot_amounts(): void
@@ -81,13 +140,13 @@ class CharacterInventoryCountTest extends TestCase
 
         $gemBag = $character->gemBag;
 
-        GemBagSlot::create([
+        $this->createGemBagSlot([
             'gem_bag_id' => $gemBag->id,
             'gem_id' => $this->createGem()->id,
             'amount' => 4,
         ]);
 
-        GemBagSlot::create([
+        $this->createGemBagSlot([
             'gem_bag_id' => $gemBag->id,
             'gem_id' => $this->createGem()->id,
             'amount' => 6,
@@ -106,7 +165,7 @@ class CharacterInventoryCountTest extends TestCase
         $character->update(['alchemy_bag_limit' => 2]);
         $character = $character->refresh();
 
-        AlchemyBagSlot::create([
+        $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $this->createItem(['type' => 'alchemy'])->id,
@@ -125,7 +184,7 @@ class CharacterInventoryCountTest extends TestCase
 
         $character->update(['alchemy_bag_limit' => 10]);
 
-        AlchemyBagSlot::create([
+        $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->refresh()->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $this->createItem(['type' => 'alchemy'])->id,
@@ -145,7 +204,7 @@ class CharacterInventoryCountTest extends TestCase
         $character->update(['gem_bag_limit' => 3]);
         $character = $character->refresh();
 
-        GemBagSlot::create([
+        $this->createGemBagSlot([
             'gem_bag_id' => $character->gemBag->id,
             'gem_id' => $this->createGem()->id,
             'amount' => 3,
@@ -163,7 +222,7 @@ class CharacterInventoryCountTest extends TestCase
 
         $character->update(['gem_bag_limit' => 10]);
 
-        GemBagSlot::create([
+        $this->createGemBagSlot([
             'gem_bag_id' => $character->refresh()->gemBag->id,
             'gem_id' => $this->createGem()->id,
             'amount' => 5,
@@ -238,7 +297,7 @@ class CharacterInventoryCountTest extends TestCase
         $character->update(['alchemy_bag_limit' => 5]);
         $character = $character->refresh();
 
-        AlchemyBagSlot::create([
+        $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $this->createItem(['type' => 'alchemy'])->id,
@@ -258,7 +317,7 @@ class CharacterInventoryCountTest extends TestCase
         $character->update(['alchemy_bag_limit' => 5]);
         $character = $character->refresh();
 
-        AlchemyBagSlot::create([
+        $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $this->createItem(['type' => 'alchemy'])->id,
@@ -278,7 +337,7 @@ class CharacterInventoryCountTest extends TestCase
         $character->update(['gem_bag_limit' => 5]);
         $character = $character->refresh();
 
-        GemBagSlot::create([
+        $this->createGemBagSlot([
             'gem_bag_id' => $character->gemBag->id,
             'gem_id' => $this->createGem()->id,
             'amount' => 4,
@@ -297,7 +356,7 @@ class CharacterInventoryCountTest extends TestCase
         $character->update(['gem_bag_limit' => 5]);
         $character = $character->refresh();
 
-        GemBagSlot::create([
+        $this->createGemBagSlot([
             'gem_bag_id' => $character->gemBag->id,
             'gem_id' => $this->createGem()->id,
             'amount' => 5,

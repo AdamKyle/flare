@@ -14,4 +14,6 @@ export default interface UsableItemsListProps {
   on_use_quantity: (slotId: number, quantity: number) => void;
   on_use_all: (slotId: number) => void;
   on_gem_scroll_activated: () => void;
+  using_cache_slot_id: number | null;
+  on_use_cache: (slotId: number) => void;
 }

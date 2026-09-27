@@ -7,8 +7,16 @@ import AdminPage from '../../shared/components/admin-page';
 import { AdminPageWidth } from '../../shared/enums/admin-page-width';
 import { GuideQuestApiMessages } from '../api/enums/guide-quest-api-messages';
 import { useGuideQuestDetail } from '../api/hooks/use-guide-quest-detail';
+import GuideQuestContentSection from '../components/guide-quest-content-section';
 import { useGuideQuestScreenNavigation } from '../screen-manager/guide-quest-screen-kit';
 import { GuideQuestShowScreenProps } from '../screen-manager/guide-quest-screen-props';
+import GuideQuestShowSectionDefinition, {
+  GuideQuestShowRowDefinition,
+  GuideQuestShowRowValue,
+} from '../types/guide-quest-show-section-definition';
+import { buildGuideQuestShowSections } from '../utils/build-guide-quest-show-sections';
+
+import { formatNumberWithCommas } from 'game-utils/format-number';
 
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import Card from 'ui/cards/card';
@@ -16,6 +24,30 @@ import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
+
+const isHiddenValue = (value: GuideQuestShowRowValue): boolean => {
+  if (Array.isArray(value)) {
+    return value.length === 0;
+  }
+
+  return value === null || value === '' || value === 0 || value === false;
+};
+
+const formatRowValue = (value: GuideQuestShowRowValue): string => {
+  if (Array.isArray(value)) {
+    return value.join(', ');
+  }
+
+  if (typeof value === 'number') {
+    return formatNumberWithCommas(value);
+  }
+
+  if (value === true) {
+    return 'Yes';
+  }
+
+  return String(value);
+};
 
 const GuideQuestShowScreen = ({
   guide_quest_id: guideQuestId,
@@ -27,19 +59,37 @@ const GuideQuestShowScreen = ({
     error,
   } = useGuideQuestDetail(guideQuestId);
 
-  const renderRow = (
-    label: string,
-    value: number | string | null
-  ): ReactNode => {
-    if (value === null || value === '') {
+  const renderRow = (row: GuideQuestShowRowDefinition): ReactNode => {
+    if (isHiddenValue(row.value)) {
       return null;
     }
 
     return (
-      <React.Fragment key={label}>
-        <Dt>{label}</Dt>
-        <Dd>{value}</Dd>
+      <React.Fragment key={row.label}>
+        <Dt>{row.label}</Dt>
+        <Dd>{formatRowValue(row.value)}</Dd>
       </React.Fragment>
+    );
+  };
+
+  const renderSection = (
+    section: GuideQuestShowSectionDefinition
+  ): ReactNode => {
+    const hasVisibleRows = section.rows.some(
+      (row) => !isHiddenValue(row.value)
+    );
+
+    if (!hasVisibleRows) {
+      return null;
+    }
+
+    return (
+      <Card key={section.title}>
+        <h3 className="mb-3 text-lg font-semibold text-gray-900 dark:text-gray-100">
+          {section.title}
+        </h3>
+        <Dl>{section.rows.map(renderRow)}</Dl>
+      </Card>
     );
   };
 
@@ -65,37 +115,19 @@ const GuideQuestShowScreen = ({
             variant={ButtonVariant.PRIMARY}
           />
         </div>
-        <Card>
-          <h3 className="mb-3 text-lg font-semibold text-gray-900 dark:text-gray-100">
-            Progression
-          </h3>
-          <Dl>
-            {renderRow('Required Level', guideQuest.required_level)}
-            {renderRow('Unlock At Level', guideQuest.unlock_at_level)}
-            {renderRow(
-              'Required Passive Level',
-              guideQuest.required_passive_level
-            )}
-            {renderRow(
-              'Required Class Rank Level',
-              guideQuest.required_class_rank_level
-            )}
-          </Dl>
-        </Card>
-        <Card>
-          <h3 className="mb-3 text-lg font-semibold text-gray-900 dark:text-gray-100">
-            Rewards and Currency
-          </h3>
-          <Dl>
-            {renderRow('XP Reward', guideQuest.xp_reward)}
-            {renderRow('Gold Reward', guideQuest.gold_reward)}
-            {renderRow('Gold Dust Reward', guideQuest.gold_dust_reward)}
-            {renderRow('Shards Reward', guideQuest.shards_reward)}
-            {renderRow('Required Gold', guideQuest.required_gold)}
-            {renderRow('Required Gold Dust', guideQuest.required_gold_dust)}
-            {renderRow('Required Shards', guideQuest.required_shards)}
-          </Dl>
-        </Card>
+        {buildGuideQuestShowSections(guideQuest).map(renderSection)}
+        <GuideQuestContentSection
+          title="Intro"
+          blocks={guideQuest.intro_text}
+        />
+        <GuideQuestContentSection
+          title="Desktop Instructions"
+          blocks={guideQuest.desktop_instructions}
+        />
+        <GuideQuestContentSection
+          title="Mobile Instructions"
+          blocks={guideQuest.mobile_instructions}
+        />
       </div>
     );
   };

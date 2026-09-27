@@ -4,7 +4,9 @@ import { debounce } from 'lodash';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { useUseAlchemyItemApi } from './api/hooks/use-use-alchemy-item-api';
+import { useUseCurrencyCacheApi } from './api/hooks/use-use-currency-cache-api';
 import { useUseManyAlchemyItemsApi } from './api/hooks/use-use-many-alchemy-items-api';
+import CurrencyCacheUsableItemAction from './components/currency-cache-usable-item-action';
 import GemScrollUsableItemAction from './components/gem-scroll-usable-item-action';
 import SpecialUsableItemGuidance from './components/special-usable-item-guidance';
 import UsableItemsProps from './types/usable-items-props';
@@ -126,6 +128,21 @@ const UsableItems = ({
   } = useUseManyAlchemyItemsApi({
     characterId: character_id,
     onSuccess: handleUseSuccess,
+  });
+
+  const handleCurrencyCacheUsed = (): void => {
+    setRefresh((previousValue) => !previousValue);
+    setItemToView(null);
+  };
+
+  const {
+    usingSlotId: usingCacheSlotId,
+    error: cacheError,
+    successMessage: cacheSuccessMessage,
+    useCurrencyCache: submitCurrencyCacheUse,
+  } = useUseCurrencyCacheApi({
+    characterId: character_id,
+    onSuccess: handleCurrencyCacheUsed,
   });
 
   const [actingSlotId, setActingSlotId] = useState<number | null>(null);
@@ -406,6 +423,44 @@ const UsableItems = ({
     );
   };
 
+  const handleUseCurrencyCache = (slotId: number): void => {
+    void submitCurrencyCacheUse(slotId);
+  };
+
+  const renderCurrencyCacheFeedback = () => {
+    if (!cacheError && !cacheSuccessMessage) {
+      return null;
+    }
+
+    return (
+      <Alert variant={cacheError ? AlertVariant.DANGER : AlertVariant.SUCCESS}>
+        {cacheError ?? cacheSuccessMessage}
+      </Alert>
+    );
+  };
+
+  const renderCurrencyCacheAction = () => {
+    if (
+      !itemToView ||
+      itemToView.slot_id === null ||
+      itemToView.currency_cache_type === null ||
+      itemToView.cache_amount === null
+    ) {
+      return null;
+    }
+
+    const slotId = itemToView.slot_id;
+
+    return (
+      <CurrencyCacheUsableItemAction
+        currency_cache_type={itemToView.currency_cache_type}
+        cache_amount={itemToView.cache_amount}
+        is_using={usingCacheSlotId === slotId}
+        on_use={() => handleUseCurrencyCache(slotId)}
+      />
+    );
+  };
+
   const renderUsableItemView = () => {
     if (!itemToView) {
       return null;
@@ -436,6 +491,8 @@ const UsableItems = ({
             )}
             {isSpecialItem && <SpecialUsableItemGuidance item={itemToView} />}
             {renderGemScrollAction()}
+            {renderCurrencyCacheFeedback()}
+            {renderCurrencyCacheAction()}
             {renderDetailQuantityControl()}
           </div>
         </InventoryStackBody>
@@ -484,6 +541,7 @@ const UsableItems = ({
             />
           )}
         </div>
+        <div className="px-4">{renderCurrencyCacheFeedback()}</div>
         <div className="min-h-0 flex-1" aria-busy={loading}>
           <UsableItemsList
             items={data}
@@ -498,6 +556,8 @@ const UsableItems = ({
             }
             on_use_all={(slotId) => handleUseAll(slotId, 'list')}
             on_gem_scroll_activated={() => handleGemScrollActivated('list')}
+            using_cache_slot_id={usingCacheSlotId}
+            on_use_cache={handleUseCurrencyCache}
           />
         </div>
       </div>

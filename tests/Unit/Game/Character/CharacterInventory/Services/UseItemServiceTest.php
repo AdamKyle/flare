@@ -7,16 +7,20 @@ use App\Game\Automation\Values\AutomationType;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Character\CharacterAttack\Events\UpdateCharacterAttackEvent;
 use App\Game\Character\CharacterInventory\Events\CharacterBoonsUpdateBroadcastEvent;
+use App\Game\Character\CharacterInventory\Services\CharacterActiveBoonService;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\UseItemService;
+use App\Game\Core\Currency\Values\CurrencyCacheType;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Core\Items\Transformers\Api\UsableItemTransformer;
 use App\Game\Skills\Values\SkillTypeValue;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
+use League\Fractal\Manager;
 use Mockery;
 use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
@@ -40,7 +44,16 @@ class UseItemServiceTest extends TestCase
 
         $this->character = (new CharacterFactory)->createBaseCharacter();
 
-        $this->useItemService = resolve(UseItemService::class);
+        $manager = new Manager;
+
+        $characterActiveBoonService = new CharacterActiveBoonService(
+            $manager,
+            new UsableItemTransformer,
+        );
+
+        $this->useItemService = new UseItemService(
+            $characterActiveBoonService,
+        );
     }
 
     protected function tearDown(): void
@@ -738,6 +751,36 @@ class UseItemServiceTest extends TestCase
         $this->useItemService->useSingleItemFromInventory($character->refresh(), $item);
 
         $this->assertEquals(1, AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag->id)->where('item_id', $item->id)->value('amount'));
+    }
+
+    public function test_compensation_cache_is_not_used_as_a_normal_alchemy_boon(): void
+    {
+        $cacheItem = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 30,
+            'type' => 'alchemy',
+            'currency_cache_type' => CurrencyCacheType::GOLD,
+            'cache_amount' => 5000,
+        ]);
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        $slot = $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $cacheItem->id,
+            'amount' => 1,
+        ]);
+
+        $result = $this->useItemService->useSingleAlchemyItem($character->refresh(), $slot);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertFalse($this->useItemService->isAlchemyBoonItem($cacheItem));
+        $this->assertEquals(1, $slot->refresh()->amount);
+        $this->assertEquals(5000, $cacheItem->refresh()->cache_amount);
+        $this->assertEquals(0, $character->boons()->count());
     }
 
     public function test_using_single_alchemy_item_deletes_alchemy_bag_slot_row_when_amount_reaches_zero(): void
@@ -1853,9 +1896,7 @@ class UseItemServiceTest extends TestCase
             })
         );
 
-        $useItemService = resolve(UseItemService::class);
-
-        $result = $useItemService->useSingleItemFromInventory($character->refresh(), $item);
+        $result = $this->useItemService->useSingleItemFromInventory($character->refresh(), $item);
 
         $this->assertEquals(200, $result['status']);
         $this->assertEquals('Used selected item.', $result['message']);

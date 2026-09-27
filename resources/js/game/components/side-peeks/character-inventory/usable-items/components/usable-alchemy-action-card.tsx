@@ -1,5 +1,6 @@
 import React, { ReactNode, useState } from 'react';
 
+import CurrencyCacheUsableItemAction from './currency-cache-usable-item-action';
 import GemScrollUsableItemAction from './gem-scroll-usable-item-action';
 import UsableAlchemyActionCardProps from './types/usable-alchemy-action-card-props';
 import UsableItem from '../../../components/items/usable-item';
@@ -19,14 +20,21 @@ const UsableAlchemyActionCard = ({
   on_use_quantity: onUseQuantity,
   on_use_all: onUseAll,
   on_gem_scroll_activated: onGemScrollActivated,
+  using_cache_slot_id: usingCacheSlotId,
+  on_use_cache: onUseCache,
 }: UsableAlchemyActionCardProps): ReactNode => {
   const [showQuantity, setShowQuantity] = useState(false);
   const [quantity, setQuantity] = useState(1);
 
   const isSpecialItem = item.holy_level !== null || item.damages_kingdoms;
   const isGemScroll = item.gem_scroll_type !== null;
+  const isCompensationCache = item.currency_cache_type !== null;
   const canShowActions =
-    item.slot_id !== null && item.usable && !isSpecialItem && !isGemScroll;
+    item.slot_id !== null &&
+    item.usable &&
+    !isSpecialItem &&
+    !isGemScroll &&
+    !isCompensationCache;
   const isBusy = usingSlotId !== null && usingSlotId === item.slot_id;
 
   const handleQuantityChange = (value: string): void => {
@@ -111,6 +119,27 @@ const UsableAlchemyActionCard = ({
     );
   };
 
+  const renderCurrencyCacheAction = (): ReactNode => {
+    const slotId = item.slot_id;
+
+    if (
+      slotId === null ||
+      item.currency_cache_type === null ||
+      item.cache_amount === null
+    ) {
+      return null;
+    }
+
+    return (
+      <CurrencyCacheUsableItemAction
+        currency_cache_type={item.currency_cache_type}
+        cache_amount={item.cache_amount}
+        is_using={usingCacheSlotId === slotId}
+        on_use={() => onUseCache(slotId)}
+      />
+    );
+  };
+
   const renderActionButtons = (): ReactNode => {
     if (item.slot_id === null || legalUseCount <= 0) {
       return null;
@@ -179,6 +208,8 @@ const UsableAlchemyActionCard = ({
       <UsableItem item={item} on_click={onClick} />
 
       {renderGemScrollAction()}
+
+      {renderCurrencyCacheAction()}
 
       {canShowActions && (
         <div className="flex flex-wrap items-center gap-2">

@@ -142,7 +142,7 @@
                                     @if (request()->routeIs('admin.game-maps.*')) aria-current="page" @endif
                                 >
                                     <i class="fas fa-map" aria-hidden="true"></i>
-                                    <span>Maps</span>
+                                    <span>Game Maps</span>
                                 </a>
                                 <button
                                     type="button"
@@ -209,7 +209,7 @@
                                 @if (request()->routeIs('admin.npcs.*')) aria-current="page" @endif
                             >
                                 <i class="fas fa-user-friends" aria-hidden="true"></i>
-                                <span>NPC's</span>
+                                <span>NPCs</span>
                             </a>
                         </li>
                     </ul>

@@ -7,6 +7,7 @@ use App\Admin\Requests\GuideQuestRequest;
 use App\Admin\Requests\GuideQuestStoreRequest;
 use App\Admin\Services\GuideQuestAdminReadService;
 use App\Admin\Services\GuideQuestService;
+use App\Admin\Transformers\GuideQuestDetailTransformer;
 use App\Admin\Transformers\GuideQuestListTransformer;
 use App\Admin\Transformers\GuideQuestTransformer;
 use App\Flare\Models\GameBuilding;
@@ -30,6 +31,7 @@ class GuideQuestsController
      * @param GuideQuestAdminReadService $guideQuestAdminReadService
      * @param GuideQuestListTransformer $guideQuestListTransformer
      * @param GuideQuestTransformer $guideQuestTransformer
+     * @param GuideQuestDetailTransformer $guideQuestDetailTransformer
      * @param GuideQuestService $guideQuestService
      */
     public function __construct(
@@ -37,6 +39,7 @@ class GuideQuestsController
         private readonly GuideQuestAdminReadService $guideQuestAdminReadService,
         private readonly GuideQuestListTransformer $guideQuestListTransformer,
         private readonly GuideQuestTransformer $guideQuestTransformer,
+        private readonly GuideQuestDetailTransformer $guideQuestDetailTransformer,
         private readonly GuideQuestService $guideQuestService,
     ) {}
 
@@ -62,7 +65,7 @@ class GuideQuestsController
      */
     public function show(GuideQuest $guideQuest): JsonResponse
     {
-        return response()->json($this->guideQuestTransformer->transform($guideQuest));
+        return response()->json($this->guideQuestDetailTransformer->transform($guideQuest));
     }
 
     /**

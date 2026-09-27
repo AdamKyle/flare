@@ -9,7 +9,9 @@ use Database\Factories\CharacterFactory;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Character extends Model
 {
@@ -119,41 +121,81 @@ class Character extends Model
         'is_auto_battling',
     ];
 
+    /**
+     * Get the Game Race of this Character.
+     *
+     * @return BelongsTo
+     */
     public function race()
     {
         return $this->belongsTo(GameRace::class, 'game_race_id', 'id');
     }
 
+    /**
+     * Get the Game Class of this Character.
+     *
+     * @return BelongsTo
+     */
     public function class()
     {
         return $this->belongsTo(GameClass::class, 'game_class_id', 'id');
     }
 
+    /**
+     * Get the skills this Character has learned.
+     *
+     * @return HasMany
+     */
     public function skills()
     {
         return $this->hasMany(Skill::class);
     }
 
+    /**
+     * Get the User who owns this Character.
+     *
+     * @return BelongsTo
+     */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Get this Character's main inventory.
+     *
+     * @return HasOne
+     */
     public function inventory()
     {
         return $this->hasOne(Inventory::class, 'character_id', 'id');
     }
 
+    /**
+     * Get this Character's inventory sets.
+     *
+     * @return HasMany
+     */
     public function inventorySets()
     {
         return $this->hasMany(InventorySet::class, 'character_id', 'id');
     }
 
+    /**
+     * Get this Character's Gem Bag.
+     *
+     * @return HasOne
+     */
     public function gemBag()
     {
         return $this->hasOne(GemBag::class, 'character_id', 'id');
     }
 
+    /**
+     * Get this Character's Alchemy Bag.
+     *
+     * @return HasOne
+     */
     public function alchemyBag()
     {
         return $this->hasOne(AlchemyBag::class, 'character_id', 'id');
@@ -161,6 +203,8 @@ class Character extends Model
 
     /**
      * Get this Character's personal Gem progression for every Map Gem profile.
+     *
+     * @return HasMany
      */
     public function gameMapGemProgressions(): HasMany
     {
@@ -169,6 +213,8 @@ class Character extends Model
 
     /**
      * Get this Character's personal Gem progression for every Location Gem profile.
+     *
+     * @return HasMany
      */
     public function gameLocationGemProgressions(): HasMany
     {
@@ -177,6 +223,8 @@ class Character extends Model
 
     /**
      * Get this Character's active Gem Scrolls applied to Map Gem Worlds.
+     *
+     * @return HasMany
      */
     public function gameMapGemScrolls(): HasMany
     {
@@ -185,117 +233,229 @@ class Character extends Model
 
     /**
      * Get this Character's active Gem Scrolls applied to Location Gem Worlds.
+     *
+     * @return HasMany
      */
     public function gameLocationGemScrolls(): HasMany
     {
         return $this->hasMany(CharacterGameLocationGemScroll::class);
     }
 
+    /**
+     * Get this Character's faction progress for each map.
+     *
+     * @return HasMany
+     */
     public function factions()
     {
         return $this->hasMany(Faction::class, 'character_id', 'id');
     }
 
+    /**
+     * Get this Character's faction loyalty records.
+     *
+     * @return HasMany
+     */
     public function factionLoyalties()
     {
         return $this->hasMany(FactionLoyalty::class, 'character_id', 'id');
     }
 
+    /**
+     * Get this Character's current map position record.
+     *
+     * @return HasOne
+     */
     public function map()
     {
         return $this->hasOne(Map::class);
     }
 
+    /**
+     * Return this Character's current X map position.
+     *
+     * @return int
+     */
     public function getXPositionAttribute()
     {
         return $this->map->character_position_x;
     }
 
+    /**
+     * Return this Character's current Y map position.
+     *
+     * @return int
+     */
     public function getYPositionAttribute()
     {
         return $this->map->character_position_y;
     }
 
+    /**
+     * Return the image path of the Game Map this Character is on.
+     *
+     * @return string
+     */
     public function getMapUrlAttribute()
     {
         return $this->map->gameMap->path;
     }
 
+    /**
+     * Count the Kingdoms this Character owns.
+     *
+     * @return int
+     */
     public function getKingdomsCountAttribute()
     {
         return $this->kingdoms->count();
     }
 
+    /**
+     * Get the Kingdoms this Character owns.
+     *
+     * @return HasMany
+     */
     public function kingdoms()
     {
         return $this->hasMany(Kingdom::class, 'character_id', 'id');
     }
 
+    /**
+     * Get the Kingdom attack logs recorded for this Character.
+     *
+     * @return HasMany
+     */
     public function kingdomAttackLogs()
     {
         return $this->hasMany(KingdomLog::class, 'character_id', 'id');
     }
 
+    /**
+     * Get the unit movement queues started by this Character.
+     *
+     * @return HasMany
+     */
     public function unitMovementQueues()
     {
         return $this->hasMany(UnitMovementQueue::class, 'character_id', 'id');
     }
 
+    /**
+     * Get the boons applied to this Character.
+     *
+     * @return HasMany
+     */
     public function boons()
     {
         return $this->hasMany(CharacterBoon::class, 'character_id', 'id');
     }
 
+    /**
+     * Get the quests and guide quests this Character has completed.
+     *
+     * @return HasMany
+     */
     public function questsCompleted()
     {
         return $this->hasMany(QuestsCompleted::class, 'character_id', 'id');
     }
 
+    /**
+     * Get the automations currently recorded for this Character.
+     *
+     * @return HasMany
+     */
     public function currentAutomations()
     {
         return $this->hasMany(CharacterAutomation::class, 'character_id', 'id');
     }
 
+    /**
+     * Get this Character's passive skills.
+     *
+     * @return HasMany
+     */
     public function passiveSkills()
     {
         return $this->hasMany(CharacterPassiveSkill::class, 'character_id', 'id');
     }
 
+    /**
+     * Get this Character's class ranks.
+     *
+     * @return HasMany
+     */
     public function classRanks()
     {
         return $this->hasMany(CharacterClassRank::class, 'character_id', 'id');
     }
 
+    /**
+     * Get the class specials this Character has equipped.
+     *
+     * @return HasMany
+     */
     public function classSpecialsEquipped()
     {
         return $this->hasMany(CharacterClassSpecialtiesEquipped::class, 'character_id', 'id');
     }
 
+    /**
+     * Get this Character's global event participation records.
+     *
+     * @return HasMany
+     */
     public function globalEventParticipation()
     {
         return $this->hasMany(GlobalEventParticipation::class, 'character_id', 'id');
     }
 
+    /**
+     * Get this Character's global event kill records.
+     *
+     * @return HasMany
+     */
     public function globalEventKills()
     {
         return $this->hasMany(GlobalEventKill::class, 'character_id', 'id');
     }
 
+    /**
+     * Get this Character's global event crafting records.
+     *
+     * @return HasMany
+     */
     public function globalEventCrafts()
     {
         return $this->hasMany(GlobalEventCraft::class, 'character_id', 'id');
     }
 
+    /**
+     * Get this Character's global event enchanting records.
+     *
+     * @return HasMany
+     */
     public function globalEventEnchants()
     {
         return $this->hasMany(GlobalEventEnchant::class, 'character_id', 'id');
     }
 
+    /**
+     * Get this Character's weekly battle fight records.
+     *
+     * @return HasMany
+     */
     public function weeklyBattleFights()
     {
         return $this->hasMany(WeeklyMonsterFight::class, 'character_id', 'id');
     }
 
+    /**
+     * Determine whether this Character currently has any automation running.
+     *
+     * @return bool
+     */
     public function getIsAutoBattlingAttribute()
     {
         if ($this->relationLoaded('currentAutomations')) {
@@ -305,6 +465,11 @@ class Character extends Model
         return $this->currentAutomations()->exists();
     }
 
+    /**
+     * Determine whether this Character has a Faction Loyalty automation that has not completed.
+     *
+     * @return bool
+     */
     public function isFactionLoyaltyAutomationRunning(): bool
     {
         return $this->currentAutomations()
@@ -314,10 +479,9 @@ class Character extends Model
     }
 
     /**
-     * Allows one to get specific information from a character.
+     * Return a stat builder prepared for this Character's calculated information.
      *
-     * By returning the CharacterStatBuilder class, we can allow you to get
-     * multiple calculated sets of data.
+     * @return CharacterStatBuilder
      */
     public function getInformation(): CharacterStatBuilder
     {
@@ -327,7 +491,9 @@ class Character extends Model
     }
 
     /**
-     * Returns the character class value.
+     * Return the class value object for this Character's Game Class.
+     *
+     * @return CharacterClass
      *
      * @throws Exception
      */
@@ -337,7 +503,9 @@ class Character extends Model
     }
 
     /**
-     * Is the character logged in?
+     * Determine whether this Character's User has an active session.
+     *
+     * @return bool
      */
     public function isLoggedIn(): bool
     {
@@ -345,9 +513,9 @@ class Character extends Model
     }
 
     /**
-     * Gets the main inventory count.
+     * Count the unequipped main inventory slots, excluding quest, alchemy and gem Items.
      *
-     * Excludes quest items, alchemy items, and gems.
+     * @return int
      */
     public function getInventoryCount(): int
     {
@@ -369,7 +537,9 @@ class Character extends Model
     }
 
     /**
-     * Gets the gem bag count as sum of all gem amounts.
+     * Sum the Gem amounts held in this Character's Gem Bag.
+     *
+     * @return int
      */
     public function getGemBagCount(): int
     {
@@ -379,11 +549,13 @@ class Character extends Model
             return 0;
         }
 
-        return (int) GemBagSlot::where('gem_bag_id', $gemBag->id)->sum('amount');
+        return intval(GemBagSlot::where('gem_bag_id', $gemBag->id)->sum('amount'));
     }
 
     /**
-     * Gets the alchemy bag count as sum of all slot amounts.
+     * Sum the Alchemy Bag slot amounts for this Character, excluding Compensation Caches.
+     *
+     * @return int
      */
     public function getAlchemyBagCount(): int
     {
@@ -393,11 +565,19 @@ class Character extends Model
             return 0;
         }
 
-        return (int) AlchemyBagSlot::where('alchemy_bag_id', $alchemyBag->id)->sum('amount');
+        return intval(
+            AlchemyBagSlot::where('alchemy_bag_id', $alchemyBag->id)
+                ->whereDoesntHave('item', function ($query) {
+                    $query->whereNotNull('currency_cache_type');
+                })
+                ->sum('amount')
+        );
     }
 
     /**
-     * Is the main inventory full?
+     * Determine whether the main inventory has reached its limit.
+     *
+     * @return bool
      */
     public function isInventoryFull(): bool
     {
@@ -405,7 +585,9 @@ class Character extends Model
     }
 
     /**
-     * Is the gem bag full?
+     * Determine whether the Gem Bag has reached its limit.
+     *
+     * @return bool
      */
     public function isGemBagFull(): bool
     {
@@ -413,7 +595,9 @@ class Character extends Model
     }
 
     /**
-     * Is the alchemy bag full?
+     * Determine whether the Alchemy Bag has reached its limit.
+     *
+     * @return bool
      */
     public function isAlchemyBagFull(): bool
     {
@@ -421,7 +605,10 @@ class Character extends Model
     }
 
     /**
-     * Can the given amount be added to the alchemy bag without exceeding the limit?
+     * Determine whether the given amount fits in the Alchemy Bag without exceeding its limit.
+     *
+     * @param int $amount
+     * @return bool
      */
     public function canAddToAlchemyBag(int $amount = 1): bool
     {
@@ -433,7 +620,10 @@ class Character extends Model
     }
 
     /**
-     * Can the given amount be added to the gem bag without exceeding the limit?
+     * Determine whether the given amount fits in the Gem Bag without exceeding its limit.
+     *
+     * @param int $amount
+     * @return bool
      */
     public function canAddToGemBag(int $amount = 1): bool
     {
@@ -444,11 +634,21 @@ class Character extends Model
         return $this->getGemBagCount() + $amount <= $this->gem_bag_limit;
     }
 
+    /**
+     * Return the main inventory count used for capacity checks.
+     *
+     * @return int
+     */
     public function totalInventoryCount(): int
     {
         return $this->getInventoryCount();
     }
 
+    /**
+     * Create the model factory used by Laravel for this Character.
+     *
+     * @return CharacterFactory
+     */
     protected static function newFactory()
     {
         return CharacterFactory::new();

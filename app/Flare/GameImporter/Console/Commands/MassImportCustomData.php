@@ -64,6 +64,10 @@ class MassImportCustomData extends Command
             return;
         }
 
+        if ($this->runStage('Remove all character Gems and compensate players', 'gem-rebuild:remove-alll-gems') !== self::SUCCESS) {
+            return;
+        }
+
         if ($this->runStage('Create Character attack data', 'create:character-attack-data') !== self::SUCCESS) {
             return;
         }

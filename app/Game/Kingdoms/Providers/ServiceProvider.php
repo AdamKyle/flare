@@ -8,6 +8,7 @@ use App\Game\Kingdoms\Console\Commands\DeleteKingdomLogs;
 use App\Game\Kingdoms\Console\Commands\RepairKingdomData;
 use App\Game\Kingdoms\Console\Commands\ResetCapitalCityWalkingStatus;
 use App\Game\Kingdoms\Console\Commands\UpdateKingdoms;
+use App\Game\Kingdoms\Contracts\CharacterGoldBarDeposit;
 use App\Game\Kingdoms\Handlers\AttackKingdomWithUnitsHandler;
 use App\Game\Kingdoms\Handlers\AttackLogHandler;
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityBuildingManagementRequestHandler;
@@ -36,6 +37,7 @@ use App\Game\Kingdoms\Service\CancelUnitRequestService;
 use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
 use App\Game\Kingdoms\Service\CapitalCityManagementService;
 use App\Game\Kingdoms\Service\CapitalCityUnitManagement;
+use App\Game\Kingdoms\Service\CharacterGoldBarDepositService;
 use App\Game\Kingdoms\Service\ExpandResourceBuildingService;
 use App\Game\Kingdoms\Service\KingdomAttackService;
 use App\Game\Kingdoms\Service\KingdomBuildingService;
@@ -78,7 +80,9 @@ use League\Fractal\Manager;
 class ServiceProvider extends ApplicationServiceProvider
 {
     /**
-     * Register any application services.
+     * Register the Kingdoms module services, handlers, contracts and commands.
+     *
+     * @return void
      */
     public function register(): void
     {
@@ -363,6 +367,12 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
+        $this->app->bind(CharacterGoldBarDeposit::class, function ($app) {
+            return new CharacterGoldBarDepositService(
+                $app->make(UpdateKingdom::class),
+            );
+        });
+
         $this->app->bind(KingdomAttackService::class, function ($app) {
             return new KingdomAttackService(
                 $app->make(UnitMovementService::class),
@@ -442,7 +452,9 @@ class ServiceProvider extends ApplicationServiceProvider
     }
 
     /**
-     * Bootstrap any application services.
+     * Register the Kingdoms module middleware aliases.
+     *
+     * @return void
      */
     public function boot(): void
     {

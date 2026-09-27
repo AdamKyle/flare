@@ -20,6 +20,7 @@ Route::group(['middleware' => ['auth', 'is.character.who.they.say.they.are']], f
     Route::post('/character/{character}/gem-scrolls/location/{characterGameLocationGemScroll}/fill/{alchemyBagSlot}', ['uses' => 'Api\CharacterGemScrollController@fillLocationScroll']);
     Route::post('/character/{character}/gem-scrolls/map/{characterGameMapGemScroll}/remove', ['uses' => 'Api\CharacterGemScrollController@removeMapScroll']);
     Route::post('/character/{character}/gem-scrolls/location/{characterGameLocationGemScroll}/remove', ['uses' => 'Api\CharacterGemScrollController@removeLocationScroll']);
+    Route::post('/character/{character}/currency-caches/use/{alchemyBagSlot}', ['uses' => 'Api\CharacterCurrencyCacheController@use']);
 
     Route::group(['middleware' => ['is.character.dead']], function () {
         Route::get('/character/{character}/inventory/item', ['uses' => 'Api\CharacterInventoryController@itemDetails']);

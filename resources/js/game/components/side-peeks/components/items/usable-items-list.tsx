@@ -19,6 +19,8 @@ const UsableItemsList = ({
   on_use_quantity: onUseQuantity,
   on_use_all: onUseAll,
   on_gem_scroll_activated: onGemScrollActivated,
+  using_cache_slot_id: usingCacheSlotId,
+  on_use_cache: onUseCache,
 }: UsableItemsListProps) => {
   const now = new Date();
 
@@ -46,6 +48,8 @@ const UsableItemsList = ({
         on_use_quantity={onUseQuantity}
         on_use_all={onUseAll}
         on_gem_scroll_activated={onGemScrollActivated}
+        using_cache_slot_id={usingCacheSlotId}
+        on_use_cache={onUseCache}
       />
     ));
   };

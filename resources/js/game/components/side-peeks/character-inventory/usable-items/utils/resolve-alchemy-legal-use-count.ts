@@ -11,6 +11,7 @@ export const isSelfUseAlchemyBoonItem = (
   item.holy_level === null &&
   !item.damages_kingdoms &&
   item.gem_scroll_type === null &&
+  item.currency_cache_type === null &&
   (item.lasts_for ?? 0) > 0;
 
 export const resolveAlchemyLegalUseCount = (

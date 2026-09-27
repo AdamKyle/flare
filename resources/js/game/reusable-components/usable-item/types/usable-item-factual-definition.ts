@@ -1,3 +1,5 @@
+import { CurrencyCacheTypeValue } from '../enums/currency-cache-type-labels';
+
 export default interface UsableItemFactualDefinition {
   name: string;
   description: string;
@@ -19,4 +21,6 @@ export default interface UsableItemFactualDefinition {
   damages_kingdoms: boolean;
   kingdom_damage: number | null;
   holy_level: number | null;
+  currency_cache_type?: CurrencyCacheTypeValue | null;
+  cache_amount?: number | null;
 }
