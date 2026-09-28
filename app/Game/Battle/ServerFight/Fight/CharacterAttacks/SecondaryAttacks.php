@@ -201,7 +201,9 @@ class SecondaryAttacks extends BattleBase
 
         $damage = $this->characterCacheData->getCachedCharacterData($character, $damageType);
 
-        $this->elementalAttack->doElementalAttack($monster->getElementData(), $characterElementalData, $damage);
+        $penetration = $this->characterCacheData->getCachedCharacterData($character, 'elemental_penetration') ?? [];
+
+        $this->elementalAttack->doElementalAttack($monster->getElementData(), $characterElementalData, $damage, false, $penetration);
 
         $this->mergeMessages($this->elementalAttack->getMessages());
 

@@ -8,10 +8,10 @@ use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Pagination\Pagination;
-use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
+use App\Game\Core\Items\Services\ItemSocketRollService;
 use App\Game\Core\Items\Transformers\CraftingItemPreviewTransformer;
-use App\Game\Core\Items\Values\ArmourType;
-use App\Game\Core\Items\Values\ItemType;
+use App\Game\Core\Items\Values\ItemSocketEligibility;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Gems\Services\GemComparison;
 use App\Game\Messages\Types\NpcMessageTypes;
@@ -35,11 +35,12 @@ class SeerService
 
     public function __construct(
         GemComparison $gemComparison,
-        private readonly RandomNumberGenerator $randomNumberGenerator,
         private readonly Pagination $pagination,
         private readonly SeerInventoryItemTransformer $seerInventoryItemTransformer,
         private readonly SeerGemTransformer $seerGemTransformer,
         private readonly CraftingItemPreviewTransformer $craftingItemPreviewTransformer,
+        private readonly ItemSocketEligibility $itemSocketEligibility,
+        private readonly ItemSocketRollService $itemSocketRollService,
     ) {
         $this->gemComparison = $gemComparison;
     }
@@ -53,19 +54,7 @@ class SeerService
     {
         $inventory = Inventory::where('character_id', $character->id)->first();
 
-        $eligibleTypes = [
-            ItemType::WEAPON->value,
-            ItemType::STAVE->value,
-            ItemType::BOW->value,
-            ItemType::HAMMER->value,
-            ArmourType::SHIELD->value,
-            ArmourType::BODY->value,
-            ArmourType::SLEEVES->value,
-            ArmourType::HELMET->value,
-            ArmourType::FEET->value,
-            ArmourType::LEGGINGS->value,
-            ArmourType::GLOVES->value,
-        ];
+        $eligibleTypes = $this->itemSocketEligibility->eligibleTypes();
 
         $query = InventorySlot::with(['item' => function ($itemQuery) {
             $itemQuery->with(['itemPrefix', 'itemSuffix', 'appliedHolyStacks', 'itemSkillProgressions'])
@@ -102,7 +91,7 @@ class SeerService
             return $this->pagination->paginateCollectionResponse(collect(), $perPage, $page);
         }
 
-        $query = GemBagSlot::with('gem')->where('gem_bag_id', $character->gemBag->id);
+        $query = GemBagSlot::with('gem.characterModifiers.gameGemAbility')->where('gem_bag_id', $character->gemBag->id);
 
         if ($search !== '') {
             $query->whereHas('gem', function ($gemQuery) use ($search) {
@@ -122,19 +111,7 @@ class SeerService
     {
         $inventory = Inventory::where('character_id', $character->id)->first();
 
-        $eligibleTypes = [
-            ItemType::WEAPON->value,
-            ItemType::STAVE->value,
-            ItemType::BOW->value,
-            ItemType::HAMMER->value,
-            ArmourType::SHIELD->value,
-            ArmourType::BODY->value,
-            ArmourType::SLEEVES->value,
-            ArmourType::HELMET->value,
-            ArmourType::FEET->value,
-            ArmourType::LEGGINGS->value,
-            ArmourType::GLOVES->value,
-        ];
+        $eligibleTypes = $this->itemSocketEligibility->eligibleTypes();
 
         $query = InventorySlot::with(['item' => function ($itemQuery) {
             $itemQuery->with(['itemPrefix', 'itemSuffix', 'appliedHolyStacks', 'itemSkillProgressions'])
@@ -178,19 +155,9 @@ class SeerService
      */
     public function getItems(Character $character, bool $isManagingGems = false): array
     {
-        $slots = $character->inventory->slots->whereNotNull('item.socket_count')->whereIn('item.type', [
-            ItemType::WEAPON->value,
-            ItemType::STAVE->value,
-            ItemType::BOW->value,
-            ItemType::HAMMER->value,
-            ArmourType::SHIELD->value,
-            ArmourType::BODY->value,
-            ArmourType::SLEEVES->value,
-            ArmourType::HELMET->value,
-            ArmourType::FEET->value,
-            ArmourType::LEGGINGS->value,
-            ArmourType::GLOVES->value,
-        ]);
+        $slots = $character->inventory->slots
+            ->whereNotNull('item.socket_count')
+            ->whereIn('item.type', $this->itemSocketEligibility->eligibleTypes());
 
         if ($isManagingGems) {
             $slots = $slots->filter(fn ($slot) => $slot->item->socket_count > 0);
@@ -218,8 +185,8 @@ class SeerService
             return $this->errorResult('No item was found to apply sockets to.');
         }
 
-        if ($slot->item->type === 'trinket' || $slot->item->type === 'artifact') {
-            return $this->errorResult('Trinkets and Artifacts cannot have sockets on them.');
+        if (! $this->itemSocketEligibility->isEligible($slot->item->type)) {
+            return $this->errorResult('This item cannot have sockets.');
         }
 
         if (! HandleGoldBarsAsACurrency::hasTheGoldBars($character->kingdoms, self::SOCKET_COST)) {
@@ -229,6 +196,8 @@ class SeerService
         $oldSocketCount = $slot->item->socket_count;
 
         $this->assignSocketCount($slot);
+
+        CharacterAttackTypesCacheBuilder::dispatch($character);
 
         $slot = $slot->refresh();
 
@@ -320,6 +289,8 @@ class SeerService
 
         $character = $character->refresh();
 
+        CharacterAttackTypesCacheBuilder::dispatch($character);
+
         $result = $this->fetchGemsWithItemsForRemoval($character);
 
         return $this->successResult([
@@ -362,6 +333,8 @@ class SeerService
         }
 
         $character = $character->refresh();
+
+        CharacterAttackTypesCacheBuilder::dispatch($character);
 
         $message = 'The Seer removes all gems from: '.$slot->item->affix_name.'. The seer is exhausted!';
 
@@ -440,6 +413,8 @@ class SeerService
 
         $character = $character->refresh();
 
+        CharacterAttackTypesCacheBuilder::dispatch($character);
+
         return $this->successResult([
             'items' => $this->getItems($character, true),
             'gems' => $this->getGems($character),
@@ -484,6 +459,8 @@ class SeerService
 
         $character = $character->refresh();
 
+        CharacterAttackTypesCacheBuilder::dispatch($character);
+
         $message = 'The Seer adds a gem to: '.$slot->item->affix_name.'. The seer smiles as he hands you the item.';
 
         ServerMessageHandler::handleMessage($character->user, NpcMessageTypes::SEER_ACTIONS, $message, $slot->id);
@@ -527,9 +504,11 @@ class SeerService
         $newItem = DuplicateItemHandler::duplicateItem($slot->item);
 
         $newItem->sockets()->create([
-            'item_id' => $slot->item_id,
+            'item_id' => $newItem->id,
             'gem_id' => $gemSlot->gem_id,
         ]);
+
+        $newItem->update(['has_gems_socketed' => true]);
 
         $slot->update([
             'item_id' => $newItem->id,
@@ -561,6 +540,8 @@ class SeerService
 
         $socket->delete();
 
+        $newItem->update(['has_gems_socketed' => $newItem->sockets()->exists()]);
+
         HandleGoldBarsAsACurrency::subtractCostFromKingdoms($character->kingdoms, self::REMOVE_GEM);
 
         $slot->update(['item_id' => $newItem->id]);
@@ -569,78 +550,12 @@ class SeerService
     }
 
     /**
-     * Get random type.
-     */
-    protected function getRandomType(): int
-    {
-        return $this->randomNumberGenerator->numberBetween(1, 100);
-    }
-
-    /**
      * Assign a random socket count (1-6 sockets)
      */
     protected function assignSocketCount(InventorySlot $slot): void
     {
-
         $newItem = DuplicateItemHandler::duplicateItem($slot->item);
-
-        $type = $this->getRandomType();
-
-        $socketCount = $slot->item->socket_count;
-
-        if ($type > 99) {
-            $newItem->update(['socket_count' => $socketCount > 6 ? $socketCount : 6]);
-
-            $slot->update([
-                'item_id' => $newItem->refresh()->id,
-            ]);
-
-            return;
-        }
-
-        if ($type >= 95) {
-            $newItem->update(['socket_count' => $socketCount > 5 ? $socketCount : 5]);
-
-            $slot->update([
-                'item_id' => $newItem->refresh()->id,
-            ]);
-
-            return;
-        }
-
-        if ($type >= 80) {
-            $newItem->update(['socket_count' => $socketCount > 4 ? $socketCount : 4]);
-
-            $slot->update([
-                'item_id' => $newItem->refresh()->id,
-            ]);
-
-            return;
-        }
-
-        if ($type >= 60) {
-            $newItem->update(['socket_count' => $socketCount > 3 ? $socketCount : 3]);
-
-            $slot->update([
-                'item_id' => $newItem->refresh()->id,
-            ]);
-
-            return;
-        }
-
-        if ($type >= 50) {
-            $newItem->update(['socket_count' => $socketCount > 2 ? $socketCount : 2]);
-
-            $slot->update([
-                'item_id' => $newItem->refresh()->id,
-            ]);
-
-            return;
-        }
-
-        if ($type >= 1) {
-            $newItem->update(['socket_count' => $socketCount > 1 ? $socketCount : 1]);
-        }
+        $newItem->update(['socket_count' => $this->itemSocketRollService->rollForSeer($slot->item)]);
 
         $slot->update([
             'item_id' => $newItem->refresh()->id,

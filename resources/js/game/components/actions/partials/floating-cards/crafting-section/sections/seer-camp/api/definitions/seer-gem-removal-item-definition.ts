@@ -1,21 +1,17 @@
-import { ElementalAtonementDefinition } from './gem-comparison-api-response-definition';
+import CharacterGemDefinition from '../../../../../../../../../api-definitions/gems/character-gem-definition';
+
+export type SeerAtonementChangeDefinition = CharacterGemDefinition;
 
 export interface SeerAttachedRemovalGemDefinition {
   gem_name: string;
   gem_id: number;
 }
 
-export interface SeerAtonementChangeDefinition {
-  gem_id_to_remove: number;
-  comparisons: ElementalAtonementDefinition;
-}
-
 export default interface SeerGemRemovalItemDefinition {
   slot_id: number;
   gems: SeerAttachedRemovalGemDefinition[];
   comparison: {
-    original_atonement: ElementalAtonementDefinition;
-    atonement_changes: SeerAtonementChangeDefinition[];
+    removed_gems: CharacterGemDefinition[];
   };
   remove_one_cost: number;
   remove_all_cost: number;

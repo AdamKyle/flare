@@ -8,7 +8,10 @@ use App\Flare\Transformers\BaseTransformer;
 class CharacterElementalAtonementTransformer extends BaseTransformer
 {
     /**
-     * Gets the response data for the character sheet
+     * Build the character's elemental atonement and dominant element data.
+     *
+     * @param Character $character
+     * @return array
      */
     public function transform(Character $character): array
     {

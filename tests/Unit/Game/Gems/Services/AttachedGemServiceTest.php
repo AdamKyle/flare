@@ -4,7 +4,6 @@ namespace Tests\Unit\Game\Gems\Services;
 
 use App\Flare\Models\Item;
 use App\Game\Gems\Services\AttachedGemService;
-use App\Game\Gems\Values\GemTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -29,16 +28,7 @@ class AttachedGemServiceTest extends TestCase
             'socket_count' => 2,
         ]);
 
-        $gem = $this->createGem([
-            'name' => 'Sample',
-            'tier' => 4,
-            'primary_atonement_type' => GemTypeValue::FIRE,
-            'secondary_atonement_type' => GemTypeValue::ICE,
-            'tertiary_atonement_type' => GemTypeValue::WATER,
-            'primary_atonement_amount' => 0.10,
-            'secondary_atonement_amount' => 0.25,
-            'tertiary_atonement_amount' => 0.45,
-        ]);
+        $gem = $this->createGem(['name' => 'Sample', 'tier' => 4]);
 
         $item->sockets()->create([
             'item_id' => $item->id,

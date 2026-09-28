@@ -5,6 +5,7 @@ import ClassBonusAttributesSection from './sections/class-bonus-attributes-secti
 import ClassMasteriesSection from './sections/class-masteries-section';
 import ClassSkillsSection from './sections/class-skills-section';
 import ClassSpecialtiesSection from './sections/class-specialties-section';
+import GemModifierSection from './sections/gem-modifier-section';
 import AttackTypesBreakDownProps from './types/attack-types-break-down-props';
 import { getAttackTypeFormattedName } from '../../../enums/attack-types';
 import { StatTypes } from '../../../enums/stat-types';
@@ -77,6 +78,9 @@ const Defence = ({ break_down, type }: AttackTypesBreakDownProps) => {
             />
             <ClassSpecialtiesSection
               class_specialties={break_down.regular.class_specialties}
+            />
+            <GemModifierSection
+              details={break_down.regular.gem_modifier_details}
             />
           </div>
         </div>

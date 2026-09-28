@@ -9,19 +9,10 @@ use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Pagination\Pagination;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
-use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ClassRanksWeaponMasteriesBuilder;
-use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\DamageBuilder;
-use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\DefenceBuilder;
-use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ElementalAtonement;
-use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HealingBuilder;
-use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HolyBuilder;
-use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ReductionsBuilder;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
-use App\Game\Character\CharacterInventory\Transformers\CharacterGemsTransformer;
 use App\Game\Character\Values\CharacterClass;
 use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Chance\RandomNumberGenerator;
-use App\Game\Core\Combat\Values\ElementAttackData;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Items\Builders\AffixAttributeBuilder;
 use App\Game\Core\Items\Builders\RandomAffixGenerator;
@@ -38,10 +29,6 @@ use App\Game\Events\Services\GlobalEventGoalProgressionService;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Events\Values\ScheduledEventStatus;
-use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
-use App\Game\Gems\Progression\Services\GemProgressionEffectService;
-use App\Game\Gems\Services\AreaGemEffectService;
-use App\Game\Gems\Services\GemComparison;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CraftingMessageTypes;
@@ -62,6 +49,7 @@ use Illuminate\Support\Facades\Event;
 use League\Fractal\Manager;
 use Mockery;
 use Mockery\MockInterface;
+use Tests\Setup\Character\CharacterCacheDataFactory;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;
@@ -139,18 +127,7 @@ class EnchantingServiceTest extends TestCase
 
         $chanceCalculator = new ChanceCalculator($randomNumberGenerator);
 
-        $this->characterStatBuilder = new CharacterStatBuilder(
-            new DefenceBuilder(),
-            new DamageBuilder(new ClassRanksWeaponMasteriesBuilder()),
-            new HealingBuilder(new ClassRanksWeaponMasteriesBuilder()),
-            new HolyBuilder(),
-            new ReductionsBuilder(),
-            new ElementalAtonement(
-                new GemComparison(new CharacterGemsTransformer(), new PlainDataSerializer(), new Manager()),
-                new ElementAttackData(),
-            ),
-            new CharacterAreaGemEffectService(new AreaGemEffectService(), new GemProgressionEffectService()),
-        );
+        $this->characterStatBuilder = (new CharacterCacheDataFactory)->buildCharacterStatBuilder();
 
         $this->globalEventGoalEligibilityService = new GlobalEventGoalEligibilityService();
 
@@ -796,13 +773,13 @@ class EnchantingServiceTest extends TestCase
     {
         $character = $this->character->getCharacter();
         $character->update(['gold' => 5000]);
-        $goldBefore = (int) $character->gold;
+        $goldBefore = $character->gold;
 
         $result = $this->enchantingService->enchantItemForBatch($character, $this->itemToEnchant, [$this->prefix->id, 999999], 1000);
 
         $this->assertFalse($result['success']);
         $this->assertSame('invalid_affix', $result['reason']);
-        $this->assertSame($goldBefore, (int) $character->refresh()->gold);
+        $this->assertSame($goldBefore, $character->refresh()->gold);
     }
 
     public function test_enchant_item_for_batch_does_not_charge_gold_when_affix_validation_fails(): void
@@ -816,13 +793,13 @@ class EnchantingServiceTest extends TestCase
             'skill_level_trivial' => 2,
             'cost' => 1000,
         ]);
-        $goldBefore = (int) $character->gold;
+        $goldBefore = $character->gold;
 
         $result = $this->enchantingService->enchantItemForBatch($character, $this->itemToEnchant, [$wrongTypeAffix->id], 1000);
 
         $this->assertFalse($result['success']);
         $this->assertSame('invalid_affix_type', $result['reason']);
-        $this->assertSame($goldBefore, (int) $character->refresh()->gold);
+        $this->assertSame($goldBefore, $character->refresh()->gold);
     }
 
     public function test_enchant_item_for_batch_rejects_affix_above_character_int(): void
@@ -836,13 +813,13 @@ class EnchantingServiceTest extends TestCase
             'skill_level_trivial' => 2,
             'cost' => 1000,
         ]);
-        $goldBefore = (int) $character->gold;
+        $goldBefore = $character->gold;
 
         $result = $this->enchantingService->enchantItemForBatch($character, $this->itemToEnchant, [$affix->id], 1000);
 
         $this->assertFalse($result['success']);
         $this->assertSame('int_too_low', $result['reason']);
-        $this->assertSame($goldBefore, (int) $character->refresh()->gold);
+        $this->assertSame($goldBefore, $character->refresh()->gold);
     }
 
     public function test_enchant_item_for_batch_rejects_affix_above_enchanting_skill(): void
@@ -856,13 +833,13 @@ class EnchantingServiceTest extends TestCase
             'skill_level_trivial' => 10001,
             'cost' => 1000,
         ]);
-        $goldBefore = (int) $character->gold;
+        $goldBefore = $character->gold;
 
         $result = $this->enchantingService->enchantItemForBatch($character, $this->itemToEnchant, [$affix->id], 1000);
 
         $this->assertFalse($result['success']);
         $this->assertSame('skill_too_low', $result['reason']);
-        $this->assertSame($goldBefore, (int) $character->refresh()->gold);
+        $this->assertSame($goldBefore, $character->refresh()->gold);
     }
 
     public function test_resolve_batch_affixes_returns_both_requested_affixes(): void

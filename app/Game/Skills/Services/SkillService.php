@@ -10,6 +10,7 @@ use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Gems\Contracts\CharacterGemEffects;
 use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
 use App\Game\Skills\Events\SkillLeveledUpServerMessageEvent;
 use App\Game\Skills\Transformers\BasicSkillsTransformer;
@@ -34,6 +35,7 @@ class SkillService
      * @param RandomNumberGenerator $randomNumberGenerator
      * @param CharacterAreaGemEffectService $characterAreaGemEffectService
      * @param SkillBonusService $skillBonusService
+     * @param CharacterGemEffects $characterGemEffects
      */
     public function __construct(
         private readonly Manager $manager,
@@ -45,6 +47,7 @@ class SkillService
         private readonly RandomNumberGenerator $randomNumberGenerator,
         private readonly CharacterAreaGemEffectService $characterAreaGemEffectService,
         private readonly SkillBonusService $skillBonusService,
+        private readonly CharacterGemEffects $characterGemEffects,
     ) {}
 
     /**
@@ -243,6 +246,12 @@ class SkillService
         $skillXp = $xp + ($xp * $this->skillInTraining->xp_towards);
         $skillXp = $skillXp + $skillXp * ($this->skillBonusService->skillTrainingBonus($this->skillInTraining) + $character->map->gameMap->skill_training_bonus);
         $skillXp += 5;
+
+        $baseSkillClassId = $this->skillInTraining->baseSkill->game_class_id;
+
+        if (! is_null($baseSkillClassId) && $baseSkillClassId === $character->game_class_id) {
+            $skillXp = round($skillXp * (1 + $this->characterGemEffects->resolveForCharacterId($character->id)->classSkillXpGain()));
+        }
 
         return $skillXp;
     }

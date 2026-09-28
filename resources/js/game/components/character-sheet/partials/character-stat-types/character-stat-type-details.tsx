@@ -5,6 +5,7 @@ import { CharacterStatBreakDownUrls } from './api/enums/character-stat-break-dow
 import { useGetCharacterStatBreakDown } from './api/hooks/use-get-character-stat-break-down';
 import EquippedItems from './partials/equipped-items';
 import CharacterStatTypeDetailsProps from './types/character-stat-type-details-props';
+import { characterGemModifierLabels } from '../../../../reusable-components/character-gem/enums/character-gem-modifier-type';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 
@@ -58,6 +59,20 @@ export const CharacterStatTypeDetails = ({
     );
   };
 
+  const renderGemDetails = () => {
+    if (data.gem_details.length === 0) {
+      return <li>No socketed Gems affect this stat.</li>;
+    }
+
+    return data.gem_details.map((gemDetail) => (
+      <li key={`${gemDetail.gem_id}-${gemDetail.item_id}`}>
+        <strong>{gemDetail.gem_name}</strong> — {gemDetail.item_name}: +
+        {formatNumberWithCommas(gemDetail.amount)}{' '}
+        {characterGemModifierLabels[gemDetail.modifier_type]}
+      </li>
+    ));
+  };
+
   return (
     <div>
       <div className={'mx-auto w-full md:w-2/3'}>
@@ -80,6 +95,16 @@ export const CharacterStatTypeDetails = ({
           your raw stat value. Finally your raw stat value has a percentage of
           it carried over and added to your raw stat value when you reincarnate.
         </p>
+        <Separator />
+        <section aria-labelledby="gems-affecting-stat-heading">
+          <h4 id="gems-affecting-stat-heading">Gems affecting this stat</h4>
+          <Dl>
+            <Dt>Socketed Gem contributions</Dt>
+            <Dd>
+              <ul className="space-y-2">{renderGemDetails()}</ul>
+            </Dd>
+          </Dl>
+        </section>
         <Separator />
       </div>
       <div className={'w-full'}>

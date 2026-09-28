@@ -7,7 +7,7 @@ import { CraftingIntroductionStorageKey } from '../../shared/enums/crafting-intr
 import { useCraftingDisciplineIntroduction } from '../../shared/hooks/use-crafting-discipline-introduction';
 
 const GEM_CRAFTING_INTRODUCTION_DESCRIPTION =
-  'Gem Crafting lets you craft gems from Copper Coins, Shards, and Gold Dust across four tiers, then socket them into your weapons and armour for elemental resistance and bonus damage against enemies.';
+  'Gem Crafting creates role-specialized Gems: Tier 1 grants a Gem Ability and two raw stats; Tier 2 grants raw stats and direct combat modifiers; Tier 3 specializes Class Rank, Class Mastery, Weapon Mastery, and class-skill progression; Tier 4 specializes atonement, penetration, Character XP, and currency gains.';
 
 const GemCraftingSection = (): ReactNode => {
   const { introductionAcknowledged, acknowledgeIntroduction } =

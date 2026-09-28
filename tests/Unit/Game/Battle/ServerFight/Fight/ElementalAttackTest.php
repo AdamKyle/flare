@@ -49,7 +49,7 @@ class ElementalAttackTest extends TestCase
         $this->assertSame(100, $elementalAttack->getMonsterHealth());
     }
 
-    public function test_no_attack_happens_when_the_defender_has_no_elements_and_not_a_monster_attack(): void
+    public function test_player_elemental_attack_applies_when_defender_has_no_resistance(): void
     {
         $elementalAttack = $this->elementalAttackFactory->buildElementalAttack();
         $elementalAttack->setCharacterHealth(100);
@@ -57,7 +57,7 @@ class ElementalAttackTest extends TestCase
 
         $elementalAttack->doElementalAttack(['fire' => 0, 'ice' => 0, 'water' => 0], ['fire' => 0.5, 'ice' => 0, 'water' => 0], 100, false);
 
-        $this->assertSame(100, $elementalAttack->getMonsterHealth());
+        $this->assertSame(50, $elementalAttack->getMonsterHealth());
     }
 
     public function test_regular_damage_is_dealt_when_the_defender_has_no_elements(): void
@@ -84,7 +84,7 @@ class ElementalAttackTest extends TestCase
             false
         );
 
-        $this->assertSame(75, $elementalAttack->getMonsterHealth());
+        $this->assertSame(50, $elementalAttack->getMonsterHealth());
     }
 
     public function test_double_damage_is_dealt_when_the_attacking_element_is_strong_against_the_defender(): void
@@ -100,7 +100,7 @@ class ElementalAttackTest extends TestCase
             false
         );
 
-        $this->assertSame(0, $elementalAttack->getMonsterHealth());
+        $this->assertSame(-100, $elementalAttack->getMonsterHealth());
     }
 
     public function test_regular_damage_is_dealt_when_the_elements_are_the_same(): void
@@ -148,7 +148,7 @@ class ElementalAttackTest extends TestCase
             true
         );
 
-        $this->assertSame(75, $elementalAttack->getCharacterHealth());
+        $this->assertSame(50, $elementalAttack->getCharacterHealth());
     }
 
     public function test_monster_double_damage_attack_reduces_the_character_health(): void
@@ -164,7 +164,40 @@ class ElementalAttackTest extends TestCase
             true
         );
 
-        $this->assertSame(0, $elementalAttack->getCharacterHealth());
+        $this->assertSame(-100, $elementalAttack->getCharacterHealth());
+    }
+
+    public function test_unrelated_high_resistance_does_not_suppress_player_attack(): void
+    {
+        $elementalAttack = $this->elementalAttackFactory->buildElementalAttack();
+        $elementalAttack->setCharacterHealth(100);
+        $elementalAttack->setMonsterHealth(100);
+
+        $elementalAttack->doElementalAttack(
+            ['fire' => 0, 'ice' => 0.75, 'water' => 0],
+            ['fire' => 1.0, 'ice' => 0, 'water' => 0],
+            100,
+            false,
+        );
+
+        $this->assertSame(50, $elementalAttack->getMonsterHealth());
+    }
+
+    public function test_player_penetration_subtracts_matching_resistance_without_going_below_zero(): void
+    {
+        $elementalAttack = $this->elementalAttackFactory->buildElementalAttack();
+        $elementalAttack->setCharacterHealth(100);
+        $elementalAttack->setMonsterHealth(100);
+
+        $elementalAttack->doElementalAttack(
+            ['fire' => 0.25, 'ice' => 0, 'water' => 0],
+            ['fire' => 1.0, 'ice' => 0, 'water' => 0],
+            100,
+            false,
+            ['fire' => 0.50, 'ice' => 0, 'water' => 0],
+        );
+
+        $this->assertSame(0, $elementalAttack->getMonsterHealth());
     }
 
     public function test_raid_boss_damage_is_capped_for_non_monster_attacks(): void

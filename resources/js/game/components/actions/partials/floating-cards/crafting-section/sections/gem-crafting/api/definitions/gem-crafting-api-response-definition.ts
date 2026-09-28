@@ -1,6 +1,6 @@
 import GemTierDefinition from './gem-tier-definition';
-import BaseGemDetails from '../../../../../../../../../api-definitions/items/base-gem-details';
-import CondensedGemDetails from '../../../../../../../../../api-definitions/items/condensed-gem-details';
+import CharacterGemBagSlotDefinition from '../../../../../../../../../api-definitions/gems/character-gem-bag-slot-definition';
+import CharacterGemDefinition from '../../../../../../../../../api-definitions/gems/character-gem-definition';
 import CraftingInventoryCountDefinition from '../../../../shared/api/definitions/crafting-inventory-count-definition';
 import CraftingXpDefinition from '../../../../shared/api/definitions/crafting-xp-definition';
 
@@ -10,6 +10,6 @@ export default interface GemCraftingApiResponseDefinition {
   inventory_count: CraftingInventoryCountDefinition;
   message?: string;
   craft_succeeded?: boolean;
-  crafted_gem?: CondensedGemDetails | null;
-  crafted_gem_preview?: BaseGemDetails | null;
+  crafted_gem?: CharacterGemDefinition | null;
+  crafted_gem_preview?: CharacterGemBagSlotDefinition | null;
 }

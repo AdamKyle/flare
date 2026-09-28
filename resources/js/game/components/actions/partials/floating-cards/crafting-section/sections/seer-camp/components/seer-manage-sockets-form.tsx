@@ -98,6 +98,11 @@ const SeerManageSocketsForm = ({
           Possible resulting sockets: {selectedItem.possible_socket_minimum}–
           {selectedItem.possible_socket_maximum}
         </p>
+        <p>
+          Possible result: {selectedItem.possible_socket_minimum}–
+          {selectedItem.possible_socket_maximum} sockets. The Seer never removes
+          existing sockets.
+        </p>
         <p>Cost: {costs.socket} Gold Bars.</p>
       </CraftingActionPreview>
     );

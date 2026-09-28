@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Game\Character\CharacterSheet\Transformers\CharacterSheetTransformer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\Setup\Character\CharacterSheetTransformerFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterBoon;
 use Tests\Traits\CreateItem;
@@ -22,7 +23,7 @@ class CharacterSheetTransformerTest extends TestCase
     {
         parent::setUp();
 
-        $this->transformer = resolve(CharacterSheetTransformer::class);
+        $this->transformer = (new CharacterSheetTransformerFactory)->build();
         $this->character = (new CharacterFactory)
             ->createBaseCharacter()
             ->givePlayerLocation()
@@ -125,7 +126,7 @@ class CharacterSheetTransformerTest extends TestCase
             ],
             'highest_element' => [
                 'name' => 'N/A',
-                'damage' => 0,
+                'damage' => 0.0,
             ],
         ], $data['elemental_atonements']);
     }

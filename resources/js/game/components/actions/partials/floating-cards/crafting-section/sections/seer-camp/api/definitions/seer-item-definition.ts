@@ -4,6 +4,7 @@ export default interface SeerItemDefinition {
   slot_id: number;
   name: string;
   current_sockets: number;
+  max_socket_count: number;
   possible_socket_minimum: number;
   possible_socket_maximum: number;
   preview: CraftingItemPreviewDefinition;

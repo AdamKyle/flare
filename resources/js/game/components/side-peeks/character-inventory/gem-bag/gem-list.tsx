@@ -3,7 +3,7 @@ import React, { ReactNode } from 'react';
 
 import GemSlot from './gem-slot';
 import GemListProps from './types/gem-list-props';
-import BaseGemDetails from '../../../../api-definitions/items/base-gem-details';
+import CharacterGemBagSlotDefinition from '../../../../api-definitions/gems/character-gem-bag-slot-definition';
 
 import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
 
@@ -23,7 +23,7 @@ const GemList = ({
       );
     }
 
-    return gems.map((gem: BaseGemDetails) => (
+    return gems.map((gem: CharacterGemBagSlotDefinition) => (
       <GemSlot key={gem.slot_id} gem_slot={gem} on_view_gem={on_view_gem} />
     ));
   };

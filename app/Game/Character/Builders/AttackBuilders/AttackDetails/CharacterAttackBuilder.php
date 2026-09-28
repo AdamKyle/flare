@@ -9,7 +9,10 @@ use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\Core\Combat\Values\AttackType;
 use App\Game\Core\Items\Values\ItemType;
+use App\Game\Gems\Contracts\CharacterGemEffects;
 use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
+use App\Game\Gems\Values\GemAbilityEffectType;
+use App\Game\Gems\Values\ResolvedCharacterGemEffects;
 use Exception;
 
 class CharacterAttackBuilder
@@ -24,34 +27,53 @@ class CharacterAttackBuilder
 
     private float $areaGemCharacterPowerReduction = 0.0;
 
+    private ResolvedCharacterGemEffects $characterGemEffects;
+
     public function __construct(
         CharacterStatBuilder $characterStatBuilder,
         private readonly CharacterAreaGemEffectService $characterAreaGemEffectService,
+        private readonly CharacterGemEffects $characterGemEffectService,
     ) {
         $this->characterStatBuilder = $characterStatBuilder;
     }
 
     /**
-     * Set the character.
+     * Set the Character and resolve its Area and character Gem effects for attack building.
      *
-     * @return $this
+     * @param Character $character
+     * @param bool $ignoreReductions
+     * @param float|null $damageStatAmount
+     * @return CharacterAttackBuilder
      */
-    public function setCharacter(Character $character, bool $ignoreReductions = false, ?float $damageStatAmount = null): CharacterAttackBuilder
-    {
+    public function setCharacter(
+        Character $character,
+        bool $ignoreReductions = false,
+        ?float $damageStatAmount = null,
+        ?ResolvedCharacterGemEffects $resolvedCharacterGemEffects = null,
+    ): CharacterAttackBuilder {
         $this->character = $character;
         $this->damageStatAmount = $damageStatAmount;
+        $this->characterGemEffects = $resolvedCharacterGemEffects
+            ?? $this->characterGemEffectService->resolveForCharacterId($character->id);
 
         $this->areaGemCharacterPowerReduction = $ignoreReductions
             ? 0.0
             : $this->characterAreaGemEffectService->resolveForCharacter($character)->characterPowerReduction();
 
-        $this->characterStatBuilder = $this->characterStatBuilder->setCharacter($character, $ignoreReductions);
+        $this->characterStatBuilder = $this->characterStatBuilder->setCharacter(
+            $character,
+            $ignoreReductions,
+            $this->characterGemEffects,
+        );
 
         return $this;
     }
 
     /**
-     * Build the characters attack.
+     * Build the cached weapon attack payload.
+     *
+     * @param bool $voided
+     * @return array
      *
      * @throws Exception
      */
@@ -59,30 +81,38 @@ class CharacterAttackBuilder
     {
         $attack = $this->baseAttack(AttackType::ATTACK->value, $voided);
 
-        $attack['weapon_damage'] = $this->characterStatBuilder->buildDamage(ItemType::validWeapons(), $voided);
+        $attack['weapon_damage'] = $this->applyPassiveAbility(
+            $this->characterStatBuilder->buildDamage(ItemType::validWeapons(), $voided),
+            GemAbilityEffectType::WEAPON_DAMAGE_MOD,
+            AttackType::ATTACK->value,
+        );
 
         return $attack;
     }
 
     /**
-     * Build the characters cast attack
+     * Build the cached cast attack payload.
      *
+     * @param bool $voided
      * @return array
      *
      * @throws Exception
      */
-    public function buildCastAttack(bool $voided = false)
+    public function buildCastAttack(bool $voided = false): array
     {
         $attack = $this->baseAttack(AttackType::CAST->value, $voided);
 
-        $attack['spell_damage'] = $this->characterStatBuilder->buildDamage('spell-damage', $voided);
-        $attack['heal_for'] = $this->characterStatBuilder->buildHealing($voided);
+        $attack['spell_damage'] = $this->applyPassiveAbility($this->characterStatBuilder->buildDamage('spell-damage', $voided), GemAbilityEffectType::SPELL_DAMAGE_MOD, AttackType::CAST->value);
+        $attack['heal_for'] = $this->applyPassiveAbility($this->characterStatBuilder->buildHealing($voided), GemAbilityEffectType::HEALING_MOD, AttackType::CAST->value);
 
         return $attack;
     }
 
     /**
-     * Build the characters Cast and Attack.
+     * Build the cached cast-and-attack payload.
+     *
+     * @param bool $voided
+     * @return array
      *
      * @throws Exception
      */
@@ -92,7 +122,10 @@ class CharacterAttackBuilder
     }
 
     /**
-     * Build the characters Attack and Cast.
+     * Build the cached attack-and-cast payload.
+     *
+     * @param bool $voided
+     * @return array
      *
      * @throws Exception
      */
@@ -102,7 +135,10 @@ class CharacterAttackBuilder
     }
 
     /**
-     * Build the characters defend.
+     * Build the cached defend payload.
+     *
+     * @param bool $voided
+     * @return array
      *
      * @throws Exception
      */
@@ -110,13 +146,17 @@ class CharacterAttackBuilder
     {
         $defence = $this->baseAttack(AttackType::DEFEND->value, $voided);
 
-        $defence['defence'] = $this->characterStatBuilder->buildDefence($voided);
+        $defence['defence'] = $this->applyPassiveAbility($this->characterStatBuilder->buildDefence($voided), GemAbilityEffectType::DEFENCE_MOD, AttackType::DEFEND->value);
 
         return $defence;
     }
 
     /**
-     * The base attack object when building the different attack types.
+     * Build fields shared by every cached top-level attack action.
+     *
+     * @param string $attackType
+     * @param bool $voided
+     * @return array
      *
      * @throws Exception
      */
@@ -131,6 +171,9 @@ class CharacterAttackBuilder
         return [
             'attack_type' => $attackType,
             'name' => $this->character->name,
+            'weapon_damage' => $this->characterStatBuilder->buildDamage(ItemType::validWeapons(), $voided),
+            'spell_damage' => $this->characterStatBuilder->buildDamage(ItemType::SPELL_DAMAGE->value, $voided),
+            'defence' => $this->characterStatBuilder->buildDefence($voided),
             'ring_damage' => $this->characterStatBuilder->buildDamage(ItemType::RING->value, $voided),
             'heal_for' => $this->characterStatBuilder->buildHealing($voided),
             'res_chance' => $this->characterStatBuilder->buildResurrectionChance(),
@@ -148,13 +191,18 @@ class CharacterAttackBuilder
                 'entrancing_chance' => $this->characterStatBuilder->buildEntrancingChance($voided),
             ],
             'special_damage' => $this->fetchClassSpecialDamageInfo(),
+            'damage_stat_amount' => $this->damageStatAmount ?? $this->characterStatBuilder->statMod($this->character->damage_stat, $voided),
+            'gem_abilities' => [
+                'active' => $this->abilitiesForAction($this->characterGemEffects->activeAbilitySnapshots(), $attackType),
+                'passive' => $this->abilitiesForAction($this->characterGemEffects->passiveAbilitySnapshots(), $attackType),
+            ],
         ];
     }
 
     /**
-     * Builds the special damage information.
+     * Build effective equipped Class Mastery specialty damage details.
      *
-     * - Based off the class special equipped which does damage.
+     * @return array
      */
     private function fetchClassSpecialDamageInfo(): array
     {
@@ -170,7 +218,11 @@ class CharacterAttackBuilder
 
         $baseDamage = $classSpecialEquipped->gameClassSpecial->specialty_damage;
         $addedDamage = $classSpecialEquipped->gameClassSpecial->increase_specialty_damage_per_level * $classSpecialEquipped->level;
-        $damage = $baseDamage + $addedDamage + $damageStatAmount * $classSpecialEquipped->gameClassSpecial->specialty_damage_uses_damage_stat_amount;
+        $damage = (
+            $baseDamage
+            + $addedDamage
+            + $damageStatAmount * $classSpecialEquipped->gameClassSpecial->specialty_damage_uses_damage_stat_amount
+        ) * (1 + $this->characterGemEffects->classMasteryEffect());
 
         return [
             'name' => $classSpecialEquipped->gameClassSpecial->name,
@@ -180,7 +232,13 @@ class CharacterAttackBuilder
     }
 
     /**
-     * Deals with the positional aspects of Attack and Cast and Cast and Attack.
+     * Build positional weapon, spell, and healing values for one mixed action.
+     *
+     * @param string $attackType
+     * @param string $spellPosition
+     * @param string $weaponPosition
+     * @param bool $voided
+     * @return array
      *
      * @throws Exception
      */
@@ -192,10 +250,38 @@ class CharacterAttackBuilder
         $spellDamage = $this->characterStatBuilder->positionalSpellDamage($spellPosition, $voided);
         $spellHealing = $this->characterStatBuilder->positionalHealing($spellPosition, $voided);
 
-        $attack['spell_damage'] = $spellDamage;
-        $attack['heal_for'] = $spellHealing;
-        $attack['weapon_damage'] = $weaponDamage;
+        $attack['spell_damage'] = $this->applyPassiveAbility($spellDamage, GemAbilityEffectType::SPELL_DAMAGE_MOD, $attackType);
+        $attack['heal_for'] = $this->applyPassiveAbility($spellHealing, GemAbilityEffectType::HEALING_MOD, $attackType);
+        $attack['weapon_damage'] = $this->applyPassiveAbility($weaponDamage, GemAbilityEffectType::WEAPON_DAMAGE_MOD, $attackType);
 
         return $attack;
+    }
+
+    /**
+     * Apply action-specific passive Gem Ability bonuses to one cached combat value.
+     *
+     * @param int $value
+     * @param GemAbilityEffectType $effectType
+     * @param string $attackType
+     * @return int
+     */
+    private function applyPassiveAbility(int $value, GemAbilityEffectType $effectType, string $attackType): int
+    {
+        return floor($value * (1 + $this->characterGemEffects->passiveBonusFor($effectType, $attackType)));
+    }
+
+    /**
+     * Return cached Gem Ability snapshots allowed for the selected base action.
+     *
+     * @param array $abilities
+     * @param string $attackType
+     * @return array
+     */
+    private function abilitiesForAction(array $abilities, string $attackType): array
+    {
+        return array_values(array_filter(
+            $abilities,
+            fn (array $ability): bool => in_array($attackType, $ability['attack_types'], true),
+        ));
     }
 }

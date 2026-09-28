@@ -1,4 +1,5 @@
 import BaseEquippedItemDetails from '../../../../../../api-definitions/items/base-equipped-item-details';
+import { CharacterGemModifierType } from '../../../../../../reusable-components/character-gem/enums/character-gem-modifier-type';
 import {
   AncestralItemSkillData,
   CharacterBoonDefinition,
@@ -27,6 +28,17 @@ export interface MasteryBreakdown {
   amount: number;
 }
 
+export interface GemModifierDetail {
+  gem_id: number;
+  gem_name: string;
+  item_id: number;
+  item_name: string;
+  modifier_type: CharacterGemModifierType;
+  amount: number | null;
+  ability_name: string | null;
+  attack_types?: string[];
+}
+
 export interface CharacterAttackTypeBreakDownDefinition {
   damage_stat_name: string;
   damage_stat_amount: number;
@@ -53,6 +65,7 @@ export interface CharacterAttackTypeBreakDownDefinition {
   spell_evasion: number;
   affix_damage_reduction: number;
   healing_reduction: number;
+  gem_modifier_details?: GemModifierDetail[];
 }
 
 export default interface CharacterAttackBreakDownDefinition {

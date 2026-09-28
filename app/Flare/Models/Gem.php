@@ -3,12 +3,12 @@
 namespace App\Flare\Models;
 
 use App\Game\Gems\Values\GemTierValue;
-use App\Game\Gems\Values\GemTypeValue;
 use Database\Factories\GemFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Gem extends Model
 {
@@ -28,12 +28,6 @@ class Gem extends Model
     protected $fillable = [
         'name',
         'tier',
-        'primary_atonement_type',
-        'secondary_atonement_type',
-        'tertiary_atonement_type',
-        'primary_atonement_amount',
-        'secondary_atonement_amount',
-        'tertiary_atonement_amount',
         'domain',
         'rolled_by_user_id',
         'roll_number',
@@ -79,12 +73,6 @@ class Gem extends Model
      */
     protected $casts = [
         'tier' => 'integer',
-        'primary_atonement_type' => 'integer',
-        'secondary_atonement_type' => 'integer',
-        'tertiary_atonement_type' => 'integer',
-        'primary_atonement_amount' => 'float',
-        'secondary_atonement_amount' => 'float',
-        'tertiary_atonement_amount' => 'float',
         'domain' => 'string',
         'rolled_by_user_id' => 'integer',
         'roll_number' => 'integer',
@@ -123,57 +111,95 @@ class Gem extends Model
         'monster_atonement_amount' => 'float',
     ];
 
+    /**
+     * Scope the query to character-domain Gems.
+     *
+     * @param Builder $query
+     * @return Builder
+     */
     public function scopeCharacter(Builder $query): Builder
     {
         return $query->where('domain', self::DOMAIN_CHARACTER);
     }
 
+    /**
+     * Scope the query to Map-domain Gems.
+     *
+     * @param Builder $query
+     * @return Builder
+     */
     public function scopeMap(Builder $query): Builder
     {
         return $query->where('domain', self::DOMAIN_MAP);
     }
 
+    /**
+     * Scope the query to Location-domain Gems.
+     *
+     * @param Builder $query
+     * @return Builder
+     */
     public function scopeLocation(Builder $query): Builder
     {
         return $query->where('domain', self::DOMAIN_LOCATION);
     }
 
+    /**
+     * Get the User who rolled this World Gem.
+     *
+     * @return BelongsTo
+     */
     public function rolledByUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'rolled_by_user_id');
     }
 
+    /**
+     * Get the Map Gem profile this World Gem was rolled from.
+     *
+     * @return BelongsTo
+     */
     public function gameMapGemParamter(): BelongsTo
     {
         return $this->belongsTo(GameMapGemParamter::class, 'game_map_gem_paramters_id');
     }
 
+    /**
+     * Get the Location Gem profile this World Gem was rolled from.
+     *
+     * @return BelongsTo
+     */
     public function gameLocationGemParamter(): BelongsTo
     {
         return $this->belongsTo(GameLocationGemParamter::class, 'game_location_gem_paramters_id');
     }
 
-    public function primaryAtonement(): GemTypeValue
+    /**
+     * Get the three rolled modifiers of this character Gem ordered by roll position.
+     *
+     * @return HasMany
+     */
+    public function characterModifiers(): HasMany
     {
-        return new GemTypeValue($this->primary_atonement_type);
+        return $this->hasMany(CharacterGemModifier::class)->orderBy('roll_position');
     }
 
-    public function secondaryAtonementType(): GemTypeValue
-    {
-        return new GemTypeValue($this->secondary_atonement_type);
-    }
-
-    public function tertiaryAtonementType(): GemTypeValue
-    {
-        return new GemTypeValue($this->tertiary_atonement_type);
-    }
-
+    /**
+     * Return the tier value object for this Gem.
+     *
+     * @return GemTierValue
+     */
     public function gemTier(): GemTierValue
     {
         return new GemTierValue($this->tier);
     }
 
-    protected static function newFactory()
+    /**
+     * Get the factory instance for this model.
+     *
+     * @return GemFactory
+     */
+    protected static function newFactory(): GemFactory
     {
         return GemFactory::new();
     }

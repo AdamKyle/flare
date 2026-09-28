@@ -16,9 +16,11 @@ use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Events\Values\EventType;
+use App\Game\Gems\Contracts\CharacterGemEffects;
 use App\Game\Gems\Progression\Contracts\CharacterAreaGemEffects;
 use App\Game\Gems\Values\AreaGemRewardEffect;
 use App\Game\Gems\Values\ResolvedAreaGemEffects;
+use App\Game\Gems\Values\ResolvedCharacterGemEffects;
 use App\Game\Maps\Values\LocationType;
 use App\Game\Messages\Types\CurrenciesMessageTypes;
 use RuntimeException;
@@ -37,15 +39,19 @@ class CharacterCurrencyRewardService
 
     private ?Throwable $currencyCalculationFailure = null;
 
+    private ResolvedCharacterGemEffects $characterGemEffects;
+
     /**
      * @param BattleMessageHandler $battleMessageHandler
      * @param RandomNumberGenerator $randomNumberGenerator
      * @param CharacterAreaGemEffects $characterAreaGemEffects
+     * @param CharacterGemEffects $characterGemEffectService
      */
     public function __construct(
         private readonly BattleMessageHandler $battleMessageHandler,
         private readonly RandomNumberGenerator $randomNumberGenerator,
         private readonly CharacterAreaGemEffects $characterAreaGemEffects,
+        private readonly CharacterGemEffects $characterGemEffectService,
     ) {}
 
     /**
@@ -64,6 +70,7 @@ class CharacterCurrencyRewardService
             'copper_coins' => 0,
         ];
         $this->currencyCalculationFailure = null;
+        $this->characterGemEffects = $this->characterGemEffectService->resolveForCharacterId($character->id);
 
         return $this;
     }
@@ -275,8 +282,8 @@ class CharacterCurrencyRewardService
 
             $resolvedAreaGemEffects = $this->characterAreaGemEffects->resolveForCharacterId($this->character->id);
 
-            $shards = $this->roundToWholeCurrency($shards * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::SHARDS_GAIN)));
-            $goldDust = $this->roundToWholeCurrency($goldDust * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::GOLD_DUST_GAIN)));
+            $shards = $this->roundToWholeCurrency($shards * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::SHARDS_GAIN) + $this->characterGemEffects->shardsGain()));
+            $goldDust = $this->roundToWholeCurrency($goldDust * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::GOLD_DUST_GAIN) + $this->characterGemEffects->goldDustGain()));
 
             if (is_null($shards) || is_null($goldDust)) {
                 return $this;
@@ -290,7 +297,7 @@ class CharacterCurrencyRewardService
 
             if ($canHaveCopperCoins) {
                 $copperCoins = $this->randomNumberGenerator->numberBetween(1, 115) * $killCount;
-                $copperCoins = $this->roundToWholeCurrency($copperCoins * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::COPPER_COIN_GAIN)));
+                $copperCoins = $this->roundToWholeCurrency($copperCoins * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::COPPER_COIN_GAIN) + $this->characterGemEffects->copperCoinGain()));
 
                 if (is_null($copperCoins)) {
                     return $this;
@@ -379,7 +386,7 @@ class CharacterCurrencyRewardService
             return;
         }
 
-        $goldToReward = $this->roundToWholeCurrency($goldToReward * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::GOLD_GAIN)));
+        $goldToReward = $this->roundToWholeCurrency($goldToReward * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::GOLD_GAIN) + $this->characterGemEffects->goldGain()));
 
         if (is_null($goldToReward)) {
             return;
@@ -441,7 +448,8 @@ class CharacterCurrencyRewardService
 
                 $coins = $coins + $coins * $mercenarySlotBonus;
 
-                $copperCoinGain = $this->characterAreaGemEffects->resolveForCharacterId($this->character->id)->rewardEffect(AreaGemRewardEffect::COPPER_COIN_GAIN);
+                $copperCoinGain = $this->characterAreaGemEffects->resolveForCharacterId($this->character->id)->rewardEffect(AreaGemRewardEffect::COPPER_COIN_GAIN)
+                    + $this->characterGemEffects->copperCoinGain();
                 $coins = $coins + $coins * $copperCoinGain;
 
                 $this->earnedCurrencies['copper_coins'] += $coins;
@@ -472,7 +480,8 @@ class CharacterCurrencyRewardService
             return;
         }
 
-        $copperCoinGain = $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::COPPER_COIN_GAIN);
+        $copperCoinGain = $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::COPPER_COIN_GAIN)
+            + $this->characterGemEffects->copperCoinGain();
         $coins = $this->roundToWholeCurrency($coins * (1 + $copperCoinGain));
 
         if (is_null($coins)) {
@@ -505,9 +514,9 @@ class CharacterCurrencyRewardService
         $goldDust = $eventPlan['gold_dust'] ?? 0;
         $copperCoins = $eventPlan['copper_coins'] ?? 0;
 
-        $shards = $this->roundToWholeCurrency($shards * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::SHARDS_GAIN)));
-        $goldDust = $this->roundToWholeCurrency($goldDust * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::GOLD_DUST_GAIN)));
-        $copperCoins = $this->roundToWholeCurrency($copperCoins * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::COPPER_COIN_GAIN)));
+        $shards = $this->roundToWholeCurrency($shards * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::SHARDS_GAIN) + $this->characterGemEffects->shardsGain()));
+        $goldDust = $this->roundToWholeCurrency($goldDust * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::GOLD_DUST_GAIN) + $this->characterGemEffects->goldDustGain()));
+        $copperCoins = $this->roundToWholeCurrency($copperCoins * (1 + $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::COPPER_COIN_GAIN) + $this->characterGemEffects->copperCoinGain()));
 
         if (is_null($shards) || is_null($goldDust) || is_null($copperCoins)) {
             return;

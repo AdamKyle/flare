@@ -3,12 +3,14 @@
 namespace Tests\Unit\Game\Character\Builders\StatDetailsBuilder;
 
 use App\Game\Character\Builders\StatDetailsBuilder\StatModifierDetails;
+use App\Game\Gems\Values\CharacterGemModifierType;
 use App\Game\Maps\Values\MapName;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterBoon;
 use Tests\Traits\CreateCharacterClassSpecialitiesEquipped;
+use Tests\Traits\CreateCharacterGemModifier;
 use Tests\Traits\CreateGameClassSpecial;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGameMapGemParamter;
@@ -21,7 +23,7 @@ use Tests\Traits\CreateItemSkillProgression;
 
 class StatModifierDetailsTest extends TestCase
 {
-    use CreateCharacterBoon, CreateCharacterClassSpecialitiesEquipped, CreateGameClassSpecial, CreateGameMap, CreateGameMapGemParamter, CreateGameSkill, CreateGem, CreateItem, CreateItemAffix, CreateItemSkill, CreateItemSkillProgression, RefreshDatabase;
+    use CreateCharacterBoon, CreateCharacterClassSpecialitiesEquipped, CreateCharacterGemModifier, CreateGameClassSpecial, CreateGameMap, CreateGameMapGemParamter, CreateGameSkill, CreateGem, CreateItem, CreateItemAffix, CreateItemSkill, CreateItemSkillProgression, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -56,6 +58,29 @@ class StatModifierDetailsTest extends TestCase
         $this->assertArrayHasKey('class_specialties', $details);
         $this->assertArrayHasKey('ancestral_item_skill_data', $details);
         $this->assertArrayHasKey('map_reduction', $details);
+        $this->assertArrayHasKey('gem_details', $details);
+    }
+
+    public function test_for_stat_keeps_persisted_base_and_lists_exact_equipped_gem_contribution(): void
+    {
+        $gem = $this->createGem(['name' => 'Strong Ruby', 'tier' => 1]);
+        $this->createCharacterGemModifier([
+            'gem_id' => $gem->id,
+            'roll_position' => 1,
+            'modifier_type' => CharacterGemModifierType::STRENGTH,
+            'amount' => 20,
+        ]);
+        $item = $this->createItem(['name' => 'Dragon Plate', 'type' => 'body', 'socket_count' => 1]);
+        $item->sockets()->create(['gem_id' => $gem->id]);
+        $character = $this->character->inventoryManagement()->giveItem($item, true, 'body')->getCharacter();
+
+        $details = $this->statModifierDetails->setCharacter($character->refresh())->forStat('str');
+
+        $this->assertSame($character->str, $details['base_value']);
+        $this->assertGreaterThanOrEqual($character->str + 20, $details['modded_value']);
+        $this->assertSame('Strong Ruby', $details['gem_details'][0]['gem_name']);
+        $this->assertSame('Dragon Plate', $details['gem_details'][0]['item_name']);
+        $this->assertSame(20.0, $details['gem_details'][0]['amount']);
     }
 
     public function test_for_stat_includes_equipped_item_affixes(): void

@@ -6,15 +6,12 @@ use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Game\Core\Items\Enricher\ItemEnricherFactory;
 use App\Game\Core\Items\Values\ItemUniqueness;
-use App\Game\Gems\Traits\GetItemAtonements;
 use App\Game\Maps\Transformers\LocationTransformer;
 use League\Fractal\Resource\Item as ItemResource;
 use League\Fractal\TransformerAbstract;
 
 class ItemTransformer extends TransformerAbstract
 {
-    use GetItemAtonements;
-
     protected array $defaultIncludes = ['drop_location'];
 
     public function __construct(private readonly ItemEnricherFactory $itemEnricherFactory) {}
@@ -111,7 +108,6 @@ class ItemTransformer extends TransformerAbstract
             'ignores_caps' => $item->ignores_caps,
             'sockets' => $item->sockets,
             'socket_amount' => $item->socket_count,
-            'item_atonements' => $this->getElementAtonement($item),
             'item_skills' => $itemSkills,
             'item_skill_progressions' => $itemSkillProgressions,
         ];

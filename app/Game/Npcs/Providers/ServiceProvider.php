@@ -4,10 +4,11 @@ namespace App\Game\Npcs\Providers;
 
 use App\Flare\Pagination\Pagination;
 use App\Game\Core\Chance\ChanceCalculator;
-use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Items\Builders\AffixAttributeBuilder;
 use App\Game\Core\Items\Builders\RandomAffixGenerator;
+use App\Game\Core\Items\Services\ItemSocketRollService;
 use App\Game\Core\Items\Transformers\CraftingItemPreviewTransformer;
+use App\Game\Core\Items\Values\ItemSocketEligibility;
 use App\Game\Gems\Services\GemComparison;
 use App\Game\Npcs\Actions\LabyrinthOracle\Services\ItemTransferService;
 use App\Game\Npcs\Actions\QueenOfHearts\Services\QueenOfHeartsService;
@@ -29,11 +30,12 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(SeerService::class, fn ($app) => new SeerService(
             $app->make(GemComparison::class),
-            $app->make(RandomNumberGenerator::class),
             $app->make(Pagination::class),
             $app->make(SeerInventoryItemTransformer::class),
             $app->make(SeerGemTransformer::class),
             $app->make(CraftingItemPreviewTransformer::class),
+            $app->make(ItemSocketEligibility::class),
+            $app->make(ItemSocketRollService::class),
         ));
         $this->app->bind(RandomEnchantmentService::class, fn ($app) => new RandomEnchantmentService(
             $app->make(RandomAffixGenerator::class),

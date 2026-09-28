@@ -6,24 +6,37 @@ use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Core\Items\Services\ItemSocketRollService;
 
 class RandomItemDropBuilder
 {
+    /**
+     * @param RandomNumberGenerator $randomNumberGenerator
+     * @param ChanceCalculator $chanceCalculator
+     * @param ItemSocketRollService $itemSocketRollService
+     */
     public function __construct(
         private readonly RandomNumberGenerator $randomNumberGenerator,
         private readonly ChanceCalculator $chanceCalculator,
+        private readonly ItemSocketRollService $itemSocketRollService,
     ) {}
+
+    private int $socketCount = 0;
 
     private array $cachedAffixesByType = [];
 
     private array $cachedAffixesMaxLevelByType = [];
 
     /**
-     * Generates the random item for a player.
+     * Generate a reusable affixed Item variant with its ordinary-drop socket roll.
+     *
+     * @param int $forLevel
+     * @return Item|null
      */
     public function generateItem(int $forLevel): ?Item
     {
         $item = $this->getItem($forLevel);
+        $this->socketCount = $this->itemSocketRollService->rollForOrdinaryDrop($item);
         $affixes = $this->getAffixes($forLevel);
 
         if (count($affixes) < 1) {
@@ -40,9 +53,10 @@ class RandomItemDropBuilder
     }
 
     /**
-     * Fetches a random item with not attached affixes.
+     * Return a random eligible base Item without attached affixes.
      *
-     * The item cannot be a quest item, artifact item or alchemy item.
+     * @param int $level
+     * @return Item
      */
     private function getItem(int $level): Item
     {
@@ -56,7 +70,10 @@ class RandomItemDropBuilder
     }
 
     /**
-     * Fetches one or two Affixes.
+     * Roll one prefix and optionally one suffix for the Item level.
+     *
+     * @param int $level
+     * @return array
      */
     private function getAffixes(int $level): array
     {
@@ -82,28 +99,51 @@ class RandomItemDropBuilder
     }
 
     /**
-     * Returns a possible item that may already exist with the affixes.
+     * Return an existing exact affix and socket-count Item variant when one exists.
+     *
+     * @param Item $item
+     * @param array $affixes
+     * @return Item|null
      */
     private function itemExists(Item $item, array $affixes): ?Item
     {
-        $query = Item::where('id', $item->id);
+        $affixIds = [
+            'item_prefix_id' => null,
+            'item_suffix_id' => null,
+        ];
 
         foreach ($affixes as $affix) {
-            $column = 'item_'.$affix->type.'_id';
-            $query->where($column, $affix->id);
+            $affixIds['item_'.$affix->type.'_id'] = $affix->id;
         }
+
+        $query = Item::query()
+            ->where('name', $item->name)
+            ->where('type', $item->type)
+            ->where('base_damage', $item->base_damage)
+            ->where('base_ac', $item->base_ac)
+            ->where('base_healing', $item->base_healing)
+            ->where('item_prefix_id', $affixIds['item_prefix_id'])
+            ->where('item_suffix_id', $affixIds['item_suffix_id'])
+            ->where('socket_count', $this->socketCount);
 
         return $query->first();
     }
 
     /**
-     * Creates a new entry in the database for a new item.
+     * Create a reusable Item variant with the rolled affixes and socket count.
+     *
+     * @param Item $item
+     * @param array $affixes
+     * @return Item
      */
     private function createItem(Item $item, array $affixes): Item
     {
         $item = $item->duplicate();
 
-        $updates = [];
+        $updates = [
+            'socket_count' => $this->socketCount,
+            'has_gems_socketed' => false,
+        ];
 
         foreach ($affixes as $affix) {
             $updates['item_'.$affix->type.'_id'] = $affix->id;
@@ -115,7 +155,12 @@ class RandomItemDropBuilder
     }
 
     /**
-     * Fetch a random affix without using ORDER BY RAND().
+     * Return one random eligible cached affix of the requested type.
+     *
+     * @param string $type
+     * @param int $level
+     * @param int $maxRequiredLevel
+     * @return ItemAffix|null
      */
     private function getRandomAffix(string $type, int $level, int $maxRequiredLevel): ?ItemAffix
     {
@@ -143,7 +188,11 @@ class RandomItemDropBuilder
     }
 
     /**
-     * Cache affixes by type and max level for the current process.
+     * Cache eligible affixes of one type through the requested level.
+     *
+     * @param string $type
+     * @param int $level
+     * @return void
      */
     private function ensureAffixesCached(string $type, int $level): void
     {
@@ -166,7 +215,11 @@ class RandomItemDropBuilder
     }
 
     /**
-     * Find last index where skill_Level_required is <= the provided max.
+     * Return the last cached affix index allowed by the maximum required level.
+     *
+     * @param array $affixes
+     * @param int $maxRequiredLevel
+     * @return int
      */
     private function findLastAffixIndexForMaxRequired(array $affixes, int $maxRequiredLevel): int
     {
@@ -175,9 +228,9 @@ class RandomItemDropBuilder
         $resultIndex = -1;
 
         while ($lowIndex <= $highIndex) {
-            $midIndex = (int) floor(($lowIndex + $highIndex) / 2);
+            $midIndex = intdiv($lowIndex + $highIndex, 2);
 
-            $requiredLevel = (int) ($affixes[$midIndex]->skill_Level_required ?? 0);
+            $requiredLevel = $affixes[$midIndex]->skill_Level_required ?? 0;
 
             if ($requiredLevel <= $maxRequiredLevel) {
                 $resultIndex = $midIndex;
@@ -190,6 +243,12 @@ class RandomItemDropBuilder
         return $resultIndex;
     }
 
+    /**
+     * Roll a maximum eligible Item or affix level from one through the supplied level.
+     *
+     * @param int $level
+     * @return int
+     */
     protected function rollLevel(int $level): int
     {
         return $this->randomNumberGenerator->numberBetween(1, $level);

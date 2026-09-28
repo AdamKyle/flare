@@ -10,6 +10,12 @@ use App\Game\Core\Combat\Values\ElementAttackData;
 
 class ElementalAttack extends BattleBase
 {
+    /**
+     * @param CharacterCacheData $characterCacheData
+     * @param ChanceCalculator $chanceCalculator
+     * @param RandomNumberGenerator $randomNumberGenerator
+     * @param ElementAttackData $elementAttackData
+     */
     public function __construct(
         CharacterCacheData $characterCacheData,
         ChanceCalculator $chanceCalculator,
@@ -20,95 +26,102 @@ class ElementalAttack extends BattleBase
     }
 
     /**
-     * Do the elemental attack.
+     * Apply elemental matchup, matching resistance, and player penetration to an attack.
+     *
+     * @param array $defenderElements
+     * @param array $attackerElements
+     * @param int $damage
+     * @param bool $isMonster
+     * @param array $attackerPenetration
+     * @return void
      */
-    public function doElementalAttack(array $defenderElements, array $attackerElements, int $damage, bool $isMonster = false): void
-    {
-        $highestElement = $this->elementAttackData->getHighestElementDamage($attackerElements);
+    public function doElementalAttack(
+        array $defenderElements,
+        array $attackerElements,
+        int $damage,
+        bool $isMonster = false,
+        array $attackerPenetration = [],
+    ): void {
+        $attackingElementAmount = $this->elementAttackData->getHighestElementDamage($attackerElements);
+        $attackingElementName = $this->elementAttackData->getHighestElementName($attackerElements, $attackingElementAmount);
 
-        $highestElementName = $this->elementAttackData->getHighestElementName($attackerElements, $highestElement);
-
-        if ($highestElementName === 'UNKNOWN') {
+        if ($attackingElementName === 'UNKNOWN') {
             return;
         }
 
-        if ($highestElement <= 0) {
-            return;
-        }
-
-        if (! $isMonster && $this->elementAttackData->getHighestElementDamage($defenderElements) <= 0) {
+        if ($attackingElementAmount <= 0) {
             return;
         }
 
         if (empty($defenderElements)) {
-            $damage = floor($damage * $highestElement);
+            $damage = floor($damage * $attackingElementAmount);
 
-            $this->dealDamage($damage, 0, $highestElement, $isMonster, 'regular');
-
-            return;
-        }
-
-        $highestDefendingElement = $this->elementAttackData->getHighestElementDamage($defenderElements);
-
-        if ($this->elementAttackData->isHalfDamage($defenderElements, $highestElementName)) {
-
-            $damage = floor(($damage * $highestElement) / 2);
-
-            $this->dealDamage($damage, $highestDefendingElement, $highestElement, $isMonster, 'half');
+            $this->dealDamage($damage, 0, $isMonster, 'regular');
 
             return;
         }
 
-        if ($this->elementAttackData->isDoubleDamage($defenderElements, $highestElementName)) {
+        $matchingResistance = $this->matchingElementValue($defenderElements, $attackingElementName);
+        $matchingPenetration = $isMonster ? 0.0 : $this->matchingElementValue($attackerPenetration, $attackingElementName);
+        $effectiveResistance = max(0, $matchingResistance - $matchingPenetration);
 
-            $damage = floor(($damage * $highestElement) * 2);
+        if ($this->elementAttackData->isHalfDamage($defenderElements, $attackingElementName)) {
+            $damage = floor(($damage * $attackingElementAmount) / 2);
 
-            $this->dealDamage($damage, $highestDefendingElement, $highestElement, $isMonster, 'double');
+            $this->dealDamage($damage, $effectiveResistance, $isMonster, 'half', $attackingElementName, $matchingPenetration);
 
             return;
         }
 
-        $damage = floor($damage * $highestElement);
+        if ($this->elementAttackData->isDoubleDamage($defenderElements, $attackingElementName)) {
+            $damage = floor(($damage * $attackingElementAmount) * 2);
 
-        $this->dealDamage($damage, $highestDefendingElement, $highestElement, $isMonster, 'regular');
+            $this->dealDamage($damage, $effectiveResistance, $isMonster, 'double', $attackingElementName, $matchingPenetration);
+
+            return;
+        }
+
+        $damage = floor($damage * $attackingElementAmount);
+
+        $this->dealDamage($damage, $effectiveResistance, $isMonster, 'regular', $attackingElementName, $matchingPenetration);
     }
 
     /**
-     * Deal the elemental damage.
+     * Apply matching resistance, update health, and record elemental battle messages.
      *
-     * @param float $highestDefendingElement [defending]
-     * @param float $highestElement [attacking]
-     * @param string $type - hald, double or regular
+     * @param int $damage
+     * @param float $matchingResistance
+     * @param bool $isMonster
+     * @param string $type
+     * @param string $elementName
+     * @param float $penetration
      * @return void
      */
-    private function dealDamage(int $damage, float $highestDefendingElement, float $highestElement, bool $isMonster, string $type)
-    {
-        if (! $isMonster) {
-            if ($this->isRaidBoss && $damage > self::MAX_DAMAGE_FOR_RAID_BOSSES) {
-                $damage = self::MAX_DAMAGE_FOR_RAID_BOSSES;
-            }
+    private function dealDamage(
+        int $damage,
+        float $matchingResistance,
+        bool $isMonster,
+        string $type,
+        string $elementName = 'Unknown',
+        float $penetration = 0.0,
+    ): void {
+        if (! $isMonster && $this->isRaidBoss && $damage > self::MAX_DAMAGE_FOR_RAID_BOSSES) {
+            $damage = self::MAX_DAMAGE_FOR_RAID_BOSSES;
         }
 
-        $newDamage = $this->applyResistanceToDamage($highestDefendingElement, $damage, $isMonster);
+        $newDamage = $this->applyResistanceToDamage($matchingResistance, $damage);
 
-        switch ($type) {
-            case 'half':
-                $this->halfDamageAttackMessages($isMonster, $damage);
-                break;
-            case 'double':
-                $this->doubleDamageAttackMessages($isMonster, $damage);
-                break;
-            case 'regular':
-            default:
-                $this->regularAttackMessages($isMonster, $damage);
-        }
+        match ($type) {
+            'half' => $this->halfDamageAttackMessages($isMonster, $damage),
+            'double' => $this->doubleDamageAttackMessages($isMonster, $damage),
+            default => $this->regularAttackMessages($isMonster, $damage),
+        };
 
-        $this->addMessage(
-            $isMonster ?
-                'You manage to resist: '.number_format($damage - $newDamage).' ('.number_format($highestDefendingElement * 100, 2).'%) damage from the enemies bloody gems!' :
-                'The enemy resists: '.number_format($damage - $newDamage).' ('.number_format($highestDefendingElement * 100, 2).'%) damage from your gems!',
-            ($isMonster ? 'regular' : 'enemy-action')
-        );
+        $resistanceMessage = $isMonster
+            ? 'You resist '.number_format($matchingResistance * 100, 2).'% of the enemy\'s '.$elementName.' Gem damage.'
+            : 'The enemy resists '.number_format($matchingResistance * 100, 2).'% of your '.$elementName.' Gem damage after '.number_format($penetration * 100, 2).'% '.$elementName.' penetration.';
+
+        $this->addMessage($resistanceMessage, $isMonster ? 'regular' : 'enemy-action');
 
         $this->addMessage(
             $isMonster ?
@@ -119,28 +132,54 @@ class ElementalAttack extends BattleBase
 
         if ($isMonster) {
             $this->characterHealth -= $newDamage;
-        } else {
-            $this->monsterHealth -= $newDamage;
+
+            return;
         }
+
+        $this->monsterHealth -= $newDamage;
     }
 
     /**
-     * Apply the resistance to the damage.
+     * Reduce elemental damage by the matching resistance value.
+     *
+     * @param float $matchingResistance
+     * @param int $damage
+     * @return int
      */
-    private function applyResistanceToDamage(float $highestDefendingElement, int $damage, bool $isMonster = false): int
+    private function applyResistanceToDamage(float $matchingResistance, int $damage): int
     {
 
-        if ($highestDefendingElement > 0) {
-            $amountToResist = $damage * $highestDefendingElement;
-
-            $damage = $damage - $amountToResist;
+        if ($matchingResistance <= 0) {
+            return $damage;
         }
 
-        return $damage;
+        return $damage - ($damage * $matchingResistance);
     }
 
     /**
-     * Create messages when the damage is half
+     * Return the defender or attacker value for the exact attacking element.
+     *
+     * @param array $elements
+     * @param string $elementName
+     * @return float
+     */
+    private function matchingElementValue(array $elements, string $elementName): float
+    {
+        foreach ($elements as $name => $value) {
+            if (strtolower($name) === strtolower($elementName)) {
+                return $value;
+            }
+        }
+
+        return 0.0;
+    }
+
+    /**
+     * Record messages for a weak elemental matchup.
+     *
+     * @param bool $isMonster
+     * @param int $damage
+     * @return void
      */
     private function halfDamageAttackMessages(bool $isMonster, int $damage): void
     {
@@ -157,7 +196,11 @@ class ElementalAttack extends BattleBase
     }
 
     /**
-     * Create messages when the damage is double
+     * Record messages for a strong elemental matchup.
+     *
+     * @param bool $isMonster
+     * @param int $damage
+     * @return void
      */
     private function doubleDamageAttackMessages(bool $isMonster, int $damage): void
     {
@@ -173,7 +216,11 @@ class ElementalAttack extends BattleBase
     }
 
     /**
-     * Create regular messages when damage is regular
+     * Record messages for a neutral elemental matchup.
+     *
+     * @param bool $isMonster
+     * @param int $damage
+     * @return void
      */
     private function regularAttackMessages(bool $isMonster, int $damage): void
     {

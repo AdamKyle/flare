@@ -85,6 +85,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapAdminClassesWebRoutes();
         $this->mapAdminRacesWebRoutes();
         $this->mapAdminClassMasteriesWebRoutes();
+        $this->mapAdminGemAbilitiesWebRoutes();
         $this->mapAdminMapGemsWebRoutes();
         $this->mapAdminLocationGemsWebRoutes();
         $this->mapAdminSkillsWebRoutes();
@@ -110,6 +111,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapAdminClassesApiRoutes();
         $this->mapAdminRacesApiRoutes();
         $this->mapAdminClassMasteriesApiRoutes();
+        $this->mapAdminGemAbilitiesApiRoutes();
         $this->mapAdminMapGemsApiRoutes();
         $this->mapAdminLocationGemsApiRoutes();
         $this->mapAdminSkillsApiRoutes();
@@ -612,6 +614,31 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Admin\ClassMasteries\Controllers')
             ->group(base_path('routes/admin/class-masteries/api.php'));
+    }
+
+    /**
+     * Define the Admin Gem Abilities web routes.
+     *
+     * @return void
+     */
+    private function mapAdminGemAbilitiesWebRoutes(): void
+    {
+        Route::middleware('web')
+            ->namespace('App\Admin\GemAbilities\Controllers')
+            ->group(base_path('routes/admin/gem-abilities/web.php'));
+    }
+
+    /**
+     * Define the Admin Gem Abilities api routes.
+     *
+     * @return void
+     */
+    private function mapAdminGemAbilitiesApiRoutes(): void
+    {
+        Route::prefix('api')
+            ->middleware(['web', 'update.player-activity'])
+            ->namespace('App\Admin\GemAbilities\Controllers')
+            ->group(base_path('routes/admin/gem-abilities/api.php'));
     }
 
     /**

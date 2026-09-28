@@ -5,10 +5,16 @@ namespace App\Game\Character\Builders\InformationBuilders\AttributeBuilders;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\SetSlot;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
+use App\Game\Gems\Contracts\CharacterGemEffects;
 use Exception;
 
 class ClassRanksWeaponMasteriesBuilder extends BaseAttribute
 {
+    /**
+     * @param CharacterGemEffects $characterGemEffects
+     */
+    public function __construct(private readonly CharacterGemEffects $characterGemEffects) {}
+
     public function determineBonusForWeapon(string $position = 'both'): float
     {
 
@@ -51,7 +57,7 @@ class ClassRanksWeaponMasteriesBuilder extends BaseAttribute
         return [
             'position' => $position,
             'name' => $type,
-            'amount' => $mastery->level / 100,
+            'amount' => ($mastery->level / 100) * (1 + $this->characterGemEffects->resolveForCharacterId($this->character->id)->weaponMasteryEffect()),
         ];
     }
 
@@ -121,7 +127,7 @@ class ClassRanksWeaponMasteriesBuilder extends BaseAttribute
 
             $weaponMastery = $classRank->weaponMasteries->where('weapon_type', $weaponMasteryType)->where('character_class_rank_id', $classRank->id)->first();
 
-            return $weaponMastery->level / 100;
+            return ($weaponMastery->level / 100) * (1 + $this->characterGemEffects->resolveForCharacterId($this->character->id)->weaponMasteryEffect());
         } catch (Exception $e) {
             return 0.0;
         }

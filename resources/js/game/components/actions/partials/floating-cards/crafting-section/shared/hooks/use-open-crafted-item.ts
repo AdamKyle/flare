@@ -1,5 +1,5 @@
 import UseOpenCraftedItemDefinition from './definitions/use-open-crafted-item-definition';
-import BaseGemDetails from '../../../../../../../api-definitions/items/base-gem-details';
+import CharacterGemBagSlotDefinition from '../../../../../../../api-definitions/gems/character-gem-bag-slot-definition';
 import BaseUsableItemDefinition from '../../../../../../../api-definitions/items/usable-item-definitions/base-usable-item-definition';
 import { SidePeekComponentRegistrationEnum } from '../../../../../../side-peeks/base/component-registration/side-peek-component-registration-enum';
 import { SidePeek } from '../../../../../../side-peeks/base/event-types/side-peek';
@@ -39,7 +39,7 @@ export const useOpenCraftedItem = (): UseOpenCraftedItemDefinition => {
     );
   };
 
-  const openCraftedGem = (gem: BaseGemDetails): void => {
+  const openCraftedGem = (gem: CharacterGemBagSlotDefinition): void => {
     sidePeekEmitter.emit(
       SidePeek.SIDE_PEEK,
       SidePeekComponentRegistrationEnum.CRAFTED_ITEM,

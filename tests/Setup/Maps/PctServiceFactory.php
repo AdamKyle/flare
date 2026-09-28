@@ -28,6 +28,7 @@ use App\Game\Monsters\Transformers\MonsterTransformer;
 use League\Fractal\Manager;
 use Tests\Setup\Character\CharacterCacheDataFactory;
 use Tests\Setup\Character\CharacterSheetBaseInfoTransformerFactory;
+use Tests\Setup\Gems\EmptyCharacterGemEffects;
 
 class PctServiceFactory
 {
@@ -62,8 +63,10 @@ class PctServiceFactory
             new CharacterAttackBuilder(
                 $characterCacheDataFactory->buildCharacterStatBuilder(),
                 $characterAreaGemEffectService,
+                new EmptyCharacterGemEffects,
             ),
             $characterCacheDataFactory->build(),
+            new EmptyCharacterGemEffects,
         );
         $locationService = new LocationService(
             new CoordinatesCache,

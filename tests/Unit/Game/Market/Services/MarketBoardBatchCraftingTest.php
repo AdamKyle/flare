@@ -10,7 +10,6 @@ use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\ComparisonService;
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
 use App\Game\Character\CharacterInventory\Services\InventorySetService;
-use App\Game\Character\CharacterInventory\Transformers\CharacterGemsTransformer;
 use App\Game\Character\CharacterInventory\Transformers\CharacterInventoryCountTransformer;
 use App\Game\Character\CharacterInventory\Transformers\InventorySetOptionTransformer;
 use App\Game\Character\CharacterInventory\Transformers\InventoryTransformer;
@@ -26,8 +25,6 @@ use App\Game\Core\Items\Transformers\ItemTransformer;
 use App\Game\Core\Items\Transformers\QuestItemTransformer;
 use App\Game\Core\Items\Transformers\UsableItemTransformer;
 use App\Game\Core\Values\ValidEquipPositionsValue;
-use App\Game\Gems\Services\GemComparison;
-use App\Game\Gems\Services\ItemAtonements;
 use App\Game\Market\Services\MarketBoard;
 use App\Game\Market\Services\MarketRealtimePublisher;
 use App\Game\Market\Transformers\MarketItemsTransformer;
@@ -90,7 +87,6 @@ class MarketBoardBatchCraftingTest extends TestCase
                 new InventorySetOptionTransformer,
             ),
             $equipItemService,
-            new ItemAtonements(new GemComparison(new CharacterGemsTransformer, $plainDataSerializer, $manager)),
             $manager,
             $equippableItemTransformer,
             $apiUsableItemTransformer,

@@ -12,8 +12,8 @@ use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ItemSkillA
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ReductionsBuilder;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Core\Combat\Values\ElementAttackData;
+use App\Game\Gems\Contracts\CharacterGemEffects;
 use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
-use App\Game\Gems\Services\GemComparison;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
 class ServiceProvider extends ApplicationServiceProvider
@@ -51,7 +51,7 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(ElementalAtonement::class, function ($app) {
-            return new ElementalAtonement($app->make(GemComparison::class), $app->make(ElementAttackData::class));
+            return new ElementalAtonement($app->make(CharacterGemEffects::class), $app->make(ElementAttackData::class));
         });
 
         $this->app->bind(CharacterStatBuilder::class, function ($app) {
@@ -63,6 +63,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(ReductionsBuilder::class),
                 $app->make(ElementalAtonement::class),
                 $app->make(CharacterAreaGemEffectService::class),
+                $app->make(CharacterGemEffects::class),
             );
         });
     }

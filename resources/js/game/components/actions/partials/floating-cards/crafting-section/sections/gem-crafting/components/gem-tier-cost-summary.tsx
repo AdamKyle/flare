@@ -5,8 +5,26 @@ import CurrencyDisplay from '../../../../../../../../reusable-components/currenc
 import { CurrencyDisplayMode } from '../../../../../../../../reusable-components/currency/enums/currency-display-mode';
 import { CurrencyType } from '../../../../../../../../reusable-components/currency/enums/currency-type';
 
-const GemTierCostSummary = ({ tier }: GemTierCostSummaryProps): ReactNode => (
+const tierRoles: Record<number, string> = {
+  1: 'Gem Ability + two raw stats',
+  2: 'Raw stats and direct combat modifiers',
+  3: 'Class Rank, Class Mastery, Weapon Mastery, and class-skill specialization',
+  4: 'One elemental atonement + two reward, penetration, or progression modifiers',
+};
+
+const GemTierCostSummary = ({
+  tier,
+  tierNumber,
+}: GemTierCostSummaryProps): ReactNode => (
   <dl className="grid grid-cols-2 gap-2 rounded-md border border-gray-300 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-900">
+    <dt>Tier role</dt>
+    <dd>{tierRoles[tierNumber]}</dd>
+    {tierNumber === 4 ? (
+      <>
+        <dt>Elemental rule</dt>
+        <dd>Penetration always matches the Gem&apos;s atonement.</dd>
+      </>
+    ) : null}
     <dt>Gold Dust</dt>
     <dd>
       <CurrencyDisplay
@@ -33,10 +51,6 @@ const GemTierCostSummary = ({ tier }: GemTierCostSummaryProps): ReactNode => (
         display_mode={CurrencyDisplayMode.EXACT}
         show_label={false}
       />
-    </dd>
-    <dt>Item value range</dt>
-    <dd>
-      {tier.min}–{tier.max}
     </dd>
     <dt>Skill level range</dt>
     <dd>

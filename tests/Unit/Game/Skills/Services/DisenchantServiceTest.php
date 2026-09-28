@@ -5,25 +5,14 @@ namespace Tests\Unit\Game\Skills\Services;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Pagination\Pagination;
-use App\Flare\Transformers\Serializer\PlainDataSerializer;
-use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ClassRanksWeaponMasteriesBuilder;
-use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\DamageBuilder;
-use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\DefenceBuilder;
-use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ElementalAtonement;
-use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HealingBuilder;
-use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HolyBuilder;
-use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ReductionsBuilder;
-use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\CharacterInventory\Jobs\DisenchantMany;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\InventorySetService;
-use App\Game\Character\CharacterInventory\Transformers\CharacterGemsTransformer;
 use App\Game\Character\CharacterInventory\Transformers\InventorySetOptionTransformer;
 use App\Game\Character\CharacterInventory\Transformers\InventoryTransformer;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Chance\RandomNumberGenerator;
-use App\Game\Core\Combat\Values\ElementAttackData;
 use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Items\Enricher\ItemEnricherFactory;
@@ -32,10 +21,6 @@ use App\Game\Core\Items\Transformers\EquippableItemTransformer;
 use App\Game\Core\Items\Transformers\QuestItemTransformer;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Events\Services\GlobalEventGoalEligibilityService;
-use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
-use App\Game\Gems\Progression\Services\GemProgressionEffectService;
-use App\Game\Gems\Services\AreaGemEffectService;
-use App\Game\Gems\Services\GemComparison;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CraftingMessageTypes;
@@ -54,6 +39,7 @@ use Illuminate\Support\Facades\Event;
 use League\Fractal\Manager;
 use Mockery;
 use Mockery\MockInterface;
+use Tests\Setup\Character\CharacterCacheDataFactory;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;
@@ -99,18 +85,7 @@ class DisenchantServiceTest extends TestCase
             $this->disenchantingSkill
         )->assignSkill($this->enchantingSkill)->givePlayerLocation();
 
-        $characterStatBuilder = new CharacterStatBuilder(
-            new DefenceBuilder(),
-            new DamageBuilder(new ClassRanksWeaponMasteriesBuilder()),
-            new HealingBuilder(new ClassRanksWeaponMasteriesBuilder()),
-            new HolyBuilder(),
-            new ReductionsBuilder(),
-            new ElementalAtonement(
-                new GemComparison(new CharacterGemsTransformer(), new PlainDataSerializer(), new Manager()),
-                new ElementAttackData(),
-            ),
-            new CharacterAreaGemEffectService(new AreaGemEffectService(), new GemProgressionEffectService()),
-        );
+        $characterStatBuilder = (new CharacterCacheDataFactory)->buildCharacterStatBuilder();
 
         $this->enchantingAffixService = new EnchantingAffixService(
             $characterStatBuilder,

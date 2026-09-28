@@ -18,6 +18,7 @@ use App\Game\Core\Items\Enricher\EquippableEnricher;
 use App\Game\Core\Items\Enricher\ItemEnricherFactory;
 use App\Game\Core\Items\Enricher\Manifest\Concerns\ManifestSchema;
 use App\Game\Core\Items\Enricher\Manifest\EquippableManifest;
+use App\Game\Core\Items\Services\ItemSocketRollService;
 use App\Game\Core\Items\Transformers\Api\UsableItemTransformer as ApiUsableItemTransformer;
 use App\Game\Core\Items\Transformers\BaseEquippableItemTransformer;
 use App\Game\Core\Items\Transformers\CraftingItemPreviewTransformer;
@@ -113,6 +114,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new RandomItemDropBuilder(
                 $app->make(RandomNumberGenerator::class),
                 $app->make(ChanceCalculator::class),
+                $app->make(ItemSocketRollService::class),
             );
         });
 

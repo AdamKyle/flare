@@ -6,14 +6,17 @@ use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ClassRanks
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
 use App\Game\Core\Items\Values\ItemType;
+use App\Game\Gems\Values\CharacterGemModifierType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterGemModifier;
+use Tests\Traits\CreateGem;
 use Tests\Traits\CreateItem;
 
 class ClassRanksWeaponMasteriesBuilderTest extends TestCase
 {
-    use CreateItem, RefreshDatabase;
+    use CreateCharacterGemModifier, CreateGem, CreateItem, RefreshDatabase;
 
     private ?CharacterStatBuilder $characterStatBuilder;
 
@@ -66,6 +69,35 @@ class ClassRanksWeaponMasteriesBuilderTest extends TestCase
         $result = $this->classRanksWeaponMasteriesBuilder->determineBonusForWeapon('left-hand');
 
         $this->assertSame(0.5, $result);
+    }
+
+    public function test_weapon_mastery_gem_effect_multiplies_contribution_without_changing_level(): void
+    {
+        $factory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
+        $item = $this->createItem(['type' => ItemType::SWORD->value, 'socket_count' => 1]);
+        $gem = $this->createGem(['tier' => 3]);
+        $this->createCharacterGemModifier([
+            'gem_id' => $gem->id,
+            'roll_position' => 1,
+            'modifier_type' => CharacterGemModifierType::WEAPON_MASTERY_EFFECT,
+            'amount' => 0.10,
+        ]);
+        $item->sockets()->create(['gem_id' => $gem->id]);
+        $factory->inventoryManagement()->giveItem($item, true, 'left-hand');
+        $character = $factory->getCharacter();
+        $weaponMastery = $character->classRanks->first()->weaponMasteries
+            ->where('weapon_type', ItemType::SWORD->value)
+            ->first();
+        $weaponMastery->update([
+            'weapon_type' => WeaponMasteryValue::getNumericValueForStringType(ItemType::SWORD->value),
+            'level' => 50,
+        ]);
+        $equipped = $this->characterStatBuilder->fetchEquipped($character->refresh());
+
+        $this->classRanksWeaponMasteriesBuilder->initialize($character->refresh(), $character->skills, $equipped);
+
+        $this->assertSame(0.55, $this->classRanksWeaponMasteriesBuilder->determineBonusForWeapon('left-hand'));
+        $this->assertSame(50, $weaponMastery->refresh()->level);
     }
 
     public function test_determine_bonus_for_weapon_combines_left_and_right_hand_for_both_position(): void

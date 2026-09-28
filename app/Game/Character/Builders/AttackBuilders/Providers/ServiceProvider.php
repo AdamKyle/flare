@@ -9,6 +9,7 @@ use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackType
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\CharacterAttack\Transformers\CharacterAttackDataTransformer;
+use App\Game\Gems\Contracts\CharacterGemEffects;
 use App\Game\Skills\Contracts\SkillBonusQuery;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
@@ -29,13 +30,15 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CharacterAttackDataTransformer::class),
                 $app->make(CharacterStatBuilder::class),
                 $app->make(SkillBonusQuery::class),
+                $app->make(CharacterGemEffects::class),
             );
         });
 
         $this->app->bind(BuildCharacterAttackTypes::class, function ($app) {
             return new BuildCharacterAttackTypes(
                 $app->make(CharacterAttackBuilder::class),
-                $app->make(CharacterCacheData::class)
+                $app->make(CharacterCacheData::class),
+                $app->make(CharacterGemEffects::class),
             );
         });
 

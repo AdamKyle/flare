@@ -6,7 +6,8 @@ use App\Game\Character\CharacterInventory\Transformers\CharacterGemSlotsTransfor
 use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Chance\PhpRandomNumberGenerator;
 use App\Game\Gems\Builders\GemBuilder;
-use App\Game\Gems\Transformers\GemTransformer;
+use App\Game\Gems\Services\CharacterGemRollService;
+use App\Game\Gems\Transformers\CharacterGemTransformer;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Skills\Services\GemService;
 use App\Game\Skills\Services\SkillBonusContextService;
@@ -25,11 +26,17 @@ class GemServiceFactory
         $randomNumberGenerator = new PhpRandomNumberGenerator;
 
         return new GemService(
-            $gemBuilder ?? new GemBuilder($randomNumberGenerator),
+            $gemBuilder ?? new GemBuilder(
+                $randomNumberGenerator,
+                new CharacterGemRollService(
+                    $randomNumberGenerator,
+                    new ChanceCalculator($randomNumberGenerator),
+                ),
+            ),
             $chanceCalculator ?? new ChanceCalculator($randomNumberGenerator),
-            new GemTransformer,
+            new CharacterGemTransformer,
             new ServerMessageBuilder,
-            new CharacterGemSlotsTransformer,
+            new CharacterGemSlotsTransformer(new CharacterGemTransformer),
             new SkillBonusService(new SkillBonusContextService),
         );
     }

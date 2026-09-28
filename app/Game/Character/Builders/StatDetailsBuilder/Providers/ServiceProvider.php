@@ -4,6 +4,7 @@ namespace App\Game\Character\Builders\StatDetailsBuilder\Providers;
 
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\Builders\StatDetailsBuilder\StatModifierDetails;
+use App\Game\Gems\Contracts\CharacterGemEffects;
 use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
@@ -21,6 +22,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new StatModifierDetails(
                 $app->make(CharacterStatBuilder::class),
                 $app->make(CharacterAreaGemEffectService::class),
+                $app->make(CharacterGemEffects::class),
             );
         });
     }

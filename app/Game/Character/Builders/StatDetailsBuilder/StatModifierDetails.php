@@ -10,7 +10,11 @@ use App\Game\Character\Builders\StatDetailsBuilder\Concerns\BasicItemDetails;
 use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Core\Items\Values\ItemType;
+use App\Game\Gems\Contracts\CharacterGemEffects;
 use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
+use App\Game\Gems\Values\CharacterGemModifierType;
+use App\Game\Gems\Values\GemAbilityEffectType;
+use App\Game\Gems\Values\ResolvedCharacterGemEffects;
 use Facades\App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ItemSkillAttribute;
 use Illuminate\Support\Collection;
 
@@ -22,9 +26,17 @@ class StatModifierDetails
 
     private ?Character $character = null;
 
+    private ResolvedCharacterGemEffects $characterGemEffects;
+
+    /**
+     * @param CharacterStatBuilder $characterStatBuilder
+     * @param CharacterAreaGemEffectService $characterAreaGemEffectService
+     * @param CharacterGemEffects $characterGemEffectService
+     */
     public function __construct(
         private readonly CharacterStatBuilder $characterStatBuilder,
         private readonly CharacterAreaGemEffectService $characterAreaGemEffectService,
+        private readonly CharacterGemEffects $characterGemEffectService,
     ) {}
 
     /**
@@ -38,12 +50,16 @@ class StatModifierDetails
         $this->character = $character;
 
         $this->equipped = $this->fetchEquipped($character);
+        $this->characterGemEffects = $this->characterGemEffectService->resolveForCharacterId($character->id);
 
         return $this;
     }
 
     /**
-     * Get stat details for a specific stat.
+     * Return the persisted, modified, and source details for one raw Character stat.
+     *
+     * @param string $stat
+     * @return array
      */
     public function forStat(string $stat): array
     {
@@ -59,32 +75,37 @@ class StatModifierDetails
         $details['class_specialties'] = $this->fetchClassRankSpecialtiesDetails($stat);
         $details['ancestral_item_skill_data'] = $this->fetchAncestralItemSkills($stat);
         $details['map_reduction'] = $this->getMapCharacterReductionsDetails();
+        $modifierType = CharacterGemModifierType::fromStatKey($stat);
+        $details['gem_details'] = is_null($modifierType) ? [] : $this->characterGemEffects->detailsFor($modifierType);
 
         return $details;
     }
 
+    /**
+     * Build the requested Character combat-stat breakdown.
+     *
+     * @param string $type
+     * @param bool $isVodied
+     * @return array
+     */
     public function buildSpecificBreakDown(string $type, bool $isVodied = false): array
     {
-        switch ($type) {
-            case 'health':
-                return $this->fetchHealthBreakDown($isVodied);
-            case 'ac':
-                return $this->buildDefenceBreakDown($isVodied);
-            case 'weapon_damage':
-                return $this->buildDamageBreakDown(ItemType::validWeapons(), $isVodied);
-            case 'spell_damage':
-                return $this->buildDamageBreakDown([ItemType::SPELL_DAMAGE->value], $isVodied);
-            case 'ring_damage':
-                return $this->buildDamageBreakDown([ItemType::RING->value], $isVodied);
-            case 'heal_for':
-                return $this->buildDamageBreakDown([ItemType::SPELL_HEALING->value], $isVodied);
-            default:
-                return [];
-        }
+        return match ($type) {
+            'health' => $this->fetchHealthBreakDown($isVodied),
+            'ac' => $this->buildDefenceBreakDown($isVodied),
+            'weapon_damage' => $this->buildDamageBreakDown(ItemType::validWeapons(), $isVodied),
+            'spell_damage' => $this->buildDamageBreakDown([ItemType::SPELL_DAMAGE->value], $isVodied),
+            'ring_damage' => $this->buildDamageBreakDown([ItemType::RING->value], $isVodied),
+            'heal_for' => $this->buildDamageBreakDown([ItemType::SPELL_HEALING->value], $isVodied),
+            default => [],
+        };
     }
 
     /**
-     * Fetch Health Break Down.
+     * Build the Character health breakdown.
+     *
+     * @param bool $isVoided
+     * @return array
      */
     public function fetchHealthBreakDown(bool $isVoided): array
     {
@@ -99,7 +120,10 @@ class StatModifierDetails
     }
 
     /**
-     * Build Defence Details.
+     * Build the Character defence breakdown with Gem modifier sources.
+     *
+     * @param bool $isVoided
+     * @return array
      */
     public function buildDefenceBreakDown(bool $isVoided): array
     {
@@ -112,10 +136,21 @@ class StatModifierDetails
         $details['ancestral_item_skill_data'] = $this->fetchAncestralItemSkills('base_ac');
         $details['items_equipped'] = array_values($this->fetchItemDetails('base_ac'));
         $details['map_reduction'] = $this->getMapCharacterReductionsDetails();
+        $details['gem_modifier_details'] = [
+            ...$this->characterGemEffects->detailsFor(CharacterGemModifierType::BASE_AC_MOD),
+            ...$this->characterGemEffects->passiveDetailsFor(GemAbilityEffectType::DEFENCE_MOD->value),
+        ];
 
         return array_merge($details, $this->character->getInformation()->getDefenceBuilder()->buildDefenceBreakDownDetails($isVoided));
     }
 
+    /**
+     * Build a weapon, spell, ring, or healing breakdown with Gem modifier sources.
+     *
+     * @param string|array $type
+     * @param bool $isVoided
+     * @return array
+     */
     public function buildDamageBreakDown(string|array $type, bool $isVoided): array
     {
         $details = [];
@@ -178,6 +213,29 @@ class StatModifierDetails
         $details['boon_details'] = $isRingDamage ? null : $this->fetchBoonDetails('base_damage');
         $details['class_specialties'] = $isRingDamage ? null : $this->fetchClassRankSpecialtiesDetails($classSpecialtyStat);
         $details['ancestral_item_skill_data'] = $isRingDamage ? [] : $this->fetchAncestralItemSkills('base_damage');
+        $gemModifierType = match (true) {
+            $isWeaponDamage => CharacterGemModifierType::BASE_DAMAGE_MOD,
+            $isSpellDamage => CharacterGemModifierType::BASE_SPELL_DAMAGE_MOD,
+            $isHealing => CharacterGemModifierType::BASE_HEALING_MOD,
+            default => null,
+        };
+        $details['gem_modifier_details'] = is_null($gemModifierType)
+            ? []
+            : $this->characterGemEffects->detailsFor($gemModifierType);
+
+        $passiveEffectType = match (true) {
+            $isWeaponDamage => GemAbilityEffectType::WEAPON_DAMAGE_MOD->value,
+            $isSpellDamage => GemAbilityEffectType::SPELL_DAMAGE_MOD->value,
+            $isHealing => GemAbilityEffectType::HEALING_MOD->value,
+            default => null,
+        };
+
+        if (! is_null($passiveEffectType)) {
+            $details['gem_modifier_details'] = [
+                ...$details['gem_modifier_details'],
+                ...$this->characterGemEffects->passiveDetailsFor($passiveEffectType),
+            ];
+        }
 
         $typeAttributes = match (true) {
             $isWeaponDamage => $this->character->getInformation()->getDamageBuilder()->buildWeaponDamageBreakDown($damageStatAmount, $isVoided),
@@ -190,6 +248,14 @@ class StatModifierDetails
         return array_merge($details, $typeAttributes);
     }
 
+    /**
+     * Add the class-specific fallback damage details used when no weapon is equipped.
+     *
+     * @param array $details
+     * @param array $types
+     * @param float $damageStatAmount
+     * @return array
+     */
     private function setNonEquippedDamageDetails(array $details, array $types, float $damageStatAmount): array
     {
         $percentage = 0.02;
@@ -210,6 +276,12 @@ class StatModifierDetails
         return $details;
     }
 
+    /**
+     * Return equipped Item contribution rows for damage or healing types.
+     *
+     * @param array $types
+     * @return array
+     */
     private function fetchDamageOrHealingEquipmentBreakDown(array $types): array
     {
         if (in_array(ItemType::RING->value, $types)) {
@@ -224,7 +296,10 @@ class StatModifierDetails
     }
 
     /**
-     * Fetch Class Bonus Effecting the attribute.
+     * Return the matching current-class Skill bonus for one attribute.
+     *
+     * @param string $attribute
+     * @return array|null
      */
     private function fetchClassBonusesEffecting(string $attribute): ?array
     {
@@ -246,7 +321,9 @@ class StatModifierDetails
     }
 
     /**
-     * Get the combined legacy Map reduction and resolved Gem power reduction that effect the character, when any exists.
+     * Return the combined Map and Area Gem Character power reduction details.
+     *
+     * @return array|null
      */
     private function getMapCharacterReductionsDetails(): ?array
     {
@@ -268,7 +345,10 @@ class StatModifierDetails
     }
 
     /**
-     * Resolve the legacy, non-Gem Map Character power reduction, when applicable.
+     * Resolve the legacy non-Gem Map Character power reduction when applicable.
+     *
+     * @param GameMap $map
+     * @return float
      */
     private function resolveLegacyMapReduction(GameMap $map): float
     {
@@ -292,9 +372,12 @@ class StatModifierDetails
     }
 
     /**
-     * Fetch Ancestral Item Skill Details that effect the stat.
+     * Return Ancestral Item Skill contributions for one stat.
+     *
+     * @param string $stat
+     * @return array
      */
-    private function fetchAncestralItemSkills($stat): array
+    private function fetchAncestralItemSkills(string $stat): array
     {
         $artifact = ItemSkillAttribute::fetchArtifactItemEquipped($this->character);
 
@@ -321,7 +404,10 @@ class StatModifierDetails
     }
 
     /**
-     * Fetch class ranks specialties details.
+     * Return equipped Class Mastery contributions for one stat.
+     *
+     * @param string $stat
+     * @return array
      */
     private function fetchClassRankSpecialtiesDetails(string $stat): array
     {
@@ -359,7 +445,9 @@ class StatModifierDetails
     }
 
     /**
-     * Fetch class rank specialties that can effect your health.
+     * Return equipped Class Mastery contributions that affect health.
+     *
+     * @return array
      */
     private function fetchClassRankSpecialtiesForHealth(): array
     {
@@ -391,7 +479,10 @@ class StatModifierDetails
     }
 
     /**
-     * Fetch boon details.
+     * Return active boon contributions for one stat.
+     *
+     * @param string $stat
+     * @return array|null
      */
     private function fetchBoonDetails(string $stat): ?array
     {
@@ -436,7 +527,11 @@ class StatModifierDetails
     }
 
     /**
-     * Fetch Item Details that effect the stat.
+     * Return equipped Item and affix contributions for one stat.
+     *
+     * @param string $stat
+     * @param bool $isVoided
+     * @return array
      */
     private function fetchItemDetails(string $stat, bool $isVoided = false): array
     {
@@ -459,7 +554,11 @@ class StatModifierDetails
     }
 
     /**
-     * Fetch stat details from equipped items.
+     * Return prefix and suffix contributions from one equipped Item.
+     *
+     * @param Item $item
+     * @param string $stat
+     * @return array
      */
     private function fetchStatDetailsFromEquipment(Item $item, string $stat): array
     {

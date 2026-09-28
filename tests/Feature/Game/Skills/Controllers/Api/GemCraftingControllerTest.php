@@ -10,11 +10,19 @@ use Mockery;
 use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateGameGemAbility;
 use Tests\Traits\CreateGameSkill;
 
 class GemCraftingControllerTest extends TestCase
 {
-    use CreateGameSkill, RefreshDatabase;
+    use CreateGameGemAbility, CreateGameSkill, RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->createGameGemAbility();
+    }
 
     public function test_craftable_tiers_endpoint_returns_tiers_and_skill_xp(): void
     {
@@ -85,16 +93,13 @@ class GemCraftingControllerTest extends TestCase
         $this->assertTrue($character->gemBag->gemSlots()->whereKey($preview['slot_id'])->exists());
         $this->assertSame($data['crafted_gem']['name'], $preview['name']);
         $this->assertSame($data['crafted_gem']['tier'], $preview['tier']);
-        $this->assertArrayHasKey('weak_against', $preview);
-        $this->assertArrayHasKey('strong_against', $preview);
-        $this->assertArrayHasKey('element_atoned_to', $preview);
-        $this->assertArrayHasKey('element_atoned_to_amount', $preview);
-        $this->assertArrayHasKey('primary_atonement_type', $preview);
-        $this->assertArrayHasKey('primary_atonement_amount', $preview);
-        $this->assertArrayHasKey('secondary_atonement_type', $preview);
-        $this->assertArrayHasKey('secondary_atonement_amount', $preview);
-        $this->assertArrayHasKey('tertiary_atonement_type', $preview);
-        $this->assertArrayHasKey('tertiary_atonement_amount', $preview);
+        $this->assertCount(3, $preview['modifiers']);
+        $this->assertSame('gem_ability', $preview['modifiers'][0]['modifier_type']);
+        $this->assertArrayNotHasKey('label', $preview['modifiers'][0]);
+        $this->assertArrayNotHasKey('display_type', $preview['modifiers'][0]);
+        $this->assertNotNull($preview['modifiers'][0]['ability']);
+        $this->assertArrayNotHasKey('weak_against', $preview);
+        $this->assertArrayNotHasKey('primary_atonement_type', $preview);
     }
 
     public function test_craft_gem_failure_returns_null_crafted_gem(): void

@@ -2,13 +2,13 @@
 
 namespace Tests\Unit\Game\Skills\Services;
 
+use App\Flare\Models\GameGemAbility;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\GemBagSlot;
 use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Gems\Builders\GemBuilder;
 use App\Game\Gems\Values\GemTierValue;
-use App\Game\Gems\Values\GemTypeValue;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Events\UpdateSkillEvent;
 use App\Game\Skills\Services\GemService;
@@ -22,6 +22,7 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\Skills\GemServiceFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;
+use Tests\Traits\CreateGameGemAbility;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateGem;
 use Tests\Traits\CreateItem;
@@ -29,7 +30,7 @@ use Tests\Traits\CreateItemAffix;
 
 class GemServiceTest extends TestCase
 {
-    use CreateClass, CreateGameSkill, CreateGem, CreateItem, CreateItemAffix, RefreshDatabase;
+    use CreateClass, CreateGameGemAbility, CreateGameSkill, CreateGem, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -46,6 +47,7 @@ class GemServiceTest extends TestCase
             'type' => SkillTypeValue::GEM_CRAFTING->value,
             'max_level' => 100,
         ]);
+        $this->createGameGemAbility();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->assignSkill(
             $this->gemSkill
@@ -71,6 +73,34 @@ class GemServiceTest extends TestCase
 
         $this->assertEquals(422, $result['status']);
         $this->assertEquals('You do not have the required currencies to craft this item.', $result['message']);
+    }
+
+    public function test_tier_one_without_enabled_abilities_fails_before_payment(): void
+    {
+        $character = $this->character->getCharacter();
+        $character->update([
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
+            'copper_coins' => CurrencyLimit::MAX_COPPER,
+        ]);
+        $character->refresh();
+        $startingGoldDust = $character->gold_dust;
+        $startingShards = $character->shards;
+        $startingCopper = $character->copper_coins;
+        $this->createGameGemAbility(['enabled' => false]);
+        GameGemAbility::query()->update(['enabled' => false]);
+
+        $result = $this->gemService->generateGem($character, 1);
+
+        $character->refresh();
+        $this->assertSame(422, $result['status']);
+        $this->assertSame('No enabled Gem abilities are available for Tier 1 crafting.', $result['message']);
+        $this->assertFalse($result['craft_succeeded']);
+        $this->assertNull($result['crafted_gem']);
+        $this->assertNull($result['crafted_gem_preview']);
+        $this->assertSame($startingGoldDust, $character->gold_dust);
+        $this->assertSame($startingShards, $character->shards);
+        $this->assertSame($startingCopper, $character->copper_coins);
     }
 
     public function test_cannot_craft_when_gem_bag_is_full()
@@ -308,18 +338,10 @@ class GemServiceTest extends TestCase
     {
         Event::fake();
 
-        $gem = $this->createGem([
-            'name' => 'Sample',
-            'tier' => 1,
-            'primary_atonement_type' => GemTypeValue::FIRE,
-            'secondary_atonement_type' => GemTypeValue::WATER,
-            'tertiary_atonement_type' => GemTypeValue::ICE,
-            'primary_atonement_amount' => 0.10,
-            'secondary_atonement_amount' => 0.10,
-            'tertiary_atonement_amount' => 0.10,
-        ]);
+        $gem = $this->createGem(['name' => 'Sample', 'tier' => 1]);
 
         $gemBuilder = Mockery::mock(GemBuilder::class, function (MockInterface $mock) use ($gem) {
+            $mock->shouldReceive('canBuildTier')->once()->with(1)->andReturn(true);
             $mock->shouldReceive('buildGem')->once()->andReturn($gem);
         });
 

@@ -1,4 +1,4 @@
-import BaseGemDetails from '../../../../../../../../../api-definitions/items/base-gem-details';
+import CharacterGemBagSlotDefinition from '../../../../../../../../../api-definitions/gems/character-gem-bag-slot-definition';
 import GemCraftingApiResponseDefinition from '../../api/definitions/gem-crafting-api-response-definition';
 import GemTierDefinition from '../../api/definitions/gem-tier-definition';
 
@@ -18,7 +18,7 @@ export default interface UseGemCraftingFlowDefinition {
   progress: number;
   formattedRemaining: string;
   craftSucceeded: boolean;
-  craftedGemPreview: BaseGemDetails | null;
+  craftedGemPreview: CharacterGemBagSlotDefinition | null;
   selectTier: (tier: number) => void;
   craftGem: () => Promise<void>;
 }

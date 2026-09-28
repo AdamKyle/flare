@@ -14,6 +14,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
 use RuntimeException;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\Setup\Gems\EmptyCharacterGemEffects;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterAutomation;
 use Tests\Traits\CreateGameMap;
@@ -237,6 +238,7 @@ class CharacterCurrencyRewardServiceTest extends TestCase
             resolve(BattleMessageHandler::class),
             $randomNumberGenerator,
             resolve(CharacterAreaGemEffectService::class),
+            new EmptyCharacterGemEffects,
         );
 
         $characterCurrencyRewardService
@@ -794,6 +796,7 @@ class CharacterCurrencyRewardServiceTest extends TestCase
             resolve(BattleMessageHandler::class),
             $randomNumberGenerator,
             resolve(CharacterAreaGemEffectService::class),
+            new EmptyCharacterGemEffects,
         );
 
         $service->setCharacter($character->refresh())->currencyEventReward($monster);

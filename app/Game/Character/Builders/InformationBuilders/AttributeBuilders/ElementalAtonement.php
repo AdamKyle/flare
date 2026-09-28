@@ -2,116 +2,43 @@
 
 namespace App\Game\Character\Builders\InformationBuilders\AttributeBuilders;
 
-use App\Flare\Models\Item;
 use App\Game\Core\Combat\Values\ElementAttackData;
-use App\Game\Gems\Services\GemComparison;
+use App\Game\Gems\Contracts\CharacterGemEffects;
 
 class ElementalAtonement extends BaseAttribute
 {
-    private GemComparison $gemComparison;
-
-    public function __construct(GemComparison $gemComparison, private readonly ElementAttackData $elementAttackData)
-    {
-        $this->gemComparison = $gemComparison;
-    }
+    /**
+     * @param CharacterGemEffects $characterGemEffects
+     * @param ElementAttackData $elementAttackData
+     */
+    public function __construct(
+        private readonly CharacterGemEffects $characterGemEffects,
+        private readonly ElementAttackData $elementAttackData,
+    ) {}
 
     /**
-     * Calculates the average atonements for items in the inventory.
+     * Resolve the summed and capped equipped character-Gem atonements and dominant element.
      *
-     * @return array|null An array of average atonement data or null if the inventory is empty.
+     * @return array|null
      */
     public function calculateAtonement(): ?array
     {
-        $atonements = $this->calculateAtonements();
-
-        if (is_null($atonements)) {
-            return null;
-        }
-
-        $averages = $this->calculateAverages($atonements);
-        $highestElement = $this->calculateHighestElement($averages);
-
-        return [
-            'atonements' => $averages,
-            'highest_element' => $highestElement,
+        $effects = $this->characterGemEffects->resolveForCharacterId($this->character->id);
+        $atonements = [
+            'Fire' => $effects->fireAtonement(),
+            'Water' => $effects->waterAtonement(),
+            'Ice' => $effects->iceAtonement(),
         ];
-    }
-
-    /**
-     * Calculates the atonements for items in the inventory.
-     *
-     * @return array|null An array of atonement data or null if the inventory is empty.
-     */
-    private function calculateAtonements(): ?array
-    {
-        if (is_null($this->inventory)) {
-            return null;
-        }
-
-        $atonements = [];
-
-        foreach ($this->inventory as $slot) {
-            $itemAtonements = $this->buildPossibleAtonementDataWithDefaultValuesForItem($slot->item);
-
-            if (! empty($itemAtonements)) {
-                foreach ($itemAtonements as $key => $value) {
-                    $value = floatval($value);
-
-                    if ($value <= 0) {
-                        continue;
-                    }
-
-                    $atonements[$key][] = $value;
-                }
-            }
-        }
-
-        return $atonements;
-    }
-
-    /**
-     * Calculates the average values for each key in the given atonement data.
-     *
-     * - Caps at 75%.
-     *
-     * @param array $atonements The atonement data.
-     * @return array The array of average values.
-     */
-    private function calculateAverages(array $atonements): array
-    {
-        $averages = [];
-
-        foreach ($atonements as $key => $values) {
-            $average = array_sum($values) / count($values);
-
-            $averages[strtolower($key)] = $average > 0.75 ? 0.75 : $average;
-        }
-
-        return $averages;
-    }
-
-    /**
-     * Calculates the highest element based on the given atonement data.
-     *
-     * @param array $atonements The atonement data.
-     * @return array The highest element information.
-     */
-    private function calculateHighestElement(array $atonements): array
-    {
         $highestElementDamage = $this->elementAttackData->getHighestElementDamage($atonements);
-        $highestElementName = ($highestElementDamage <= 0) ? 'N/A' : $this->elementAttackData->getHighestElementName($atonements, $highestElementDamage);
 
         return [
-            'name' => $highestElementName,
-            'damage' => $highestElementDamage,
+            'atonements' => $atonements,
+            'highest_element' => [
+                'name' => $highestElementDamage <= 0
+                    ? 'N/A'
+                    : $this->elementAttackData->getHighestElementName($atonements, $highestElementDamage),
+                'damage' => $highestElementDamage,
+            ],
         ];
-    }
-
-    /**
-     * Build possible Data with default values for an item
-     */
-    protected function buildPossibleAtonementDataWithDefaultValuesForItem(Item $item): array
-    {
-        return $this->gemComparison->getElementAtonement($item)['atonements'];
     }
 }

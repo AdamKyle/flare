@@ -2,162 +2,65 @@
 
 namespace Tests\Unit\Game\Gems\Services;
 
-use App\Flare\Models\Gem;
-use App\Flare\Models\Item;
 use App\Game\Gems\Services\GemComparison;
-use App\Game\Gems\Values\GemTypeValue;
+use App\Game\Gems\Transformers\CharacterGemTransformer;
+use App\Game\Gems\Values\CharacterGemModifierType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterGemModifier;
 use Tests\Traits\CreateGem;
 use Tests\Traits\CreateItem;
 
 class GemComparisonTest extends TestCase
 {
-    use CreateGem, CreateItem, RefreshDatabase;
+    use CreateCharacterGemModifier, CreateGem, CreateItem, RefreshDatabase;
 
-    private ?Item $item;
-
-    private ?Gem $gemToAdd;
-
-    private ?CharacterFactory $characterFactory;
-
-    private ?GemComparison $gemComparisonService;
-
-    protected function setUp(): void
+    public function test_compare_returns_generic_removed_and_added_gems(): void
     {
-        parent::setUp();
-
-        $item = $this->createItem([
-            'socket_count' => 2,
+        $characterFactory = (new CharacterFactory)->createBaseCharacter();
+        $item = $this->createItem(['socket_count' => 2]);
+        $removedGem = $this->createGem(['name' => 'Old Gem', 'tier' => 2]);
+        $addedGem = $this->createGem(['name' => 'New Gem', 'tier' => 4]);
+        $this->createCharacterGemModifier([
+            'gem_id' => $removedGem->id,
+            'roll_position' => 1,
+            'modifier_type' => CharacterGemModifierType::STRENGTH,
+            'amount' => 30,
         ]);
-
-        $gem = $this->createGem([
-            'name' => 'Sample',
-            'tier' => 4,
-            'primary_atonement_type' => GemTypeValue::FIRE,
-            'secondary_atonement_type' => GemTypeValue::ICE,
-            'tertiary_atonement_type' => GemTypeValue::WATER,
-            'primary_atonement_amount' => 0.10,
-            'secondary_atonement_amount' => 0.25,
-            'tertiary_atonement_amount' => 0.45,
+        $this->createCharacterGemModifier([
+            'gem_id' => $addedGem->id,
+            'roll_position' => 1,
+            'modifier_type' => CharacterGemModifierType::FIRE_PENETRATION,
+            'amount' => 0.08,
         ]);
-
-        $this->gemToAdd = $this->createGem([
-            'name' => 'Sample',
-            'tier' => 4,
-            'primary_atonement_type' => GemTypeValue::FIRE,
-            'secondary_atonement_type' => GemTypeValue::ICE,
-            'tertiary_atonement_type' => GemTypeValue::WATER,
-            'primary_atonement_amount' => 0.18,
-            'secondary_atonement_amount' => 0.28,
-            'tertiary_atonement_amount' => 0.25,
-        ]);
-
-        $item->sockets()->create([
-            'item_id' => $item->id,
-            'gem_id' => $gem->id,
-        ]);
-
-        $this->item = $item->refresh();
-
-        $this->characterFactory = (new CharacterFactory)->createBaseCharacter();
-
-        $this->gemComparisonService = resolve(GemComparison::class);
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        $this->item = null;
-
-        $this->characterFactory = null;
-
-        $this->gemComparisonService = null;
-    }
-
-    public function test_returns_error_message_when_item_does_not_exist()
-    {
-        $character = $this->characterFactory->getCharacter();
-
-        $result = $this->gemComparisonService->compareGemForItem($character, rand(1000, 5000), rand(1000, 5000));
-
-        $this->assertEquals($result['message'], 'Selected item was not found in your inventory.');
-        $this->assertEquals($result['status'], 422);
-    }
-
-    public function test_returns_error_message_when_gem_does_not_exist()
-    {
-        $character = $this->characterFactory->inventoryManagement()->giveItem($this->item)->getCharacter();
-
-        $result = $this->gemComparisonService->compareGemForItem($character, $character->inventory->slots->first()->id, rand(1000, 5000));
-
-        $this->assertEquals($result['message'], 'Selected gem was not found in your gem bag.');
-        $this->assertEquals($result['status'], 422);
-    }
-
-    public function test_when_comparing_a_gem_to_no_gems_on_item()
-    {
-        $item = $this->createItem();
-        $gem = $this->createGem();
-
-        $character = $this->characterFactory->inventoryManagement()->giveItem($item)->getCharacter();
-
-        $character->gemBag->gemSlots()->create([
+        $item->sockets()->create(['item_id' => $item->id, 'gem_id' => $removedGem->id]);
+        $character = $characterFactory->inventoryManagement()->giveItem($item)->getCharacter();
+        $gemSlot = $character->gemBag->gemSlots()->create([
             'gem_bag_id' => $character->gemBag->id,
-            'gem_id' => $gem->id,
+            'gem_id' => $addedGem->id,
             'amount' => 1,
         ]);
 
-        $character = $character->refresh();
+        $result = (new GemComparison(new CharacterGemTransformer))->compareGemForItem(
+            $character->refresh(),
+            $character->inventory->slots->first()->id,
+            $gemSlot->id,
+        );
 
-        $result = $this->gemComparisonService->compareGemForItem($character, $character->inventory->slots->first()->id, $character->gemBag->gemSlots->first()->id);
-
-        $this->assertEmpty($result['attached_gems']);
-        $this->assertNotEmpty($result['socket_data']);
-        $this->assertFalse($result['has_gems_on_item']);
-        $this->assertNotEmpty($result['gem_to_attach']);
-        $this->assertEmpty($result['when_replacing']);
-        $this->assertEmpty($result['if_replaced']);
+        $this->assertSame('Old Gem', $result['attached_gems'][0]['name']);
+        $this->assertSame('New Gem', $result['added_gem']['name']);
+        $this->assertSame('strength', $result['replacements'][0]['removed_gem']['modifiers'][0]['modifier_type']);
+        $this->assertSame('fire_penetration', $result['replacements'][0]['added_gem']['modifiers'][0]['modifier_type']);
     }
 
-    public function test_when_comparing_gems_to_gems_on_an_item()
+    public function test_compare_rejects_an_item_not_owned_by_character(): void
     {
-        $this->item->sockets()->create([
-            'item_id' => $this->item->id,
-            'gem_id' => $this->createGem([
-                'name' => 'Sample VR',
-                'tier' => 4,
-                'primary_atonement_type' => GemTypeValue::FIRE,
-                'secondary_atonement_type' => GemTypeValue::ICE,
-                'tertiary_atonement_type' => GemTypeValue::WATER,
-                'primary_atonement_amount' => 0.10,
-                'secondary_atonement_amount' => 0.26,
-                'tertiary_atonement_amount' => 0.45,
-            ])->id,
-        ]);
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
-        $item = $this->item->refresh();
+        $result = (new GemComparison(new CharacterGemTransformer))->compareGemForItem($character, 999999, 999999);
 
-        $character = $this->characterFactory->inventoryManagement()->giveItem($item)->getCharacter();
-
-        $character->gemBag->gemSlots()->create([
-            'gem_bag_id' => $character->gemBag->id,
-            'gem_id' => $this->gemToAdd->id,
-            'amount' => 1,
-        ]);
-
-        $character = $character->refresh();
-
-        $result = $this->gemComparisonService->compareGemForItem($character, $character->inventory->slots->first()->id, $character->gemBag->gemSlots->first()->id);
-
-        $this->assertNotEmpty($result['attached_gems']);
-        $this->assertNotEmpty($result['socket_data']);
-        $this->assertTrue($result['has_gems_on_item']);
-        $this->assertNotEmpty($result['gem_to_attach']);
-        $this->assertNotEmpty($result['when_replacing']);
-        $this->assertNotEmpty($result['if_replacing_atonements']);
-        $this->assertNotEmpty($result['original_atonement']);
+        $this->assertSame(422, $result['status']);
+        $this->assertSame('Selected item was not found in your inventory.', $result['message']);
     }
 }

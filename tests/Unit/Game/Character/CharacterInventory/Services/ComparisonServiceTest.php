@@ -9,7 +9,6 @@ use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\ComparisonService;
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
 use App\Game\Character\CharacterInventory\Services\InventorySetService;
-use App\Game\Character\CharacterInventory\Transformers\CharacterGemsTransformer;
 use App\Game\Character\CharacterInventory\Transformers\InventorySetOptionTransformer;
 use App\Game\Character\CharacterInventory\Transformers\InventoryTransformer;
 use App\Game\Character\CharacterInventory\Validations\SetHandsValidation;
@@ -24,8 +23,6 @@ use App\Game\Core\Items\Transformers\UsableItemTransformer;
 use App\Game\Core\Items\Values\ArmourType;
 use App\Game\Core\Items\Values\ItemType;
 use App\Game\Core\Values\ValidEquipPositionsValue;
-use App\Game\Gems\Services\GemComparison;
-use App\Game\Gems\Services\ItemAtonements;
 use App\Game\Skills\Services\DisenchantService;
 use App\Game\Skills\Services\MassDisenchantService;
 use App\Game\Skills\Services\SkillBonusContextService;
@@ -89,7 +86,6 @@ class ComparisonServiceTest extends TestCase
                 new InventorySetOptionTransformer,
             ),
             new EquipItemService($manager, new CharacterAttackTransformer, $inventorySetService),
-            new ItemAtonements(new GemComparison(new CharacterGemsTransformer, $plainDataSerializer, $manager)),
             $manager,
             $equippableItemTransformer,
             $apiUsableItemTransformer,

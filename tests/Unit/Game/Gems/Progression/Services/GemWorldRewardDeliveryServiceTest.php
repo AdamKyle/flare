@@ -8,6 +8,7 @@ use App\Game\BattleRewardProcessing\Services\BattleRewardLedgerService;
 use App\Game\Core\Items\Builders\BuildCosmicItem;
 use App\Game\Core\Items\Builders\BuildMythicItem;
 use App\Game\Core\Items\Builders\BuildUniqueItem;
+use App\Game\Core\Items\Services\ItemSocketRollService;
 use App\Game\Core\Items\Values\ItemSocketEligibility;
 use App\Game\Gems\Builders\GemBuilder;
 use App\Game\Gems\Progression\Services\GemScrollGenerator;
@@ -84,6 +85,7 @@ class GemWorldRewardDeliveryServiceTest extends TestCase
             resolve(BattleRewardLedgerService::class),
             $gemScrollGenerator,
             resolve(ItemSocketEligibility::class),
+            resolve(ItemSocketRollService::class),
             resolve(GemBuilder::class),
             resolve(BuildUniqueItem::class),
             resolve(BuildMythicItem::class),

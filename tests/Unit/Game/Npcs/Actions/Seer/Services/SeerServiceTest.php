@@ -80,12 +80,12 @@ class SeerServiceTest extends TestCase
 
         $result = $this->seerService->createSockets($character, $slot->id);
 
-        $this->assertSame('Trinkets and Artifacts cannot have sockets on them.', $result['message']);
+        $this->assertSame('This item cannot have sockets.', $result['message']);
     }
 
     public function test_create_sockets_returns_error_when_not_enough_gold_bars(): void
     {
-        $item = $this->createItem(['type' => 'weapon', 'socket_count' => 0]);
+        $item = $this->createItem(['type' => 'body', 'socket_count' => 0]);
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
         $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
 
@@ -117,7 +117,7 @@ class SeerServiceTest extends TestCase
 
     public function test_remove_gem_returns_error_when_item_has_no_sockets(): void
     {
-        $item = $this->createItem(['type' => 'weapon', 'socket_count' => 0]);
+        $item = $this->createItem(['type' => 'body', 'socket_count' => 0]);
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
         $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
 
@@ -269,7 +269,7 @@ class SeerServiceTest extends TestCase
     public function test_replace_gem_returns_error_when_item_has_no_sockets(): void
     {
         $gem = $this->createGem();
-        $item = $this->createItem(['type' => 'weapon', 'socket_count' => 0]);
+        $item = $this->createItem(['type' => 'body', 'socket_count' => 0]);
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
         $character = $this->character->gemBagManagement()->assignGemToBag($gem->id)->getCharacter();
         $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
@@ -454,7 +454,7 @@ class SeerServiceTest extends TestCase
             })
         );
 
-        $item = $this->createItem(['type' => 'weapon', 'socket_count' => 0]);
+        $item = $this->createItem(['type' => 'body', 'socket_count' => 0]);
         $this->character->kingdomManagement()->assignKingdom(['gold_bars' => 5000]);
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
         $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
@@ -473,7 +473,7 @@ class SeerServiceTest extends TestCase
             })
         );
 
-        $item = $this->createItem(['type' => 'weapon', 'socket_count' => 0]);
+        $item = $this->createItem(['type' => 'body', 'socket_count' => 0]);
         $this->character->kingdomManagement()->assignKingdom(['gold_bars' => 5000]);
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
         $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
@@ -492,7 +492,7 @@ class SeerServiceTest extends TestCase
             })
         );
 
-        $item = $this->createItem(['type' => 'weapon', 'socket_count' => 0]);
+        $item = $this->createItem(['type' => 'body', 'socket_count' => 0]);
         $this->character->kingdomManagement()->assignKingdom(['gold_bars' => 5000]);
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
         $slot = $character->inventory->slots()->where('item_id', $item->id)->first();

@@ -27,6 +27,7 @@ use App\Game\Core\Items\Builders\RandomAffixGenerator;
 use App\Game\Core\Services\CharacterService;
 use App\Game\Core\Values\LevelUpValue;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
+use App\Game\Gems\Contracts\CharacterGemEffects;
 use App\Game\Gems\Progression\Contracts\CharacterAreaGemEffects;
 use App\Game\Gems\Services\AreaGemEffectService;
 use App\Game\GuideQuests\Services\GuideQuestService;
@@ -47,6 +48,7 @@ class ServiceProvider extends ApplicationServiceProvider
             $app->make(BattleMessageHandler::class),
             $app->make(RandomNumberGenerator::class),
             $app->make(CharacterAreaGemEffects::class),
+            $app->make(CharacterGemEffects::class),
         ));
         $this->app->bind(CharacterXPService::class, fn ($app) => new CharacterXPService(
             $app->make(CharacterService::class),
@@ -54,6 +56,7 @@ class ServiceProvider extends ApplicationServiceProvider
             $app->make(SkillService::class),
             $app->make(BattleMessageHandler::class),
             $app->make(CharacterAreaGemEffects::class),
+            $app->make(CharacterGemEffects::class),
         ));
         $this->app->bind(CharacterRewardService::class, fn ($app) => new CharacterRewardService(
             $app->make(CharacterXPService::class),

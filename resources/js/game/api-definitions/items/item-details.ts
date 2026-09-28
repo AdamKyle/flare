@@ -76,23 +76,6 @@ export default interface ItemDetails {
   ignores_caps: boolean;
   sockets: unknown[];
   socket_amount: number;
-  item_atonements: ItemAtonements;
   item_skills: ItemSkillDefinition[];
   item_skill_progressions: ItemSkillProgressionDefinition[];
-}
-
-export interface ItemAtonements {
-  atonements: Atonements;
-  elemental_damage: ElementalDamage;
-}
-
-export interface Atonements {
-  Fire: number;
-  Ice: number;
-  Water: number;
-}
-
-export interface ElementalDamage {
-  name: string;
-  amount: number;
 }

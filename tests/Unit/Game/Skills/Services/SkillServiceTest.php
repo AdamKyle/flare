@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Event;
 use League\Fractal\Manager;
 use Tests\Setup\Character\CharacterCacheDataFactory;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\Setup\Gems\EmptyCharacterGemEffects;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateEvent;
@@ -63,14 +64,20 @@ class SkillServiceTest extends TestCase
             new BasicSkillsTransformer,
             new SkillsTransformer($skillBonusService),
             new UpdateCharacterAttackTypesHandler(new BuildCharacterAttackTypes(
-                new CharacterAttackBuilder($characterCacheDataFactory->buildCharacterStatBuilder(), $characterAreaGemEffectService),
+                new CharacterAttackBuilder(
+                    $characterCacheDataFactory->buildCharacterStatBuilder(),
+                    $characterAreaGemEffectService,
+                    new EmptyCharacterGemEffects,
+                ),
                 $characterCacheDataFactory->build(),
+                new EmptyCharacterGemEffects,
             )),
             new BattleMessageHandler,
             new PlainDataSerializer,
             new PhpRandomNumberGenerator,
             $characterAreaGemEffectService,
             $skillBonusService,
+            new EmptyCharacterGemEffects,
         );
     }
 

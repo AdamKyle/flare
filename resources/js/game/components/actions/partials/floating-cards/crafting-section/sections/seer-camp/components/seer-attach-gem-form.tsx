@@ -125,7 +125,10 @@ const SeerAttachGemForm = ({
     if (comparison) {
       return (
         <CraftingActionPreview title="Gem attachment preview">
-          <SeerGemComparison comparison={comparison} />
+          <SeerGemComparison
+            comparison={comparison}
+            selectedGemId={replaceId}
+          />
           <p>Attach Gem cost: {costs.attach} Gold Bars.</p>
           {hasAttachedGemsToReplace && (
             <p>Replace Gem cost: {costs.replace} Gold Bars.</p>

@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import React from 'react';
 
 import GemDetailsProps from './types/gem-details-props';
-import GemDetailsContent from '../../../../reusable-components/gem/gem-details-content';
+import CharacterGemModifierList from '../../../../reusable-components/character-gem/character-gem-modifier-list';
 import { getGemSlotTitleTextColor } from '../../../character-sheet/partials/character-inventory/styles/gem-slot-styles';
 
 import Separator from 'ui/separator/separator';
@@ -16,7 +16,8 @@ const GemDetails = ({ gem }: GemDetailsProps) => {
         <h2 className={clsx('my-2 text-lg', itemColor)}>{gem.name}</h2>
         <Separator />
 
-        <GemDetailsContent gem={gem} />
+        <p>Tier {gem.tier}</p>
+        <CharacterGemModifierList modifiers={gem.modifiers} />
       </div>
     </>
   );

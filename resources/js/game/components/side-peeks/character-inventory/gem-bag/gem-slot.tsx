@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import React, { ReactNode } from 'react';
 
+import CharacterGemModifierList from '../../../../reusable-components/character-gem/character-gem-modifier-list';
 import { backpackBaseItemStyles } from '../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
 import {
   gemSlotBorderStyles,
@@ -22,24 +23,8 @@ const GemSlot = ({ gem_slot, on_view_gem }: GemSlotProps): ReactNode => {
       <>
         <span>
           <strong>Tier</strong>: {gem_slot.tier}
-        </span>{' '}
-        |{' '}
-        <span>
-          <strong>Weak Against</strong>: {gem_slot.weak_against}
-        </span>{' '}
-        |{' '}
-        <span>
-          <strong>Strong Against</strong>: {gem_slot.strong_against}
-        </span>{' '}
-        |{' '}
-        <span>
-          <strong>Atoned To</strong>: {gem_slot.element_atoned_to}
-        </span>{' '}
-        |{' '}
-        <span>
-          <strong>Atoned To %</strong>:{' '}
-          {(gem_slot.element_atoned_to_amount * 100).toFixed(2)}%
         </span>
+        <CharacterGemModifierList modifiers={gem_slot.modifiers} />
       </>
     );
   };
@@ -53,8 +38,12 @@ const GemSlot = ({ gem_slot, on_view_gem }: GemSlotProps): ReactNode => {
         gemSlotButtonBackgroundColor(gem_slot)
       )}
       onClick={handleViewGem}
+      type="button"
     >
-      <i className="ra ra-bone-knife text-2xl text-gray-800 dark:text-gray-600"></i>
+      <i
+        className="ra ra-bone-knife text-2xl text-gray-800 dark:text-gray-600"
+        aria-hidden="true"
+      ></i>
       <div className="text-left">
         <div className={clsx('text-lg font-semibold', itemColor)}>
           {gem_slot.name}

@@ -1,7 +1,7 @@
-import { AttachedGemDefinition } from '../../api/definitions/gem-comparison-api-response-definition';
+import CharacterGemDefinition from '../../../../../../../../../api-definitions/gems/character-gem-definition';
 
 export default interface SeerReplaceGemFormProps {
-  attachedGems: AttachedGemDefinition[];
+  attachedGems: CharacterGemDefinition[];
   selectedGemId: number | null;
   onSelect: (gemId: number) => void;
 }

@@ -30,6 +30,7 @@ export default defineConfig({
             'resources/js/admin/classes/classes-app.tsx',
             'resources/js/admin/races/races-app.tsx',
             'resources/js/admin/class-masteries/class-masteries-app.tsx',
+            'resources/js/admin/gem-abilities/gem-abilities-app.tsx',
             'resources/js/admin/map-gems/map-gems-app.tsx',
             'resources/js/admin/location-gems/location-gems-app.tsx',
             'resources/js/admin/skills/skills-app.tsx',

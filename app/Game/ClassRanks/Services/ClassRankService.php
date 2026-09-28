@@ -19,6 +19,7 @@ use App\Game\ClassRanks\Values\ClassSpecialValue;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
 use App\Game\Core\Items\Values\ItemType;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Gems\Contracts\CharacterGemEffects;
 use App\Game\Gems\Progression\Contracts\CharacterAreaGemEffects;
 use App\Game\Gems\Values\AreaGemRewardEffect;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -36,12 +37,14 @@ class ClassRankService
     /**
      * @param BattleMessageHandler $battleMessageHandler
      * @param CharacterAreaGemEffects $characterAreaGemEffects
+     * @param CharacterGemEffects $characterGemEffects
      * @param ClassDetailTransformer $classDetailTransformer
      * @param ClassMasteryDetailTransformer $classMasteryDetailTransformer
      */
     public function __construct(
         private readonly BattleMessageHandler $battleMessageHandler,
         private readonly CharacterAreaGemEffects $characterAreaGemEffects,
+        private readonly CharacterGemEffects $characterGemEffects,
         private readonly ClassDetailTransformer $classDetailTransformer,
         private readonly ClassMasteryDetailTransformer $classMasteryDetailTransformer,
     ) {}
@@ -69,7 +72,8 @@ class ClassRankService
      */
     private function resolveClassRankXpPerKill(Character $character, ?float $preResolvedGemBonus = null): ?int
     {
-        $bonus = $preResolvedGemBonus ?? $this->characterAreaGemEffects->resolveForCharacterId($character->id)->rewardEffect(AreaGemRewardEffect::CHARACTER_CLASS_RANK_XP_BONUS);
+        $areaGemBonus = $preResolvedGemBonus ?? $this->characterAreaGemEffects->resolveForCharacterId($character->id)->rewardEffect(AreaGemRewardEffect::CHARACTER_CLASS_RANK_XP_BONUS);
+        $bonus = $areaGemBonus + $this->characterGemEffects->resolveForCharacterId($character->id)->classRankXpGain();
 
         return $this->wholeXpPerKill(ClassRankValue::XP_PER_KILL * (1 + $bonus));
     }
@@ -84,7 +88,8 @@ class ClassRankService
      */
     private function resolveClassSpecialtyXpPerKill(Character $character, ?float $preResolvedGemBonus = null): ?int
     {
-        $bonus = $preResolvedGemBonus ?? $this->characterAreaGemEffects->resolveForCharacterId($character->id)->rewardEffect(AreaGemRewardEffect::CHARACTER_CLASS_SPECIALTY_XP_GAIN);
+        $areaGemBonus = $preResolvedGemBonus ?? $this->characterAreaGemEffects->resolveForCharacterId($character->id)->rewardEffect(AreaGemRewardEffect::CHARACTER_CLASS_SPECIALTY_XP_GAIN);
+        $bonus = $areaGemBonus + $this->characterGemEffects->resolveForCharacterId($character->id)->classMasteryXpGain();
 
         return $this->wholeXpPerKill(ClassSpecialValue::XP_PER_KILL * (1 + $bonus));
     }
@@ -706,6 +711,14 @@ class ClassRankService
             return;
         }
 
+        $xpPerKill = $this->wholeXpPerKill(
+            WeaponMasteryValue::XP_PER_KILL * (1 + $this->characterGemEffects->resolveForCharacterId($character->id)->weaponMasteryXpGain())
+        );
+
+        if (is_null($xpPerKill)) {
+            return;
+        }
+
         if ($killCount === 1) {
             $classRank = $character->classRanks()->where('game_class_id', $character->game_class_id)->first();
 
@@ -738,14 +751,14 @@ class ClassRankService
                     }
 
                     $weaponMastery->update([
-                        'current_xp' => $weaponMastery->current_xp + WeaponMasteryValue::XP_PER_KILL,
+                        'current_xp' => $weaponMastery->current_xp + $xpPerKill,
                     ]);
 
                     $weaponMastery = $weaponMastery->refresh();
 
                     $weaponMasteryName = ItemType::getProperNameForType($type);
 
-                    $this->battleMessageHandler->handleClassRankMessage($character->user, ClassRanksMessageTypes::XP_FOR_CLASS_MASTERIES, $character->class->name, WeaponMasteryValue::XP_PER_KILL, $weaponMastery->current_xp, $weaponMasteryName);
+                    $this->battleMessageHandler->handleClassRankMessage($character->user, ClassRanksMessageTypes::XP_FOR_CLASS_MASTERIES, $character->class->name, $xpPerKill, $weaponMastery->current_xp, $weaponMasteryName);
 
                     if ($weaponMastery->current_xp >= $weaponMastery->required_xp) {
                         $weaponMastery->update([
@@ -811,7 +824,7 @@ class ClassRankService
                     $weaponMastery->level,
                     $weaponMastery->current_xp,
                     $weaponMastery->required_xp,
-                    WeaponMasteryValue::XP_PER_KILL,
+                    $xpPerKill,
                     $killCount,
                     WeaponMasteryValue::MAX_LEVEL
                 );
@@ -829,7 +842,7 @@ class ClassRankService
                     $character->user,
                     ClassRanksMessageTypes::XP_FOR_CLASS_MASTERIES,
                     $character->class->name,
-                    WeaponMasteryValue::XP_PER_KILL * $killCount,
+                    $xpPerKill * $killCount,
                     $weaponMastery->current_xp,
                     $weaponMasteryName
                 );

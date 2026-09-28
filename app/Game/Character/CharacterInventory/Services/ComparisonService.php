@@ -10,7 +10,6 @@ use App\Flare\Models\SetSlot;
 use App\Game\Core\Items\Transformers\Api\UsableItemTransformer;
 use App\Game\Core\Items\Transformers\EquippableItemTransformer;
 use App\Game\Core\Values\ValidEquipPositionsValue;
-use App\Game\Gems\Services\ItemAtonements;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item as FractalItem;
 
@@ -20,7 +19,6 @@ class ComparisonService
      * @param ValidEquipPositionsValue $validEquipPositionsValue
      * @param CharacterInventoryService $characterInventoryService
      * @param EquipItemService $equipItemService
-     * @param ItemAtonements $itemAtonements
      * @param Manager $manager
      * @param EquippableItemTransformer $equippableItemTransformer
      * @param UsableItemTransformer $usableItemTransformer
@@ -29,7 +27,6 @@ class ComparisonService
         private readonly ValidEquipPositionsValue $validEquipPositionsValue,
         private readonly CharacterInventoryService $characterInventoryService,
         private readonly EquipItemService $equipItemService,
-        private readonly ItemAtonements $itemAtonements,
         private readonly Manager $manager,
         private readonly EquippableItemTransformer $equippableItemTransformer,
         private readonly UsableItemTransformer $usableItemTransformer,
@@ -59,7 +56,6 @@ class ComparisonService
 
         $viewData = [
             'details' => [],
-            'atonement' => $this->itemAtonements->getAtonements($itemToEquip->item, $inventory),
             'itemToEquip' => $this->buildItemDetails($itemToEquip),
             'type' => $normalizedType,
             'slotId' => $itemToEquip->id,
@@ -80,7 +76,6 @@ class ComparisonService
 
             $viewData = [
                 'details' => $this->equipItemService->getItemStats($itemToEquip->item, $inventory, $character),
-                'atonement' => $this->itemAtonements->getAtonements($itemToEquip->item, $inventory),
                 'itemToEquip' => $this->buildItemDetails($itemToEquip),
                 'type' => $normalizedType,
                 'slotId' => $itemToEquip->id,
@@ -111,7 +106,6 @@ class ComparisonService
 
         return [
             'details' => [],
-            'atonement' => [],
             'itemToEquip' => $item,
             'type' => 'alchemy',
             'slotId' => $slot->id,
@@ -138,7 +132,6 @@ class ComparisonService
 
         return [
             'details' => [],
-            'atonement' => [],
             'itemToEquip' => $item,
             'type' => $slot->item->type,
             'slotId' => $slot->id,

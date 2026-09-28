@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import UseGemCraftingFlowDefinition from './definitions/use-gem-crafting-flow-definition';
-import BaseGemDetails from '../../../../../../../../api-definitions/items/base-gem-details';
+import CharacterGemBagSlotDefinition from '../../../../../../../../api-definitions/gems/character-gem-bag-slot-definition';
 import { useCraftingTimeout } from '../../../shared/hooks/use-crafting-timeout';
 import { useCraftGemApi } from '../api/hooks/use-craft-gem-api';
 import { useGemCraftingApi } from '../api/hooks/use-gem-crafting-api';
@@ -37,7 +37,7 @@ export const useGemCraftingFlow = (): UseGemCraftingFlowDefinition => {
   const [status, setStatus] = useState<string | null>(null);
   const [craftSucceeded, setCraftSucceeded] = useState<boolean>(false);
   const [craftedGemPreview, setCraftedGemPreview] =
-    useState<BaseGemDetails | null>(null);
+    useState<CharacterGemBagSlotDefinition | null>(null);
 
   const effectiveSelectedTier =
     data && selectedTier !== null && selectedTier <= data.tiers.length

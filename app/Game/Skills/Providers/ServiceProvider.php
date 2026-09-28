@@ -19,8 +19,9 @@ use App\Game\Events\Services\GlobalEventGoalEligibilityService;
 use App\Game\Events\Services\GlobalEventGoalProgressionService;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Gems\Builders\GemBuilder;
+use App\Game\Gems\Contracts\CharacterGemEffects;
 use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
-use App\Game\Gems\Transformers\GemTransformer;
+use App\Game\Gems\Transformers\CharacterGemTransformer;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Npcs\Actions\QueenOfHearts\Services\RandomEnchantmentService;
 use App\Game\Skills\Builders\BaseSkillBuilder;
@@ -163,6 +164,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(RandomNumberGenerator::class),
                 $app->make(CharacterAreaGemEffectService::class),
                 $app->make(SkillBonusService::class),
+                $app->make(CharacterGemEffects::class),
             );
         });
 
@@ -203,7 +205,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new GemService(
                 $app->make(GemBuilder::class),
                 $app->make(ChanceCalculator::class),
-                $app->make(GemTransformer::class),
+                $app->make(CharacterGemTransformer::class),
                 $app->make(ServerMessageBuilder::class),
                 $app->make(CharacterGemSlotsTransformer::class),
                 $app->make(SkillBonusService::class),

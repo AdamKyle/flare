@@ -8,6 +8,7 @@ use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\CharacterAttack\Transformers\CharacterAttackDataTransformer;
 use App\Game\Core\Items\Values\ItemType;
+use App\Game\Gems\Contracts\CharacterGemEffects;
 use App\Game\Skills\Contracts\SkillBonusQuery;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -23,6 +24,7 @@ class CharacterCacheData
      * @param CharacterAttackDataTransformer $characterAttackDataTransformer
      * @param CharacterStatBuilder $characterStatBuilder
      * @param SkillBonusQuery $skillBonusQuery
+     * @param CharacterGemEffects $characterGemEffects
      */
     public function __construct(
         private readonly Manager $manager,
@@ -30,6 +32,7 @@ class CharacterCacheData
         private readonly CharacterAttackDataTransformer $characterAttackDataTransformer,
         private readonly CharacterStatBuilder $characterStatBuilder,
         private readonly SkillBonusQuery $skillBonusQuery,
+        private readonly CharacterGemEffects $characterGemEffects,
     ) {}
 
     /**
@@ -84,7 +87,7 @@ class CharacterCacheData
             $cache = $this->characterSheetCache($character);
         }
 
-        return $cache[$key];
+        return $cache[$key] ?? null;
     }
 
     /**
@@ -176,6 +179,14 @@ class CharacterCacheData
         ];
 
         $characterSheet['elemental_atonement'] = $this->characterStatBuilder->buildElementalAtonement();
+
+        $resolvedCharacterGemEffects = $this->characterGemEffects->resolveForCharacterId($character->id);
+        $characterSheet['character_gem_effects'] = $resolvedCharacterGemEffects->toArray();
+        $characterSheet['elemental_penetration'] = [
+            'Fire' => $resolvedCharacterGemEffects->firePenetration(),
+            'Water' => $resolvedCharacterGemEffects->waterPenetration(),
+            'Ice' => $resolvedCharacterGemEffects->icePenetration(),
+        ];
 
         $characterSheet['weapon_attack'] = $this->characterStatBuilder->buildDamage(ItemType::validWeapons());
         $characterSheet['spell_attack'] = $this->characterStatBuilder->buildDamage('spell-damage');

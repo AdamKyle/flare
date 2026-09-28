@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 
 import GemTierCostSummary from './gem-tier-cost-summary';
 import GemTierSelection from './gem-tier-selection';
-import GemDetailsContent from '../../../../../../../../reusable-components/gem/gem-details-content';
+import CharacterGemModifierList from '../../../../../../../../reusable-components/character-gem/character-gem-modifier-list';
 import { getGemSlotTitleTextColor } from '../../../../../../../character-sheet/partials/character-inventory/styles/gem-slot-styles';
 import CraftingActionLayout from '../../../shared/components/crafting-action-layout';
 import CraftingActionPreview from '../../../shared/components/crafting-action-preview';
@@ -92,7 +92,7 @@ const GemCraftingFlow = (): ReactNode => {
             class_name={gemColor}
             on_click={handleViewCraftedGem}
           />
-          <GemDetailsContent gem={craftedGemPreview} />
+          <CharacterGemModifierList modifiers={craftedGemPreview.modifiers} />
         </CraftingActionPreview>
       );
     }
@@ -112,9 +112,12 @@ const GemCraftingFlow = (): ReactNode => {
     return (
       <CraftingActionPreview
         title="Gem preview"
-        description="The exact Gem and its atonements are generated after a successful craft."
+        description="The exact three Gem modifiers are generated after a successful craft."
       >
-        <GemTierCostSummary tier={selectedTierData} />
+        <GemTierCostSummary
+          tier={selectedTierData}
+          tierNumber={selectedTier ?? 1}
+        />
       </CraftingActionPreview>
     );
   };

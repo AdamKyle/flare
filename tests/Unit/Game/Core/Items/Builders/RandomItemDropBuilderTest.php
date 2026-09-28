@@ -6,6 +6,8 @@ use App\Flare\Models\Item;
 use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Items\Builders\RandomItemDropBuilder;
+use App\Game\Core\Items\Services\ItemSocketRollService;
+use App\Game\Core\Items\Values\ItemSocketEligibility;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
 use Tests\TestCase;
@@ -35,6 +37,11 @@ class RandomItemDropBuilderTest extends TestCase
         $builder = new RandomItemDropBuilder(
             $randomNumberGenerator,
             new ChanceCalculator($randomNumberGenerator),
+            new ItemSocketRollService(
+                $randomNumberGenerator,
+                new ChanceCalculator($randomNumberGenerator),
+                new ItemSocketEligibility,
+            ),
         );
 
         $result = $builder->generateItem(10);
@@ -67,6 +74,11 @@ class RandomItemDropBuilderTest extends TestCase
         $builder = new RandomItemDropBuilder(
             $randomNumberGenerator,
             new ChanceCalculator($randomNumberGenerator),
+            new ItemSocketRollService(
+                $randomNumberGenerator,
+                new ChanceCalculator($randomNumberGenerator),
+                new ItemSocketEligibility,
+            ),
         );
 
         $result = $builder->generateItem(10);
@@ -102,6 +114,11 @@ class RandomItemDropBuilderTest extends TestCase
         $builder = new RandomItemDropBuilder(
             $randomNumberGenerator,
             new ChanceCalculator($randomNumberGenerator),
+            new ItemSocketRollService(
+                $randomNumberGenerator,
+                new ChanceCalculator($randomNumberGenerator),
+                new ItemSocketEligibility,
+            ),
         );
 
         $result = $builder->generateItem(10);

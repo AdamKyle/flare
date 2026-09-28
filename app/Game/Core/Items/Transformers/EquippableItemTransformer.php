@@ -6,14 +6,11 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\SetSlot;
 use App\Game\Core\Items\Values\ItemType;
 use App\Game\Core\Items\Values\ItemUniqueness;
-use App\Game\Gems\Traits\GetItemAtonements;
 use Facades\App\Game\Core\Items\Pricing\SellItemCalculator;
 use League\Fractal\TransformerAbstract;
 
 class EquippableItemTransformer extends TransformerAbstract
 {
-    use GetItemAtonements;
-
     /**
      * Transform a slot holding an enriched equippable Item into its API detail payload.
      *
@@ -80,7 +77,6 @@ class EquippableItemTransformer extends TransformerAbstract
             'total_irresistible_affix_damage' => $slot->item->total_irresistible_affix_damage,
             'sockets' => $slot->item->sockets,
             'socket_amount' => $slot->item->socket_count,
-            'item_atonements' => $this->getElementAtonement($slot->item),
             'spell_evasion' => $slot->item->spell_evasion,
             'healing_reduction' => $slot->item->healing_reduction,
             'affix_damage_reduction' => $slot->item->affix_damage_reduction,

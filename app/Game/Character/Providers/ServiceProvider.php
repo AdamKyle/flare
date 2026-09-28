@@ -18,6 +18,7 @@ use App\Game\Character\Console\Commands\AssignNewFactionsToCharacters;
 use App\Game\Character\Console\Commands\CreateCharacterAttackDataCache;
 use App\Game\Character\Services\CharacterDeletion;
 use App\Game\Core\Items\Enricher\ItemEnricherFactory;
+use App\Game\Gems\Contracts\CharacterGemEffects;
 use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
 use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -45,6 +46,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new CharacterAttackBuilder(
                 $app->make(CharacterStatBuilder::class),
                 $app->make(CharacterAreaGemEffectService::class),
+                $app->make(CharacterGemEffects::class),
             );
         });
 
@@ -65,8 +67,8 @@ class ServiceProvider extends ApplicationServiceProvider
             return new InventoryTransformer($app->make(ItemEnricherFactory::class));
         });
 
-        $this->app->bind(ClassRanksWeaponMasteriesBuilder::class, function () {
-            return new ClassRanksWeaponMasteriesBuilder;
+        $this->app->bind(ClassRanksWeaponMasteriesBuilder::class, function ($app) {
+            return new ClassRanksWeaponMasteriesBuilder($app->make(CharacterGemEffects::class));
         });
 
         $this->commands([

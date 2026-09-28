@@ -43,11 +43,13 @@ class BuildCharacterAttackTypesTest extends TestCase
 
         Cache::delete('character-attack-data-'.$character->id);
 
-        $this->buildCharacterAttackTypes->buildCache($character);
+        $cacheData = $this->buildCharacterAttackTypes->buildCache($character);
 
-        $this->assertNotNull(
-            Cache::get('character-attack-data-'.$character->id)
-        );
+        $this->assertNotNull(Cache::get('character-attack-data-'.$character->id));
+        $this->assertArrayHasKey('character_gem_effects', $cacheData);
+        $this->assertArrayHasKey('elemental_atonement', $cacheData);
+        $this->assertArrayHasKey('elemental_penetration', $cacheData);
+        $this->assertArrayHasKey('gem_abilities', $cacheData['attack_types']['attack']);
     }
 
     public function test_build_character_attack_types_calculates_damage_stat_amount_fresh_before_building()

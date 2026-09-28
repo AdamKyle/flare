@@ -15,9 +15,11 @@ use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Core\Services\CharacterService;
 use App\Game\Core\Traits\SafelyBroadcastsEvents;
 use App\Game\Core\Values\LevelUpValue;
+use App\Game\Gems\Contracts\CharacterGemEffects;
 use App\Game\Gems\Progression\Contracts\CharacterAreaGemEffects;
 use App\Game\Gems\Values\AreaGemRewardEffect;
 use App\Game\Gems\Values\ResolvedAreaGemEffects;
+use App\Game\Gems\Values\ResolvedCharacterGemEffects;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CharacterMessageTypes;
 use App\Game\Skills\Services\SkillService;
@@ -41,12 +43,15 @@ class CharacterXPService
 
     private array $checkpointedProgression = [];
 
+    private ResolvedCharacterGemEffects $resolvedCharacterGemEffects;
+
     /**
      * @param CharacterService $characterService
      * @param LevelUpValue $levelUpValue
      * @param SkillService $skillService
      * @param BattleMessageHandler $battleMessageHandler
      * @param CharacterAreaGemEffects $characterAreaGemEffects
+     * @param CharacterGemEffects $characterGemEffects
      */
     public function __construct(
         private readonly CharacterService $characterService,
@@ -54,6 +59,7 @@ class CharacterXPService
         private readonly SkillService $skillService,
         private readonly BattleMessageHandler $battleMessageHandler,
         private readonly CharacterAreaGemEffects $characterAreaGemEffects,
+        private readonly CharacterGemEffects $characterGemEffects,
     ) {}
 
     /**
@@ -67,6 +73,7 @@ class CharacterXPService
         $this->character = $character;
         $this->xpCalculationFailure = null;
         $this->checkpointedProgression = [];
+        $this->resolvedCharacterGemEffects = $this->characterGemEffects->resolveForCharacterId($character->id);
 
         return $this;
     }
@@ -320,7 +327,8 @@ class CharacterXPService
         $map = $character->map->gameMap;
         $mapBonus = ! is_null($map->xp_bonus) ? $map->xp_bonus : 0;
         $resolvedAreaGemEffects ??= $this->characterAreaGemEffects->resolveForCharacterId($character->id);
-        $gemCharacterXpBonus = $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::CHARACTER_XP_BONUS);
+        $gemCharacterXpBonus = $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::CHARACTER_XP_BONUS)
+            + $this->resolvedCharacterGemEffects->characterXpGain();
 
         $xpBonusIgnoreCaps = $this->getTotalXpBonus($xpBonusQuestSlots, true) + $boonBonus + $mapBonus + $gemCharacterXpBonus;
         $xpBonusWithCaps = $this->getTotalXpBonus($xpBonusQuestSlots, false);
@@ -425,6 +433,10 @@ class CharacterXPService
     {
         $maxLevel = $this->getCharacterMaxLevel($character);
         $levelsPerTrigger = $this->gainsAdditionalLevelOnLevelUp($character) ? $this->additionalLevelsToGain($character) : 1;
+
+        if ($this->resolvedCharacterGemEffects->gainsAdditionalLevel()) {
+            $levelsPerTrigger++;
+        }
 
         $leveledCharacter = clone $character;
         $leveledCharacter->xp = $character->xp + $xp;

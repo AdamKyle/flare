@@ -1,5 +1,4 @@
 import { BaseItemDetails } from '../base-item-details';
-import { AtonementsDefinition } from './atonements-definition';
 import { HolyStackDefinition } from './holy-stack-definition';
 import ItemAffixDefinition from './item-affix-definition';
 import SkillSummaryDefinition from './skill-summary-definition';
@@ -70,8 +69,6 @@ export default interface EquippableItemDefinition {
 
   sockets: SocketDefinition[];
   socket_amount: number;
-
-  item_atonements: AtonementsDefinition;
 
   spell_evasion: number;
   healing_reduction: number;

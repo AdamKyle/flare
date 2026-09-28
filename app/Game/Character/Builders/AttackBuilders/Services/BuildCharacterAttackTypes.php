@@ -5,6 +5,7 @@ namespace App\Game\Character\Builders\AttackBuilders\Services;
 use App\Flare\Models\Character;
 use App\Game\Character\Builders\AttackBuilders\AttackDetails\CharacterAttackBuilder;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Gems\Contracts\CharacterGemEffects;
 use Illuminate\Support\Facades\Cache;
 
 class BuildCharacterAttackTypes
@@ -12,10 +13,12 @@ class BuildCharacterAttackTypes
     /**
      * @param CharacterAttackBuilder $characterAttackBuilder
      * @param CharacterCacheData $characterCacheData
+     * @param CharacterGemEffects $characterGemEffects
      */
     public function __construct(
         private readonly CharacterAttackBuilder $characterAttackBuilder,
         private readonly CharacterCacheData $characterCacheData,
+        private readonly CharacterGemEffects $characterGemEffects,
     ) {}
 
     /**
@@ -27,9 +30,21 @@ class BuildCharacterAttackTypes
      */
     public function buildCache(Character $character, bool $ignoreReductions = false): array
     {
-        $damageStatAmount = $character->getInformation()->statMod($character->damage_stat);
+        $resolvedCharacterGemEffects = $this->characterGemEffects->resolveForCharacterId($character->id);
+        $damageStatAmount = $character->getInformation()->setCharacter(
+            $character,
+            $ignoreReductions,
+            $resolvedCharacterGemEffects,
+        )->statMod($character->damage_stat);
 
-        $characterAttack = $this->characterAttackBuilder->setCharacter($character, $ignoreReductions, $damageStatAmount);
+        $characterAttack = $this->characterAttackBuilder->setCharacter(
+            $character,
+            $ignoreReductions,
+            $damageStatAmount,
+            $resolvedCharacterGemEffects,
+        );
+
+        $elementalAtonement = $character->getInformation()->buildElementalAtonement();
 
         Cache::put('character-attack-data-'.$character->id, [
             'attack_types' => [
@@ -43,10 +58,17 @@ class BuildCharacterAttackTypes
                 'voided_attack_and_cast' => $characterAttack->buildAttackAndCast(true),
                 'defend' => $characterAttack->buildDefend(),
                 'voided_defend' => $characterAttack->buildDefend(true),
-                'elemental_atonement' => $character->getInformation()->buildElementalAtonement(),
+                'elemental_atonement' => $elementalAtonement,
 
             ],
             'damage_stat_amount' => $damageStatAmount,
+            'elemental_atonement' => $elementalAtonement,
+            'elemental_penetration' => [
+                'Fire' => $resolvedCharacterGemEffects->firePenetration(),
+                'Water' => $resolvedCharacterGemEffects->waterPenetration(),
+                'Ice' => $resolvedCharacterGemEffects->icePenetration(),
+            ],
+            'character_gem_effects' => $resolvedCharacterGemEffects->toArray(),
         ]);
 
         $this->characterCacheData->deleteCharacterSheet($character);

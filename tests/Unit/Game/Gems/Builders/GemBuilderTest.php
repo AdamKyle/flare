@@ -3,92 +3,86 @@
 namespace Tests\Unit\Game\Gems\Builders;
 
 use App\Flare\Models\Gem;
+use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Gems\Builders\GemBuilder;
-use App\Game\Gems\Values\GemTypeValue;
+use App\Game\Gems\Services\CharacterGemRollService;
+use App\Game\Gems\Values\CharacterGemModifierType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Mockery;
-use Mockery\MockInterface;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterGemModifier;
+use Tests\Traits\CreateGameGemAbility;
 use Tests\Traits\CreateGem;
 
 class GemBuilderTest extends TestCase
 {
-    use CreateGem, RefreshDatabase;
+    use CreateCharacterGemModifier, CreateGameGemAbility, CreateGem, RefreshDatabase;
 
-    public function test_creates_a_new_gem_when_no_matching_gem_exists(): void
+    /**
+     * Prove Tier One creates one ability roll and two distinct raw-stat rolls.
+     *
+     * @return void
+     */
+    public function test_tier_one_creates_ability_and_two_distinct_raw_stats(): void
     {
-        $this->instance(
-            RandomNumberGenerator::class,
-            Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
-                $mock->shouldReceive('numberBetween')->andReturn(5, 10, 15, 3);
-            })
-        );
-
-        $gem = resolve(GemBuilder::class)->buildGem(1);
+        $ability = $this->createGameGemAbility();
+        $gem = $this->builder([3, 0, 0, 0, 5, 5])->buildGem(1);
+        $gem->load('characterModifiers');
 
         $this->assertSame('Glinting Bytocchacuaite', $gem->name);
         $this->assertSame(Gem::DOMAIN_CHARACTER, $gem->domain);
-        $this->assertSame(1, $gem->tier);
-        $this->assertSame(GemTypeValue::FIRE, $gem->primary_atonement_type);
-        $this->assertSame(GemTypeValue::WATER, $gem->secondary_atonement_type);
-        $this->assertSame(GemTypeValue::ICE, $gem->tertiary_atonement_type);
-        $this->assertEquals(0.05, $gem->primary_atonement_amount);
-        $this->assertEquals(0.1, $gem->secondary_atonement_amount);
-        $this->assertEquals(0.15, $gem->tertiary_atonement_amount);
+        $this->assertCount(3, $gem->characterModifiers);
+        $this->assertSame(CharacterGemModifierType::GEM_ABILITY, $gem->characterModifiers[0]->modifier_type);
+        $this->assertSame($ability->id, $gem->characterModifiers[0]->game_gem_ability_id);
+        $this->assertNotSame($gem->characterModifiers[1]->modifier_type, $gem->characterModifiers[2]->modifier_type);
     }
 
-    public function test_reuses_matching_character_domain_gem(): void
+    /**
+     * Prove an exact normalized roll signature reuses the existing character Gem.
+     *
+     * @return void
+     */
+    public function test_reuses_exact_matching_character_gem(): void
     {
-        $existingGem = $this->createGem([
-            'name' => 'Glinting Bytocchacuaite',
-            'domain' => Gem::DOMAIN_CHARACTER,
-            'tier' => 1,
-            'primary_atonement_type' => GemTypeValue::FIRE,
-            'secondary_atonement_type' => GemTypeValue::WATER,
-            'tertiary_atonement_type' => GemTypeValue::ICE,
-            'primary_atonement_amount' => 0.05,
-            'secondary_atonement_amount' => 0.1,
-            'tertiary_atonement_amount' => 0.15,
-        ]);
+        $ability = $this->createGameGemAbility();
+        $existingGem = $this->createGem(['name' => 'Glinting Bytocchacuaite', 'tier' => 1]);
+        $this->createCharacterGemModifier(['gem_id' => $existingGem->id, 'roll_position' => 1, 'modifier_type' => CharacterGemModifierType::GEM_ABILITY, 'amount' => null, 'game_gem_ability_id' => $ability->id]);
+        $this->createCharacterGemModifier(['gem_id' => $existingGem->id, 'roll_position' => 2, 'modifier_type' => CharacterGemModifierType::STRENGTH, 'amount' => 5]);
+        $this->createCharacterGemModifier(['gem_id' => $existingGem->id, 'roll_position' => 3, 'modifier_type' => CharacterGemModifierType::DEXTERITY, 'amount' => 5]);
 
-        $this->instance(
-            RandomNumberGenerator::class,
-            Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
-                $mock->shouldReceive('numberBetween')->andReturn(5, 10, 15, 3);
-            })
-        );
-
-        $gem = resolve(GemBuilder::class)->buildGem(1);
+        $gem = $this->builder([3, 0, 0, 0, 5, 5])->buildGem(1);
 
         $this->assertSame($existingGem->id, $gem->id);
-        $this->assertSame(1, Gem::count());
+        $this->assertSame(1, Gem::where('domain', Gem::DOMAIN_CHARACTER)->count());
     }
 
-    public function test_does_not_reuse_matching_map_domain_gem_for_character_gem(): void
+    /**
+     * Prove disabled definitions are excluded from newly rolled Tier One Gems.
+     *
+     * @return void
+     */
+    public function test_disabled_ability_is_never_newly_rolled(): void
     {
-        $this->createGem([
-            'name' => 'Glinting Bytocchacuaite',
-            'domain' => Gem::DOMAIN_MAP,
-            'tier' => 1,
-            'primary_atonement_type' => GemTypeValue::FIRE,
-            'secondary_atonement_type' => GemTypeValue::WATER,
-            'tertiary_atonement_type' => GemTypeValue::ICE,
-            'primary_atonement_amount' => 0.05,
-            'secondary_atonement_amount' => 0.1,
-            'tertiary_atonement_amount' => 0.15,
-        ]);
+        $this->createGameGemAbility(['enabled' => false]);
+        $enabledAbility = $this->createGameGemAbility(['name' => 'Enabled Ability', 'enabled' => true]);
 
-        $this->instance(
-            RandomNumberGenerator::class,
-            Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
-                $mock->shouldReceive('numberBetween')->andReturn(5, 10, 15, 3);
-            })
-        );
+        $gem = $this->builder([3, 0, 0, 0, 5, 5])->buildGem(1);
 
-        $gem = resolve(GemBuilder::class)->buildGem(1);
+        $this->assertSame($enabledAbility->id, $gem->characterModifiers()->first()->game_gem_ability_id);
+    }
 
-        $this->assertSame(Gem::DOMAIN_CHARACTER, $gem->domain);
-        $this->assertSame(2, Gem::count());
+    /**
+     * Build a GemBuilder with a deterministic number sequence.
+     *
+     * @param array $numbers
+     * @return GemBuilder
+     */
+    private function builder(array $numbers): GemBuilder
+    {
+        $random = $this->createStub(RandomNumberGenerator::class);
+        $random->method('numberBetween')->willReturnOnConsecutiveCalls(...$numbers);
+        $chance = $this->createStub(ChanceCalculator::class);
+
+        return new GemBuilder($random, new CharacterGemRollService($random, $chance));
     }
 }

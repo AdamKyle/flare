@@ -5,33 +5,18 @@ namespace Tests\Unit\Game\Skills\Services;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
-use App\Flare\Transformers\Serializer\PlainDataSerializer;
-use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ClassRanksWeaponMasteriesBuilder;
-use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\DamageBuilder;
-use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\DefenceBuilder;
-use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ElementalAtonement;
-use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HealingBuilder;
-use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HolyBuilder;
-use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ReductionsBuilder;
-use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
-use App\Game\Character\CharacterInventory\Transformers\CharacterGemsTransformer;
 use App\Game\Character\Values\CharacterClass;
-use App\Game\Core\Combat\Values\ElementAttackData;
 use App\Game\Core\Items\Values\ItemSpecialtyType;
 use App\Game\Events\Services\GlobalEventGoalEligibilityService;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Events\Values\ScheduledEventStatus;
-use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
-use App\Game\Gems\Progression\Services\GemProgressionEffectService;
-use App\Game\Gems\Services\AreaGemEffectService;
-use App\Game\Gems\Services\GemComparison;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\EnchantingAffixService;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
-use League\Fractal\Manager;
+use Tests\Setup\Character\CharacterCacheDataFactory;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;
@@ -84,18 +69,7 @@ class EnchantingAffixServiceTest extends TestCase
             $this->enchantingSkill
         )->givePlayerLocation();
 
-        $characterStatBuilder = new CharacterStatBuilder(
-            new DefenceBuilder(),
-            new DamageBuilder(new ClassRanksWeaponMasteriesBuilder()),
-            new HealingBuilder(new ClassRanksWeaponMasteriesBuilder()),
-            new HolyBuilder(),
-            new ReductionsBuilder(),
-            new ElementalAtonement(
-                new GemComparison(new CharacterGemsTransformer(), new PlainDataSerializer(), new Manager()),
-                new ElementAttackData(),
-            ),
-            new CharacterAreaGemEffectService(new AreaGemEffectService(), new GemProgressionEffectService()),
-        );
+        $characterStatBuilder = (new CharacterCacheDataFactory)->buildCharacterStatBuilder();
 
         $this->enchantingAffixService = new EnchantingAffixService(
             $characterStatBuilder,

@@ -173,7 +173,7 @@ class SecondaryAttacksTest extends TestCase
         ], $secondaryAttacks->getMessages());
     }
 
-    public function test_player_elemental_damage_does_not_fire_when_monster_has_no_atonement(): void
+    public function test_player_elemental_damage_treats_missing_monster_atonement_as_zero_resistance(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -214,8 +214,8 @@ class SecondaryAttacksTest extends TestCase
 
         $secondaryAttacks->dealElementalDamage($character, $serverMonster, true);
 
-        $this->assertEquals(1000, $secondaryAttacks->getMonsterHealth());
-        $this->assertEmpty($secondaryAttacks->getMessages());
+        $this->assertEquals(950, $secondaryAttacks->getMonsterHealth());
+        $this->assertNotEmpty($secondaryAttacks->getMessages());
     }
 
     public function test_player_elemental_damage_does_not_fire_when_character_has_no_elemental_atonement_cached(): void

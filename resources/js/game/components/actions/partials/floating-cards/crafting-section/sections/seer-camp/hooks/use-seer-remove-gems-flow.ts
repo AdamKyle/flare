@@ -26,9 +26,8 @@ export const useSeerRemoveGemsFlow = ({
     removalData?.gems.find((detail) => detail.slot_id === slotId) ?? null;
 
   const selectedChange =
-    selectedDetails?.comparison.atonement_changes.find(
-      (change) => change.gem_id_to_remove === gemId
-    ) ?? null;
+    selectedDetails?.comparison.removed_gems.find((gem) => gem.id === gemId) ??
+    null;
 
   const oneApi = useSeerActionApi({
     characterId,

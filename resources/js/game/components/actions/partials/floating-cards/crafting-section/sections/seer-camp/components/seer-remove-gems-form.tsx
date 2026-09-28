@@ -1,10 +1,10 @@
 import React, { ReactNode } from 'react';
 
 import SeerRemoveGemsFormProps from './types/seer-remove-gems-form-props';
+import CharacterGemModifierList from '../../../../../../../../reusable-components/character-gem/character-gem-modifier-list';
 import CraftingActionButton from '../../../shared/components/crafting-action-button';
 import CraftingActionLayout from '../../../shared/components/crafting-action-layout';
 import CraftingActionPreview from '../../../shared/components/crafting-action-preview';
-import { ElementalAtonementDefinition } from '../api/definitions/gem-comparison-api-response-definition';
 import { useSeerRemoveGemsFlow } from '../hooks/use-seer-remove-gems-flow';
 
 import { Alert } from 'ui/alerts/alert';
@@ -12,25 +12,6 @@ import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
-
-const renderAtonement = (
-  atonement: ElementalAtonementDefinition
-): ReactNode => (
-  <div className="space-y-2">
-    <dl className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-3">
-      {Object.entries(atonement.atonements).map(([name, amount]) => (
-        <div key={name}>
-          <dt className="font-semibold">{name}</dt>
-          <dd>{amount}</dd>
-        </div>
-      ))}
-    </dl>
-    <p>
-      <span className="font-semibold">Strongest elemental damage:</span>{' '}
-      {atonement.elemental_damage.name} ({atonement.elemental_damage.amount})
-    </p>
-  </div>
-);
 
 const SeerRemoveGemsForm = ({
   removalData,
@@ -138,7 +119,7 @@ const SeerRemoveGemsForm = ({
         <h4 className="font-semibold">
           Result after removing the selected Gem
         </h4>
-        {renderAtonement(selectedChange.comparisons)}
+        <CharacterGemModifierList modifiers={selectedChange.modifiers} />
       </section>
     );
   };
@@ -168,8 +149,13 @@ const SeerRemoveGemsForm = ({
           status={status ? 'success' : 'default'}
         >
           {renderSuccessText()}
-          <h4 className="font-semibold">Original atonement</h4>
-          {renderAtonement(selectedDetails.comparison.original_atonement)}
+          <h4 className="font-semibold">Gems that can be removed</h4>
+          {selectedDetails.comparison.removed_gems.map((gem) => (
+            <article key={gem.id} className="space-y-1">
+              <h5 className="font-semibold">{gem.name}</h5>
+              <CharacterGemModifierList modifiers={gem.modifiers} />
+            </article>
+          ))}
           <p>
             Remove one cost: {selectedDetails.remove_one_cost} Gold Bars. Remove
             all cost: {selectedDetails.remove_all_cost} Gold Bars.

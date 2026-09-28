@@ -3,6 +3,7 @@
 namespace Tests\Unit\Game\Battle\ServerFight\Fight\CharacterAttacks;
 
 use App\Game\Battle\ServerFight\Fight\CharacterAttacks\CharacterAttack;
+use App\Game\Battle\ServerFight\Fight\CharacterAttacks\GemAbilityExecutor;
 use App\Game\Battle\ServerFight\Fight\CharacterAttacks\Types\AttackAndCast;
 use App\Game\Battle\ServerFight\Fight\CharacterAttacks\Types\CastAndAttack;
 use App\Game\Battle\ServerFight\Fight\CharacterAttacks\Types\CastType;
@@ -48,8 +49,10 @@ class CharacterAttackTest extends TestCase
         $weaponType->shouldReceive('setAllowEntrancing')->once()->with(true);
         $weaponType->shouldReceive('doWeaponAttack')->once()->with($character, $monster);
         $weaponType->shouldReceive('getMessages')->once()->andReturn([['message' => 'weapon', 'type' => 'regular']]);
-        $weaponType->shouldReceive('getCharacterHealth')->once()->andReturn(900);
-        $weaponType->shouldReceive('getMonsterHealth')->once()->andReturn(1800);
+        $weaponType->shouldReceive('getCharacterHealth')->andReturn(900);
+        $weaponType->shouldReceive('getMonsterHealth')->andReturn(1800);
+        $weaponType->shouldReceive('setMonsterHealth')->once()->with(1800);
+        $weaponType->shouldReceive('mergeMessages')->once()->with([]);
         $weaponType->shouldReceive('resetMessages')->once();
 
         $characterAttack = new CharacterAttack(
@@ -58,6 +61,7 @@ class CharacterAttackTest extends TestCase
             Mockery::mock(AttackAndCast::class),
             Mockery::mock(CastAndAttack::class),
             Mockery::mock(Defend::class),
+            $this->gemAbilityExecutor(),
         );
 
         $result = $characterAttack->attack($character, $monster, false, 1000, 2000);
@@ -82,7 +86,10 @@ class CharacterAttackTest extends TestCase
         $castType->shouldReceive('setCharacterAttackData')->once()->with($character, true, AttackType::CAST->value);
         $castType->shouldReceive('setAllowEntrancing')->once()->with(true);
         $castType->shouldReceive('castAttack')->once()->with($character, $monster);
-        $castType->shouldReceive('getCharacterHealth')->once()->andReturn(950);
+        $castType->shouldReceive('getCharacterHealth')->andReturn(950);
+        $castType->shouldReceive('getMonsterHealth')->andReturn(2000);
+        $castType->shouldReceive('setMonsterHealth')->once()->with(2000);
+        $castType->shouldReceive('mergeMessages')->once()->with([]);
 
         $characterAttack = new CharacterAttack(
             Mockery::mock(WeaponType::class),
@@ -90,6 +97,7 @@ class CharacterAttackTest extends TestCase
             Mockery::mock(AttackAndCast::class),
             Mockery::mock(CastAndAttack::class),
             Mockery::mock(Defend::class),
+            $this->gemAbilityExecutor(),
         );
 
         $characterAttack->cast($character, $monster, true, 1000, 2000);
@@ -108,7 +116,10 @@ class CharacterAttackTest extends TestCase
         $attackAndCast->shouldReceive('setMonsterHealth')->once()->with(2000);
         $attackAndCast->shouldReceive('setCharacterAttackData')->once()->with($character, false, AttackType::ATTACK_AND_CAST->value);
         $attackAndCast->shouldReceive('handleAttack')->once()->with($character, $monster);
-        $attackAndCast->shouldReceive('getMonsterHealth')->once()->andReturn(1500);
+        $attackAndCast->shouldReceive('getCharacterHealth')->andReturn(1000);
+        $attackAndCast->shouldReceive('getMonsterHealth')->andReturn(1500);
+        $attackAndCast->shouldReceive('setMonsterHealth')->once()->with(1500);
+        $attackAndCast->shouldReceive('mergeMessages')->once()->with([]);
 
         $characterAttack = new CharacterAttack(
             Mockery::mock(WeaponType::class),
@@ -116,6 +127,7 @@ class CharacterAttackTest extends TestCase
             $attackAndCast,
             Mockery::mock(CastAndAttack::class),
             Mockery::mock(Defend::class),
+            $this->gemAbilityExecutor(),
         );
 
         $characterAttack->attackAndCast($character, $monster, false, 1000, 2000);
@@ -134,7 +146,10 @@ class CharacterAttackTest extends TestCase
         $castAndAttack->shouldReceive('setMonsterHealth')->once()->with(2000);
         $castAndAttack->shouldReceive('setCharacterCastAndAttackkData')->once()->with($character, false);
         $castAndAttack->shouldReceive('handleAttack')->once()->with($character, $monster);
-        $castAndAttack->shouldReceive('getMonsterHealth')->once()->andReturn(1600);
+        $castAndAttack->shouldReceive('getCharacterHealth')->andReturn(1000);
+        $castAndAttack->shouldReceive('getMonsterHealth')->andReturn(1600);
+        $castAndAttack->shouldReceive('setMonsterHealth')->once()->with(1600);
+        $castAndAttack->shouldReceive('mergeMessages')->once()->with([]);
 
         $characterAttack = new CharacterAttack(
             Mockery::mock(WeaponType::class),
@@ -142,6 +157,7 @@ class CharacterAttackTest extends TestCase
             Mockery::mock(AttackAndCast::class),
             $castAndAttack,
             Mockery::mock(Defend::class),
+            $this->gemAbilityExecutor(),
         );
 
         $characterAttack->castAndAttack($character, $monster, false, 1000, 2000);
@@ -157,10 +173,12 @@ class CharacterAttackTest extends TestCase
         $defend = Mockery::mock(Defend::class);
         $defend->shouldReceive('setIsRaidBoss')->once()->with(false);
         $defend->shouldReceive('setCharacterHealth')->once()->with(1000);
-        $defend->shouldReceive('setMonsterHealth')->once()->with(2000);
+        $defend->shouldReceive('setMonsterHealth')->twice()->with(2000);
         $defend->shouldReceive('setCharacterAttackData')->once()->with($character, false);
         $defend->shouldReceive('defend')->once()->with($character, $monster);
-        $defend->shouldReceive('getCharacterHealth')->once()->andReturn(1000);
+        $defend->shouldReceive('getCharacterHealth')->andReturn(1000);
+        $defend->shouldReceive('getMonsterHealth')->andReturn(2000);
+        $defend->shouldReceive('mergeMessages')->once()->with([]);
 
         $characterAttack = new CharacterAttack(
             Mockery::mock(WeaponType::class),
@@ -168,10 +186,24 @@ class CharacterAttackTest extends TestCase
             Mockery::mock(AttackAndCast::class),
             Mockery::mock(CastAndAttack::class),
             $defend,
+            $this->gemAbilityExecutor(),
         );
 
         $characterAttack->defend($character, $monster, false, 1000, 2000);
 
         $this->assertSame(1000, $characterAttack->getCharacterHealth());
+    }
+
+    private function gemAbilityExecutor(): GemAbilityExecutor
+    {
+        $executor = Mockery::mock(GemAbilityExecutor::class);
+        $executor->shouldReceive('execute')->once()->andReturnUsing(
+            fn ($character, string $attackType, int $characterHealth, int $monsterHealth): array => [
+                'monster_health' => $monsterHealth,
+                'messages' => [],
+            ]
+        );
+
+        return $executor;
     }
 }

@@ -13,7 +13,7 @@ use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Gems\Builders\GemBuilder;
-use App\Game\Gems\Transformers\GemTransformer;
+use App\Game\Gems\Transformers\CharacterGemTransformer;
 use App\Game\Gems\Values\GemTierValue;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Types\CraftingMessageTypes;
@@ -29,7 +29,7 @@ class GemService
     /**
      * @param GemBuilder $gemBuilder
      * @param ChanceCalculator $chanceCalculator
-     * @param GemTransformer $gemTransformer
+     * @param CharacterGemTransformer $gemTransformer
      * @param ServerMessageBuilder $serverMessageBuilder
      * @param CharacterGemSlotsTransformer $characterGemSlotsTransformer
      * @param SkillBonusService $skillBonusService
@@ -37,7 +37,7 @@ class GemService
     public function __construct(
         private readonly GemBuilder $gemBuilder,
         private readonly ChanceCalculator $chanceCalculator,
-        private readonly GemTransformer $gemTransformer,
+        private readonly CharacterGemTransformer $gemTransformer,
         private readonly ServerMessageBuilder $serverMessageBuilder,
         private readonly CharacterGemSlotsTransformer $characterGemSlotsTransformer,
         private readonly SkillBonusService $skillBonusService,
@@ -52,6 +52,14 @@ class GemService
      */
     public function generateGem(Character $character, int $tier): array
     {
+        if (! $this->gemBuilder->canBuildTier($tier)) {
+            return $this->errorResult('No enabled Gem abilities are available for Tier 1 crafting.') + [
+                'craft_succeeded' => false,
+                'crafted_gem' => null,
+                'crafted_gem_preview' => null,
+            ];
+        }
+
         if (! $this->canAffordCost($character, $tier)) {
             return $this->errorResult('You do not have the required currencies to craft this item.') + [
                 'craft_succeeded' => false,

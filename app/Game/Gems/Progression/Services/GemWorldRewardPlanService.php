@@ -4,7 +4,6 @@ namespace App\Game\Gems\Progression\Services;
 
 use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Chance\RandomNumberGenerator;
-use App\Game\Core\Items\Values\ItemSocketEligibility;
 use App\Game\Gems\Progression\Values\GemItemRarity;
 use App\Game\Gems\Progression\Values\GemProgressionBands;
 use App\Game\Gems\Progression\Values\GemScrollAggregate;
@@ -100,8 +99,8 @@ class GemWorldRewardPlanService
             return GemSpecialItemRollPlan::failed($candidateRarity);
         }
 
-        $socketCount = $this->randomNumberGenerator->numberBetween(1, ItemSocketEligibility::MAX_SOCKET_COUNT);
-        $gemCount = $this->randomNumberGenerator->numberBetween(1, $socketCount);
+        $socketCount = 1;
+        $gemCount = 1;
 
         return new GemSpecialItemRollPlan($candidateRarity, true, true, $socketCount, true, $gemCount);
     }
@@ -159,7 +158,7 @@ class GemWorldRewardPlanService
             return null;
         }
 
-        return $this->randomNumberGenerator->numberBetween(1, ItemSocketEligibility::MAX_SOCKET_COUNT);
+        return 1;
     }
 
     /**

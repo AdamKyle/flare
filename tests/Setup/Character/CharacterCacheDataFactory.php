@@ -13,15 +13,14 @@ use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HolyBuilde
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ReductionsBuilder;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\CharacterAttack\Transformers\CharacterAttackDataTransformer;
-use App\Game\Character\CharacterInventory\Transformers\CharacterGemsTransformer;
 use App\Game\Core\Combat\Values\ElementAttackData;
 use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
 use App\Game\Gems\Progression\Services\GemProgressionEffectService;
 use App\Game\Gems\Services\AreaGemEffectService;
-use App\Game\Gems\Services\GemComparison;
 use App\Game\Skills\Services\SkillBonusContextService;
 use App\Game\Skills\Services\SkillBonusService;
 use League\Fractal\Manager;
+use Tests\Setup\Gems\EmptyCharacterGemEffects;
 
 class CharacterCacheDataFactory
 {
@@ -30,12 +29,15 @@ class CharacterCacheDataFactory
      */
     public function build(): CharacterCacheData
     {
+        $characterGemEffects = new EmptyCharacterGemEffects;
+
         return new CharacterCacheData(
             new Manager(),
             new PlainDataSerializer(),
             new CharacterAttackDataTransformer(),
             $this->buildCharacterStatBuilder(),
             new SkillBonusService(new SkillBonusContextService),
+            $characterGemEffects,
         );
     }
 
@@ -44,24 +46,20 @@ class CharacterCacheDataFactory
      */
     public function buildCharacterStatBuilder(): CharacterStatBuilder
     {
+        $characterGemEffects = new EmptyCharacterGemEffects;
+
         return new CharacterStatBuilder(
             new DefenceBuilder(),
-            new DamageBuilder(new ClassRanksWeaponMasteriesBuilder()),
-            new HealingBuilder(new ClassRanksWeaponMasteriesBuilder()),
+            new DamageBuilder(new ClassRanksWeaponMasteriesBuilder($characterGemEffects)),
+            new HealingBuilder(new ClassRanksWeaponMasteriesBuilder($characterGemEffects)),
             new HolyBuilder(),
             new ReductionsBuilder(),
-            new ElementalAtonement(
-                new GemComparison(
-                    new CharacterGemsTransformer(),
-                    new PlainDataSerializer(),
-                    new Manager(),
-                ),
-                new ElementAttackData(),
-            ),
+            new ElementalAtonement($characterGemEffects, new ElementAttackData()),
             new CharacterAreaGemEffectService(
                 new AreaGemEffectService(),
                 new GemProgressionEffectService(),
             ),
+            $characterGemEffects,
         );
     }
 }

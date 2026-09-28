@@ -3,13 +3,22 @@
 namespace App\Game\Npcs\Actions\Seer\Transformers;
 
 use App\Flare\Models\GemBagSlot;
-use App\Game\Gems\Transformers\GemTransformer;
+use App\Game\Gems\Transformers\CharacterGemTransformer;
 use League\Fractal\TransformerAbstract;
 
 class SeerGemTransformer extends TransformerAbstract
 {
-    public function __construct(private readonly GemTransformer $gemTransformer) {}
+    /**
+     * @param CharacterGemTransformer $gemTransformer
+     */
+    public function __construct(private readonly CharacterGemTransformer $gemTransformer) {}
 
+    /**
+     * Transform a Gem Bag slot for Seer Gem selection.
+     *
+     * @param GemBagSlot $slot
+     * @return array
+     */
     public function transform(GemBagSlot $slot): array
     {
         return [

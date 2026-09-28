@@ -6,7 +6,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import GemDetails from './gem-details';
 import GemList from './gem-list';
 import GemBagProps from './types/gem-bag-props';
-import BaseGemDetails from '../../../../api-definitions/items/base-gem-details';
+import CharacterGemBagSlotDefinition from '../../../../api-definitions/gems/character-gem-bag-slot-definition';
 import { useInfiniteScroll } from '../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
 import InventoryStackBody from '../components/inventory-stack-body';
@@ -19,12 +19,11 @@ import Input from 'ui/input/input';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const GemBag = ({ character_id, initial_gem }: GemBagProps) => {
-  const [gemToView, setGemToView] = useState<BaseGemDetails | null>(
-    initial_gem ?? null
-  );
+  const [gemToView, setGemToView] =
+    useState<CharacterGemBagSlotDefinition | null>(initial_gem ?? null);
 
   const { data, error, loading, setSearchText, onEndReached } =
-    UsePaginatedApiHandler<BaseGemDetails>({
+    UsePaginatedApiHandler<CharacterGemBagSlotDefinition>({
       url: CharacterInventoryApiUrls.CHARACTER_GEM_BAG,
       urlParams: { character: character_id },
     });

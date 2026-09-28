@@ -4,7 +4,6 @@ namespace App\Game\Core\Items\Transformers;
 
 use App\Flare\Models\Item;
 use App\Game\Core\Items\Values\ItemUniqueness;
-use App\Game\Gems\Traits\GetItemAtonements;
 use League\Fractal\TransformerAbstract;
 
 /**
@@ -15,8 +14,6 @@ use League\Fractal\TransformerAbstract;
  */
 class BaseEquippableItemTransformer extends TransformerAbstract
 {
-    use GetItemAtonements;
-
     private $slotId = null;
 
     /**

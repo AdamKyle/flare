@@ -11,6 +11,7 @@ use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Items\Builders\BuildCosmicItem;
 use App\Game\Core\Items\Builders\BuildMythicItem;
 use App\Game\Core\Items\Builders\BuildUniqueItem;
+use App\Game\Core\Items\Services\ItemSocketRollService;
 use App\Game\Core\Items\Values\ItemSocketEligibility;
 use App\Game\Gems\Builders\GemBuilder;
 use App\Game\Gems\Progression\Values\GemItemRarity;
@@ -27,6 +28,7 @@ class GemWorldRewardDeliveryService
      * @param BattleRewardLedgerService $battleRewardLedgerService
      * @param GemScrollGenerator $gemScrollGenerator
      * @param ItemSocketEligibility $itemSocketEligibility
+     * @param ItemSocketRollService $itemSocketRollService
      * @param GemBuilder $gemBuilder
      * @param BuildUniqueItem $buildUniqueItem
      * @param BuildMythicItem $buildMythicItem
@@ -37,6 +39,7 @@ class GemWorldRewardDeliveryService
         private readonly BattleRewardLedgerService $battleRewardLedgerService,
         private readonly GemScrollGenerator $gemScrollGenerator,
         private readonly ItemSocketEligibility $itemSocketEligibility,
+        private readonly ItemSocketRollService $itemSocketRollService,
         private readonly GemBuilder $gemBuilder,
         private readonly BuildUniqueItem $buildUniqueItem,
         private readonly BuildMythicItem $buildMythicItem,
@@ -264,7 +267,10 @@ class GemWorldRewardDeliveryService
             return $item;
         }
 
-        $item->update(['socket_count' => $roll->socketCount()]);
+        $item->update([
+            'socket_count' => $this->itemSocketRollService->rollForGuaranteedSocketReward($item),
+            'has_gems_socketed' => false,
+        ]);
         $item = $item->refresh();
 
         if ($roll->preGemmed() && $item->socket_count > 0) {

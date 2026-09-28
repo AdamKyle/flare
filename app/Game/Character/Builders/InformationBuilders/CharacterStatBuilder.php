@@ -16,7 +16,9 @@ use App\Game\Character\Concerns\Boons;
 use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Core\Items\Values\ItemType;
+use App\Game\Gems\Contracts\CharacterGemEffects;
 use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
+use App\Game\Gems\Values\ResolvedCharacterGemEffects;
 use Exception;
 use Facades\App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ItemSkillAttribute;
 use Illuminate\Support\Collection;
@@ -53,6 +55,18 @@ class CharacterStatBuilder
 
     private float $areaGemCharacterPowerReduction = 0.0;
 
+    private ResolvedCharacterGemEffects $characterGemEffects;
+
+    /**
+     * @param DefenceBuilder $defenceBuilder
+     * @param DamageBuilder $damageBuilder
+     * @param HealingBuilder $healingBuilder
+     * @param HolyBuilder $holyBuilder
+     * @param ReductionsBuilder $reductionsBuilder
+     * @param ElementalAtonement $elementalAtonement
+     * @param CharacterAreaGemEffectService $characterAreaGemEffectService
+     * @param CharacterGemEffects $characterGemEffectService
+     */
     public function __construct(
         DefenceBuilder $defenceBuilder,
         DamageBuilder $damageBuilder,
@@ -61,6 +75,7 @@ class CharacterStatBuilder
         ReductionsBuilder $reductionsBuilder,
         ElementalAtonement $elementalAtonement,
         private readonly CharacterAreaGemEffectService $characterAreaGemEffectService,
+        private readonly CharacterGemEffects $characterGemEffectService,
     ) {
         $this->defenceBuilder = $defenceBuilder;
         $this->damageBuilder = $damageBuilder;
@@ -73,13 +88,19 @@ class CharacterStatBuilder
     /**
      * Set the character and their inventory.
      */
-    public function setCharacter(Character $character, bool $ignoreReductions = false): CharacterStatBuilder
-    {
+    public function setCharacter(
+        Character $character,
+        bool $ignoreReductions = false,
+        ?ResolvedCharacterGemEffects $resolvedCharacterGemEffects = null,
+    ): CharacterStatBuilder {
         $this->ignoreReductions = $ignoreReductions;
 
         $this->character = $character;
 
         $this->equippedItems = $this->fetchEquipped($character);
+
+        $this->characterGemEffects = $resolvedCharacterGemEffects
+            ?? $this->characterGemEffectService->resolveForCharacterId($character->id);
 
         $this->questItems = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->type === 'quest';
@@ -112,6 +133,7 @@ class CharacterStatBuilder
         $this->elementalAtonement->initialize($this->character, $this->skills, $this->equippedItems);
 
         $this->reductionsBuilder->initialize($this->character, $this->skills, $this->equippedItems);
+        $this->reductionsBuilder->setClassMasteryEffect($this->characterGemEffects->classMasteryEffect());
 
         return $this;
     }
@@ -191,7 +213,7 @@ class CharacterStatBuilder
      */
     public function statMod(string $stat, bool $voided = false): float
     {
-        $baseStat = $this->character->{$stat};
+        $baseStat = $this->character->{$stat} + $this->characterGemEffects->rawStat($stat);
 
         $baseStat = $baseStat + $baseStat * $this->fetchStatFromEquipment($stat, $voided);
 
@@ -203,7 +225,7 @@ class CharacterStatBuilder
             $classSpecialsBonus = $this->character->classSpecialsEquipped
                 ->where('equipped', true)
                 ->where('base_damage_stat_increase', '>', 0)
-                ->sum('base_damage_stat_increase');
+                ->sum('base_damage_stat_increase') * (1 + $this->characterGemEffects->classMasteryEffect());
 
             $baseStat = $baseStat + $baseStat * ($classSpecialsBonus + $this->character->base_damage_stat_mod);
         } else {
@@ -248,11 +270,12 @@ class CharacterStatBuilder
             return $slot->item->effect === ItemEffectType::PURGATORY->value;
         })->first();
 
-        if (! is_null($purgatoryQuestItem)) {
+        if (is_null($purgatoryQuestItem)) {
+            return 0.0;
+        }
 
-            if ($this->map->mapType()->isTheIcePlane() || $this->map->mapType()->isDelusionalMemories()) {
-                return $this->map->character_attack_reduction ?? 0.0;
-            }
+        if ($this->map->mapType()->isTheIcePlane() || $this->map->mapType()->isDelusionalMemories()) {
+            return $this->map->character_attack_reduction ?? 0.0;
         }
 
         return 0.0;
@@ -266,7 +289,7 @@ class CharacterStatBuilder
         $classSpecialsBonus = $this->character->classSpecialsEquipped
             ->where('equipped', true)
             ->where('health_mod', '>', 0)
-            ->sum('health_mod');
+            ->sum('health_mod') * (1 + $this->characterGemEffects->classMasteryEffect());
 
         $health = $this->statMod('dur', $voided);
 
@@ -332,7 +355,7 @@ class CharacterStatBuilder
         $classSpecialsBonus = $this->character->classSpecialsEquipped
             ->where('equipped', true)
             ->where('base_ac_mod', '>', 0)
-            ->sum('base_ac_mod');
+            ->sum('base_ac_mod') * (1 + $this->characterGemEffects->classMasteryEffect());
 
         $itemSkillBonus = 0;
 
@@ -340,7 +363,7 @@ class CharacterStatBuilder
             $itemSkillBonus = ItemSkillAttribute::fetchModifier($this->character, 'base_ac');
         }
 
-        return $defence + ($defence * ($holyBonus + $classSpecialsBonus + $itemSkillBonus));
+        return $defence + ($defence * ($holyBonus + $classSpecialsBonus + $itemSkillBonus + $this->characterGemEffects->baseAcModifier()));
     }
 
     /**
@@ -395,12 +418,12 @@ class CharacterStatBuilder
         $baseDamageClassSpecialsBonus = $this->character->classSpecialsEquipped
             ->where('equipped', true)
             ->where('base_damage_mod', '>', 0)
-            ->sum('base_damage_mod');
+            ->sum('base_damage_mod') * (1 + $this->characterGemEffects->classMasteryEffect());
 
         $baseSpellDamageClassSpecialsBonus = $this->character->classSpecialsEquipped
             ->where('equipped', true)
             ->where('base_spell_damage_mod', '>', 0)
-            ->sum('base_spell_damage_mod');
+            ->sum('base_spell_damage_mod') * (1 + $this->characterGemEffects->classMasteryEffect());
 
         $itemSkillBonus = 0;
 
@@ -413,7 +436,8 @@ class CharacterStatBuilder
 
         return ceil(
             $weaponAndRingDamage + ($weaponAndRingDamage * ($attackBonus + $baseDamageClassSpecialsBonus)) +
-            $spellDamage + ($spellDamage * ($attackBonus + $baseSpellDamageClassSpecialsBonus))
+            ($weaponDamage * $this->characterGemEffects->baseDamageModifier()) +
+            $spellDamage + ($spellDamage * ($attackBonus + $baseSpellDamageClassSpecialsBonus + $this->characterGemEffects->baseSpellDamageModifier()))
         );
     }
 
@@ -541,9 +565,9 @@ class CharacterStatBuilder
         $classSpecialsBonus = $this->character->classSpecialsEquipped
             ->where('equipped', true)
             ->where('base_damage_mod', '>', 0)
-            ->sum('base_damage_mod');
+            ->sum('base_damage_mod') * (1 + $this->characterGemEffects->classMasteryEffect());
 
-        return ceil($damage + ($damage * ($this->holyInfo()->fetchAttackBonus() + $classSpecialsBonus)));
+        return ceil($damage + ($damage * ($this->holyInfo()->fetchAttackBonus() + $classSpecialsBonus + $this->characterGemEffects->baseDamageModifier())));
     }
 
     /**
@@ -570,9 +594,9 @@ class CharacterStatBuilder
         $classSpecialsBonus = $this->character->classSpecialsEquipped
             ->where('equipped', true)
             ->where('base_spell_damage_mod', '>', 0)
-            ->sum('base_spell_damage_mod');
+            ->sum('base_spell_damage_mod') * (1 + $this->characterGemEffects->classMasteryEffect());
 
-        return ceil($damage + ($damage * ($this->holyInfo()->fetchAttackBonus() + $classSpecialsBonus)));
+        return ceil($damage + ($damage * ($this->holyInfo()->fetchAttackBonus() + $classSpecialsBonus + $this->characterGemEffects->baseSpellDamageModifier())));
     }
 
     /**
@@ -600,9 +624,9 @@ class CharacterStatBuilder
         $classSpecialsBonus = $this->character->classSpecialsEquipped
             ->where('equipped', true)
             ->where('base_healing_mod', '>', 0)
-            ->sum('base_healing_mod');
+            ->sum('base_healing_mod') * (1 + $this->characterGemEffects->classMasteryEffect());
 
-        return ceil($healing + ($healing * ($this->holyInfo()->fetchHealingBonus() + $classSpecialsBonus)));
+        return ceil($healing + ($healing * ($this->holyInfo()->fetchHealingBonus() + $classSpecialsBonus + $this->characterGemEffects->baseHealingModifier())));
     }
 
     /**
@@ -630,7 +654,7 @@ class CharacterStatBuilder
         $classSpecialsBonus = $this->character->classSpecialsEquipped
             ->where('equipped', true)
             ->where('base_healing_mod', '>', 0)
-            ->sum('base_healing_mod');
+            ->sum('base_healing_mod') * (1 + $this->characterGemEffects->classMasteryEffect());
 
         $itemSkillBonus = 0;
 
@@ -638,7 +662,7 @@ class CharacterStatBuilder
             $itemSkillBonus = ItemSkillAttribute::fetchModifier($this->character, 'base_healing');
         }
 
-        return ceil($healing + ($healing * ($this->holyInfo()->fetchHealingBonus() + $classSpecialsBonus + $itemSkillBonus)));
+        return ceil($healing + ($healing * ($this->holyInfo()->fetchHealingBonus() + $classSpecialsBonus + $itemSkillBonus + $this->characterGemEffects->baseHealingModifier())));
     }
 
     /**
@@ -736,16 +760,12 @@ class CharacterStatBuilder
      */
     public function buildAffixDamage(string $type, bool $voided = false): float|int
     {
-        switch ($type) {
-            case 'affix-stacking-damage':
-                return $this->damageBuilder->buildAffixStackingDamage($voided);
-            case 'affix-non-stacking':
-                return $this->damageBuilder->buildAffixNonStackingDamage($voided);
-            case 'life-stealing':
-                return $this->damageBuilder->buildLifeStealingDamage($voided);
-            default:
-                return 0;
-        }
+        return match ($type) {
+            'affix-stacking-damage' => $this->damageBuilder->buildAffixStackingDamage($voided),
+            'affix-non-stacking' => $this->damageBuilder->buildAffixNonStackingDamage($voided),
+            'life-stealing' => $this->damageBuilder->buildLifeStealingDamage($voided),
+            default => 0,
+        };
     }
 
     /**

@@ -231,7 +231,6 @@ class CharacterTopsApiTest extends TestCase
         $this->assertArrayHasKey('str_modifier', $itemPayload);
         $this->assertArrayHasKey('base_damage', $itemPayload);
         $this->assertArrayHasKey('base_ac_mod', $itemPayload);
-        $this->assertArrayHasKey('item_atonements', $itemPayload);
         $this->assertArrayHasKey('item_prefix', $itemPayload);
         $this->assertArrayHasKey('item_suffix', $itemPayload);
         $this->assertArrayHasKey('socket_amount', $itemPayload);

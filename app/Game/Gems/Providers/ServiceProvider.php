@@ -5,13 +5,11 @@ namespace App\Game\Gems\Providers;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Transformers\CharacterGemsTransformer;
-use App\Game\Core\Chance\RandomNumberGenerator;
-use App\Game\Gems\Builders\GemBuilder;
+use App\Game\Gems\Contracts\CharacterGemEffects;
 use App\Game\Gems\Progression\Contracts\CharacterAreaGemEffects;
 use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
 use App\Game\Gems\Services\AttachedGemService;
-use App\Game\Gems\Services\GemComparison;
-use App\Game\Gems\Services\ItemAtonements;
+use App\Game\Gems\Services\CharacterGemEffectService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 
@@ -22,9 +20,8 @@ class ServiceProvider extends ApplicationServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
-
         $this->app->bind(AttachedGemService::class, function ($app) {
             return new AttachedGemService(
                 $app->make(CharacterGemsTransformer::class),
@@ -34,23 +31,8 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(GemComparison::class, function ($app) {
-            return new GemComparison(
-                $app->make(CharacterGemsTransformer::class),
-                $app->make(PlainDataSerializer::class),
-                $app->make(Manager::class)
-            );
-        });
-
-        $this->app->bind(ItemAtonements::class, function ($app) {
-            return new ItemAtonements($app->make(GemComparison::class));
-        });
-
-        $this->app->bind(GemBuilder::class, function ($app) {
-            return new GemBuilder($app->make(RandomNumberGenerator::class));
-        });
-
         $this->app->bind(CharacterAreaGemEffects::class, CharacterAreaGemEffectService::class);
+        $this->app->bind(CharacterGemEffects::class, CharacterGemEffectService::class);
     }
 
     /**
@@ -58,5 +40,5 @@ class ServiceProvider extends ApplicationServiceProvider
      *
      * @return void
      */
-    public function boot() {}
+    public function boot(): void {}
 }

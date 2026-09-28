@@ -114,6 +114,16 @@
                                 <span>Passives</span>
                             </a>
                         </li>
+                        <li>
+                            <a
+                                href="{{ route('admin.gem-abilities.index') }}"
+                                class="menu-dropdown-item group {{ request()->routeIs('admin.gem-abilities.*') ? 'menu-dropdown-item-active' : 'menu-dropdown-item-inactive' }}"
+                                @if (request()->routeIs('admin.gem-abilities.*')) aria-current="page" @endif
+                            >
+                                <i class="ra ra-gem-pendant" aria-hidden="true"></i>
+                                <span>Gem Abilities</span>
+                            </a>
+                        </li>
                     </ul>
                 </section>
 
