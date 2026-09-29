@@ -4,9 +4,21 @@ export interface GuideQuestContentBlockDefinition {
   image_url: string | File | null;
 }
 
+export interface GuideQuestWalkthroughStepDefinition {
+  id?: number;
+  position: number;
+  title: string;
+  content: string;
+  target: string | null;
+  step_type: string;
+  required_event: string | null;
+  optional_if_target_missing: boolean;
+}
+
 export default interface GuideQuestDefinition {
   id: number;
   name: string;
+  instructions: string | null;
   intro_text: GuideQuestContentBlockDefinition[] | null;
   desktop_instructions: GuideQuestContentBlockDefinition[] | null;
   mobile_instructions: GuideQuestContentBlockDefinition[] | null;
@@ -61,4 +73,5 @@ export default interface GuideQuestDefinition {
   required_copper_coins: number | null;
   required_specialty_type: string | null;
   required_fame_level: number | null;
+  walkthrough_steps: GuideQuestWalkthroughStepDefinition[];
 }

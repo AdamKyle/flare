@@ -11,6 +11,8 @@ import { BattleType } from '../../enums/battle-type';
 import { BattleApiUrls } from '../enums/battle-api-urls';
 import UseAttackMonsterInitiationResponse from './definitions/use-attack-monster-initiation-response';
 import UseAttackMonsterRequestDefinition from './definitions/use-attack-monster-request-definition';
+import { GuideWalkthroughEvent } from '../../../../../guide-quests/walkthrough/enums/guide-walkthrough-event';
+import { useGuideWalkthroughEventEmitter } from '../../../../../guide-quests/walkthrough/hooks/use-guide-walkthrough-event-emitter';
 
 const isTerminalBattleResult = (
   result: UseAttackMonsterInitiationResponse
@@ -21,6 +23,7 @@ const isTerminalBattleResult = (
 export const useAttackMonster = (): UseAttackMonsterDefinition => {
   const { apiHandler, getUrl } = useApiHandler();
   const { handleInactivity } = useActivityTimeout();
+  const guideWalkthroughEventEmitter = useGuideWalkthroughEventEmitter();
 
   const [data, setData] = useState<UseAttackMonsterInitiationResponse | null>(
     null
@@ -77,6 +80,10 @@ export const useAttackMonster = (): UseAttackMonsterDefinition => {
       });
 
       setData(result);
+      guideWalkthroughEventEmitter.emit(
+        GuideWalkthroughEvent.FIGHT_STARTED,
+        undefined
+      );
 
       if (isTerminalBattleResult(result)) {
         setAwaitingAttackCooldownConfirmation(true);
@@ -91,7 +98,13 @@ export const useAttackMonster = (): UseAttackMonsterDefinition => {
         setError(err.response?.data || null);
       }
     }
-  }, [apiHandler, urlToUse, requestData, handleInactivity]);
+  }, [
+    apiHandler,
+    guideWalkthroughEventEmitter,
+    handleInactivity,
+    requestData,
+    urlToUse,
+  ]);
 
   const handleAttackMonster = useCallback(async () => {
     if (!requestData.attack_type || requestData.monster_id === 0) {
@@ -108,6 +121,10 @@ export const useAttackMonster = (): UseAttackMonsterDefinition => {
       });
 
       setData(result);
+      guideWalkthroughEventEmitter.emit(
+        GuideWalkthroughEvent.COMBAT_ACTION_SUCCEEDED,
+        undefined
+      );
 
       if (isTerminalBattleResult(result)) {
         setAwaitingAttackCooldownConfirmation(true);
@@ -122,7 +139,13 @@ export const useAttackMonster = (): UseAttackMonsterDefinition => {
         setError(err.response?.data || null);
       }
     }
-  }, [apiHandler, urlToUse, requestData, handleInactivity]);
+  }, [
+    apiHandler,
+    guideWalkthroughEventEmitter,
+    handleInactivity,
+    requestData,
+    urlToUse,
+  ]);
 
   const fetchBattleResults = useCallback(
     async () => {

@@ -18,6 +18,7 @@ class GuideQuestTransformer extends BaseTransformer
         return [
             'id' => $guideQuest->id,
             'name' => $guideQuest->name,
+            'instructions' => $guideQuest->instructions,
             'intro_text' => $guideQuest->intro_text,
             'desktop_instructions' => $guideQuest->desktop_instructions,
             'mobile_instructions' => $guideQuest->mobile_instructions,

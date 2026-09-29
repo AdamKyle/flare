@@ -3,6 +3,8 @@ import React from 'react';
 
 import StatsAttributesBlockRow from './stat-attributes-block-row';
 import { EquippableItemWithBase } from '../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
+import { useGuideTarget } from '../../../../components/guide-quests/walkthrough/hooks/use-guide-target';
+import { GuideTargets } from '../../../../components/guide-quests/walkthrough/registry/guide-targets';
 
 import Dl from 'ui/dl/dl';
 import Separator from 'ui/separator/separator';
@@ -12,8 +14,10 @@ type StatsBlockProps = {
 };
 
 const StatsAttributesBlock = ({ item }: StatsBlockProps) => {
+  const itemStatsGuideTarget = useGuideTarget(GuideTargets.ITEM_STATS);
+
   return (
-    <div>
+    <div {...itemStatsGuideTarget}>
       <h3 className="text-mango-tango-500 dark:text-mango-tango-300 mb-1 text-sm font-semibold tracking-wide uppercase">
         Stats
       </h3>

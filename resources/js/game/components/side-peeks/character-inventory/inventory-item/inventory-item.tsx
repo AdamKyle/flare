@@ -3,7 +3,14 @@ import { AnimatePresence } from 'framer-motion';
 import { isNil } from 'lodash';
 import React, { ReactNode, useState } from 'react';
 
+import { EquippableItemDetailsDefinition } from '../../../../api-definitions/items/equippable-item-definitions/equippable-item-details-definition';
+import { ItemActions } from '../../../../reusable-components/item/enums/item-actions';
+import ItemAction from '../../../../reusable-components/item/item-action';
+import ListItemOnMarket from '../../../../reusable-components/item/list-item-on-market';
+import { InventoryItemTypes } from '../../../character-sheet/partials/character-inventory/enums/inventory-item-types';
 import { planeTextItemColors } from '../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
+import { useGuideTarget } from '../../../guide-quests/walkthrough/hooks/use-guide-target';
+import { GuideTargets } from '../../../guide-quests/walkthrough/registry/guide-targets';
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
 import InventoryStackBody from '../components/inventory-stack-body';
 import { useEquipmentManagementRestriction } from '../hooks/use-equipment-management-restriction';
@@ -24,11 +31,6 @@ import ItemMetaSection from './partials/item-view/item-meta-tsx';
 import StatsSection from './partials/item-view/stats-section';
 import MoveToSet from './partials/move-to-set/move-to-set';
 import InventoryItemProps from './types/inventory-item-props';
-import { EquippableItemDetailsDefinition } from '../../../../api-definitions/items/equippable-item-definitions/equippable-item-details-definition';
-import { ItemActions } from '../../../../reusable-components/item/enums/item-actions';
-import ItemAction from '../../../../reusable-components/item/item-action';
-import ListItemOnMarket from '../../../../reusable-components/item/list-item-on-market';
-import { InventoryItemTypes } from '../../../character-sheet/partials/character-inventory/enums/inventory-item-types';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 
@@ -55,6 +57,7 @@ const InventoryItem = ({
   const [viewingItemSkills, setViewingItemSkills] = useState(false);
   const [selectedItemAction, setSelectedItemAction] =
     useState<ItemActions | null>(null);
+  const equipItemGuideTarget = useGuideTarget(GuideTargets.ITEM_EQUIP_ACTION);
 
   const { error, loading, data, refetch } = useGetInventoryItemDetails({
     character_id,
@@ -322,7 +325,10 @@ const InventoryItem = ({
 
     return (
       <div className="flex flex-col items-stretch gap-3 text-center sm:flex-row sm:items-center sm:justify-center sm:gap-6">
-        <div className="flex justify-center sm:justify-end">
+        <div
+          className="flex justify-center sm:justify-end"
+          {...equipItemGuideTarget}
+        >
           <Button
             on_click={handleViewEquip}
             label="Equip Item"

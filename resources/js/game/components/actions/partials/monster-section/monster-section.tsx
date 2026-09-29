@@ -24,6 +24,8 @@ import MonsterSectionProps from './types/monster-section-props';
 import { getImageTierByIndex } from './util/monster-image-tier';
 import FactionLoyaltyAutomationStatus from '../../../factions/components/faction-loyalty-automation-status';
 import { useFactionLoyaltyContext } from '../../../factions/hooks/use-faction-loyalty-context';
+import { useGuideTarget } from '../../../guide-quests/walkthrough/hooks/use-guide-target';
+import { GuideTargets } from '../../../guide-quests/walkthrough/registry/guide-targets';
 import AttackButtonsContainer from '../../components/fight-section/attack-buttons-container';
 import AttackCooldownTimer from '../../components/fight-section/attack-cooldown-timer';
 import AttackMessages from '../../components/fight-section/attack-messages';
@@ -74,6 +76,15 @@ const MonsterSection = ({
   const [showExplorationConfiguration, setShowExplorationConfiguration] =
     useState(false);
   const [showDelveConfiguration, setShowDelveConfiguration] = useState(false);
+  const initiateFightGuideTarget = useGuideTarget(
+    GuideTargets.MANUAL_FIGHT_INITIATE
+  );
+  const manualFightActionsGuideTarget = useGuideTarget(
+    GuideTargets.MANUAL_FIGHT_ACTIONS
+  );
+  const battleMessagesGuideTarget = useGuideTarget(
+    GuideTargets.BATTLE_MESSAGES
+  );
 
   const characterId = gameData?.character?.id ?? 0;
   const userId = gameData?.character?.user_id ?? 0;
@@ -369,7 +380,7 @@ const MonsterSection = ({
 
     if (isNil(monsterToFight)) {
       return (
-        <div className="my-4 text-center">
+        <div className="my-4 text-center" {...initiateFightGuideTarget}>
           {renderAttackCooldownTimer()}
           <Button
             on_click={handelMonsterSelection}
@@ -434,7 +445,7 @@ const MonsterSection = ({
       }
 
       return (
-        <>
+        <div {...manualFightActionsGuideTarget}>
           <AttackButtonsContainer>
             <Button
               label="Attack"
@@ -476,7 +487,7 @@ const MonsterSection = ({
               disabled={isAttackDisabled}
             />
           </AttackButtonsContainer>
-        </>
+        </div>
       );
     };
 
@@ -500,7 +511,9 @@ const MonsterSection = ({
         {renderAttackCooldownTimer()}
         {renderAttackButtons()}
         {renderAttackAgainButton()}
-        <AttackMessages messages={data?.attack_messages || []} />
+        <div {...battleMessagesGuideTarget}>
+          <AttackMessages messages={data?.attack_messages || []} />
+        </div>
       </>
     );
   };

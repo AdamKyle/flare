@@ -14,6 +14,7 @@ export default interface GameDataDefinition {
   monsters: MonsterDefinition[] | [];
   announcements: AnnouncementMessageDefinition[] | [];
   hasNewAnnouncements: boolean;
+  hasGuideQuestAttention: boolean;
   explorationOutput: ExplorationOutputResponseDefinition | null;
   battleRewardProgression: BattleRewardProgressionDefinition | null;
 }

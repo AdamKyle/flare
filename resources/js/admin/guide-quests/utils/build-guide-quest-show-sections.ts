@@ -75,6 +75,16 @@ export const buildGuideQuestShowSections = (
   guideQuest: GuideQuestDetailDefinition
 ): GuideQuestShowSectionDefinition[] => [
   {
+    title: 'Guided Walkthrough',
+    rows:
+      guideQuest.walkthrough_steps.length === 0
+        ? [{ label: 'Walkthrough', value: 'No guided walkthrough configured.' }]
+        : guideQuest.walkthrough_steps.map((step) => ({
+            label: `Step ${step.position}: ${step.title}`,
+            value: `${step.step_type} · ${step.target ?? 'No target'} · ${step.required_event ?? 'No event'}`,
+          })),
+  },
+  {
     title: 'Progression',
     rows: [
       { label: 'Required Level', value: guideQuest.required_level },

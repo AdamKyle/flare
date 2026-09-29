@@ -15,7 +15,7 @@ const ActivityStatusIndicator = ({
         className="far fa-bell text-mango-tango-600 dark:text-mango-tango-400 animate-pulse motion-reduce:animate-none"
         aria-hidden="true"
       />
-      <span className="sr-only">New announcements available</span>
+      <span className="sr-only">New activity available</span>
     </span>
   );
 };

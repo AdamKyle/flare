@@ -3,7 +3,6 @@ import { useCallback, useRef, useState } from 'react';
 
 import BatchApiCallsParameterDefinition from './definitions/batch-api-calls-parameter-definition';
 import UseBatchApiCallsDefinition from './definitions/use-batch-api-calls-definition';
-import { BatchApiCallKey } from './enums/batch-api-call-key';
 
 import GameDataDefinition from 'game-data/deffinitions/game-data-definition';
 
@@ -18,6 +17,7 @@ export const useBatchApiCalls = (
     monsters: [],
     announcements: [],
     hasNewAnnouncements: false,
+    hasGuideQuestAttention: false,
     explorationOutput: null,
     battleRewardProgression: null,
   });
@@ -40,14 +40,6 @@ export const useBatchApiCalls = (
             ...prevData,
             [key]: responseData,
           };
-
-          if (
-            key === BatchApiCallKey.ANNOUNCEMENTS &&
-            Array.isArray(responseData) &&
-            responseData.length > 0
-          ) {
-            nextData.hasNewAnnouncements = true;
-          }
 
           return nextData;
         });

@@ -182,9 +182,9 @@ const GameDataProvider = (props: GameDataProviderProps) => {
     });
   };
 
-  const markAnnouncementsSeen = (): void => {
+  const markAnnouncementsSeen = useCallback((): void => {
     setGameData((prev): GameDataDefinition | null => {
-      if (!prev) {
+      if (!prev || !prev.hasNewAnnouncements) {
         return prev;
       }
 
@@ -193,7 +193,17 @@ const GameDataProvider = (props: GameDataProviderProps) => {
         hasNewAnnouncements: false,
       };
     });
-  };
+  }, []);
+
+  const setGuideQuestAttention = useCallback((active: boolean): void => {
+    setGameData((previous): GameDataDefinition | null => {
+      if (!previous || previous.hasGuideQuestAttention === active) {
+        return previous;
+      }
+
+      return { ...previous, hasGuideQuestAttention: active };
+    });
+  }, []);
 
   const handleOnExplorationOutputUpdate = (
     data: ExplorationOutputResponseDefinition
@@ -370,6 +380,7 @@ const GameDataProvider = (props: GameDataProviderProps) => {
         updateCharacter,
         listenForMonsterUpdates,
         markAnnouncementsSeen,
+        setGuideQuestAttention,
         clearExplorationOutput,
       }}
     >

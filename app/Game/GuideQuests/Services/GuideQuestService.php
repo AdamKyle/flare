@@ -5,6 +5,7 @@ namespace App\Game\GuideQuests\Services;
 use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\BatchCrafting;
 use App\Flare\Models\Character;
+use App\Flare\Models\CharacterGuideQuestProgress;
 use App\Flare\Models\Event;
 use App\Flare\Models\GuideQuest;
 use App\Flare\Models\QuestsCompleted;
@@ -66,11 +67,14 @@ class GuideQuestService
 
         foreach ($quests as $quest) {
             $canHandInQuest = $this->canHandInQuest($character, $quest, true);
+            $this->appendWalkthroughStatus($character, $quest);
 
             $canHandIn[] = [
                 'quest_id' => $quest->id,
                 'can_hand_in' => $canHandInQuest,
             ];
+
+            $this->recordNewHandInAttention($character, $quest, $canHandInQuest);
 
             $completedAttributes[] = [
                 'quest_id' => $quest->id,
@@ -86,7 +90,100 @@ class GuideQuestService
             'quests' => $quests,
             'completed_requirements' => $completedAttributes,
             'can_hand_in' => $canHandIn,
+            'has_activity_attention' => $this->hasUnacknowledgedAttention($character, $quests),
         ];
+    }
+
+    /**
+     * Append lightweight Character walkthrough status without exposing step definitions.
+     *
+     * @param Character $character
+     * @param GuideQuest $guideQuest
+     * @return void
+     */
+    private function appendWalkthroughStatus(Character $character, GuideQuest $guideQuest): void
+    {
+        $progress = CharacterGuideQuestProgress::where('character_id', $character->id)
+            ->where('guide_quest_id', $guideQuest->id)
+            ->first();
+
+        if (! is_null($progress?->walkthrough_completed_at)) {
+            $guideQuest->setAttribute('walkthrough_status', 'completed');
+
+            return;
+        }
+
+        if (! is_null($progress?->started_at)) {
+            $guideQuest->setAttribute('walkthrough_status', 'in_progress');
+
+            return;
+        }
+
+        $guideQuest->setAttribute('walkthrough_status', 'not_started');
+    }
+
+    /**
+     * Acknowledge attention for the Character's currently applicable Guide Quests.
+     *
+     * @param Character $character
+     * @return void
+     */
+    public function acknowledgeAttention(Character $character): void
+    {
+        $questIds = collect($this->fetchNextGuideQuest($character))->pluck('id');
+
+        CharacterGuideQuestProgress::where('character_id', $character->id)
+            ->whereIn('guide_quest_id', $questIds)
+            ->whereNotNull('hand_in_ready_at')
+            ->whereNull('attention_acknowledged_at')
+            ->update(['attention_acknowledged_at' => now()]);
+    }
+
+    /**
+     * Persist the first transition into a hand-in-ready state.
+     *
+     * @param Character $character
+     * @param GuideQuest $guideQuest
+     * @param bool $canHandIn
+     * @return void
+     */
+    private function recordNewHandInAttention(
+        Character $character,
+        GuideQuest $guideQuest,
+        bool $canHandIn,
+    ): void {
+        if (! $canHandIn) {
+            return;
+        }
+
+        CharacterGuideQuestProgress::firstOrCreate(
+            [
+                'character_id' => $character->id,
+                'guide_quest_id' => $guideQuest->id,
+            ],
+            ['hand_in_ready_at' => now()],
+        );
+
+        CharacterGuideQuestProgress::where('character_id', $character->id)
+            ->where('guide_quest_id', $guideQuest->id)
+            ->whereNull('hand_in_ready_at')
+            ->update(['hand_in_ready_at' => now()]);
+    }
+
+    /**
+     * Determine whether current Guide Quests have unacknowledged ready attention.
+     *
+     * @param Character $character
+     * @param array $quests
+     * @return bool
+     */
+    private function hasUnacknowledgedAttention(Character $character, array $quests): bool
+    {
+        return CharacterGuideQuestProgress::where('character_id', $character->id)
+            ->whereIn('guide_quest_id', collect($quests)->pluck('id'))
+            ->whereNotNull('hand_in_ready_at')
+            ->whereNull('attention_acknowledged_at')
+            ->exists();
     }
 
     /**

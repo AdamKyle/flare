@@ -3,6 +3,8 @@ import { useApiHandler } from 'api-handler/hooks/use-api-handler';
 import { AxiosError, AxiosRequestConfig } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 
+import { GuideWalkthroughEvent } from '../../../../../guide-quests/walkthrough/enums/guide-walkthrough-event';
+import { useGuideWalkthroughEventEmitter } from '../../../../../guide-quests/walkthrough/hooks/use-guide-walkthrough-event-emitter';
 import { CharacterInventoryApiUrls } from '../../../api/enums/character-inventory-api-urls';
 import UseEquipItemApiDefinition from '../definitions/use-equip-item-api-definition';
 import UseEquipItemApiResponseDefinition from '../definitions/use-equip-item-api-response-definition';
@@ -16,6 +18,7 @@ export const useEquipItem = ({
 }: UseEquipItemParamsDefinition): UseEquipItemApiDefinition => {
   const { apiHandler, getUrl } = useApiHandler();
   const { handleInactivity } = useActivityTimeout();
+  const guideWalkthroughEventEmitter = useGuideWalkthroughEventEmitter();
 
   const [error, setError] = useState<UseEquipItemApiDefinition['error']>(null);
   const [loading, setLoading] = useState(false);
@@ -51,6 +54,10 @@ export const useEquipItem = ({
         });
 
         on_success(result.message);
+        guideWalkthroughEventEmitter.emit(
+          GuideWalkthroughEvent.ITEM_EQUIPPED,
+          undefined
+        );
 
         setLoading(false);
       } catch (err) {

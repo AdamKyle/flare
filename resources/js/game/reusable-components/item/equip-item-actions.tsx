@@ -18,6 +18,8 @@ import {
   InventoryItemTypes,
 } from '../../components/character-sheet/partials/character-inventory/enums/inventory-item-types';
 import { planeTextItemColors } from '../../components/character-sheet/partials/character-inventory/styles/backpack-item-styles';
+import { useGuideTarget } from '../../components/guide-quests/walkthrough/hooks/use-guide-target';
+import { GuideTargets } from '../../components/guide-quests/walkthrough/registry/guide-targets';
 import CurrencyDisplay from '../currency/currency-display';
 import { CurrencyDisplayMode } from '../currency/enums/currency-display-mode';
 import { CurrencyType } from '../currency/enums/currency-type';
@@ -37,6 +39,7 @@ const EquipItemActions = ({
 }: EquipItemActionProps) => {
   const [equippedPosition, setEquippedPosition] =
     useState<ItemPositions | null>(null);
+  const equipItemGuideTarget = useGuideTarget(GuideTargets.ITEM_EQUIP_ACTION);
 
   const itemToEquip = comparison_details.item_to_equip;
   const comparisonRows = comparison_details.details;
@@ -337,14 +340,16 @@ const EquipItemActions = ({
   }
 
   return (
-    <ActionBoxBase
-      variant={ActionBoxVariant.DEFAULT}
-      actions={renderEquipItemDetails()}
-    >
-      {renderHeader()}
+    <div {...equipItemGuideTarget}>
+      <ActionBoxBase
+        variant={ActionBoxVariant.DEFAULT}
+        actions={renderEquipItemDetails()}
+      >
+        {renderHeader()}
 
-      <div>{renderEquipSummary()}</div>
-    </ActionBoxBase>
+        <div>{renderEquipSummary()}</div>
+      </ActionBoxBase>
+    </div>
   );
 };
 

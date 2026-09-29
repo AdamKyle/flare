@@ -10,6 +10,7 @@ use App\Game\Skills\Values\SkillTypeValue;
 use Database\Factories\GuideQuestFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class GuideQuest extends Model
 {
@@ -169,7 +170,28 @@ class GuideQuest extends Model
         'required_to_be_on_game_map_name',
         'required_batch_crafting_type_name',
         'required_batch_crafted_item_names',
+        'has_walkthrough',
     ];
+
+    /**
+     * Return the ordered walkthrough steps owned by this Guide Quest.
+     *
+     * @return HasMany
+     */
+    public function walkthroughSteps(): HasMany
+    {
+        return $this->hasMany(GuideQuestWalkthroughStep::class)->orderBy('position');
+    }
+
+    /**
+     * Determine whether this Guide Quest has an authored walkthrough.
+     *
+     * @return bool
+     */
+    public function getHasWalkthroughAttribute(): bool
+    {
+        return $this->walkthroughSteps()->exists();
+    }
 
     public function getSkillNameAttribute()
     {

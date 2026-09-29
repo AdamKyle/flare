@@ -19,7 +19,9 @@ export const useActivityActions = (): UseActivityActionsDefinition => {
   }, [markAnnouncementsSeen, openAnnouncements]);
 
   return {
-    has_new_announcements: gameData?.hasNewAnnouncements ?? false,
+    has_new_announcements:
+      (gameData?.hasNewAnnouncements ?? false) ||
+      (gameData?.hasGuideQuestAttention ?? false),
     open_announcements: handleOpenAnnouncements,
     open_guide_quests: openGuideQuestsScreen,
     open_donations: openDonationScreen,

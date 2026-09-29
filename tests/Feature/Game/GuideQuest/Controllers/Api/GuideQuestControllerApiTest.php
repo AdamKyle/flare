@@ -7,12 +7,13 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGuideQuest;
+use Tests\Traits\CreateGuideQuestWalkthrough;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
 class GuideQuestControllerApiTest extends TestCase
 {
-    use CreateGuideQuest, CreateItem, CreateItemAffix, RefreshDatabase;
+    use CreateGuideQuest, CreateGuideQuestWalkthrough, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character = null;
 
@@ -90,6 +91,32 @@ class GuideQuestControllerApiTest extends TestCase
         foreach ($jsonData['can_hand_in'] as $canHandIn) {
             $this->assertTrue($canHandIn['can_hand_in']);
         }
+    }
+
+    public function test_walkthrough_steps_are_loaded_only_from_the_dedicated_endpoint(): void
+    {
+        $guideQuest = $this->createGuideQuest([
+            'required_level' => 2,
+        ]);
+        $step = $this->createGuideQuestWalkthroughStep([
+            'guide_quest_id' => $guideQuest->id,
+            'title' => 'Start a Fight',
+        ]);
+        $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
+
+        $currentQuestResponse = $this->actingAs($character->user)
+            ->getJson('/api/character/guide-quest/'.$character->user->id);
+
+        $currentQuestResponse->assertOk()
+            ->assertJsonPath('quests.0.has_walkthrough', true)
+            ->assertJsonMissingPath('quests.0.walkthrough_steps');
+
+        $this->actingAs($character->user)
+            ->getJson('/api/character/'.$character->user->id.'/guide-quests/'.$guideQuest->id.'/walkthrough')
+            ->assertOk()
+            ->assertJsonPath('guide_quest_id', $guideQuest->id)
+            ->assertJsonPath('current_step_id', $step->id)
+            ->assertJsonPath('steps.0.title', 'Start a Fight');
     }
 
     public function test_current_quest_response_includes_independent_batch_crafted_item_requirements(): void

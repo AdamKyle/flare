@@ -42,4 +42,17 @@ class GuideQuestsController extends Controller
             'message' => 'You cannot hand in this guide quest. You must meet all the requirements first.',
         ], 422);
     }
+
+    /**
+     * Acknowledge current Guide Quest Activity attention for the authenticated user.
+     *
+     * @param User $user
+     * @return JsonResponse
+     */
+    public function acknowledgeAttention(User $user): JsonResponse
+    {
+        $this->guideQuestService->acknowledgeAttention($user->character);
+
+        return response()->json(['message' => 'Guide Quest attention acknowledged.']);
+    }
 }

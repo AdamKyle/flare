@@ -54,6 +54,7 @@
     "axios": "1.19.0",
     "clsx": "2.1.1",
     "date-fns": "4.4.0",
+    "driver.js": "1.8.0",
     "framer-motion": "13.1.1",
     "laravel-echo": "2.4.0",
     "lexical": "0.49.0",

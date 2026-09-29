@@ -86,6 +86,23 @@ const ManageGuideQuestsBasicQuestAttributes = ({
           />
         </div>
 
+        <div className="mt-4">
+          <label
+            htmlFor="guide-quest-information"
+            className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200"
+          >
+            General Information
+          </label>
+          <textarea
+            id="guide-quest-information"
+            defaultValue={guideQuest?.instructions ?? ''}
+            onChange={(event) =>
+              handleUpdateFormData('instructions', event.target.value)
+            }
+            className="min-h-32 w-full rounded-sm border border-gray-300 bg-white p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100"
+          />
+        </div>
+
         <div className="my-4 flex items-center">
           <span className="h-px flex-1 bg-gray-300 dark:bg-gray-700" />
           <span className="px-3 text-sm text-gray-500 dark:text-gray-400">

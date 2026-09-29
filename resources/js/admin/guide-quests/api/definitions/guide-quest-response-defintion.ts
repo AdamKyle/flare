@@ -1,5 +1,10 @@
 import GuideQuestDefinition from './guide-quest-definition';
 
+export interface GuideQuestWalkthroughOptionDefinition {
+  value: string;
+  label: string;
+}
+
 export default interface GuideQuestResponseDefinition {
   guide_quest: GuideQuestDefinition;
   game_skills: { [key: number]: string };
@@ -13,4 +18,8 @@ export default interface GuideQuestResponseDefinition {
   guide_quests: { [key: number]: string } | null;
   game_maps: { [key: number]: string };
   item_specialty_types: { [key: string]: string };
+  walkthrough_steps: GuideQuestDefinition['walkthrough_steps'];
+  walkthrough_target_options: GuideQuestWalkthroughOptionDefinition[];
+  walkthrough_event_options: GuideQuestWalkthroughOptionDefinition[];
+  walkthrough_step_type_options: GuideQuestWalkthroughOptionDefinition[];
 }

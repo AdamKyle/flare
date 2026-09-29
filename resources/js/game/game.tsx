@@ -5,6 +5,8 @@ import React from 'react';
 import { ServiceContainer } from 'service-container-provider/service-container';
 
 import { EchoHandlerProvider } from '../websocket-handler/components/echo-handler-provider';
+import GuideQuestProvider from './components/guide-quests/components/guide-quest-provider';
+import GuideWalkthroughProvider from './components/guide-quests/walkthrough/components/guide-walkthrough-provider';
 import BaseSidePeek from './components/side-peeks/base/base-side-peek';
 import GameSection from './game-section';
 
@@ -17,10 +19,14 @@ export const Game = () => {
         <ApiHandlerProvider>
           <EchoHandlerProvider>
             <GameDataProvider>
-              <BaseSidePeek />
-              <AppScreenProvider>
-                <GameSection />
-              </AppScreenProvider>
+              <GuideQuestProvider>
+                <GuideWalkthroughProvider>
+                  <BaseSidePeek />
+                  <AppScreenProvider>
+                    <GameSection />
+                  </AppScreenProvider>
+                </GuideWalkthroughProvider>
+              </GuideQuestProvider>
             </GameDataProvider>
           </EchoHandlerProvider>
         </ApiHandlerProvider>

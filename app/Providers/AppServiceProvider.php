@@ -13,6 +13,7 @@ use App\Console\AfterDeployment\CreateMonsterCache;
 use App\Console\AfterDeployment\FlagUsersWithMissingCharacterInventories;
 use App\Console\AfterDeployment\MoveAlchemyAndGemsToBags;
 use App\Console\AfterDeployment\RemoveAllGemsForRebuild;
+use App\Console\AfterDeployment\RemoveAllGuideQuestsForRebuild;
 use App\Console\AfterDeployment\RemoveRacialStatBonuses;
 use App\Console\AfterDeployment\RepairQuestFeatureRewards;
 use App\Console\AfterDeployment\RepairStuckExplorationLogs;
@@ -64,6 +65,7 @@ class AppServiceProvider extends ServiceProvider
             FlagUsersWithMissingCharacterInventories::class,
             RemoveRacialStatBonuses::class,
             RemoveAllGemsForRebuild::class,
+            RemoveAllGuideQuestsForRebuild::class,
             CreateGemWorlds::class,
 
             // Development Commands:

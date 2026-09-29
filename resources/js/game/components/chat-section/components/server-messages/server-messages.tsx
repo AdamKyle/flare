@@ -2,6 +2,8 @@ import React from 'react';
 
 import ServerMessagesProps from './definitions/server-messages-props';
 import ServerMessagesDefinition from '../../../../api-definitions/chat/server-messages-definition';
+import { useGuideTarget } from '../../../guide-quests/walkthrough/hooks/use-guide-target';
+import { GuideTargets } from '../../../guide-quests/walkthrough/registry/guide-targets';
 import { useOpenItemDetails } from '../../hooks/use-open-item-details';
 import { formatMessageTimestamp } from '../../utils/format-message-timestamp';
 
@@ -19,6 +21,9 @@ const buildServerMessageKey = (
 const ServerMessages = ({ server_messages }: ServerMessagesProps) => {
   const { openServerMessageItem } = useOpenItemDetails();
   const { characterId } = useGameData();
+  const serverMessageItemGuideTarget = useGuideTarget(
+    GuideTargets.SERVER_MESSAGE_ITEM
+  );
 
   const renderTimestamp = (serverMessage: ServerMessagesDefinition) => {
     return (
@@ -39,11 +44,13 @@ const ServerMessages = ({ server_messages }: ServerMessagesProps) => {
     }
 
     return (
-      <LinkButton
-        label={serverMessage.message}
-        variant={ButtonVariant.SERVER_MESSAGE_LINK}
-        on_click={() => openServerMessageItem(characterId, slotId)}
-      />
+      <span {...serverMessageItemGuideTarget}>
+        <LinkButton
+          label={serverMessage.message}
+          variant={ButtonVariant.SERVER_MESSAGE_LINK}
+          on_click={() => openServerMessageItem(characterId, slotId)}
+        />
+      </span>
     );
   };
 

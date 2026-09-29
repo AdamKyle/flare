@@ -79,10 +79,10 @@
             <tr>
                 <td>{{ $guideQuest->id }}</td>
                 <td>{{ $guideQuest->name }}</td>
-                <td>{{ nl2br($guideQuest->intro_text) }}</td>
-                <td>{{ nl2br($guideQuest->instructions) }}</td>
-                <td>{{ nl2br($guideQuest->desktop_instructions) }}</td>
-                <td>{{ nl2br($guideQuest->mobile_instructions) }}</td>
+                <td>{{ json_encode($guideQuest->intro_text, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) }}</td>
+                <td>{{ $guideQuest->instructions }}</td>
+                <td>{{ json_encode($guideQuest->desktop_instructions, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) }}</td>
+                <td>{{ json_encode($guideQuest->mobile_instructions, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) }}</td>
                 <td>{{ $guideQuest->required_level }}</td>
                 <td>{{ $guideQuest->required_reincarnation_amount }}</td>
                 <td>{{ !is_null($guideQuest->required_skill) ? $guideQuest->skill_name : '' }}</td>

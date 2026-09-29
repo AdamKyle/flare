@@ -5,6 +5,7 @@ namespace App\Admin\Controllers\Api\GuideQuests;
 use App\Admin\Requests\GuideQuestIndexRequest;
 use App\Admin\Requests\GuideQuestRequest;
 use App\Admin\Requests\GuideQuestStoreRequest;
+use App\Admin\Requests\GuideQuestWalkthroughRequest;
 use App\Admin\Services\GuideQuestAdminReadService;
 use App\Admin\Services\GuideQuestService;
 use App\Admin\Transformers\GuideQuestDetailTransformer;
@@ -20,6 +21,10 @@ use App\Flare\Models\Quest;
 use App\Flare\Pagination\Pagination;
 use App\Game\Core\Items\Values\ItemSpecialtyType;
 use App\Game\Events\Values\EventType;
+use App\Game\GuideQuests\Services\GuideQuestWalkthroughService;
+use App\Game\GuideQuests\Values\GuideQuestWalkthroughEvent;
+use App\Game\GuideQuests\Values\GuideQuestWalkthroughStepType;
+use App\Game\GuideQuests\Values\GuideQuestWalkthroughTarget;
 use App\Game\Maps\Values\MapName;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Http\JsonResponse;
@@ -41,6 +46,7 @@ class GuideQuestsController
         private readonly GuideQuestTransformer $guideQuestTransformer,
         private readonly GuideQuestDetailTransformer $guideQuestDetailTransformer,
         private readonly GuideQuestService $guideQuestService,
+        private readonly GuideQuestWalkthroughService $guideQuestWalkthroughService,
     ) {}
 
     /**
@@ -91,6 +97,29 @@ class GuideQuestsController
             'guide_quests' => GuideQuest::pluck('name', 'id')->toArray(),
             'game_maps' => GameMap::pluck('name', 'id')->toArray(),
             'item_specialty_types' => ItemSpecialtyType::getValuesForSelect(),
+            'walkthrough_steps' => is_null($guideQuest) ? [] : $guideQuest->walkthroughSteps()->get(),
+            'walkthrough_target_options' => GuideQuestWalkthroughTarget::options(),
+            'walkthrough_event_options' => GuideQuestWalkthroughEvent::options(),
+            'walkthrough_step_type_options' => GuideQuestWalkthroughStepType::options(),
+        ]);
+    }
+
+    /**
+     * Replace a Guide Quest's ordered walkthrough steps transactionally.
+     *
+     * @param GuideQuestWalkthroughRequest $request
+     * @param GuideQuest $guideQuest
+     * @return JsonResponse
+     */
+    public function storeWalkthrough(
+        GuideQuestWalkthroughRequest $request,
+        GuideQuest $guideQuest,
+    ): JsonResponse {
+        $this->guideQuestWalkthroughService->replaceSteps($guideQuest, $request->validated('steps'));
+
+        return response()->json([
+            'steps' => $guideQuest->walkthroughSteps()->get(),
+            'message' => 'Guided walkthrough saved.',
         ]);
     }
 

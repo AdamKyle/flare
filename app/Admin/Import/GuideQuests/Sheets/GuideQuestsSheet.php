@@ -72,6 +72,9 @@ class GuideQuestsSheet implements ToCollection
         $quest = Quest::where('name', $data['required_quest_id'])->first();
         $kingdomBuilding = GameBuilding::where('name', $data['required_kingdom_building_id'])->first();
         $parentGuideQuest = GuideQuest::where('name', $data['parent_id'])->first();
+        $data['intro_text'] = $this->decodeStructuredContent($data['intro_text'] ?? null, 'intro_text');
+        $data['desktop_instructions'] = $this->decodeStructuredContent($data['desktop_instructions'] ?? null, 'desktop_instructions');
+        $data['mobile_instructions'] = $this->decodeStructuredContent($data['mobile_instructions'] ?? null, 'mobile_instructions');
 
         if (
             blank($data['required_batch_crafting_type'] ?? null) ||
@@ -164,6 +167,34 @@ class GuideQuestsSheet implements ToCollection
             : (int) $data['required_event_goal_enchanting_participation'];
 
         return $data;
+    }
+
+    /**
+     * Decode and validate one structured Guide Quest content cell.
+     *
+     * @param mixed $content
+     * @param string $field
+     * @return array|null
+     */
+    private function decodeStructuredContent(mixed $content, string $field): ?array
+    {
+        if (blank($content)) {
+            return null;
+        }
+
+        $decoded = json_decode($content, true);
+
+        if (! is_array($decoded)) {
+            throw new \InvalidArgumentException('Guide Quest '.$field.' must contain valid structured JSON.');
+        }
+
+        foreach ($decoded as $block) {
+            if (! is_array($block) || ! isset($block['id'], $block['content'])) {
+                throw new \InvalidArgumentException('Guide Quest '.$field.' contains an invalid content block.');
+            }
+        }
+
+        return $decoded;
     }
 
     /**

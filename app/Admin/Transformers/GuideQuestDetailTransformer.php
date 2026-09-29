@@ -17,6 +17,7 @@ class GuideQuestDetailTransformer
         return [
             'id' => $guideQuest->id,
             'name' => $guideQuest->name,
+            'instructions' => $guideQuest->instructions,
             'intro_text' => $guideQuest->intro_text,
             'desktop_instructions' => $guideQuest->desktop_instructions,
             'mobile_instructions' => $guideQuest->mobile_instructions,
@@ -92,6 +93,7 @@ class GuideQuestDetailTransformer
             'gold_dust_reward' => $guideQuest->gold_dust_reward,
             'shards_reward' => $guideQuest->shards_reward,
             'faction_points_per_kill' => $guideQuest->faction_points_per_kill,
+            'walkthrough_steps' => $guideQuest->walkthroughSteps()->get(),
         ];
     }
 }

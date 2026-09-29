@@ -5,6 +5,7 @@ export interface GuideQuestBatchCraftedItemRequirementDefinition {
   source: string;
   item_id: number;
   name: string;
+  instructions: string | null;
   type: string;
   type_name: string;
   amount: number;
@@ -89,4 +90,13 @@ export default interface GuideQuestDetailDefinition {
   gold_dust_reward: number | null;
   shards_reward: number | null;
   faction_points_per_kill: number | null;
+  walkthrough_steps: Array<{
+    id: number;
+    position: number;
+    title: string;
+    content: string;
+    target: string | null;
+    step_type: string;
+    required_event: string | null;
+  }>;
 }
