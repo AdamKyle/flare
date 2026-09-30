@@ -2,74 +2,103 @@ import React, { ReactNode } from 'react';
 
 import {
   CharacterGemModifierType,
-  characterGemModifierLabels,
-  integerCharacterGemModifierTypes,
+  rawStatCharacterGemModifierTypes,
 } from './enums/character-gem-modifier-type';
+import GemAbilityDetails from './gem-ability-details';
 import CharacterGemModifierListProps from './types/character-gem-modifier-list-props';
+import { formatCharacterGemModifier } from './utils/format-character-gem-modifier';
 import CharacterGemModifierDefinition from '../../api-definitions/gems/character-gem-modifier-definition';
-import { gemAbilityEffectTypeLabel } from '../gem-ability/enums/gem-ability-effect-type';
-import { gemAbilityScalingSourceLabel } from '../gem-ability/enums/gem-ability-scaling-source';
-import { gemAbilityTypeLabel } from '../gem-ability/enums/gem-ability-type';
+
+import Dd from 'ui/dl/dd';
+import Dl from 'ui/dl/dl';
+import Dt from 'ui/dl/dt';
+import GeneralToolTip from 'ui/tool-tips/general-tool-tip';
 
 const CharacterGemModifierList = ({
   modifiers,
 }: CharacterGemModifierListProps): ReactNode => {
-  const renderAbility = (
+  const renderModifier = (
     modifier: CharacterGemModifierDefinition
-  ): ReactNode => {
-    if (modifier.ability === null) {
+  ): { label: string; value: string } | null => {
+    if (modifier.modifier_type === CharacterGemModifierType.GEM_ABILITY) {
       return null;
     }
 
-    const ability = modifier.ability;
+    return formatCharacterGemModifier(modifier);
+  };
+
+  const renderModifierLabel = (
+    modifier: CharacterGemModifierDefinition,
+    label: string,
+    value: string
+  ): ReactNode => {
+    if (!rawStatCharacterGemModifierTypes.has(modifier.modifier_type)) {
+      return label;
+    }
 
     return (
       <>
-        <strong>{ability.name}</strong> —{' '}
-        {gemAbilityTypeLabel(ability.ability_type)}
-        <p>{ability.description}</p>
-        <p>Allowed actions: {ability.attack_types.join(', ')}</p>
-        <p>Effect: {gemAbilityEffectTypeLabel(ability.effect_type)}</p>
-        {ability.proc_chance !== null ? (
-          <p>Proc chance: {(ability.proc_chance * 100).toFixed(2)}%</p>
-        ) : null}
-        <p>Effect value: {(ability.effect_value * 100).toFixed(2)}%</p>
-        {ability.scaling_source !== null ? (
-          <p>
-            Scaling source:{' '}
-            {gemAbilityScalingSourceLabel(ability.scaling_source)}
-          </p>
-        ) : null}
+        <GeneralToolTip
+          label={label}
+          message={`When this gem is socketed into equipped gear, it adds ${value} directly to your ${label} before equipment, boon, skill, class, and map-reduction modifiers are applied. Its contribution appears in the ${label} breakdown under Modified Stats.`}
+          placement="auto"
+        />
+        {label}
       </>
     );
   };
 
-  const renderModifier = (
-    modifier: CharacterGemModifierDefinition
-  ): ReactNode => {
-    if (modifier.modifier_type === CharacterGemModifierType.GEM_ABILITY) {
-      return renderAbility(modifier);
-    }
-
-    const label = characterGemModifierLabels[modifier.modifier_type];
-
-    if (modifier.amount === null) {
-      return label;
-    }
-
-    if (!integerCharacterGemModifierTypes.has(modifier.modifier_type)) {
-      return `${label}: +${(modifier.amount * 100).toFixed(2)}%`;
-    }
-
-    return `${label}: +${modifier.amount}`;
-  };
+  const abilities = modifiers.filter(
+    (modifier) =>
+      modifier.modifier_type === CharacterGemModifierType.GEM_ABILITY
+  );
+  const factualModifiers = modifiers.filter(
+    (modifier) =>
+      modifier.modifier_type !== CharacterGemModifierType.GEM_ABILITY
+  );
 
   return (
-    <ul className="mt-2 list-inside list-disc space-y-2">
-      {modifiers.map((modifier) => (
-        <li key={modifier.roll_position}>{renderModifier(modifier)}</li>
-      ))}
-    </ul>
+    <div className="space-y-5">
+      {abilities.length > 0 ? (
+        <div className="space-y-4">
+          <h3 className="text-mango-tango-600 dark:text-mango-tango-300 text-xs font-semibold tracking-wide uppercase">
+            Ability
+          </h3>
+          {abilities.map((modifier) => (
+            <div key={modifier.roll_position}>
+              {modifier.ability !== null ? (
+                <GemAbilityDetails ability={modifier.ability} />
+              ) : null}
+            </div>
+          ))}
+        </div>
+      ) : null}
+      {factualModifiers.length > 0 ? (
+        <div className="space-y-2">
+          <h3 className="text-mango-tango-600 dark:text-mango-tango-300 text-xs font-semibold tracking-wide uppercase">
+            Modifiers
+          </h3>
+          <Dl>
+            {factualModifiers.map((modifier) => {
+              const row = renderModifier(modifier);
+
+              if (!row) {
+                return null;
+              }
+
+              return (
+                <React.Fragment key={modifier.roll_position}>
+                  <Dt>{renderModifierLabel(modifier, row.label, row.value)}</Dt>
+                  <Dd text_class="font-semibold text-emerald-700 dark:text-emerald-400">
+                    {row.value}
+                  </Dd>
+                </React.Fragment>
+              );
+            })}
+          </Dl>
+        </div>
+      ) : null}
+    </div>
   );
 };
 

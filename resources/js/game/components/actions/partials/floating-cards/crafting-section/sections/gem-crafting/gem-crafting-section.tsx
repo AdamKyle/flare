@@ -5,11 +5,15 @@ import ScreenTransition from '../../../../../../../reusable-components/screen-tr
 import CraftingDisciplineIntroduction from '../../shared/components/crafting-discipline-introduction';
 import { CraftingIntroductionStorageKey } from '../../shared/enums/crafting-introduction-storage-key';
 import { useCraftingDisciplineIntroduction } from '../../shared/hooks/use-crafting-discipline-introduction';
+import CraftingSectionScreenProps from '../../types/crafting-section-screen-props';
 
 const GEM_CRAFTING_INTRODUCTION_DESCRIPTION =
   'Gem Crafting creates role-specialized Gems: Tier 1 grants a Gem Ability and two raw stats; Tier 2 grants raw stats and direct combat modifiers; Tier 3 specializes Class Rank, Class Mastery, Weapon Mastery, and class-skill progression; Tier 4 specializes atonement, penetration, Character XP, and currency gains.';
 
-const GemCraftingSection = (): ReactNode => {
+const GemCraftingSection = ({
+  setActiveCraftingType,
+  registerBackHandler,
+}: CraftingSectionScreenProps): ReactNode => {
   const { introductionAcknowledged, acknowledgeIntroduction } =
     useCraftingDisciplineIntroduction(
       CraftingIntroductionStorageKey.GEM_CRAFTING
@@ -26,7 +30,12 @@ const GemCraftingSection = (): ReactNode => {
       );
     }
 
-    return <GemCraftingFlow />;
+    return (
+      <GemCraftingFlow
+        setActiveCraftingType={setActiveCraftingType}
+        registerBackHandler={registerBackHandler}
+      />
+    );
   };
 
   return (

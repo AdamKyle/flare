@@ -7,4 +7,5 @@ export default interface SidePeekProps {
   allow_clicking_outside?: boolean;
   children?: ReactNode;
   footer?: ReactNode;
+  close_button_data_guide_target?: string;
 }

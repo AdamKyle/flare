@@ -98,6 +98,7 @@ const TabsList = ({
         )}
         onClick={() => onSelect(tabIndex)}
         type="button"
+        data-guide-target={tabItem.data_guide_target}
       >
         {renderLabel(tabItem)}
       </button>

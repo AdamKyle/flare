@@ -4,6 +4,7 @@ import ServerMessagesProps from './definitions/server-messages-props';
 import ServerMessagesDefinition from '../../../../api-definitions/chat/server-messages-definition';
 import { useGuideTarget } from '../../../guide-quests/walkthrough/hooks/use-guide-target';
 import { GuideTargets } from '../../../guide-quests/walkthrough/registry/guide-targets';
+import { ServerMessageSource } from '../../enums/server-message-source';
 import { useOpenItemDetails } from '../../hooks/use-open-item-details';
 import { formatMessageTimestamp } from '../../utils/format-message-timestamp';
 
@@ -19,10 +20,17 @@ const buildServerMessageKey = (
   `${serverMessage.timeStamp}-${serverMessage.id ?? 'none'}-${serverMessage.message}`;
 
 const ServerMessages = ({ server_messages }: ServerMessagesProps) => {
-  const { openServerMessageItem } = useOpenItemDetails();
+  const { openServerMessageItem, openServerMessageQuestItem } =
+    useOpenItemDetails();
   const { characterId } = useGameData();
+  const serverMessagesPanelGuideTarget = useGuideTarget(
+    GuideTargets.SERVER_MESSAGES_PANEL
+  );
   const serverMessageItemGuideTarget = useGuideTarget(
     GuideTargets.SERVER_MESSAGE_ITEM
+  );
+  const serverMessageQuestItemGuideTarget = useGuideTarget(
+    GuideTargets.SERVER_MESSAGE_QUEST_ITEM
   );
 
   const renderTimestamp = (serverMessage: ServerMessagesDefinition) => {
@@ -43,12 +51,20 @@ const ServerMessages = ({ server_messages }: ServerMessagesProps) => {
       return serverMessage.message;
     }
 
+    const isQuestItem = serverMessage.source === ServerMessageSource.QUEST_ITEM;
+    const guideTarget = isQuestItem
+      ? serverMessageQuestItemGuideTarget
+      : serverMessageItemGuideTarget;
+    const openItem = isQuestItem
+      ? openServerMessageQuestItem
+      : openServerMessageItem;
+
     return (
-      <span {...serverMessageItemGuideTarget}>
+      <span {...guideTarget}>
         <LinkButton
           label={serverMessage.message}
           variant={ButtonVariant.SERVER_MESSAGE_LINK}
-          on_click={() => openServerMessageItem(characterId, slotId)}
+          on_click={() => openItem(characterId, slotId)}
         />
       </span>
     );
@@ -64,7 +80,10 @@ const ServerMessages = ({ server_messages }: ServerMessagesProps) => {
   };
 
   return (
-    <div className="mx-auto my-4 w-full lg:w-3/4">
+    <div
+      className="mx-auto my-4 w-full lg:w-3/4"
+      {...serverMessagesPanelGuideTarget}
+    >
       <Card>
         <div className="h-96 w-full overflow-y-auto rounded-md bg-gray-700 p-2 text-pink-200 dark:bg-gray-800 dark:text-pink-400">
           <ul className="space-y-2">{server_messages.map(renderMessage)}</ul>

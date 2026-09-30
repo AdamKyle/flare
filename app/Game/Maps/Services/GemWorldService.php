@@ -312,6 +312,29 @@ class GemWorldService
     }
 
     /**
+     * Resolve the Player-facing factual Gem context for a specific Location.
+     *
+     * @param Location $location
+     * @return array|null
+     */
+    public function locationGemContext(Location $location): ?array
+    {
+        $gameMap = $location->map;
+
+        if (is_null($gameMap)) {
+            return null;
+        }
+
+        $effects = $this->areaGemEffectService->resolveForGameMap($gameMap, $location);
+
+        if (empty($effects->sources())) {
+            return null;
+        }
+
+        return $this->gemWorldContextTransformer->transform($effects);
+    }
+
+    /**
      * Persist the Character's Gem World first-time introduction acknowledgement, once, server-side.
      *
      * @param Character $character

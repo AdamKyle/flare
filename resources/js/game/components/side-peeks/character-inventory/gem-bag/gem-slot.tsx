@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import React, { ReactNode } from 'react';
 
-import CharacterGemModifierList from '../../../../reusable-components/character-gem/character-gem-modifier-list';
+import CharacterGemCompactSummary from '../../../../reusable-components/character-gem/character-gem-compact-summary';
 import { backpackBaseItemStyles } from '../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
 import {
   gemSlotBorderStyles,
@@ -18,41 +18,37 @@ const GemSlot = ({ gem_slot, on_view_gem }: GemSlotProps): ReactNode => {
     on_view_gem(gem_slot.slot_id);
   };
 
-  const renderGemSlotDetails = (): ReactNode => {
-    return (
-      <>
-        <span>
-          <strong>Tier</strong>: {gem_slot.tier}
-        </span>
-        <CharacterGemModifierList modifiers={gem_slot.modifiers} />
-      </>
-    );
-  };
-
   return (
-    <button
+    <div
       className={clsx(
         backpackBaseItemStyles(),
-        gemSlotFocusRingStyles(gem_slot),
+        'relative',
         gemSlotBorderStyles(gem_slot),
         gemSlotButtonBackgroundColor(gem_slot)
       )}
-      onClick={handleViewGem}
-      type="button"
     >
+      <button
+        type="button"
+        className={clsx(
+          'absolute inset-0 rounded-lg focus:outline-none focus-visible:ring-2',
+          gemSlotFocusRingStyles(gem_slot)
+        )}
+        onClick={handleViewGem}
+        aria-label={`View ${gem_slot.name} details`}
+      />
       <i
-        className="ra ra-bone-knife text-2xl text-gray-800 dark:text-gray-600"
+        className="ra ra-bone-knife pointer-events-none relative text-2xl text-gray-800 dark:text-gray-600"
         aria-hidden="true"
       ></i>
-      <div className="text-left">
+      <div className="pointer-events-none relative min-w-0 flex-1 text-left">
         <div className={clsx('text-lg font-semibold', itemColor)}>
           {gem_slot.name}
         </div>
-        <div className={clsx('text-sm', itemColor)}>
-          {renderGemSlotDetails()}
+        <div className={clsx('mt-1', itemColor)}>
+          <CharacterGemCompactSummary modifiers={gem_slot.modifiers} />
         </div>
       </div>
-    </button>
+    </div>
   );
 };
 

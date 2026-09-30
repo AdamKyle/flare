@@ -7,6 +7,7 @@ export default interface UseSeerManageSocketsFlowDefinition {
   itemsApi: UseSeerItemsApiDefinition;
   submitting: boolean;
   error: string | null;
+  hasEnoughGoldBars: boolean;
   canSubmit: boolean;
   resultPreview: CraftingItemPreviewDefinition | null;
   selectItem: (slotId: number) => void;

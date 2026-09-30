@@ -53,11 +53,11 @@ export const useEquipItem = ({
           equip_type: requestParams.equip_type,
         });
 
-        on_success(result.message);
         guideWalkthroughEventEmitter.emit(
           GuideWalkthroughEvent.ITEM_EQUIPPED,
           undefined
         );
+        on_success(result.message);
 
         setLoading(false);
       } catch (err) {

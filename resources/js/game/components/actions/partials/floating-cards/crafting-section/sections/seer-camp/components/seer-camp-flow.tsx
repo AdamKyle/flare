@@ -18,6 +18,7 @@ import IndeterminateProgressBar from 'ui/progress/indeterminate-progress-bar';
 const SeerCampFlow = (): ReactNode => {
   const {
     characterId,
+    goldBars,
     data,
     loading,
     error,
@@ -85,6 +86,7 @@ const SeerCampFlow = (): ReactNode => {
       <SeerManageSocketsForm
         costs={data.costs}
         characterId={characterId}
+        goldBars={goldBars}
         status={status}
         onSuccess={handleActionSuccess}
         onChangeAction={changeAction}

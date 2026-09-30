@@ -1,3 +1,4 @@
+import { GuideTargets } from '../../guide-quests/walkthrough/registry/guide-targets';
 import ExplorationMessageProps from '../components/exploration-messages/definitions/exploration-message-props';
 import MessagesProps from '../components/messages/definitions/message-props';
 import ServerMessagesProps from '../components/server-messages/definitions/server-messages-props';
@@ -50,11 +51,13 @@ const buildTabs = (
         activity_icon: bellIconClass,
         icon_styles: bellIconStyles,
         props: serverProps,
+        data_guide_target: GuideTargets.SERVER_MESSAGES_TAB,
       } as const)
     : ({
         label: 'Server Messages',
         component: serverComponent,
         props: serverProps,
+        data_guide_target: GuideTargets.SERVER_MESSAGES_TAB,
       } as const);
 
   const explorationTab = unreadExploration

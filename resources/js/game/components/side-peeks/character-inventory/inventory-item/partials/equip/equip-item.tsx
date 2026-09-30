@@ -14,6 +14,8 @@ import {
   InventoryItemTypes,
 } from '../../../../../character-sheet/partials/character-inventory/enums/inventory-item-types';
 import { planeTextItemColors } from '../../../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
+import { useGuideTarget } from '../../../../../guide-quests/walkthrough/hooks/use-guide-target';
+import { GuideTargets } from '../../../../../guide-quests/walkthrough/registry/guide-targets';
 import UseEquipItemRequestParamsDefinition from '../../api/definitions/use-equip-item-request-params-definition';
 import { useEquipItem } from '../../api/hooks/use-equip-item';
 import { useGetInventoryItemComparisonDetails } from '../../api/hooks/use-get-inventory-item-comparison-details';
@@ -39,6 +41,10 @@ const EquipItem = ({
     slot_id: slot_id,
     item_to_equip_type: item_to_equip_type,
   });
+
+  const comparisonGuideTarget = useGuideTarget(
+    GuideTargets.ITEM_EQUIP_COMPARISON
+  );
 
   const {
     loading: equipmentIsLoading,
@@ -194,8 +200,9 @@ const EquipItem = ({
         comparison_details={data}
         on_confirm_action={handleEquipItem}
         is_processing={equipmentIsLoading}
+        confirmation_slot_id={slot_id}
       />
-      {renderTabsOrComparison()}
+      <div {...comparisonGuideTarget}>{renderTabsOrComparison()}</div>
     </>
   );
 };

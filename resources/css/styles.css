@@ -28,3 +28,70 @@
 }
 
 
+/* Guide walkthrough presentation. Driver.js remains presentation-only; these
+   styles keep its popover consistent with the game's visual language without
+   changing Driver's focus, keyboard, or close behavior. */
+.tlessa-guide-popover.driver-popover {
+  width: min(24rem, calc(100vw - 2rem));
+  max-width: calc(100vw - 2rem);
+  border: 1px solid var(--color-glacier-200);
+  border-radius: 0.75rem;
+  background: var(--color-white);
+  color: var(--color-gray-800);
+  box-shadow: 0 18px 45px rgb(0 0 0 / 0.24);
+}
+
+.dark .tlessa-guide-popover.driver-popover {
+  border-color: var(--color-glacier-700);
+  background: var(--color-glacier-950);
+  color: var(--color-glacier-100);
+}
+
+.tlessa-guide-popover .driver-popover-title {
+  color: var(--color-glacier-900);
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  line-height: 1.35;
+}
+
+.dark .tlessa-guide-popover .driver-popover-title {
+  color: var(--color-glacier-100);
+}
+
+.tlessa-guide-popover .driver-popover-description {
+  color: var(--color-gray-700);
+  font-family: var(--font-body);
+  line-height: 1.55;
+}
+
+.dark .tlessa-guide-popover .driver-popover-description {
+  color: var(--color-gray-300);
+}
+
+.tlessa-guide-popover .driver-popover-close-btn {
+  color: var(--color-gray-600);
+}
+
+.dark .tlessa-guide-popover .driver-popover-close-btn {
+  color: var(--color-gray-300);
+}
+
+.tlessa-guide-popover .driver-popover-footer button {
+  border: 1px solid var(--color-danube-700);
+  border-radius: 0.375rem;
+  background: var(--color-danube-700);
+  color: var(--color-white);
+  font-family: var(--font-body);
+  font-weight: 700;
+  text-shadow: none;
+}
+
+.tlessa-guide-popover .driver-popover-footer button:hover {
+  background: var(--color-danube-800);
+}
+
+.tlessa-guide-popover .driver-popover-footer button:focus-visible,
+.tlessa-guide-popover .driver-popover-close-btn:focus-visible {
+  outline: 2px solid var(--color-danube-400);
+  outline-offset: 2px;
+}

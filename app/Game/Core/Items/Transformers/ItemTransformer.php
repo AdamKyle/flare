@@ -6,6 +6,8 @@ use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Game\Core\Items\Enricher\ItemEnricherFactory;
 use App\Game\Core\Items\Values\ItemUniqueness;
+use App\Game\Gems\Services\GemAbilityDuplicateService;
+use App\Game\Gems\Transformers\CharacterGemTransformer;
 use App\Game\Maps\Transformers\LocationTransformer;
 use League\Fractal\Resource\Item as ItemResource;
 use League\Fractal\TransformerAbstract;
@@ -14,7 +16,25 @@ class ItemTransformer extends TransformerAbstract
 {
     protected array $defaultIncludes = ['drop_location'];
 
-    public function __construct(private readonly ItemEnricherFactory $itemEnricherFactory) {}
+    private readonly ItemSocketTransformer $itemSocketTransformer;
+
+    private readonly GemAbilityDuplicateService $gemAbilityDuplicateService;
+
+    /**
+     * @param ItemEnricherFactory $itemEnricherFactory
+     * @param ItemSocketTransformer|null $itemSocketTransformer
+     * @param GemAbilityDuplicateService|null $gemAbilityDuplicateService
+     */
+    public function __construct(
+        private readonly ItemEnricherFactory $itemEnricherFactory,
+        ?ItemSocketTransformer $itemSocketTransformer = null,
+        ?GemAbilityDuplicateService $gemAbilityDuplicateService = null,
+    ) {
+        $this->itemSocketTransformer = $itemSocketTransformer
+            ?? new ItemSocketTransformer(new CharacterGemTransformer);
+        $this->gemAbilityDuplicateService = $gemAbilityDuplicateService
+            ?? new GemAbilityDuplicateService;
+    }
 
     /**
      * Gets the response data for the character sheet
@@ -106,8 +126,9 @@ class ItemTransformer extends TransformerAbstract
             'is_cosmic' => $item->is_cosmic,
             'xp_bonus' => $item->xp_bonus,
             'ignores_caps' => $item->ignores_caps,
-            'sockets' => $item->sockets,
+            'sockets' => $this->itemSocketTransformer->transform($item),
             'socket_amount' => $item->socket_count,
+            'duplicate_gem_abilities' => $this->gemAbilityDuplicateService->duplicateActiveAbilities([$item]),
             'item_skills' => $itemSkills,
             'item_skill_progressions' => $itemSkillProgressions,
         ];

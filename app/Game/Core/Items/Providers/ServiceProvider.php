@@ -23,10 +23,12 @@ use App\Game\Core\Items\Transformers\Api\UsableItemTransformer as ApiUsableItemT
 use App\Game\Core\Items\Transformers\BaseEquippableItemTransformer;
 use App\Game\Core\Items\Transformers\CraftingItemPreviewTransformer;
 use App\Game\Core\Items\Transformers\EquippableItemTransformer;
+use App\Game\Core\Items\Transformers\ItemSocketTransformer;
 use App\Game\Core\Items\Transformers\ItemTransformer;
 use App\Game\Core\Items\Transformers\QuestItemTransformer;
 use App\Game\Core\Items\Transformers\UsableItemTransformer;
 use App\Game\Core\Items\View\Components\ItemDisplayColor;
+use App\Game\Gems\Services\GemAbilityDuplicateService;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
@@ -45,8 +47,8 @@ class ServiceProvider extends ApplicationServiceProvider
             return new EquippableEnricher;
         });
 
-        $this->app->bind(EquippableItemTransformer::class, function () {
-            return new EquippableItemTransformer;
+        $this->app->bind(EquippableItemTransformer::class, function ($app) {
+            return new EquippableItemTransformer($app->make(ItemSocketTransformer::class));
         });
 
         $this->app->bind(BaseEquippableItemTransformer::class, function () {
@@ -119,7 +121,11 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(ItemTransformer::class, function ($app) {
-            return new ItemTransformer($app->make(ItemEnricherFactory::class));
+            return new ItemTransformer(
+                $app->make(ItemEnricherFactory::class),
+                $app->make(ItemSocketTransformer::class),
+                $app->make(GemAbilityDuplicateService::class),
+            );
         });
 
         $this->app->bind(ApiUsableItemTransformer::class, function ($app) {

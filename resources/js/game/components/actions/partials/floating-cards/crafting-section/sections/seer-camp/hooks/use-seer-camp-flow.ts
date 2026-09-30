@@ -8,9 +8,10 @@ import { SeerAction } from '../enums/seer-action';
 import { useGameData } from 'game-data/hooks/use-game-data';
 
 export const useSeerCampFlow = (): UseSeerCampFlowDefinition => {
-  const { gameData } = useGameData();
+  const { gameData, updateCharacter } = useGameData();
 
   const characterId = gameData?.character?.id ?? 0;
+  const goldBars = gameData?.character?.gold_bars ?? 0;
 
   const {
     data,
@@ -42,12 +43,19 @@ export const useSeerCampFlow = (): UseSeerCampFlowDefinition => {
   const handleActionSuccess = (
     response: SeerCampApiResponseDefinition
   ): void => {
+    if (action === SeerAction.MANAGE_SOCKETS) {
+      updateCharacter({
+        gold_bars: Math.max(goldBars - response.costs.socket, 0),
+      });
+    }
+
     replaceData(response);
     setStatus(response.message ?? 'The Seer completed your request.');
   };
 
   return {
     characterId,
+    goldBars,
     data,
     loading,
     error,

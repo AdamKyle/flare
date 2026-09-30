@@ -1,7 +1,8 @@
-import { BaseItemDetails } from '../base-item-details';
 import { HolyStackDefinition } from './holy-stack-definition';
 import ItemAffixDefinition from './item-affix-definition';
 import SkillSummaryDefinition from './skill-summary-definition';
+import DuplicateGemAbilityDefinition from '../../gems/duplicate-gem-ability-definition';
+import { BaseItemDetails } from '../base-item-details';
 import { SocketDefinition } from './socket-definition';
 
 export default interface EquippableItemDefinition {
@@ -69,6 +70,7 @@ export default interface EquippableItemDefinition {
 
   sockets: SocketDefinition[];
   socket_amount: number;
+  duplicate_gem_abilities?: DuplicateGemAbilityDefinition[];
 
   spell_evasion: number;
   healing_reduction: number;

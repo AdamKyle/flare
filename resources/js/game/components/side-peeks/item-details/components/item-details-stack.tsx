@@ -9,6 +9,7 @@ import StackedCard from 'ui/cards/stacked-card';
 const ItemDetailsStack = ({
   item_id: itemId,
   on_close: onClose,
+  duplicate_gem_abilities: duplicateGemAbilities,
 }: ItemDetailsStackProps): ReactNode => {
   return (
     <StackedCard
@@ -17,7 +18,10 @@ const ItemDetailsStack = ({
       content_mode={StackedCardContentMode.FULL_BLEED}
     >
       <div className="min-h-0 flex-1 overflow-y-auto py-4">
-        <ItemDetailsBody item_id={itemId} />
+        <ItemDetailsBody
+          item_id={itemId}
+          duplicate_gem_abilities={duplicateGemAbilities}
+        />
       </div>
     </StackedCard>
   );

@@ -10,6 +10,7 @@ import React, {
   useState,
 } from 'react';
 
+import SetItemsResponseDefinition from './api/definitions/set-items-response-definition';
 import { useEmptySetApi } from './api/hooks/use-empty-set-api';
 import { useEquipSetApi } from './api/hooks/use-equip-set-api';
 import { useRemoveItemFromSetApi } from './api/hooks/use-remove-item-from-set-api';
@@ -21,8 +22,10 @@ import SetsProps from './types/sets-props';
 import { buildSetFooterOptions } from './utils/build-set-footer-options';
 import { resolveSetActionAvailability } from './utils/resolve-set-action-availability';
 import { EquippableItemWithBase } from '../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
+import DuplicateGemAbilityWarning from '../../../../reusable-components/character-gem/duplicate-gem-ability-warning';
 import { useInfiniteScroll } from '../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
 import GenericItemList from '../../components/items/generic-item-list';
+import ItemDetailsStack from '../../item-details/components/item-details-stack';
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
 import { useEquipmentManagementRestriction } from '../hooks/use-equipment-management-restriction';
 import InventoryItemDetailStack from '../inventory-item/inventory-item-detail-stack';
@@ -56,6 +59,7 @@ const Sets = ({
   );
   const [setChoicesKey, setSetChoicesKey] = useState(0);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [duplicateItemId, setDuplicateItemId] = useState<number | null>(null);
 
   const {
     data,
@@ -66,7 +70,12 @@ const Sets = ({
     setFilters,
     setPage,
     setRefresh,
-  } = UsePaginatedApiHandler<EquippableItemWithBase>({
+    response,
+  } = UsePaginatedApiHandler<
+    EquippableItemWithBase,
+    Record<string, unknown>,
+    SetItemsResponseDefinition
+  >({
     url: CharacterInventoryApiUrls.CHARACTER_SET_ITEMS,
     urlParams: { character: character_id },
     initialSearchText: initial_search_text,
@@ -376,6 +385,11 @@ const Sets = ({
       </div>
       <div className="flex flex-col gap-2 px-4 pt-2">
         {renderSetStatus()}
+        <DuplicateGemAbilityWarning
+          duplicates={response?.duplicate_gem_abilities ?? []}
+          context="set"
+          on_open_item={setDuplicateItemId}
+        />
         {renderActionError()}
         {renderSuccessMessage()}
       </div>
@@ -383,6 +397,21 @@ const Sets = ({
 
       <AnimatePresence initial={false} mode="wait">
         {renderInventoryItemView()}
+      </AnimatePresence>
+      <AnimatePresence initial={false} mode="wait">
+        {duplicateItemId === null ? null : (
+          <ItemDetailsStack
+            item_id={duplicateItemId}
+            on_close={() => setDuplicateItemId(null)}
+            duplicate_gem_abilities={(
+              response?.duplicate_gem_abilities ?? []
+            ).filter((duplicate) =>
+              duplicate.items.some(
+                (duplicateItem) => duplicateItem.item_id === duplicateItemId
+              )
+            )}
+          />
+        )}
       </AnimatePresence>
     </div>
   );

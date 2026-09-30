@@ -10,9 +10,10 @@ export const questCardThemeStyles = (): string =>
 export const questCardBorderStyles = (state?: QuestTreeState): string =>
   state
     ? QUEST_TREE_STATE_BORDER_STYLES[state]
-    : 'border-glacier-700 dark:border-glacier-500';
+    : 'border-glacier-800 dark:border-glacier-500';
 
-export const questCardPrimaryTextStyles = (): string => 'text-glacier-900';
+export const questCardPrimaryTextStyles = (): string =>
+  'text-glacier-900 dark:text-glacier-900';
 
 export const questCardSecondaryTextStyles = (): string => 'text-glacier-700';
 

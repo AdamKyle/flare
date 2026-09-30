@@ -50,11 +50,9 @@ const QuestItemDetailBody = ({
 
     return (
       <QuestItemRelationshipIdentityStack
-        quest_item={questItem}
         kind={nestedIdentity.kind}
         id={nestedIdentity.id}
         on_close={handleCloseNestedIdentity}
-        on_open_map={(id) => setNestedIdentity({ kind: 'map', id })}
       />
     );
   };

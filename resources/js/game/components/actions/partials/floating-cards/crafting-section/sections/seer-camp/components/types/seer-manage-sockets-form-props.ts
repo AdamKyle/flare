@@ -4,6 +4,7 @@ import SeerCampCostsDefinition from '../../api/definitions/seer-camp-costs-defin
 export default interface SeerManageSocketsFormProps {
   costs: SeerCampCostsDefinition;
   characterId: number;
+  goldBars: number;
   status: string | null;
   onSuccess: (data: SeerCampApiResponseDefinition) => void;
   onChangeAction: () => void;

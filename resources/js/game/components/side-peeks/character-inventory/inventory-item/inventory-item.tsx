@@ -4,6 +4,7 @@ import { isNil } from 'lodash';
 import React, { ReactNode, useState } from 'react';
 
 import { EquippableItemDetailsDefinition } from '../../../../api-definitions/items/equippable-item-definitions/equippable-item-details-definition';
+import DuplicateGemAbilityWarning from '../../../../reusable-components/character-gem/duplicate-gem-ability-warning';
 import { ItemActions } from '../../../../reusable-components/item/enums/item-actions';
 import ItemAction from '../../../../reusable-components/item/item-action';
 import ListItemOnMarket from '../../../../reusable-components/item/list-item-on-market';
@@ -28,9 +29,11 @@ import DefenceSection from './partials/item-view/defence-section';
 import HealingSection from './partials/item-view/healing-section';
 import HolyStacksSection from './partials/item-view/holy-stacks-section';
 import ItemMetaSection from './partials/item-view/item-meta-tsx';
+import SocketsSection from './partials/item-view/sockets-section';
 import StatsSection from './partials/item-view/stats-section';
 import MoveToSet from './partials/move-to-set/move-to-set';
 import InventoryItemProps from './types/inventory-item-props';
+import ItemDetailsStack from '../../item-details/components/item-details-stack';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 
@@ -55,9 +58,15 @@ const InventoryItem = ({
   const [listItem, setListItem] = useState(false);
   const [moveItem, setMoveItem] = useState(false);
   const [viewingItemSkills, setViewingItemSkills] = useState(false);
+  const [duplicateItemId, setDuplicateItemId] = useState<number | null>(null);
   const [selectedItemAction, setSelectedItemAction] =
     useState<ItemActions | null>(null);
+  const itemDetailsGuideTarget = useGuideTarget(GuideTargets.ITEM_DETAILS);
+  const itemActionsGuideTarget = useGuideTarget(GuideTargets.ITEM_ACTIONS);
   const equipItemGuideTarget = useGuideTarget(GuideTargets.ITEM_EQUIP_ACTION);
+  const equippedStateGuideTarget = useGuideTarget(
+    GuideTargets.ITEM_EQUIPPED_STATE
+  );
 
   const { error, loading, data, refetch } = useGetInventoryItemDetails({
     character_id,
@@ -127,6 +136,12 @@ const InventoryItem = ({
     setViewingEquip(false);
   };
 
+  const handleEquipped = async (successMessage: string): Promise<void> => {
+    setViewingEquip(false);
+    await refetch();
+    on_action(successMessage);
+  };
+
   const handleActionSelected = (action: ItemActions) => {
     if (action === ItemActions.LIST) {
       setListItem(true);
@@ -180,7 +195,7 @@ const InventoryItem = ({
             character_id={character_id}
             slot_id={item.slot_id}
             item_to_equip_type={item.type}
-            on_equip={on_action}
+            on_equip={(message) => void handleEquipped(message)}
           />
         </InventoryStackBody>
       </StackedCard>
@@ -235,6 +250,7 @@ const InventoryItem = ({
         on_close={handleCloseItemAffixView}
         aria_label="Affix Details"
         content_mode={StackedCardContentMode.FULL_BLEED}
+        close_button_data_guide_target={GuideTargets.ITEM_AFFIX_CLOSE}
       >
         <InventoryStackBody>
           <AttachedAffixDetails affix={itemAffix} />
@@ -325,17 +341,27 @@ const InventoryItem = ({
 
     return (
       <div className="flex flex-col items-stretch gap-3 text-center sm:flex-row sm:items-center sm:justify-center sm:gap-6">
-        <div
-          className="flex justify-center sm:justify-end"
-          {...equipItemGuideTarget}
-        >
-          <Button
-            on_click={handleViewEquip}
-            label="Equip Item"
-            variant={ButtonVariant.SUCCESS}
-            disabled={isEquipmentRestricted}
-          />
-        </div>
+        {item.is_equipped ? (
+          <p
+            role="status"
+            className="font-semibold text-emerald-700 dark:text-emerald-400"
+            {...equippedStateGuideTarget}
+          >
+            Equipped
+          </p>
+        ) : (
+          <div
+            className="flex justify-center sm:justify-end"
+            {...(!isEquipmentRestricted ? equipItemGuideTarget : {})}
+          >
+            <Button
+              on_click={handleViewEquip}
+              label="Equip Item"
+              variant={ButtonVariant.SUCCESS}
+              disabled={isEquipmentRestricted}
+            />
+          </div>
+        )}
 
         <div className="flex items-center justify-center gap-2">
           <span className="inline-block h-px w-10 bg-gray-300" />
@@ -343,7 +369,10 @@ const InventoryItem = ({
           <span className="inline-block h-px w-10 bg-gray-300" />
         </div>
 
-        <div className="flex justify-center sm:justify-start">
+        <div
+          className="flex justify-center sm:justify-start"
+          {...itemActionsGuideTarget}
+        >
           <InventoryItemActionButton on_select_action={handleActionSelected} />
         </div>
       </div>
@@ -388,6 +417,17 @@ const InventoryItem = ({
       devouringDarknessBonus={Number(item.holy_stack_devouring_darkness ?? 0)}
       onClickApplied={() => setShouldViewHolyStacks(true)}
     />,
+    <DuplicateGemAbilityWarning
+      key="duplicate-gem-abilities"
+      duplicates={item.duplicate_gem_abilities ?? []}
+      context="item"
+      on_open_item={setDuplicateItemId}
+    />,
+    <SocketsSection
+      key="sockets"
+      total={Number(item.socket_amount ?? 0)}
+      sockets={item.sockets ?? []}
+    />,
   ];
 
   const canViewItemSkills =
@@ -419,7 +459,7 @@ const InventoryItem = ({
 
   return (
     <>
-      <div className="flex flex-col gap-4 px-4">
+      <div className="flex flex-col gap-4 px-4" {...itemDetailsGuideTarget}>
         <ItemMetaSection
           name={item.name}
           description={item.description}
@@ -450,6 +490,21 @@ const InventoryItem = ({
         {renderAttachedHolyStacksView()}
       </AnimatePresence>
       <AnimatePresence mode="wait">{renderItemSkillTree()}</AnimatePresence>
+      <AnimatePresence mode="wait">
+        {duplicateItemId === null ? null : (
+          <ItemDetailsStack
+            item_id={duplicateItemId}
+            on_close={() => setDuplicateItemId(null)}
+            duplicate_gem_abilities={(
+              data?.duplicate_gem_abilities ?? []
+            ).filter((duplicate) =>
+              duplicate.items.some(
+                (duplicateItem) => duplicateItem.item_id === duplicateItemId
+              )
+            )}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 };

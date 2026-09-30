@@ -6,4 +6,5 @@ export default interface EquipItemActionProps {
   on_confirm_action: (selection: EquipItemSelectionDefinition) => void;
   on_close_equip_action?: () => void;
   is_processing: boolean;
+  confirmation_slot_id?: number;
 }

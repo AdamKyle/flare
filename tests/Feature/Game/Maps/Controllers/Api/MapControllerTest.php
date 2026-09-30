@@ -10,6 +10,7 @@ use Mockery;
 use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateGameLocationGemParamter;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGameMapGemParamter;
 use Tests\Traits\CreateGem;
@@ -20,7 +21,7 @@ use Tests\Traits\CreateMonster;
 
 class MapControllerTest extends TestCase
 {
-    use CreateGameMap, CreateGameMapGemParamter, CreateGem, CreateItem, CreateKingdom, CreateLocation, CreateMonster, RefreshDatabase;
+    use CreateGameLocationGemParamter, CreateGameMap, CreateGameMapGemParamter, CreateGem, CreateItem, CreateKingdom, CreateLocation, CreateMonster, RefreshDatabase;
 
     protected function tearDown(): void
     {
@@ -506,8 +507,38 @@ class MapControllerTest extends TestCase
         $response->assertOk();
         $this->assertSame($location->id, $data['data']['id']);
         $this->assertSame('The Old Bridge', $data['data']['name']);
+        $this->assertSame($location->map->id, $data['data']['game_map']['id']);
+        $this->assertSame($location->map->name, $data['data']['game_map']['name']);
         $this->assertNull($data['data']['quest_reward_item']['data']);
         $this->assertNull($data['data']['required_quest_item']);
+        $this->assertNull($data['data']['gem_context']);
+    }
+
+    public function test_get_location_information_includes_location_gem_context(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $location = $this->createLocation([
+            'game_map_id' => $character->map->gameMap->id,
+            'name' => 'Gem Shrine',
+        ]);
+
+        $locationGemParamter = $this->createGameLocationGemParamter([
+            'location_id' => $location->id,
+            'name' => 'Shrine Gem',
+        ]);
+        $locationGem = $this->createLocationGeneratedGem($locationGemParamter, [
+            'enemy_strength_increase' => 0.25,
+        ]);
+        $locationGemParamter->update(['rolled_gem_id' => $locationGem->id]);
+
+        $response = $this->actingAs($character->user)
+            ->getJson('/api/map/location-details/'.$location->id);
+
+        $response->assertOk();
+        $this->assertSame('location', $response->json('data.gem_context.type'));
+        $this->assertSame('location_gem', $response->json('data.gem_context.sources.0.type'));
+        $this->assertSame($locationGem->id, $response->json('data.gem_context.sources.0.rolled_gem.id'));
     }
 
     public function test_get_location_information_includes_transformed_quest_reward_item(): void

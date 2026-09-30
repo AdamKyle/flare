@@ -16,6 +16,7 @@ use App\Game\Core\Traits\CanHaveQuestItem;
 use App\Game\Maps\Values\LocationType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Types\CharacterMessageTypes;
+use App\Game\Messages\Values\ServerMessageSource;
 use App\Game\Shop\Services\ShopService;
 use App\Game\Skills\Services\DisenchantService;
 use Facades\App\Game\Core\Chance\DropCheckCalculator;
@@ -669,7 +670,13 @@ class BattleDrop
             'inventory_id' => $character->inventory->id,
         ]);
 
-        ServerMessageHandler::sendBasicMessageWithId($character->user, 'You found: '.$item->affix_name.' on the enemies corpse.', $slot->id);
+        ServerMessageHandler::sendBasicMessageWithLink(
+            $character->user,
+            'You found: '.$item->affix_name.' on the enemies corpse.',
+            $slot->id,
+            ServerMessageSource::INVENTORY_ITEM->value,
+            $item->affix_name,
+        );
 
         if ($isMythic) {
             event(new GlobalMessageEvent($character->name.' Has found a mythical item on the enemies corpse! Such a rare drop!'));
@@ -698,7 +705,13 @@ class BattleDrop
 
         $message = $character->name.' has found: '.$item->affix_name;
 
-        ServerMessageHandler::sendBasicMessageWithId($character->user, 'You found: '.$item->affix_name.' on the enemies corpse.', $slot->id);
+        ServerMessageHandler::sendBasicMessageWithLink(
+            $character->user,
+            'You found: '.$item->affix_name.' on the enemies corpse.',
+            $slot->id,
+            ServerMessageSource::QUEST_ITEM->value,
+            $item->affix_name,
+        );
 
         broadcast(new GlobalMessageEvent($message));
     }

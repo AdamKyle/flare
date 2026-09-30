@@ -80,7 +80,7 @@ const GuideQuest = ({ on_close }: GuideQuestProps) => {
       completed?.completed_requirements.includes('required_level');
 
     return (
-      <div className="space-y-5">
+      <div className="space-y-6">
         <section aria-labelledby="guide-quest-story">
           <h4 id="guide-quest-story" className="mb-2 text-lg font-semibold">
             Story
@@ -147,24 +147,15 @@ const GuideQuest = ({ on_close }: GuideQuestProps) => {
           </p>
         </section>
 
-        <div className="flex flex-col gap-3 sm:flex-row">
-          {quest.has_walkthrough && quest.walkthrough_status !== 'completed' ? (
+        <div className="flex flex-col gap-3 pt-2 sm:flex-row">
+          {quest.has_walkthrough ? (
             <Button
-              label={
-                walkthrough.loading
-                  ? 'Loading guide…'
-                  : quest.walkthrough_status === 'in_progress'
-                    ? 'Resume'
-                    : 'Show me'
-              }
+              label={walkthrough.loading ? 'Loading guide…' : 'Show me'}
               aria_busy={walkthrough.loading}
               disabled={walkthrough.loading}
               on_click={() => void handleStartWalkthrough()}
               variant={ButtonVariant.PRIMARY}
             />
-          ) : null}
-          {quest.walkthrough_status === 'completed' ? (
-            <p role="status">Guided walkthrough complete</p>
           ) : null}
           <Button
             label="Hand In"
@@ -221,7 +212,9 @@ const GuideQuest = ({ on_close }: GuideQuestProps) => {
             </select>
           </div>
         ) : null}
-        <h3 className="mb-4 text-xl font-semibold">{selectedQuest.name}</h3>
+        <h3 className="text-glacier-900 dark:text-glacier-100 mb-5 text-2xl font-semibold">
+          {selectedQuest.name}
+        </h3>
         {walkthrough.error ? (
           <ApiErrorAlert apiError={walkthrough.error} />
         ) : null}

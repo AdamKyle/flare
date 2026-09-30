@@ -21,6 +21,7 @@ use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Gems\Builders\GemBuilder;
 use App\Game\Gems\Contracts\CharacterGemEffects;
 use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
+use App\Game\Gems\Services\CharacterGemRollService;
 use App\Game\Gems\Transformers\CharacterGemTransformer;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Npcs\Actions\QueenOfHearts\Services\RandomEnchantmentService;
@@ -209,6 +210,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(ServerMessageBuilder::class),
                 $app->make(CharacterGemSlotsTransformer::class),
                 $app->make(SkillBonusService::class),
+                $app->make(CharacterGemRollService::class),
             );
         });
 

@@ -252,13 +252,25 @@ const MonsterGemEffectContextCard = ({
           {context.game_map && (
             <Fragment>
               <Dt>Game Map</Dt>
-              <Dd>{context.game_map.name}</Dd>
+              <Dd>
+                <FactualLink
+                  id={context.game_map.id}
+                  label={context.game_map.name}
+                  on_click={navigation?.on_open_map}
+                />
+              </Dd>
             </Fragment>
           )}
           {context.location && (
             <Fragment>
               <Dt>Location</Dt>
-              <Dd>{context.location.name}</Dd>
+              <Dd>
+                <FactualLink
+                  id={context.location.id}
+                  label={context.location.name}
+                  on_click={navigation?.on_open_location}
+                />
+              </Dd>
             </Fragment>
           )}
           {context.sources.map(renderSource)}

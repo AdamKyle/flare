@@ -3,6 +3,8 @@ import React from 'react';
 import DefinitionRow from '../../../../../../reusable-components/viewable-sections/definition-row';
 import InfoLabel from '../../../../../../reusable-components/viewable-sections/info-label';
 import Section from '../../../../../../reusable-components/viewable-sections/section';
+import { useGuideTarget } from '../../../../../guide-quests/walkthrough/hooks/use-guide-target';
+import { GuideTargets } from '../../../../../guide-quests/walkthrough/registry/guide-targets';
 import AffixesSectionProps from '../../types/partials/item-view/affixes-section-props';
 
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
@@ -13,6 +15,8 @@ const AffixesSection = ({
   suffix,
   onOpenAffix,
 }: AffixesSectionProps) => {
+  const itemAffixesGuideTarget = useGuideTarget(GuideTargets.ITEM_AFFIXES);
+
   const renderPrefixRow = () => {
     if (!prefix) {
       return null;
@@ -58,10 +62,12 @@ const AffixesSection = ({
   }
 
   return (
-    <Section title="Affixes">
-      {renderPrefixRow()}
-      {renderSuffixRow()}
-    </Section>
+    <div {...itemAffixesGuideTarget}>
+      <Section title="Affixes">
+        {renderPrefixRow()}
+        {renderSuffixRow()}
+      </Section>
+    </div>
   );
 };
 

@@ -6,6 +6,7 @@ export interface TabItemPresentation {
   label: string;
   activity_icon?: string;
   icon_styles?: string;
+  data_guide_target?: string;
 }
 
 export interface TabItemWithOptionalProps<

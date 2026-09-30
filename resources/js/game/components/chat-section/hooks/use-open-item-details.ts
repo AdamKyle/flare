@@ -19,7 +19,24 @@ export const useOpenItemDetails = (): UseOpenItemDetailsDefinition => {
     );
   };
 
+  const openServerMessageQuestItem = (
+    character_id: number,
+    slot_id: number
+  ) => {
+    sidePeekEmitter.emit(
+      SidePeek.SIDE_PEEK,
+      SidePeekComponentRegistrationEnum.SERVER_CHAT_QUEST_ITEM,
+      {
+        is_open: true,
+        title: 'Quest Item',
+        character_id,
+        slot_id,
+      }
+    );
+  };
+
   return {
     openServerMessageItem,
+    openServerMessageQuestItem,
   };
 };

@@ -1,9 +1,12 @@
 import BaseQuestItemDefinition from '../../../../api-definitions/items/quest-item-definitions/base-quest-item-definition';
+import AreaGemContextDefinition from '../../../../reusable-components/gems/api/definitions/area-gem-context-definition';
+import { GameMapIdentityDefinition } from '../../../../reusable-components/quest-item/types/quest-item-factual-definition';
 import { LocationTypes } from '../teleport/enums/location-types';
 
 export default interface LocationDetailsApi {
   id: number;
   name: string;
+  game_map: GameMapIdentityDefinition;
   description: string;
   can_players_enter: boolean;
   can_auto_battle: boolean;
@@ -11,6 +14,7 @@ export default interface LocationDetailsApi {
   is_corrupted: boolean;
   quest_reward_item: { data: BaseQuestItemDefinition | null };
   required_quest_item: BaseQuestItemDefinition | null;
+  gem_context: AreaGemContextDefinition | null;
   x: number;
   y: number;
 }

@@ -1,5 +1,5 @@
-import CharacterGemBagSlotDefinition from '../../../../../api-definitions/gems/character-gem-bag-slot-definition';
+import CharacterGemDefinition from '../../../../../api-definitions/gems/character-gem-definition';
 
 export default interface GemDetailsProps {
-  gem: CharacterGemBagSlotDefinition;
+  gem: CharacterGemDefinition;
 }

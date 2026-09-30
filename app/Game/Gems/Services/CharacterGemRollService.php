@@ -52,6 +52,30 @@ class CharacterGemRollService
     }
 
     /**
+     * Return the canonical modifier pool and amount ranges used when rolling the tier.
+     *
+     * @param int $tier
+     * @return array
+     */
+    public function possibleModifierRangesForTier(int $tier): array
+    {
+        return collect(CharacterGemModifierType::forTier($tier))
+            ->reject(fn (CharacterGemModifierType $type): bool => $type === CharacterGemModifierType::GEM_ABILITY)
+            ->map(function (CharacterGemModifierType $type) use ($tier): array {
+                $range = $this->amountRange($tier, $type);
+
+                return [
+                    'modifier_type' => $type->value,
+                    'minimum' => $range['minimum'],
+                    'maximum' => $range['maximum'],
+                    'percentage' => $range['percentage'],
+                ];
+            })
+            ->values()
+            ->all();
+    }
+
+    /**
      * Roll one enabled Gem Ability followed by two distinct raw stats.
      *
      * @return array
@@ -169,36 +193,47 @@ class CharacterGemRollService
      */
     private function rollAmount(int $tier, CharacterGemModifierType $modifierType): float
     {
-        if ($modifierType->isRawStat()) {
-            return $tier === GemTierValue::TIER_ONE
-                ? $this->randomNumberGenerator->numberBetween(5, 25)
-                : $this->randomNumberGenerator->numberBetween(25, 100);
-        }
+        $range = $this->amountRange($tier, $modifierType);
+        $amount = $this->randomNumberGenerator->numberBetween($range['minimum'], $range['maximum']);
 
-        return match ($modifierType) {
-            CharacterGemModifierType::ADDITIONAL_LEVEL_GAIN => 1,
-            CharacterGemModifierType::BASE_DAMAGE_MOD,
-            CharacterGemModifierType::BASE_AC_MOD,
-            CharacterGemModifierType::BASE_HEALING_MOD,
-            CharacterGemModifierType::BASE_SPELL_DAMAGE_MOD => $this->rollPercent(1, 5),
-            CharacterGemModifierType::CLASS_MASTERY_EFFECT,
-            CharacterGemModifierType::WEAPON_MASTERY_EFFECT => $this->rollPercent(2, 8),
-            CharacterGemModifierType::FIRE_PENETRATION,
-            CharacterGemModifierType::WATER_PENETRATION,
-            CharacterGemModifierType::ICE_PENETRATION => $this->rollPercent(3, 10),
-            default => $this->rollPercent(5, 15),
-        };
+        return $range['percentage'] ? $amount / 100 : $amount;
     }
 
     /**
-     * Roll a whole-percent amount between the bounds and return it as a decimal fraction.
+     * Return the canonical whole-number roll bounds and whether they represent percentages.
      *
-     * @param int $minimumPercent
-     * @param int $maximumPercent
-     * @return float
+     * @param int $tier
+     * @param CharacterGemModifierType $modifierType
+     * @return array
      */
-    private function rollPercent(int $minimumPercent, int $maximumPercent): float
+    private function amountRange(int $tier, CharacterGemModifierType $modifierType): array
     {
-        return $this->randomNumberGenerator->numberBetween($minimumPercent, $maximumPercent) / 100;
+        if ($modifierType->isRawStat()) {
+            return [
+                'minimum' => $tier === GemTierValue::TIER_ONE ? 5 : 25,
+                'maximum' => $tier === GemTierValue::TIER_ONE ? 25 : 100,
+                'percentage' => false,
+            ];
+        }
+
+        [$minimum, $maximum] = match ($modifierType) {
+            CharacterGemModifierType::ADDITIONAL_LEVEL_GAIN => [1, 1],
+            CharacterGemModifierType::BASE_DAMAGE_MOD,
+            CharacterGemModifierType::BASE_AC_MOD,
+            CharacterGemModifierType::BASE_HEALING_MOD,
+            CharacterGemModifierType::BASE_SPELL_DAMAGE_MOD => [1, 5],
+            CharacterGemModifierType::CLASS_MASTERY_EFFECT,
+            CharacterGemModifierType::WEAPON_MASTERY_EFFECT => [2, 8],
+            CharacterGemModifierType::FIRE_PENETRATION,
+            CharacterGemModifierType::WATER_PENETRATION,
+            CharacterGemModifierType::ICE_PENETRATION => [3, 10],
+            default => [5, 15],
+        };
+
+        return [
+            'minimum' => $minimum,
+            'maximum' => $maximum,
+            'percentage' => $modifierType !== CharacterGemModifierType::ADDITIONAL_LEVEL_GAIN,
+        ];
     }
 }

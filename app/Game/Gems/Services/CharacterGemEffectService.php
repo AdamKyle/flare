@@ -18,6 +18,11 @@ class CharacterGemEffectService implements CharacterGemEffects
     use FetchEquipped;
 
     /**
+     * @param GemAbilityDuplicateService $gemAbilityDuplicateService
+     */
+    public function __construct(private readonly GemAbilityDuplicateService $gemAbilityDuplicateService) {}
+
+    /**
      * Resolve the effects supplied by character-domain Gems socketed into equipped Items.
      *
      * @param int $characterId
@@ -43,6 +48,8 @@ class CharacterGemEffectService implements CharacterGemEffects
         $activeAbilities = [];
         $passiveAbilities = [];
         $gemDetails = [];
+        $items = $equippedSlots->pluck('item')->filter()->values();
+        $activeModifierIds = $this->gemAbilityDuplicateService->firstActiveModifierIds($items);
 
         foreach ($equippedSlots as $equippedSlot) {
             $item = $equippedSlot->item;
@@ -52,7 +59,7 @@ class CharacterGemEffectService implements CharacterGemEffects
             }
 
             foreach ($item->sockets as $socket) {
-                $this->collectSocketEffects($socket, $item, $amounts, $activeAbilities, $passiveAbilities, $gemDetails);
+                $this->collectSocketEffects($socket, $item, $activeModifierIds, $amounts, $activeAbilities, $passiveAbilities, $gemDetails);
             }
         }
 
@@ -69,6 +76,7 @@ class CharacterGemEffectService implements CharacterGemEffects
      *
      * @param ItemSocket $socket
      * @param Item $item
+     * @param array $activeModifierIds
      * @param array $amounts
      * @param array $activeAbilities
      * @param array $passiveAbilities
@@ -78,6 +86,7 @@ class CharacterGemEffectService implements CharacterGemEffects
     private function collectSocketEffects(
         ItemSocket $socket,
         Item $item,
+        array $activeModifierIds,
         array &$amounts,
         array &$activeAbilities,
         array &$passiveAbilities,
@@ -91,7 +100,7 @@ class CharacterGemEffectService implements CharacterGemEffects
 
         foreach ($gem->characterModifiers as $modifier) {
             if ($modifier->modifier_type === CharacterGemModifierType::GEM_ABILITY) {
-                $this->collectAbility($modifier, $gem, $item, $activeAbilities, $passiveAbilities, $gemDetails);
+                $this->collectAbility($modifier, $gem, $item, $activeModifierIds, $activeAbilities, $passiveAbilities, $gemDetails);
 
                 continue;
             }
@@ -108,6 +117,7 @@ class CharacterGemEffectService implements CharacterGemEffects
      * @param CharacterGemModifier $modifier
      * @param Gem $gem
      * @param Item $item
+     * @param array $activeModifierIds
      * @param array $activeAbilities
      * @param array $passiveAbilities
      * @param array $gemDetails
@@ -117,6 +127,7 @@ class CharacterGemEffectService implements CharacterGemEffects
         CharacterGemModifier $modifier,
         Gem $gem,
         Item $item,
+        array $activeModifierIds,
         array &$activeAbilities,
         array &$passiveAbilities,
         array &$gemDetails,
@@ -145,7 +156,9 @@ class CharacterGemEffectService implements CharacterGemEffects
         ];
 
         if ($ability->ability_type === GemAbilityType::ACTIVE) {
-            $activeAbilities[] = $snapshot;
+            if (in_array($modifier->id, $activeModifierIds, true)) {
+                $activeAbilities[] = $snapshot;
+            }
         } else {
             $passiveAbilities[] = $snapshot;
         }

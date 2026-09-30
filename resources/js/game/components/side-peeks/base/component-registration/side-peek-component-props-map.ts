@@ -91,6 +91,7 @@ export type SidePeekComponentPropsMap = {
   [Registration.MAP_ACTIONS_GEM_PROGRESS_HISTORY]: GemProgressHistorySidePeekProps;
   [Registration.MAP_ACTIONS_ALL_ACTIVE_GEM_SCROLLS]: AllActiveGemScrollsSidePeekProps;
   [SidePeekComponentRegistrationEnum.SERVER_CHAT_ITEM]: ServerChatItemProps;
+  [SidePeekComponentRegistrationEnum.SERVER_CHAT_QUEST_ITEM]: ServerChatItemProps;
   [SidePeekComponentRegistrationEnum.CRAFTED_ITEM]: CraftedItemProps;
   [SidePeekComponentRegistrationEnum.ITEM_DETAILS]: ItemDetailsProps;
   [SidePeekComponentRegistrationEnum.ACTIVITY]: ActivitySidePeekProps;

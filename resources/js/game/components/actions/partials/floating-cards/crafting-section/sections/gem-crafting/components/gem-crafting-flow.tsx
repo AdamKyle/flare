@@ -1,9 +1,11 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 
 import GemTierCostSummary from './gem-tier-cost-summary';
+import GemTierRollDetails from './gem-tier-roll-details';
 import GemTierSelection from './gem-tier-selection';
 import CharacterGemModifierList from '../../../../../../../../reusable-components/character-gem/character-gem-modifier-list';
 import { getGemSlotTitleTextColor } from '../../../../../../../character-sheet/partials/character-inventory/styles/gem-slot-styles';
+import { CraftingTypes } from '../../../enums/crafting-types';
 import CraftingActionLayout from '../../../shared/components/crafting-action-layout';
 import CraftingActionPreview from '../../../shared/components/crafting-action-preview';
 import CraftingInventoryProgress from '../../../shared/components/crafting-inventory-progress';
@@ -11,6 +13,7 @@ import CraftingProgressActionButton from '../../../shared/components/crafting-pr
 import CraftingResultNameButton from '../../../shared/components/crafting-result-name-button';
 import CraftingSkillXpProgress from '../../../shared/components/crafting-skill-xp-progress';
 import { useOpenCraftedItem } from '../../../shared/hooks/use-open-crafted-item';
+import CraftingSectionScreenProps from '../../../types/crafting-section-screen-props';
 import { useGemCraftingFlow } from '../hooks/use-gem-crafting-flow';
 
 import { Alert } from 'ui/alerts/alert';
@@ -18,7 +21,11 @@ import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import { ProgressBarVariant } from 'ui/progress/enums/progress-bar-variant';
 import IndeterminateProgressBar from 'ui/progress/indeterminate-progress-bar';
 
-const GemCraftingFlow = (): ReactNode => {
+const GemCraftingFlow = ({
+  setActiveCraftingType,
+  registerBackHandler,
+}: CraftingSectionScreenProps): ReactNode => {
+  const [showTierDetails, setShowTierDetails] = useState(false);
   const {
     data,
     loading,
@@ -40,6 +47,22 @@ const GemCraftingFlow = (): ReactNode => {
   } = useGemCraftingFlow();
 
   const { openCraftedGem } = useOpenCraftedItem();
+
+  const handleBack = useCallback((): void => {
+    if (showTierDetails === true) {
+      setShowTierDetails(false);
+
+      return;
+    }
+
+    setActiveCraftingType(CraftingTypes.HOME);
+  }, [setActiveCraftingType, showTierDetails]);
+
+  useEffect(() => {
+    registerBackHandler?.(handleBack);
+
+    return () => registerBackHandler?.(null);
+  }, [handleBack, registerBackHandler]);
 
   const handleViewCraftedGem = (): void => {
     if (!craftedGemPreview) {
@@ -117,6 +140,7 @@ const GemCraftingFlow = (): ReactNode => {
         <GemTierCostSummary
           tier={selectedTierData}
           tierNumber={selectedTier ?? 1}
+          on_open_details={() => setShowTierDetails(true)}
         />
       </CraftingActionPreview>
     );
@@ -142,6 +166,15 @@ const GemCraftingFlow = (): ReactNode => {
 
   if (!data) {
     return renderMissingDataState();
+  }
+
+  if (showTierDetails && selectedTierData) {
+    return (
+      <GemTierRollDetails
+        tier={selectedTierData}
+        tier_number={selectedTier ?? 1}
+      />
+    );
   }
 
   return (

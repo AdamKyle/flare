@@ -58,6 +58,15 @@ const GenericItem = ({
         <span>
           <strong>AC</strong>: {getAc(equippableItem)}
         </span>
+        {equippableItem.socket_amount > 0 ? (
+          <>
+            {' '}
+            |{' '}
+            <span>
+              <strong>Sockets</strong>: {equippableItem.socket_amount}
+            </span>
+          </>
+        ) : null}
       </>
     );
   };

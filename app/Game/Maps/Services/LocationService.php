@@ -161,11 +161,15 @@ class LocationService
         return $this->questItemTransformer->transform($requiredItem);
     }
 
-    public function getLocationDetails(Location $location): array
+    public function getLocationDetails(Location $location, ?array $gemContext = null): array
     {
         return [
             'id' => $location->id,
             'name' => $location->name,
+            'game_map' => [
+                'id' => $location->map->id,
+                'name' => $location->map->name,
+            ],
             'description' => $location->description,
             'can_players_enter' => $location->can_players_enter,
             'can_auto_battle' => $location->can_auto_battle,
@@ -175,6 +179,7 @@ class LocationService
                 'data' => is_null($location->questRewardItem) ? null : $this->questItemTransformer->transform($location->questRewardItem),
             ],
             'required_quest_item' => is_null($location->requiredQuestItem) ? null : $this->questItemTransformer->transform($location->requiredQuestItem),
+            'gem_context' => $gemContext,
             'x' => $location->x,
             'y' => $location->y,
         ];

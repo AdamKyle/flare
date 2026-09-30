@@ -8,6 +8,7 @@ import { SidePeekContentScrollMode } from './enums/side-peek-content-scroll-mode
 import { CloseSidePeekEventMap } from './event-map/side-peek-event-map';
 import { SidePeek as SidePeekEventType } from './event-types/side-peek';
 import { useDynamicComponentVisibility } from './hooks/use-manage-side-peek-visibility';
+import { GuideTargets } from '../../guide-quests/walkthrough/registry/guide-targets';
 
 import SidePeekOptionsFooter from 'ui/side-peek/options/components/side-peek-options-footer';
 import SidePeekOptionsContext from 'ui/side-peek/options/side-peek-options-context';
@@ -77,6 +78,7 @@ const BaseSidePeek = () => {
           title={componentProps.title}
           is_open={componentProps.is_open}
           on_close={closeSidePeek}
+          close_button_data_guide_target={GuideTargets.SIDE_PEEK_CLOSE}
           allow_clicking_outside={componentProps.allow_clicking_outside}
           footer={
             sidePeekOptions.length > 0 ? (

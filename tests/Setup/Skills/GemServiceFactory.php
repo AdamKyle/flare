@@ -24,20 +24,22 @@ class GemServiceFactory
     public function build(?ChanceCalculator $chanceCalculator = null, ?GemBuilder $gemBuilder = null): GemService
     {
         $randomNumberGenerator = new PhpRandomNumberGenerator;
+        $characterGemRollService = new CharacterGemRollService(
+            $randomNumberGenerator,
+            new ChanceCalculator($randomNumberGenerator),
+        );
 
         return new GemService(
             $gemBuilder ?? new GemBuilder(
                 $randomNumberGenerator,
-                new CharacterGemRollService(
-                    $randomNumberGenerator,
-                    new ChanceCalculator($randomNumberGenerator),
-                ),
+                $characterGemRollService,
             ),
             $chanceCalculator ?? new ChanceCalculator($randomNumberGenerator),
             new CharacterGemTransformer,
             new ServerMessageBuilder,
             new CharacterGemSlotsTransformer(new CharacterGemTransformer),
             new SkillBonusService(new SkillBonusContextService),
+            $characterGemRollService,
         );
     }
 }

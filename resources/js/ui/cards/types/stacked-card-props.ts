@@ -8,4 +8,5 @@ export default interface StackedCardProps {
   back_action?: () => void;
   aria_label?: string;
   content_mode?: StackedCardContentMode;
+  close_button_data_guide_target?: string;
 }

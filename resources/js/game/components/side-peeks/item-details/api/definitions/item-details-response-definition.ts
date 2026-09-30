@@ -1,3 +1,5 @@
+import DuplicateGemAbilityDefinition from '../../../../../api-definitions/gems/duplicate-gem-ability-definition';
+import { SocketDefinition } from '../../../../../api-definitions/items/equippable-item-definitions/socket-definition';
 import ItemColorFieldsDefinition from '../../../../character-sheet/partials/character-inventory/styles/item-color-fields-definition';
 import StatModifiersDefinition from '../../../character-inventory/inventory-item/types/partials/item-view/stat-modifiers-definition';
 
@@ -18,4 +20,7 @@ export default interface ItemDetailsResponseDefinition
   ambush_resistance_chance: number | null;
   counter_chance: number | null;
   counter_resistance_chance: number | null;
+  sockets: SocketDefinition[];
+  socket_amount: number;
+  duplicate_gem_abilities: DuplicateGemAbilityDefinition[];
 }

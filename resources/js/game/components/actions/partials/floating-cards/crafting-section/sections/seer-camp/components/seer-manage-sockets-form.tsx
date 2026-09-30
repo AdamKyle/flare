@@ -7,6 +7,8 @@ import CraftingActionPreview from '../../../shared/components/crafting-action-pr
 import CraftingItemPreview from '../../../shared/components/crafting-item-preview';
 import { useSeerManageSocketsFlow } from '../hooks/use-seer-manage-sockets-flow';
 
+import { formatNumberWithCommas } from 'game-utils/format-number';
+
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
@@ -16,6 +18,7 @@ import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 const SeerManageSocketsForm = ({
   costs,
   characterId,
+  goldBars,
   status,
   onSuccess,
   onChangeAction,
@@ -25,22 +28,20 @@ const SeerManageSocketsForm = ({
     itemsApi,
     submitting,
     error,
+    hasEnoughGoldBars,
     canSubmit,
     resultPreview,
     selectItem,
     submit,
-  } = useSeerManageSocketsFlow({ characterId, onSuccess });
+  } = useSeerManageSocketsFlow({
+    characterId,
+    goldBarCost: costs.socket,
+    currentGoldBars: goldBars,
+    onSuccess,
+  });
 
   const handleSelectItem = (option: DropdownItem): void => {
     selectItem(Number(option.value));
-  };
-
-  const renderStatus = (): ReactNode => {
-    if (!error) {
-      return null;
-    }
-
-    return <Alert variant={AlertVariant.DANGER}>{error}</Alert>;
   };
 
   const renderForm = (): ReactNode => (
@@ -108,8 +109,31 @@ const SeerManageSocketsForm = ({
     );
   };
 
+  const renderAffordabilityWarning = (): ReactNode => {
+    if (!selectedItem || hasEnoughGoldBars) {
+      return null;
+    }
+
+    return (
+      <Alert variant={AlertVariant.WARNING}>
+        You need {formatNumberWithCommas(costs.socket)} Gold Bars to perform
+        this action. You currently have {formatNumberWithCommas(goldBars)}.
+      </Alert>
+    );
+  };
+
+  const renderActionError = (): ReactNode => {
+    if (!error) {
+      return null;
+    }
+
+    return <Alert variant={AlertVariant.DANGER}>{error}</Alert>;
+  };
+
   const renderAction = (): ReactNode => (
     <div className="space-y-2">
+      {renderAffordabilityWarning()}
+      {renderActionError()}
       <CraftingActionButton
         label={submitting ? 'Creating…' : 'Create/ReRoll Sockets'}
         on_click={() => void submit()}
@@ -126,7 +150,6 @@ const SeerManageSocketsForm = ({
   return (
     <CraftingActionLayout
       title="Seer Camp: Manage Sockets"
-      status={renderStatus()}
       form={renderForm()}
       preview={renderPreview()}
       action={renderAction()}

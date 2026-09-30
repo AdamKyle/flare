@@ -2,5 +2,7 @@ import SeerCampApiResponseDefinition from '../../api/definitions/seer-camp-api-r
 
 export default interface UseSeerManageSocketsFlowParams {
   characterId: number;
+  goldBarCost: number;
+  currentGoldBars: number;
   onSuccess: (data: SeerCampApiResponseDefinition) => void;
 }

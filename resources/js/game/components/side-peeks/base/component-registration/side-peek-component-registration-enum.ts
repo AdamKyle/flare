@@ -32,6 +32,7 @@ export enum SidePeekComponentRegistrationEnum {
    * Server Chat Items
    */
   SERVER_CHAT_ITEM = 'SERVER_CHAT_ITEM',
+  SERVER_CHAT_QUEST_ITEM = 'SERVER_CHAT_QUEST_ITEM',
 
   /**
    * Crafting

@@ -1,4 +1,5 @@
 import ItemAffixDefinition from './equippable-item-definitions/item-affix-definition';
+import { SocketDefinition } from './equippable-item-definitions/socket-definition';
 import ItemSkillDefinition from './item-skill-definition';
 import ItemSkillProgressionDefinition from './item-skill-progression-definition';
 
@@ -74,7 +75,7 @@ export default interface ItemDetails {
   is_cosmic: boolean;
   xp_bonus: number | null;
   ignores_caps: boolean;
-  sockets: unknown[];
+  sockets: SocketDefinition[];
   socket_amount: number;
   item_skills: ItemSkillDefinition[];
   item_skill_progressions: ItemSkillProgressionDefinition[];

@@ -3,10 +3,13 @@ import React, { ReactNode, useState } from 'react';
 
 import CharacterQuestHandInActions from './character-quest-hand-in-actions';
 import CharacterQuestDetailStackProps from './types/character-quest-detail-stack-props';
+import { QuestRelatedItemDefinition } from '../../../../reusable-components/quest/api/definitions/quest-detail-definition';
 import QuestDetail from '../../../../reusable-components/quest/components/quest-detail';
+import QuestItemDetailStack from '../../../side-peeks/character-inventory/inventory-item/quest-item-detail-stack';
 import PlayerGameMapDetailStack from '../../../side-peeks/game-data/components/player-game-map-detail-stack';
 import PlayerNpcDetailStack from '../../../side-peeks/game-data/components/player-npc-detail-stack';
 import ItemDetailsStack from '../../../side-peeks/item-details/components/item-details-stack';
+import { InventoryItemTypes } from '../../partials/character-inventory/enums/inventory-item-types';
 import { useCharacterQuestDetail } from '../api/hooks/use-character-quest-detail';
 import { useHandInCharacterQuest } from '../api/hooks/use-hand-in-character-quest';
 
@@ -25,6 +28,8 @@ const CharacterQuestDetailStack = ({
   const [nestedNpcId, setNestedNpcId] = useState<number | null>(null);
   const [nestedGameMapId, setNestedGameMapId] = useState<number | null>(null);
   const [nestedItemId, setNestedItemId] = useState<number | null>(null);
+  const [nestedQuestItem, setNestedQuestItem] =
+    useState<QuestRelatedItemDefinition | null>(null);
 
   const {
     quest,
@@ -113,6 +118,42 @@ const CharacterQuestDetailStack = ({
     );
   };
 
+  const renderNestedQuestItem = (): ReactNode => {
+    if (!nestedQuestItem) {
+      return null;
+    }
+
+    return (
+      <QuestItemDetailStack
+        quest_item={nestedQuestItem}
+        on_close={() => setNestedQuestItem(null)}
+      />
+    );
+  };
+
+  const handleOpenItem = (itemId: number): void => {
+    if (!quest) {
+      return;
+    }
+
+    const questItems = [
+      quest.requirements.primary_item,
+      quest.requirements.secondary_item,
+      quest.rewards.item?.type === InventoryItemTypes.QUEST
+        ? quest.rewards.item
+        : null,
+    ].filter((item): item is QuestRelatedItemDefinition => item !== null);
+
+    const questItem = questItems.find((item) => item.item_id === itemId);
+
+    if (questItem) {
+      setNestedQuestItem(questItem);
+      return;
+    }
+
+    setNestedItemId(itemId);
+  };
+
   const renderContent = (): ReactNode => {
     if (loading) {
       return <InfiniteLoader />;
@@ -144,7 +185,7 @@ const CharacterQuestDetailStack = ({
             on_open_quest: setNestedQuestId,
             on_open_npc: setNestedNpcId,
             on_open_map: setNestedGameMapId,
-            on_open_item: setNestedItemId,
+            on_open_item: handleOpenItem,
           }}
           quest_item_ownership={questItemOwnership}
         />
@@ -167,6 +208,7 @@ const CharacterQuestDetailStack = ({
         {renderNestedNpc()}
         {renderNestedGameMap()}
         {renderNestedItem()}
+        {renderNestedQuestItem()}
       </div>
     </StackedCard>
   );

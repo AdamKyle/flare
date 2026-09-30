@@ -24,6 +24,7 @@ const StackedCard = ({
   back_action: backAction,
   aria_label: ariaLabel,
   content_mode: contentMode = StackedCardContentMode.PADDED,
+  close_button_data_guide_target: closeButtonDataGuideTarget,
 }: StackedCardProps) => {
   const isPresent = useIsPresent();
   const reduceMotion = useReducedMotion();
@@ -136,6 +137,7 @@ const StackedCard = ({
         type="button"
         onClick={onClose}
         aria-label={`Close ${displayTitle}`}
+        data-guide-target={closeButtonDataGuideTarget}
         className="focus-visible:ring-danube-500 dark:focus-visible:ring-danube-300 flex h-9 w-9 items-center justify-center rounded-full text-gray-600 hover:bg-gray-100 focus:outline-none focus-visible:ring-2 dark:text-gray-300 dark:hover:bg-gray-700"
       >
         <i className="fas fa-times" aria-hidden="true" />
@@ -154,6 +156,7 @@ const StackedCard = ({
         onClick={onClose}
         aria-label="Close details"
         title="Close"
+        data-guide-target={closeButtonDataGuideTarget}
         className="absolute top-3 right-3 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-800 hover:bg-gray-200 focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:outline-none dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600 dark:focus:ring-gray-500"
       >
         <i className="fas fa-times" aria-hidden="true" />

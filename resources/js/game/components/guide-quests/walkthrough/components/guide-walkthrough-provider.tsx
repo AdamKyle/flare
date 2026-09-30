@@ -18,7 +18,11 @@ import { GuideWalkthroughEvent } from '../enums/guide-walkthrough-event';
 import { GuideWalkthroughStepType } from '../enums/guide-walkthrough-step-type';
 import GuideWalkthroughEventMap from '../events/guide-walkthrough-event-map';
 import { GUIDE_WALKTHROUGH_EVENT_EMITTER } from '../events/guide-walkthrough-events';
-import { isStateDependentGuideTarget } from '../registry/guide-targets';
+import { useWalkthroughScrollLock } from '../hooks/use-walkthrough-scroll-lock';
+import {
+  isAsyncGuideTarget,
+  isStateDependentGuideTarget,
+} from '../registry/guide-targets';
 import {
   resolveActiveGuideTarget,
   waitForActiveGuideTarget,
@@ -31,6 +35,7 @@ interface GuideWalkthroughProviderProps {
 }
 
 const OPTIONAL_TARGET_WAIT_MS = 400;
+const ASYNC_TARGET_WAIT_MS = 3000;
 
 const GuideWalkthroughProvider = ({
   children,
@@ -60,6 +65,8 @@ const GuideWalkthroughProvider = ({
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useWalkthroughScrollLock(activeGuideQuestId !== null);
 
   const cleanPresentation = useCallback(() => {
     driverRef.current?.destroy();
@@ -148,11 +155,15 @@ const GuideWalkthroughProvider = ({
         !!step.target &&
         (step.optional_if_target_missing ||
           isStateDependentGuideTarget(step.target));
+      const targetWaitMs = step.target
+        ? isAsyncGuideTarget(step.target)
+          ? ASYNC_TARGET_WAIT_MS
+          : targetIsOptional
+            ? OPTIONAL_TARGET_WAIT_MS
+            : undefined
+        : undefined;
       const target = step.target
-        ? await waitForActiveGuideTarget(
-            step.target,
-            targetIsOptional ? OPTIONAL_TARGET_WAIT_MS : undefined
-          )
+        ? await waitForActiveGuideTarget(step.target, targetWaitMs)
         : null;
 
       if (cancelled) {
@@ -222,14 +233,16 @@ const GuideWalkthroughProvider = ({
 
       try {
         const walkthrough = await fetchWalkthrough(guideQuestId);
-        const savedIndex = walkthrough.current_step_id
-          ? walkthrough.steps.findIndex(
-              (step) => step.id === walkthrough.current_step_id
-            )
-          : 0;
+        const firstStep = walkthrough.steps[0];
 
+        if (!firstStep) {
+          setError('This walkthrough has no steps.');
+          return false;
+        }
+
+        await saveProgress(guideQuestId, firstStep.id, false);
         setSteps(walkthrough.steps);
-        setStepIndex(savedIndex >= 0 ? savedIndex : 0);
+        setStepIndex(0);
         setActiveGuideQuestId(guideQuestId);
 
         return true;
@@ -246,7 +259,7 @@ const GuideWalkthroughProvider = ({
         setLoading(false);
       }
     },
-    [closeWalkthrough, fetchWalkthrough]
+    [closeWalkthrough, fetchWalkthrough, saveProgress]
   );
 
   useEffect(() => cleanPresentation, [cleanPresentation]);
@@ -258,7 +271,6 @@ const GuideWalkthroughProvider = ({
         loading,
         error,
         startWalkthrough,
-        resumeWalkthrough: startWalkthrough,
         pauseWalkthrough: closeWalkthrough,
         closeWalkthrough,
       }}

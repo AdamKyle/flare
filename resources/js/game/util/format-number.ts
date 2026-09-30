@@ -129,12 +129,15 @@ export const formatNumberWithCommas = (value: number): string => {
  * @example
  * formatPercent(20);    // "2,000.00%"
  */
-export const formatPercent = (value: number): string => {
+export const formatPercent = (
+  value: number,
+  fractionDigits: number = 2
+): string => {
   const percentage = Number(value) * 100;
 
   return `${percentage.toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
   })}%`;
 };
 

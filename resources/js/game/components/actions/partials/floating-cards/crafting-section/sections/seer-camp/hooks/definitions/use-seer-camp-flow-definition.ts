@@ -3,6 +3,7 @@ import { SeerAction } from '../../enums/seer-action';
 
 export default interface UseSeerCampFlowDefinition {
   characterId: number;
+  goldBars: number;
   data: SeerCampApiResponseDefinition | null;
   loading: boolean;
   error: string | null;

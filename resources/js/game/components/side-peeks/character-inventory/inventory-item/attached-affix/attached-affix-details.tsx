@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { useGuideTarget } from '../../../../guide-quests/walkthrough/hooks/use-guide-target';
+import { GuideTargets } from '../../../../guide-quests/walkthrough/registry/guide-targets';
 import AffixCoreAttributesSection from '../partials/affix-view/affix-core-attributes-section';
 import AffixDamageSection from '../partials/affix-view/affix-damage-section';
 import AffixMiscModifiersSection from '../partials/affix-view/affix-misc-modifiers-section';
@@ -11,6 +13,10 @@ import AttachedAffixDetailsProps from '../types/attached-affix-details-props';
 import Separator from 'ui/separator/separator';
 
 const AttachedAffixDetails = ({ affix }: AttachedAffixDetailsProps) => {
+  const itemAffixDetailsGuideTarget = useGuideTarget(
+    GuideTargets.ITEM_AFFIX_DETAILS
+  );
+
   const renderAffixHeader = () => {
     return (
       <div>
@@ -27,7 +33,7 @@ const AttachedAffixDetails = ({ affix }: AttachedAffixDetailsProps) => {
   };
 
   return (
-    <>
+    <div {...itemAffixDetailsGuideTarget}>
       <div className="flex flex-col gap-4 px-4 pb-4">
         {renderAffixHeader()}
 
@@ -40,7 +46,7 @@ const AttachedAffixDetails = ({ affix }: AttachedAffixDetailsProps) => {
           <AffixMiscModifiersSection affix={affix} />
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

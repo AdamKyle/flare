@@ -31,7 +31,7 @@ const StatRowInteger = ({
       right={
         <span className="inline-flex items-center gap-2 whitespace-nowrap">
           <i
-            className="fas fa-chevron-up text-emerald-600"
+            className="fas fa-chevron-up text-emerald-600 dark:text-emerald-400"
             aria-hidden="true"
           />
           <span className="font-semibold text-emerald-700 tabular-nums dark:text-emerald-400">

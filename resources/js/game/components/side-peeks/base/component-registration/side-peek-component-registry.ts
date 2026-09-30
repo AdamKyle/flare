@@ -140,6 +140,7 @@ import TraversePropsDefinition from '../../map-actions/traverse/definitions/trav
 import Traverse from '../../map-actions/traverse/traverse';
 import ServerChatItem from '../../server-chat-item/server-chat-item';
 import ServerChatItemProps from '../../server-chat-item/types/server-chat-item-props';
+import ServerChatQuestItem from '../../server-chat-quest-item/server-chat-quest-item';
 import { SidePeekContentScrollMode } from '../enums/side-peek-content-scroll-mode';
 
 export const SidePeekComponentRegistry: {
@@ -227,6 +228,10 @@ export const SidePeekComponentRegistry: {
   },
   [SidePeekComponentRegistrationEnum.SERVER_CHAT_ITEM]: {
     component: ServerChatItem,
+    props: {} as ServerChatItemProps,
+  },
+  [SidePeekComponentRegistrationEnum.SERVER_CHAT_QUEST_ITEM]: {
+    component: ServerChatQuestItem,
     props: {} as ServerChatItemProps,
   },
   [SidePeekComponentRegistrationEnum.CRAFTED_ITEM]: {

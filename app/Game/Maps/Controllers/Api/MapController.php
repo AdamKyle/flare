@@ -183,7 +183,10 @@ class MapController extends Controller
     public function getLocationInformation(Location $location): JsonResponse
     {
         return response()->json([
-            'data' => $this->locationService->getLocationDetails($location),
+            'data' => $this->locationService->getLocationDetails(
+                $location,
+                $this->gemWorldService->locationGemContext($location),
+            ),
         ]);
     }
 

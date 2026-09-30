@@ -3,6 +3,7 @@
 namespace App\Game\Skills\Services;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\GameGemAbility;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\GemBagSlot;
 use App\Flare\Models\Skill;
@@ -13,6 +14,7 @@ use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Gems\Builders\GemBuilder;
+use App\Game\Gems\Services\CharacterGemRollService;
 use App\Game\Gems\Transformers\CharacterGemTransformer;
 use App\Game\Gems\Values\GemTierValue;
 use App\Game\Messages\Builders\ServerMessageBuilder;
@@ -33,6 +35,7 @@ class GemService
      * @param ServerMessageBuilder $serverMessageBuilder
      * @param CharacterGemSlotsTransformer $characterGemSlotsTransformer
      * @param SkillBonusService $skillBonusService
+     * @param CharacterGemRollService $characterGemRollService
      */
     public function __construct(
         private readonly GemBuilder $gemBuilder,
@@ -41,6 +44,7 @@ class GemService
         private readonly ServerMessageBuilder $serverMessageBuilder,
         private readonly CharacterGemSlotsTransformer $characterGemSlotsTransformer,
         private readonly SkillBonusService $skillBonusService,
+        private readonly CharacterGemRollService $characterGemRollService,
     ) {}
 
     /**
@@ -121,7 +125,20 @@ class GemService
             $tierValue = (new GemTierValue($tier))->maxForTier();
 
             if ($craftableSkill->level >= $tierValue['min_level']) {
-                $craftableTiers[] = $tierValue;
+                $craftableTiers[] = [
+                    ...$tierValue,
+                    'base_chance' => $tierValue['chance'],
+                    'chance' => $this->effectiveCraftChance($craftableSkill, $tierValue['chance']),
+                    'possible_modifiers' => $this->characterGemRollService->possibleModifierRangesForTier($tier),
+                    'possible_abilities' => $tier === GemTierValue::TIER_ONE
+                        ? GameGemAbility::where('enabled', true)
+                            ->orderBy('name')
+                            ->get()
+                            ->map(fn (GameGemAbility $ability): array => $this->gemTransformer->transformAbility($ability))
+                            ->values()
+                            ->all()
+                        : [],
+                ];
             }
         }
 
@@ -252,9 +269,25 @@ class GemService
             return true;
         }
 
-        $effectiveChance = min(1.0, $chance + $this->skillBonusService->skillBonus($skill));
+        $effectiveChance = $this->effectiveCraftChance($skill, $chance);
 
         return $this->chanceCalculator->passesPercentage(floor($effectiveChance * 100));
+    }
+
+    /**
+     * Calculate the tier chance after the Gem Crafting Skill bonus, capped at certainty.
+     *
+     * @param Skill $skill
+     * @param float $chance
+     * @return float
+     */
+    private function effectiveCraftChance(Skill $skill, float $chance): float
+    {
+        if ($skill->level >= $skill->baseSkill->max_level) {
+            return 1.0;
+        }
+
+        return min(1.0, $chance + $this->skillBonusService->skillBonus($skill));
     }
 
     /**

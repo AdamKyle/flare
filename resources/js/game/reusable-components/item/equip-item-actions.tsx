@@ -36,10 +36,16 @@ const EquipItemActions = ({
   on_confirm_action,
   on_close_equip_action,
   is_processing,
+  confirmation_slot_id: confirmationSlotId,
 }: EquipItemActionProps) => {
   const [equippedPosition, setEquippedPosition] =
     useState<ItemPositions | null>(null);
-  const equipItemGuideTarget = useGuideTarget(GuideTargets.ITEM_EQUIP_ACTION);
+  const equipOptionsGuideTarget = useGuideTarget(
+    GuideTargets.ITEM_EQUIP_OPTIONS
+  );
+  const equipConfirmGuideTarget = useGuideTarget(
+    GuideTargets.ITEM_EQUIP_CONFIRM
+  );
 
   const itemToEquip = comparison_details.item_to_equip;
   const comparisonRows = comparison_details.details;
@@ -68,6 +74,10 @@ const EquipItemActions = ({
   };
 
   const resolveReplacementSlotId = (position: ItemPositions): number | null => {
+    if (confirmationSlotId !== undefined) {
+      return confirmationSlotId;
+    }
+
     const foundComparison = comparisonRows.find(
       (detail) => detail.position === position
     );
@@ -173,7 +183,10 @@ const EquipItemActions = ({
     const [primarySlotPosition, secondarySlotPosition] = positions;
 
     return (
-      <div className="grid grid-cols-2 items-stretch gap-2">
+      <div
+        {...equipConfirmGuideTarget}
+        className="grid grid-cols-2 items-stretch gap-2"
+      >
         <IconButton
           disabled={is_processing}
           on_click={() => handleConfirmation(primarySlotPosition)}
@@ -219,7 +232,7 @@ const EquipItemActions = ({
     const [position] = positions;
 
     return (
-      <div className="flex justify-center">
+      <div {...equipConfirmGuideTarget} className="flex justify-center">
         <IconButton
           disabled={is_processing}
           on_click={() => handleConfirmation(position)}
@@ -340,7 +353,7 @@ const EquipItemActions = ({
   }
 
   return (
-    <div {...equipItemGuideTarget}>
+    <div {...equipOptionsGuideTarget}>
       <ActionBoxBase
         variant={ActionBoxVariant.DEFAULT}
         actions={renderEquipItemDetails()}

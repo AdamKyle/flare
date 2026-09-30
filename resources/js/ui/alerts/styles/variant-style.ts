@@ -22,7 +22,7 @@ export const variantStyle = (variant: AlertVariant) => {
     .with(
       AlertVariant.WARNING,
       () =>
-        'border-mango-tango-400 dark:border-mango-tango-500 bg-mango-tango-100 dark:bg-mango-tango-700'
+        'border-mango-tango-400 dark:border-mango-tango-500 bg-mango-tango-100 dark:bg-mango-tango-100 text-mango-tango-900 dark:text-mango-tango-900'
     )
     .otherwise(() => '');
 };

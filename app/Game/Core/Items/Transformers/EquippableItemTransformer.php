@@ -6,11 +6,23 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\SetSlot;
 use App\Game\Core\Items\Values\ItemType;
 use App\Game\Core\Items\Values\ItemUniqueness;
+use App\Game\Gems\Transformers\CharacterGemTransformer;
 use Facades\App\Game\Core\Items\Pricing\SellItemCalculator;
 use League\Fractal\TransformerAbstract;
 
 class EquippableItemTransformer extends TransformerAbstract
 {
+    private readonly ItemSocketTransformer $itemSocketTransformer;
+
+    /**
+     * @param ItemSocketTransformer|null $itemSocketTransformer
+     */
+    public function __construct(?ItemSocketTransformer $itemSocketTransformer = null)
+    {
+        $this->itemSocketTransformer = $itemSocketTransformer
+            ?? new ItemSocketTransformer(new CharacterGemTransformer);
+    }
+
     /**
      * Transform a slot holding an enriched equippable Item into its API detail payload.
      *
@@ -75,7 +87,7 @@ class EquippableItemTransformer extends TransformerAbstract
             'total_stackable_affix_damage' => $slot->item->total_stackable_affix_damage,
             'total_non_stacking_affix_damage' => $slot->item->total_non_stacking_affix_damage,
             'total_irresistible_affix_damage' => $slot->item->total_irresistible_affix_damage,
-            'sockets' => $slot->item->sockets,
+            'sockets' => $this->itemSocketTransformer->transform($slot->item),
             'socket_amount' => $slot->item->socket_count,
             'spell_evasion' => $slot->item->spell_evasion,
             'healing_reduction' => $slot->item->healing_reduction,

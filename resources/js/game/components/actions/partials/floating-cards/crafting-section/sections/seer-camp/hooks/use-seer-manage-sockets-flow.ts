@@ -9,6 +9,8 @@ import { useSeerItemsApi } from '../api/hooks/use-seer-items-api';
 
 export const useSeerManageSocketsFlow = ({
   characterId,
+  goldBarCost,
+  currentGoldBars,
   onSuccess,
 }: UseSeerManageSocketsFlowParams): UseSeerManageSocketsFlowDefinition => {
   const [slotId, setSlotId] = useState<number | null>(null);
@@ -35,7 +37,8 @@ export const useSeerManageSocketsFlow = ({
     request: slotId !== null ? { slot_id: slotId } : null,
   });
 
-  const canSubmit = slotId !== null && !submitting;
+  const hasEnoughGoldBars = currentGoldBars >= goldBarCost;
+  const canSubmit = slotId !== null && hasEnoughGoldBars && !submitting;
 
   const selectItem = (nextSlotId: number): void => {
     setSlotId(nextSlotId);
@@ -43,6 +46,10 @@ export const useSeerManageSocketsFlow = ({
   };
 
   const submit = async (): Promise<void> => {
+    if (!canSubmit) {
+      return;
+    }
+
     setResultPreview(null);
 
     const response = await submitAction();
@@ -58,6 +65,7 @@ export const useSeerManageSocketsFlow = ({
     itemsApi,
     submitting,
     error,
+    hasEnoughGoldBars,
     canSubmit,
     resultPreview,
     selectItem,

@@ -5,7 +5,6 @@ export interface GuideWalkthroughContextDefinition {
   loading: boolean;
   error: string | null;
   startWalkthrough: (guideQuestId: number) => Promise<boolean>;
-  resumeWalkthrough: (guideQuestId: number) => Promise<boolean>;
   pauseWalkthrough: () => void;
   closeWalkthrough: () => void;
 }

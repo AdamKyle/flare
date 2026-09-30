@@ -119,6 +119,7 @@ const SidePeek = (props: SidePeekProps) => {
                   disabled={!isPresent}
                   className="focus-visible:ring-danube-500 dark:focus-visible:ring-danube-300 rounded px-2 py-1 text-gray-700 hover:bg-gray-100 focus:outline-none focus-visible:ring-2 dark:text-white dark:hover:bg-gray-700"
                   aria-label="Close panel"
+                  data-guide-target={props.close_button_data_guide_target}
                 >
                   <i
                     className="fas fa-angle-double-right"

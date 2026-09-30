@@ -67,7 +67,7 @@ export const characterGemModifierLabels: Record<
   [CharacterGemModifierType.ADDITIONAL_LEVEL_GAIN]: 'Additional Level Gain',
 };
 
-export const integerCharacterGemModifierTypes = new Set([
+export const rawStatCharacterGemModifierTypes = new Set([
   CharacterGemModifierType.STRENGTH,
   CharacterGemModifierType.DEXTERITY,
   CharacterGemModifierType.INTELLIGENCE,
@@ -75,5 +75,9 @@ export const integerCharacterGemModifierTypes = new Set([
   CharacterGemModifierType.CHARISMA,
   CharacterGemModifierType.AGILITY,
   CharacterGemModifierType.FOCUS,
+]);
+
+export const integerCharacterGemModifierTypes = new Set([
+  ...rawStatCharacterGemModifierTypes,
   CharacterGemModifierType.ADDITIONAL_LEVEL_GAIN,
 ]);

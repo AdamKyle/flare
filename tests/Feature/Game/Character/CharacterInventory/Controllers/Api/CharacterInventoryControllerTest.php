@@ -5,6 +5,7 @@ namespace Tests\Feature\Game\Character\CharacterInventory\Controllers\Api;
 use App\Flare\Models\InventorySet;
 use App\Game\Automation\Values\AutomationType;
 use App\Game\Core\Items\Values\ItemType;
+use App\Game\Gems\Values\CharacterGemModifierType;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
@@ -13,14 +14,18 @@ use Tests\TestCase;
 use Tests\Traits\CreateAlchemyBagSlot;
 use Tests\Traits\CreateBatchCrafting;
 use Tests\Traits\CreateCharacterAutomation;
+use Tests\Traits\CreateCharacterGemModifier;
+use Tests\Traits\CreateGameGemAbility;
+use Tests\Traits\CreateGem;
 use Tests\Traits\CreateInventorySets;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemSkill;
 use Tests\Traits\CreateItemSkillProgression;
+use Tests\Traits\CreateItemSocket;
 
 class CharacterInventoryControllerTest extends TestCase
 {
-    use CreateAlchemyBagSlot, CreateBatchCrafting, CreateCharacterAutomation, CreateInventorySets, CreateItem, CreateItemSkill, CreateItemSkillProgression, RefreshDatabase;
+    use CreateAlchemyBagSlot, CreateBatchCrafting, CreateCharacterAutomation, CreateCharacterGemModifier, CreateGameGemAbility, CreateGem, CreateInventorySets, CreateItem, CreateItemSkill, CreateItemSkillProgression, CreateItemSocket, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -259,6 +264,44 @@ class CharacterInventoryControllerTest extends TestCase
         $this->assertArrayHasKey('data', $response->json());
     }
 
+    public function test_get_set_items_returns_duplicate_ability_warning_without_disabling_the_set(): void
+    {
+        $character = $this->character->getCharacter();
+        $ability = $this->createGameGemAbility(['name' => 'Flames of the Heretic']);
+        $firstGem = $this->createGem();
+        $secondGem = $this->createGem();
+
+        foreach ([$firstGem, $secondGem] as $gem) {
+            $this->createCharacterGemModifier([
+                'gem_id' => $gem->id,
+                'roll_position' => 1,
+                'modifier_type' => CharacterGemModifierType::GEM_ABILITY,
+                'amount' => null,
+                'game_gem_ability_id' => $ability->id,
+            ]);
+        }
+
+        $body = $this->createItem(['type' => 'body', 'socket_count' => 1]);
+        $helmet = $this->createItem(['type' => 'helmet', 'socket_count' => 1]);
+        $this->createItemSocket(['item_id' => $body->id, 'gem_id' => $firstGem->id]);
+        $this->createItemSocket(['item_id' => $helmet->id, 'gem_id' => $secondGem->id]);
+        $set = $this->createInventorySet([
+            'character_id' => $character->id,
+            'can_be_equipped' => true,
+        ]);
+        $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $body->id]);
+        $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $helmet->id]);
+
+        $response = $this->actingAs($character->user)
+            ->getJson('/api/character/'.$character->id.'/inventory/set-items?filters[set_id]='.$set->id);
+
+        $response->assertOk()
+            ->assertJsonPath('duplicate_gem_abilities.0.ability.id', $ability->id)
+            ->assertJsonPath('duplicate_gem_abilities.0.items.0.item_id', $body->id)
+            ->assertJsonPath('duplicate_gem_abilities.0.items.1.item_id', $helmet->id);
+        $this->assertTrue($set->refresh()->can_be_equipped);
+    }
+
     public function test_item_details_returns_item_data_for_a_valid_slot(): void
     {
         $item = $this->createItem(['type' => 'body']);
@@ -269,6 +312,100 @@ class CharacterInventoryControllerTest extends TestCase
             ->getJson('/api/character/'.$character->id.'/inventory/item?slot_id='.$slotId);
 
         $response->assertOk();
+    }
+
+    public function test_item_details_returns_socket_capacity_and_canonical_gem_details(): void
+    {
+        $item = $this->createItem(['type' => 'body', 'socket_count' => 3]);
+        $gem = $this->createGem(['name' => 'Pharozoisite', 'tier' => 2]);
+        $socket = $this->createItemSocket(['item_id' => $item->id, 'gem_id' => $gem->id]);
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+        $slotId = $character->inventory->slots()->where('item_id', $item->id)->first()->id;
+
+        $response = $this->actingAs($character->user)
+            ->getJson('/api/character/'.$character->id.'/inventory/item?slot_id='.$slotId);
+
+        $response->assertOk()
+            ->assertJsonPath('socket_amount', 3)
+            ->assertJsonPath('sockets.0.id', $socket->id)
+            ->assertJsonPath('sockets.0.position', 1)
+            ->assertJsonPath('sockets.0.gem.id', $gem->id)
+            ->assertJsonPath('sockets.0.gem.name', 'Pharozoisite')
+            ->assertJsonPath('sockets.0.gem.tier', 2)
+            ->assertJsonPath('sockets.0.gem.modifiers', []);
+    }
+
+    public function test_equipped_item_details_returns_duplicate_ability_metadata_for_both_equipped_items(): void
+    {
+        $ability = $this->createGameGemAbility(['name' => 'Flames of the Heretic']);
+        $firstGem = $this->createGem();
+        $secondGem = $this->createGem();
+
+        foreach ([$firstGem, $secondGem] as $gem) {
+            $this->createCharacterGemModifier([
+                'gem_id' => $gem->id,
+                'roll_position' => 1,
+                'modifier_type' => CharacterGemModifierType::GEM_ABILITY,
+                'amount' => null,
+                'game_gem_ability_id' => $ability->id,
+            ]);
+        }
+
+        $body = $this->createItem(['type' => 'body', 'socket_count' => 1]);
+        $helmet = $this->createItem(['type' => 'helmet', 'socket_count' => 1]);
+        $this->createItemSocket(['item_id' => $body->id, 'gem_id' => $firstGem->id]);
+        $this->createItemSocket(['item_id' => $helmet->id, 'gem_id' => $secondGem->id]);
+        $character = $this->character->inventoryManagement()
+            ->giveItem($body, true, 'body')
+            ->giveItem($helmet, true, 'helmet')
+            ->getCharacter();
+        $bodySlotId = $character->inventory->slots()->where('item_id', $body->id)->first()->id;
+
+        $response = $this->actingAs($character->user)
+            ->getJson('/api/character/'.$character->id.'/inventory/item?slot_id='.$bodySlotId);
+
+        $response->assertOk()
+            ->assertJsonPath('duplicate_gem_abilities.0.ability.id', $ability->id)
+            ->assertJsonCount(2, 'duplicate_gem_abilities.0.items');
+    }
+
+    public function test_unequipped_set_warning_includes_matching_equipped_items(): void
+    {
+        $character = $this->character->getCharacter();
+        $ability = $this->createGameGemAbility();
+        $equippedGem = $this->createGem();
+        $setGem = $this->createGem();
+
+        foreach ([$equippedGem, $setGem] as $gem) {
+            $this->createCharacterGemModifier([
+                'gem_id' => $gem->id,
+                'roll_position' => 1,
+                'modifier_type' => CharacterGemModifierType::GEM_ABILITY,
+                'amount' => null,
+                'game_gem_ability_id' => $ability->id,
+            ]);
+        }
+
+        $equippedBody = $this->createItem(['type' => 'body', 'socket_count' => 1]);
+        $setBody = $this->createItem(['type' => 'body', 'socket_count' => 1]);
+        $this->createItemSocket(['item_id' => $equippedBody->id, 'gem_id' => $equippedGem->id]);
+        $this->createItemSocket(['item_id' => $setBody->id, 'gem_id' => $setGem->id]);
+        $character = $this->character->inventoryManagement()
+            ->giveItem($equippedBody, true, 'body')
+            ->getCharacter();
+        $set = $this->createInventorySet(['character_id' => $character->id]);
+        $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $setBody->id]);
+
+        $response = $this->actingAs($character->user)
+            ->getJson('/api/character/'.$character->id.'/inventory/set-items?filters[set_id]='.$set->id);
+
+        $response->assertOk()
+            ->assertJsonCount(1, 'duplicate_gem_abilities')
+            ->assertJsonPath('duplicate_gem_abilities.0.items.0.item_id', $equippedBody->id)
+            ->assertJsonPath('duplicate_gem_abilities.0.items.0.source', 'equipped')
+            ->assertJsonPath('duplicate_gem_abilities.0.items.1.item_id', $setBody->id)
+            ->assertJsonPath('duplicate_gem_abilities.0.items.1.source', 'set')
+            ->assertJsonPath('duplicate_gem_abilities.0.items.1.set_id', $set->id);
     }
 
     public function test_item_details_returns_item_skill_tree_and_progressions_for_artifact(): void
