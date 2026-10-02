@@ -32,8 +32,16 @@ class GuideQuestWalkthroughRequest extends FormRequest
             'steps.*.title' => ['required', 'string', 'max:255'],
             'steps.*.content' => ['required', 'string'],
             'steps.*.step_type' => ['required', Rule::enum(GuideQuestWalkthroughStepType::class)],
-            'steps.*.target' => ['nullable', Rule::enum(GuideQuestWalkthroughTarget::class)],
-            'steps.*.required_event' => ['nullable', Rule::enum(GuideQuestWalkthroughEvent::class)],
+            'steps.*.target' => [
+                'nullable',
+                'required_if:steps.*.step_type,'.GuideQuestWalkthroughStepType::CLICK->value,
+                Rule::enum(GuideQuestWalkthroughTarget::class),
+            ],
+            'steps.*.required_event' => [
+                'nullable',
+                'required_if:steps.*.step_type,'.GuideQuestWalkthroughStepType::EVENT->value,
+                Rule::enum(GuideQuestWalkthroughEvent::class),
+            ],
             'steps.*.optional_if_target_missing' => ['boolean'],
         ];
     }

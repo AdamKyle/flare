@@ -1,13 +1,14 @@
 import React, { Fragment, ReactNode } from 'react';
 
+import FactualLink from '../../quest-item/partials/factual-link';
+import { MonsterGemEffectChangedValueDefinition } from '../api/definitions/monster-detail-definition';
+import MonsterGemEffectContextCardProps from '../types/monster-gem-effect-context-card-props';
+
 import {
   formatNumberWithCommas,
   formatPercent,
   formatRangeWithCommas,
-} from '../../../util/format-number';
-import FactualLink from '../../quest-item/partials/factual-link';
-import { MonsterGemEffectChangedValueDefinition } from '../api/definitions/monster-detail-definition';
-import MonsterGemEffectContextCardProps from '../types/monster-gem-effect-context-card-props';
+} from 'game-utils/format-number';
 
 import DetailGrid from 'ui/detail-grid/detail-grid';
 import Dd from 'ui/dl/dd';
@@ -113,24 +114,25 @@ const resolveEffectiveClassName = (
   effective: string | number | null,
   displayType: 'number' | 'range' | 'percent'
 ): string => {
-  if (
-    displayType === 'number' ||
-    (displayType === 'percent' &&
-      typeof base === 'number' &&
-      typeof effective === 'number')
-  ) {
-    if (typeof base === 'number' && typeof effective === 'number') {
-      if (effective > base) {
-        return 'text-de-york-600 dark:text-de-york-400 font-semibold';
-      }
+  const neutralClassName = 'text-danube-700 dark:text-danube-300 font-semibold';
 
-      if (effective < base) {
-        return 'text-mango-tango-600 dark:text-mango-tango-400 font-semibold';
-      }
-    }
+  if (
+    displayType === 'range' ||
+    typeof base !== 'number' ||
+    typeof effective !== 'number'
+  ) {
+    return neutralClassName;
   }
 
-  return 'text-danube-700 dark:text-danube-300 font-semibold';
+  if (effective > base) {
+    return 'text-de-york-600 dark:text-de-york-400 font-semibold';
+  }
+
+  if (effective < base) {
+    return 'text-mango-tango-600 dark:text-mango-tango-400 font-semibold';
+  }
+
+  return neutralClassName;
 };
 
 const renderChange = (
@@ -168,6 +170,31 @@ const MonsterGemEffectContextCard = ({
   navigation,
   single_column: singleColumn,
 }: MonsterGemEffectContextCardProps): ReactNode => {
+  const renderSourceMultipliers = (
+    source: (typeof context.sources)[number]
+  ): ReactNode => {
+    const showMonsterMultiplier = source.monster_multiplier > 1;
+    const showRewardMultiplier = source.reward_multiplier > 1;
+    const showReductionMultiplier =
+      source.reduction_multiplier !== null && source.reduction_multiplier > 1;
+
+    if (
+      !showMonsterMultiplier &&
+      !showRewardMultiplier &&
+      !showReductionMultiplier
+    ) {
+      return null;
+    }
+
+    return (
+      <span className="text-glacier-600 dark:text-glacier-400 ml-2 text-xs">
+        {showMonsterMultiplier && `Monster ×${source.monster_multiplier} `}
+        {showRewardMultiplier && `Rewards ×${source.reward_multiplier} `}
+        {showReductionMultiplier && `Reduction ×${source.reduction_multiplier}`}
+      </span>
+    );
+  };
+
   const renderSource = (
     source: (typeof context.sources)[number]
   ): ReactNode => {
@@ -175,10 +202,6 @@ const MonsterGemEffectContextCard = ({
     const onOpen = isMapGem
       ? navigation?.on_open_map_gem
       : navigation?.on_open_location_gem;
-    const showMonsterMultiplier = source.monster_multiplier > 1;
-    const showRewardMultiplier = source.reward_multiplier > 1;
-    const showReductionMultiplier =
-      source.reduction_multiplier !== null && source.reduction_multiplier > 1;
 
     return (
       <Fragment key={`${source.type}-${source.profile_id}`}>
@@ -189,17 +212,7 @@ const MonsterGemEffectContextCard = ({
             label={`${source.profile_name} — ${source.rolled_gem_name}`}
             on_click={onOpen}
           />
-          {(showMonsterMultiplier ||
-            showRewardMultiplier ||
-            showReductionMultiplier) && (
-            <span className="text-glacier-600 dark:text-glacier-400 ml-2 text-xs">
-              {showMonsterMultiplier &&
-                `Monster ×${source.monster_multiplier} `}
-              {showRewardMultiplier && `Rewards ×${source.reward_multiplier} `}
-              {showReductionMultiplier &&
-                `Reduction ×${source.reduction_multiplier}`}
-            </span>
-          )}
+          {renderSourceMultipliers(source)}
         </Dd>
       </Fragment>
     );
@@ -215,6 +228,29 @@ const MonsterGemEffectContextCard = ({
     (group) => group.changes.length > 0
   );
 
+  const renderGroupSeparator = (index: number): ReactNode => {
+    const isOddColumn = index % 2 === 1;
+    const isLastGroup = index === changedValueGroups.length - 1;
+
+    if (singleColumn || !isOddColumn || isLastGroup) {
+      return null;
+    }
+
+    return <Separator additional_css="col-span-full my-1" />;
+  };
+
+  const renderGroup = (group: ChangedValueGroup, index: number): ReactNode => (
+    <Fragment key={group.heading}>
+      <div>
+        <h4 className="mb-1 text-xs font-semibold tracking-wide text-gray-800 uppercase dark:text-gray-200">
+          {group.heading}
+        </h4>
+        <Dl>{group.changes.map(renderChange)}</Dl>
+      </div>
+      {renderGroupSeparator(index)}
+    </Fragment>
+  );
+
   const renderGroups = (): ReactNode => {
     if (changedValueGroups.length === 0) {
       return null;
@@ -222,23 +258,83 @@ const MonsterGemEffectContextCard = ({
 
     return (
       <DetailGrid single_column={singleColumn}>
-        {changedValueGroups.map((group, index) => (
-          <Fragment key={group.heading}>
-            <div>
-              <h4 className="mb-1 text-xs font-semibold tracking-wide text-gray-800 uppercase dark:text-gray-200">
-                {group.heading}
-              </h4>
-              <Dl>{group.changes.map(renderChange)}</Dl>
-            </div>
-            {!singleColumn &&
-              index % 2 === 1 &&
-              index !== changedValueGroups.length - 1 && (
-                <Separator additional_css="col-span-full my-1" />
-              )}
-          </Fragment>
-        ))}
+        {changedValueGroups.map(renderGroup)}
       </DetailGrid>
     );
+  };
+
+  const renderGameMap = (): ReactNode => {
+    if (!context.game_map) {
+      return null;
+    }
+
+    return (
+      <Fragment>
+        <Dt>Game Map</Dt>
+        <Dd>
+          <FactualLink
+            id={context.game_map.id}
+            label={context.game_map.name}
+            on_click={navigation?.on_open_map}
+          />
+        </Dd>
+      </Fragment>
+    );
+  };
+
+  const renderLocation = (): ReactNode => {
+    if (!context.location) {
+      return null;
+    }
+
+    return (
+      <Fragment>
+        <Dt>Location</Dt>
+        <Dd>
+          <FactualLink
+            id={context.location.id}
+            label={context.location.name}
+            on_click={navigation?.on_open_location}
+          />
+        </Dd>
+      </Fragment>
+    );
+  };
+
+  const renderCharacterPowerReduction = (): ReactNode => {
+    if (context.character_power_reduction <= 0) {
+      return null;
+    }
+
+    return (
+      <Fragment>
+        <Dt>Character Power Reduction</Dt>
+        <Dd>{formatPercent(context.character_power_reduction)}</Dd>
+      </Fragment>
+    );
+  };
+
+  const renderContextIdentity = (): ReactNode => {
+    if (!hasContextIdentity) {
+      return null;
+    }
+
+    return (
+      <Dl>
+        {renderGameMap()}
+        {renderLocation()}
+        {context.sources.map(renderSource)}
+        {renderCharacterPowerReduction()}
+      </Dl>
+    );
+  };
+
+  const renderIdentitySeparator = (): ReactNode => {
+    if (!hasContextIdentity || changedValueGroups.length === 0) {
+      return null;
+    }
+
+    return <Separator additional_css="my-0" />;
   };
 
   return (
@@ -247,45 +343,9 @@ const MonsterGemEffectContextCard = ({
         {context.label}
       </h3>
 
-      {hasContextIdentity && (
-        <Dl>
-          {context.game_map && (
-            <Fragment>
-              <Dt>Game Map</Dt>
-              <Dd>
-                <FactualLink
-                  id={context.game_map.id}
-                  label={context.game_map.name}
-                  on_click={navigation?.on_open_map}
-                />
-              </Dd>
-            </Fragment>
-          )}
-          {context.location && (
-            <Fragment>
-              <Dt>Location</Dt>
-              <Dd>
-                <FactualLink
-                  id={context.location.id}
-                  label={context.location.name}
-                  on_click={navigation?.on_open_location}
-                />
-              </Dd>
-            </Fragment>
-          )}
-          {context.sources.map(renderSource)}
-          {context.character_power_reduction > 0 && (
-            <Fragment>
-              <Dt>Character Power Reduction</Dt>
-              <Dd>{formatPercent(context.character_power_reduction)}</Dd>
-            </Fragment>
-          )}
-        </Dl>
-      )}
+      {renderContextIdentity()}
 
-      {hasContextIdentity && changedValueGroups.length > 0 && (
-        <Separator additional_css="my-0" />
-      )}
+      {renderIdentitySeparator()}
 
       {renderGroups()}
     </div>

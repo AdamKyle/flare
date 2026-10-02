@@ -5,6 +5,7 @@ import React, { ReactNode, useState } from 'react';
 import ItemDetailsStack from './item-details-stack';
 import ItemDetailsBodyProps from './types/item-details-body-props';
 import DuplicateGemAbilityWarning from '../../../../reusable-components/character-gem/duplicate-gem-ability-warning';
+import { DuplicateGemAbilityWarningContext } from '../../../../reusable-components/character-gem/enums/duplicate-gem-ability-warning-context';
 import { planeTextItemColors } from '../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
 import AmbushCounterSection from '../../character-inventory/inventory-item/partials/item-view/ambush-and-counter-section';
 import AttackSection from '../../character-inventory/inventory-item/partials/item-view/attack-section';
@@ -79,7 +80,7 @@ const ItemDetailsBody = ({
           <StatsSection item={data} />
           <DuplicateGemAbilityWarning
             duplicates={resolvedDuplicateGemAbilities}
-            context="item"
+            context={DuplicateGemAbilityWarningContext.ITEM}
             on_open_item={setSelectedItemId}
           />
           <SocketsSection

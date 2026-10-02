@@ -26,7 +26,7 @@ class ElementalAttack extends BattleBase
     }
 
     /**
-     * Apply elemental matchup, matching resistance, and player penetration to an attack.
+     * Apply elemental matchup, matching resistance, and attacker penetration to an attack.
      *
      * @param array $defenderElements
      * @param array $attackerElements
@@ -56,19 +56,19 @@ class ElementalAttack extends BattleBase
         if (empty($defenderElements)) {
             $damage = floor($damage * $attackingElementAmount);
 
-            $this->dealDamage($damage, 0, $isMonster, 'regular');
+            $this->dealDamage($damage, $isMonster, 'regular', $attackingElementName, 0.0, 0.0, 0.0);
 
             return;
         }
 
         $matchingResistance = $this->matchingElementValue($defenderElements, $attackingElementName);
-        $matchingPenetration = $isMonster ? 0.0 : $this->matchingElementValue($attackerPenetration, $attackingElementName);
+        $matchingPenetration = $this->matchingElementValue($attackerPenetration, $attackingElementName);
         $effectiveResistance = max(0, $matchingResistance - $matchingPenetration);
 
         if ($this->elementAttackData->isHalfDamage($defenderElements, $attackingElementName)) {
             $damage = floor(($damage * $attackingElementAmount) / 2);
 
-            $this->dealDamage($damage, $effectiveResistance, $isMonster, 'half', $attackingElementName, $matchingPenetration);
+            $this->dealDamage($damage, $isMonster, 'half', $attackingElementName, $matchingResistance, $matchingPenetration, $effectiveResistance);
 
             return;
         }
@@ -76,40 +76,42 @@ class ElementalAttack extends BattleBase
         if ($this->elementAttackData->isDoubleDamage($defenderElements, $attackingElementName)) {
             $damage = floor(($damage * $attackingElementAmount) * 2);
 
-            $this->dealDamage($damage, $effectiveResistance, $isMonster, 'double', $attackingElementName, $matchingPenetration);
+            $this->dealDamage($damage, $isMonster, 'double', $attackingElementName, $matchingResistance, $matchingPenetration, $effectiveResistance);
 
             return;
         }
 
         $damage = floor($damage * $attackingElementAmount);
 
-        $this->dealDamage($damage, $effectiveResistance, $isMonster, 'regular', $attackingElementName, $matchingPenetration);
+        $this->dealDamage($damage, $isMonster, 'regular', $attackingElementName, $matchingResistance, $matchingPenetration, $effectiveResistance);
     }
 
     /**
-     * Apply matching resistance, update health, and record elemental battle messages.
+     * Apply the effective resistance, update health, and record elemental battle messages.
      *
      * @param int $damage
-     * @param float $matchingResistance
      * @param bool $isMonster
      * @param string $type
      * @param string $elementName
-     * @param float $penetration
+     * @param float $matchingResistance
+     * @param float $matchingPenetration
+     * @param float $effectiveResistance
      * @return void
      */
     private function dealDamage(
         int $damage,
-        float $matchingResistance,
         bool $isMonster,
         string $type,
-        string $elementName = 'Unknown',
-        float $penetration = 0.0,
+        string $elementName,
+        float $matchingResistance,
+        float $matchingPenetration,
+        float $effectiveResistance,
     ): void {
         if (! $isMonster && $this->isRaidBoss && $damage > self::MAX_DAMAGE_FOR_RAID_BOSSES) {
             $damage = self::MAX_DAMAGE_FOR_RAID_BOSSES;
         }
 
-        $newDamage = $this->applyResistanceToDamage($matchingResistance, $damage);
+        $newDamage = $this->applyResistanceToDamage($effectiveResistance, $damage);
 
         match ($type) {
             'half' => $this->halfDamageAttackMessages($isMonster, $damage),
@@ -117,9 +119,18 @@ class ElementalAttack extends BattleBase
             default => $this->regularAttackMessages($isMonster, $damage),
         };
 
-        $resistanceMessage = $isMonster
-            ? 'You resist '.number_format($matchingResistance * 100, 2).'% of the enemy\'s '.$elementName.' Gem damage.'
-            : 'The enemy resists '.number_format($matchingResistance * 100, 2).'% of your '.$elementName.' Gem damage after '.number_format($penetration * 100, 2).'% '.$elementName.' penetration.';
+        $elementName = ucfirst(strtolower($elementName));
+        $baseResistanceText = number_format($matchingResistance * 100, 2).'%';
+        $penetrationText = number_format($matchingPenetration * 100, 2).'%';
+        $effectiveResistanceText = number_format($effectiveResistance * 100, 2).'%';
+        $isPenetratingResistance = $matchingPenetration > 0 && $matchingResistance > 0;
+
+        $resistanceMessage = match (true) {
+            $isPenetratingResistance && $isMonster => 'Your '.$elementName.' Atonement of '.$baseResistanceText.' is reduced by the enemy\'s '.$penetrationText.' '.$elementName.' Penetration, leaving '.$effectiveResistanceText.' effective resistance.',
+            $isPenetratingResistance => 'The enemy\'s '.$elementName.' Atonement of '.$baseResistanceText.' is reduced by your '.$penetrationText.' '.$elementName.' Penetration, leaving '.$effectiveResistanceText.' effective resistance.',
+            $isMonster => 'You resist '.$effectiveResistanceText.' of the enemy\'s '.$elementName.' Gem damage.',
+            default => 'The enemy resists '.$effectiveResistanceText.' of your '.$elementName.' Gem damage.',
+        };
 
         $this->addMessage($resistanceMessage, $isMonster ? 'regular' : 'enemy-action');
 
@@ -140,20 +151,20 @@ class ElementalAttack extends BattleBase
     }
 
     /**
-     * Reduce elemental damage by the matching resistance value.
+     * Reduce elemental damage by the effective resistance value.
      *
-     * @param float $matchingResistance
+     * @param float $effectiveResistance
      * @param int $damage
      * @return int
      */
-    private function applyResistanceToDamage(float $matchingResistance, int $damage): int
+    private function applyResistanceToDamage(float $effectiveResistance, int $damage): int
     {
-
-        if ($matchingResistance <= 0) {
+        if ($effectiveResistance <= 0) {
             return $damage;
         }
 
-        return $damage - ($damage * $matchingResistance);
+        // Resistances are 4-decimal values; rounding first stops binary float drift (0.75 - 0.20) from truncating a whole point of damage.
+        return floor(round($damage - ($damage * $effectiveResistance), 4));
     }
 
     /**
@@ -183,7 +194,6 @@ class ElementalAttack extends BattleBase
      */
     private function halfDamageAttackMessages(bool $isMonster, int $damage): void
     {
-
         if (! $isMonster) {
             $this->addMessage('The sockets on your gear glow with the radiance of the gems attached.', 'player-action');
             $this->addMessage('The enemies element is stonger then yours, you only do half damage for: '.number_format($damage), 'player-action');

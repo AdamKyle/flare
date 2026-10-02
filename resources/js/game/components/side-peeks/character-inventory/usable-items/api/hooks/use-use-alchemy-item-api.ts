@@ -1,15 +1,12 @@
 import { useApiHandler } from 'api-handler/hooks/use-api-handler';
-import { AxiosError } from 'axios';
-import { useState } from 'react';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import UseUseAlchemyItemApiDefinition from './definitions/use-use-alchemy-item-api-definition';
 import UseUseAlchemyItemApiParams from './definitions/use-use-alchemy-item-api-params';
+import UseAlchemyItemRequestDefinition from '../definitions/use-alchemy-item-request-definition';
 import UseAlchemyItemResponseDefinition from '../definitions/use-alchemy-item-response-definition';
 import { UsableItemApiUrls } from '../enums/usable-item-api-urls';
-
-interface UseAlchemyItemRequestDefinition {
-  use_all: boolean;
-}
 
 const errorMessage = (error: unknown): string =>
   error instanceof AxiosError
@@ -25,39 +22,70 @@ export const useUseAlchemyItemApi = ({
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const useAlchemyItem = async (
-    slotId: number,
-    useAll: boolean
-  ): Promise<void> => {
-    if (slotId <= 0) {
-      return;
-    }
+  const abortControllerRef = useRef<AbortController | null>(null);
 
-    setUsing(true);
-    setError(null);
-    setSuccessMessage(null);
+  useEffect(() => {
+    return () => {
+      const activeController = abortControllerRef.current;
 
-    try {
-      const response = await apiHandler.post<
-        UseAlchemyItemResponseDefinition,
-        never,
-        UseAlchemyItemRequestDefinition
-      >(
-        getUrl(UsableItemApiUrls.USE_ALCHEMY_ITEM, {
-          character: characterId,
-          alchemyBagSlot: slotId,
-        }),
-        { use_all: useAll }
-      );
+      abortControllerRef.current = null;
+      activeController?.abort();
+    };
+  }, []);
 
-      setSuccessMessage(response.message);
-      onSuccess();
-    } catch (requestError) {
-      setError(errorMessage(requestError));
-    } finally {
-      setUsing(false);
-    }
-  };
+  const useAlchemyItem = useCallback(
+    async (slotId: number, useAll: boolean): Promise<void> => {
+      if (slotId <= 0) {
+        return;
+      }
+
+      abortControllerRef.current?.abort();
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+
+      setUsing(true);
+      setError(null);
+      setSuccessMessage(null);
+
+      try {
+        const response = await apiHandler.post<
+          UseAlchemyItemResponseDefinition,
+          AxiosRequestConfig<UseAlchemyItemRequestDefinition>,
+          UseAlchemyItemRequestDefinition
+        >(
+          getUrl(UsableItemApiUrls.USE_ALCHEMY_ITEM, {
+            character: characterId,
+            alchemyBagSlot: slotId,
+          }),
+          { use_all: useAll },
+          { signal: controller.signal }
+        );
+
+        if (abortControllerRef.current !== controller) {
+          return;
+        }
+
+        setSuccessMessage(response.message);
+        onSuccess();
+      } catch (requestError) {
+        if (axios.isCancel(requestError)) {
+          return;
+        }
+
+        if (abortControllerRef.current !== controller) {
+          return;
+        }
+
+        setError(errorMessage(requestError));
+      } finally {
+        if (abortControllerRef.current === controller) {
+          abortControllerRef.current = null;
+          setUsing(false);
+        }
+      }
+    },
+    [apiHandler, getUrl, characterId, onSuccess]
+  );
 
   return { using, error, successMessage, useAlchemyItem };
 };

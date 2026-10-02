@@ -1,15 +1,9 @@
 import { driver, Driver } from 'driver.js';
 import 'driver.js/dist/driver.css';
 
-import { GuideQuestWalkthroughStepDefinition } from '../../api/definitions/guide-quest-walkthrough-definition';
+import { GuideWalkthroughStepType } from '../enums/guide-walkthrough-step-type';
 import { GuideTargets } from '../registry/guide-targets';
-
-interface PresentGuideStepParams {
-  step: GuideQuestWalkthroughStepDefinition;
-  element: HTMLElement | null;
-  on_continue: () => void;
-  on_close: () => void;
-}
+import PresentGuideStepParams from '../types/present-guide-step-params';
 
 export const presentGuideStep = ({
   step,
@@ -41,7 +35,9 @@ export const presentGuideStep = ({
       side: step.target === GuideTargets.ITEM_ACTIONS ? 'left' : undefined,
       align: step.target === GuideTargets.ITEM_ACTIONS ? 'start' : undefined,
       showButtons:
-        step.step_type === 'continue' ? ['next', 'close'] : ['close'],
+        step.step_type === GuideWalkthroughStepType.CONTINUE
+          ? ['next', 'close']
+          : ['close'],
     },
   });
 

@@ -112,12 +112,14 @@ export const formatNumberWithCommas = (value: number): string => {
 };
 
 /**
- * Formats a proportion as a comma-grouped percentage with two decimal places.
+ * Formats a proportion as a comma-grouped percentage, using two decimal places
+ * unless `fractionDigits` says otherwise.
  *
  * Pass values like `0.55` to represent `55%`.
  * Negative values are supported.
  *
  * @param {number} value - The proportion to convert (e.g., `0.1234` for 12.34%).
+ * @param {number} fractionDigits - The number of decimal places to show.
  * @returns {string} The formatted percentage (e.g., `"12.34%"`).
  *
  * @example

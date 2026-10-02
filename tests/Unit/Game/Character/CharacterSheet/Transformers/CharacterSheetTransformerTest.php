@@ -5,6 +5,7 @@ namespace Tests\Unit\Game\Character\CharacterSheet\Transformers;
 use App\Flare\Models\Character;
 use App\Game\Character\CharacterSheet\Transformers\CharacterSheetTransformer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\Character\CharacterSheetTransformerFactory;
 use Tests\TestCase;
@@ -52,7 +53,7 @@ class CharacterSheetTransformerTest extends TestCase
             'attack', 'ac', 'health', 'resurrection_chance', 'weapon_attack', 'voided_weapon_attack',
             'ring_damage', 'spell_damage', 'voided_spell_damage', 'healing_amount', 'voided_healing_amount',
             'gold', 'gold_dust', 'shards', 'copper_coins', 'gold_bars',
-            'inventory_count', 'resistance_info', 'elemental_atonements', 'reincarnation_info', 'active_boons',
+            'inventory_count', 'resistance_info', 'elemental_atonements', 'elemental_penetration', 'reincarnation_info', 'active_boons',
         ];
 
         $this->assertSame([], array_diff($expectedKeys, array_keys($data)));
@@ -120,9 +121,9 @@ class CharacterSheetTransformerTest extends TestCase
 
         $this->assertSame([
             'atonements' => [
-                'fire' => 0,
-                'ice' => 0,
-                'water' => 0,
+                'fire' => 0.0,
+                'ice' => 0.0,
+                'water' => 0.0,
             ],
             'highest_element' => [
                 'name' => 'N/A',
@@ -145,12 +146,75 @@ class CharacterSheetTransformerTest extends TestCase
         $data = $this->transformer->transform($character);
 
         $this->assertSame([
-            'fire' => 0,
-            'ice' => 0,
-            'water' => 0,
+            'fire' => 0.0,
+            'ice' => 0.0,
+            'water' => 0.0,
         ], $data['elemental_atonements']['atonements']);
         $this->assertSame('N/A', $data['elemental_atonements']['highest_element']['name']);
         $this->assertSame(0.0, $data['elemental_atonements']['highest_element']['damage']);
+    }
+
+    public function test_transform_returns_elemental_atonements_from_the_cached_character_sheet(): void
+    {
+        $character = $this->character;
+
+        Cache::put('character-sheet-'.$character->id, [
+            'level' => $character->level,
+            'elemental_atonement' => [
+                'atonements' => ['Fire' => 0.75, 'Water' => 0.1, 'Ice' => 0.25],
+                'highest_element' => ['name' => 'Fire', 'damage' => 0.75],
+            ],
+            'elemental_penetration' => ['Fire' => 0.0, 'Water' => 0.0, 'Ice' => 0.0],
+        ]);
+
+        $data = $this->transformer->transform($character);
+
+        $this->assertSame([
+            'atonements' => [
+                'fire' => 0.75,
+                'ice' => 0.25,
+                'water' => 0.1,
+            ],
+            'highest_element' => [
+                'name' => 'Fire',
+                'damage' => 0.75,
+            ],
+        ], $data['elemental_atonements']);
+    }
+
+    public function test_transform_returns_elemental_penetration_from_the_cached_character_sheet(): void
+    {
+        $character = $this->character;
+
+        Cache::put('character-sheet-'.$character->id, [
+            'level' => $character->level,
+            'elemental_atonement' => [
+                'atonements' => ['Fire' => 0.0, 'Water' => 0.0, 'Ice' => 0.0],
+                'highest_element' => ['name' => 'N/A', 'damage' => 0.0],
+            ],
+            'elemental_penetration' => ['Fire' => 0.3, 'Water' => 0.05, 'Ice' => 0.2],
+        ]);
+
+        $data = $this->transformer->transform($character);
+
+        $this->assertSame([
+            'fire' => 0.3,
+            'ice' => 0.2,
+            'water' => 0.05,
+        ], $data['elemental_penetration']);
+    }
+
+    public function test_transform_returns_zero_elemental_penetration_for_a_character_without_gems(): void
+    {
+        $character = $this->character;
+
+        $data = $this->transformer->transform($character);
+
+        $this->assertSame([
+            'fire' => 0.0,
+            'ice' => 0.0,
+            'water' => 0.0,
+        ], $data['elemental_penetration']);
     }
 
     public function test_transform_wraps_resistance_info_in_a_data_envelope(): void

@@ -1,19 +1,14 @@
-// components/shop/partials/StatsBlock.tsx
 import React from 'react';
 
 import StatsAttributesBlockRow from './stat-attributes-block-row';
-import { EquippableItemWithBase } from '../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
 import { useGuideTarget } from '../../../../components/guide-quests/walkthrough/hooks/use-guide-target';
 import { GuideTargets } from '../../../../components/guide-quests/walkthrough/registry/guide-targets';
+import StatAttributesBlockProps from '../../types/partials/item-view/stat-attributes-block-props';
 
 import Dl from 'ui/dl/dl';
 import Separator from 'ui/separator/separator';
 
-type StatsBlockProps = {
-  item: EquippableItemWithBase;
-};
-
-const StatsAttributesBlock = ({ item }: StatsBlockProps) => {
+const StatsAttributesBlock = ({ item }: StatAttributesBlockProps) => {
   const itemStatsGuideTarget = useGuideTarget(GuideTargets.ITEM_STATS);
 
   return (
@@ -25,31 +20,31 @@ const StatsAttributesBlock = ({ item }: StatsBlockProps) => {
       <Dl>
         <StatsAttributesBlockRow
           label="Strength"
-          value={Number(item.str_modifier ?? 0)}
+          value={item.str_modifier ?? 0}
         />
         <StatsAttributesBlockRow
           label="Intelligence"
-          value={Number(item.int_modifier ?? 0)}
+          value={item.int_modifier ?? 0}
         />
         <StatsAttributesBlockRow
           label="Dexterity"
-          value={Number(item.dex_modifier ?? 0)}
+          value={item.dex_modifier ?? 0}
         />
         <StatsAttributesBlockRow
           label="Focus"
-          value={Number(item.focus_modifier ?? 0)}
+          value={item.focus_modifier ?? 0}
         />
         <StatsAttributesBlockRow
           label="Charisma"
-          value={Number(item.chr_modifier ?? 0)}
+          value={item.chr_modifier ?? 0}
         />
         <StatsAttributesBlockRow
           label="Agility"
-          value={Number(item.agi_modifier ?? 0)}
+          value={item.agi_modifier ?? 0}
         />
         <StatsAttributesBlockRow
           label="Durability"
-          value={Number(item.dur_modifier ?? 0)}
+          value={item.dur_modifier ?? 0}
         />
       </Dl>
     </div>

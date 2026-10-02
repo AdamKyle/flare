@@ -3,7 +3,6 @@
 namespace App\Flare\GameImporter\Console\Commands;
 
 use App\Flare\Models\GameMap;
-use App\Flare\Models\InfoPage;
 use App\Game\Maps\Values\MapName;
 use Exception;
 use Illuminate\Console\Command;
@@ -28,55 +27,57 @@ class MassImportCustomData extends Command
     protected $description = 'Imports Game Data in a specific way defined by the programmer';
 
     /**
-     * Execute the console command.
+     * Run the 2.0 release import stages in order, stopping at the first stage that fails.
      *
-     * @return void
+     * @return int
      *
      * @throws Exception
      */
-    public function handle()
+    public function handle(): int
     {
-        if ($this->runStage('Import World Gems', 'import:game-data', ['dirName' => 'World Gems']) !== self::SUCCESS) {
-            return;
+        $exitCode = $this->runStages([
+            ['Import World Gems', 'import:game-data', ['dirName' => 'World Gems']],
+            ['Import Location Templates', 'import:game-data', ['dirName' => 'Location Templates']],
+            ['Import Quests', 'import:game-data', ['dirName' => 'Quests']],
+            ['Import Monsters', 'import:game-data', ['dirName' => 'Monsters']],
+            ['Remove racial stat bonuses', 'remove:racial-stat-bonuses', []],
+        ]);
+
+        if ($exitCode !== self::SUCCESS) {
+            return $exitCode;
         }
 
-        if ($this->runStage('Import Location Templates', 'import:game-data', ['dirName' => 'Location Templates']) !== self::SUCCESS) {
-            return;
+        if (config('app.env') !== 'production') {
+            $this->importBaseGameMaps();
         }
 
-        if ($this->runStage('Import Quests', 'import:game-data', ['dirName' => 'Quests']) !== self::SUCCESS) {
-            return;
+        return $this->runStages([
+            ['Restore base Game Map pieces', 'break:maps-into-pieces', []],
+            ['Synchronize Gem Worlds', 'create:gem-worlds', []],
+            ['Remove all character Gems and compensate players', 'gem-rebuild:remove-alll-gems', []],
+            ['Create Character attack data', 'create:character-attack-data', []],
+            ['Generate Monster cache', 'generate:monster-cache', []],
+            ['Create Quest cache', 'create:quest-cache', []],
+        ]);
+    }
+
+    /**
+     * Run each label, command, and parameters stage in order, returning the first failing exit code or success.
+     *
+     * @param array $stages
+     * @return int
+     */
+    private function runStages(array $stages): int
+    {
+        foreach ($stages as [$label, $command, $parameters]) {
+            $exitCode = $this->runStage($label, $command, $parameters);
+
+            if ($exitCode !== self::SUCCESS) {
+                return $exitCode;
+            }
         }
 
-        if ($this->runStage('Remove racial stat bonuses', 'remove:racial-stat-bonuses') !== self::SUCCESS) {
-            return;
-        }
-
-        if (config('app.env') !== 'production' && ! $this->importBaseGameMaps()) {
-            return;
-        }
-
-        if ($this->runStage('Restore base Game Map pieces', 'break:maps-into-pieces') !== self::SUCCESS) {
-            return;
-        }
-
-        if ($this->runStage('Synchronize Gem Worlds', 'create:gem-worlds') !== self::SUCCESS) {
-            return;
-        }
-
-        if ($this->runStage('Remove all character Gems and compensate players', 'gem-rebuild:remove-alll-gems') !== self::SUCCESS) {
-            return;
-        }
-
-        if ($this->runStage('Create Character attack data', 'create:character-attack-data') !== self::SUCCESS) {
-            return;
-        }
-
-        if ($this->runStage('Generate Monster cache', 'generate:monster-cache') !== self::SUCCESS) {
-            return;
-        }
-
-        $this->runStage('Create Quest cache', 'create:quest-cache');
+        return self::SUCCESS;
     }
 
     /**
@@ -111,65 +112,23 @@ class MassImportCustomData extends Command
     }
 
     /**
-     * Import the information section
+     * Import the base Game Maps outside production, reporting the stage like an Artisan stage.
      *
      * @return void
-     */
-    private function importInformationSection(): void
-    {
-
-        InfoPage::truncate();
-
-        $data = Storage::disk('data-imports')->get('Admin Section/information.json');
-
-        $data = json_decode(trim($data), true);
-
-        foreach ($data as $modelEntry) {
-            InfoPage::updateOrCreate(['id' => $modelEntry['id']], $modelEntry);
-        }
-
-        $sourceDirectory = resource_path('backup/info-sections-images');
-        $destinationDirectory = storage_path('app/public');
-
-        $deleteCommand = 'rm -rf '.escapeshellarg($destinationDirectory).'./info-sections-images';
-        exec($deleteCommand, $output, $exitCode);
-
-        if ($exitCode !== 0) {
-            $this->error('Could not delete the info-section-images directory');
-
-            return;
-        }
-
-        $command = 'cp -R '.escapeshellarg($sourceDirectory).' '.escapeshellarg($destinationDirectory);
-        exec($command, $output, $exitCode);
-
-        if ($exitCode === 0) {
-            $this->line('Information section images directory copied to public successfully. Information section is now set up.');
-        } else {
-            $this->error('Failed to copy the information images directory over. You can do this manually from the resources/backup/information-sections-images. Copy the entire directory to app/public');
-        }
-    }
-
-    /**
-     * Import the base Game Maps outside production, reporting the stage outcome like an Artisan stage.
-     *
-     * @return bool
      *
      * @throws Exception
      */
-    private function importBaseGameMaps(): bool
+    private function importBaseGameMaps(): void
     {
         $this->line('START: Import base Game Maps');
 
         $this->importGameMaps();
 
         $this->info('COMPLETE: Import base Game Maps');
-
-        return true;
     }
 
     /**
-     * Import the game maps
+     * Store each base Game Map image in progression order and create or update its Game Map record.
      *
      * @return void
      *
@@ -191,39 +150,44 @@ class MassImportCustomData extends Command
             'Delusional Memories.png',
         ];
 
-        // Sort the array such that the maps are in the correct order.
-        usort($files, function ($a, $b) use ($correctOrder) {
-            $indexA = array_search($a, $correctOrder);
-            $indexB = array_search($b, $correctOrder);
-
-            return $indexA - $indexB;
-        });
+        usort($files, fn (string $firstFile, string $secondFile): int => array_search($firstFile, $correctOrder) - array_search($secondFile, $correctOrder));
 
         foreach ($files as $file) {
-            $fileName = pathinfo($file, PATHINFO_FILENAME);
-
-            $path = Storage::disk('maps')->putFile($fileName, new File(resource_path('maps').'/'.$file));
-
-            $mapValue = MapName::from($fileName);
-
-            $gameMap = GameMap::where('name', $fileName)->first();
-
-            if (! is_null($gameMap)) {
-                $gameMap->update([
-                    'path' => $path,
-                ]);
-
-                continue;
-            }
-
-            $gameMapData = array_merge([
-                'name' => $fileName,
-                'path' => $path,
-                'default' => $mapValue->isSurface(),
-                'kingdom_color' => MapName::kingdomColors()[$fileName],
-            ], (MapName::from($fileName))->getMapModifers());
-
-            GameMap::create($gameMapData);
+            $this->importGameMap($file);
         }
+    }
+
+    /**
+     * Store one base Game Map image and create or update its Game Map record.
+     *
+     * @param string $file
+     * @return void
+     *
+     * @throws Exception
+     */
+    private function importGameMap(string $file): void
+    {
+        $fileName = pathinfo($file, PATHINFO_FILENAME);
+
+        $path = Storage::disk('maps')->putFile($fileName, new File(resource_path('maps').'/'.$file));
+
+        $mapValue = MapName::from($fileName);
+
+        $gameMap = GameMap::where('name', $fileName)->first();
+
+        if (! is_null($gameMap)) {
+            $gameMap->update([
+                'path' => $path,
+            ]);
+
+            return;
+        }
+
+        GameMap::create(array_merge([
+            'name' => $fileName,
+            'path' => $path,
+            'default' => $mapValue->isSurface(),
+            'kingdom_color' => MapName::kingdomColors()[$fileName],
+        ], $mapValue->getMapModifers()));
     }
 }

@@ -11,17 +11,15 @@ use App\Game\Gems\Values\ResolvedAreaGemEffects;
 use App\Game\Gems\Values\ResolvedAreaGemSource;
 use League\Fractal\TransformerAbstract;
 
-/**
- * Transforms a persisted Monster into its effective, cache-ready payload
- * using the resolved area (Map/Location) Gem effects for the Monster's
- * current gameplay context.
- */
 class MonsterTransformer extends TransformerAbstract
 {
     private ?ResolvedAreaGemEffects $areaEffects = null;
 
     /**
      * Return a clone of this transformer configured with the resolved area Gem effects to apply.
+     *
+     * @param ResolvedAreaGemEffects $areaEffects
+     * @return MonsterTransformer
      */
     public function withAreaGemEffects(ResolvedAreaGemEffects $areaEffects): MonsterTransformer
     {
@@ -33,6 +31,9 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Build the effective transformed Monster payload for the configured area Gem effects.
+     *
+     * @param Monster $monster
+     * @return array
      */
     public function transform(Monster $monster): array
     {
@@ -101,6 +102,9 @@ class MonsterTransformer extends TransformerAbstract
             'fire_atonement' => $fireAtonement,
             'ice_atonement' => $iceAtonement,
             'water_atonement' => $waterAtonement,
+            'fire_penetration' => $monster->fire_penetration ?? 0.0,
+            'ice_penetration' => $monster->ice_penetration ?? 0.0,
+            'water_penetration' => $monster->water_penetration ?? 0.0,
             'life_stealing_resistance' => $monster->life_stealing_resistance,
             'raid_special_attack_type' => $monster->raid_special_attack_type,
             'only_for_location_type' => $monster->only_for_location_type,
@@ -121,6 +125,8 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Resolve the configured area Gem effects, defaulting to a no-effect result when none were configured.
+     *
+     * @return ResolvedAreaGemEffects
      */
     private function resolvedAreaEffects(): ResolvedAreaGemEffects
     {
@@ -129,6 +135,10 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Increase a whole-number reward amount (XP/Gold) by a percent and round to the nearest integer.
+     *
+     * @param int|float|null $value
+     * @param float $percent
+     * @return int
      */
     private function increaseRewardAmount(int|float|null $value, float $percent): int
     {
@@ -139,6 +149,10 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Apply a percent multiplier to an integer-like stat and round to int.
+     *
+     * @param int|float|null $value
+     * @param float $percent
+     * @return int
      */
     private function applyPercentToIntegerStat(int|float|null $value, float $percent): int
     {
@@ -149,6 +163,10 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Apply a percent multiplier to a "min-max" range string.
+     *
+     * @param string $range
+     * @param float $percent
+     * @return string
      */
     private function applyPercentToRange(string $range, float $percent): string
     {
@@ -162,6 +180,10 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Increase a numeric (non-probability) stat by a percent.
+     *
+     * @param float|int|null $value
+     * @param float $percent
+     * @return float|int
      */
     private function increaseNumeric(float|int|null $value, float $percent): float|int
     {
@@ -172,6 +194,11 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Increase a ratio/probability by a percent multiplier and clamp to a maximum cap.
+     *
+     * @param float|int|null $value
+     * @param float $percent
+     * @param float $cap
+     * @return float
      */
     private function increaseRatio(float|int|null $value, float $percent, float $cap): float
     {
@@ -182,6 +209,11 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Add a resolved Gem ratio effect to a base ratio/probability and clamp to a maximum cap.
+     *
+     * @param float|int|null $value
+     * @param float $effect
+     * @param float $cap
+     * @return float
      */
     private function addRatio(float|int|null $value, float $effect, float $cap): float
     {
@@ -192,6 +224,10 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Resolve elemental atonement using the Monster-over-Gem precedence rule.
+     *
+     * @param Monster $monster
+     * @param ResolvedAreaGemAtonement $atonement
+     * @return array
      */
     private function resolveAtonement(Monster $monster, ResolvedAreaGemAtonement $atonement): array
     {
@@ -217,6 +253,8 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Build the Gem effect context metadata describing why/how this Monster was transformed.
+     *
+     * @return array
      */
     private function buildGemEffectContext(): array
     {

@@ -9,6 +9,7 @@ use App\Game\Monsters\Values\MonsterCacheKey;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\Setup\Monster\MonsterListServiceFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterGameMapGemProgression;
 use Tests\Traits\CreateGameLocationGemParamter;
@@ -22,13 +23,22 @@ class MonsterListServiceTest extends TestCase
 {
     use CreateCharacterGameMapGemProgression, CreateGameLocationGemParamter, CreateGameMap, CreateGameMapGemParamter, CreateGem, CreateLocation, CreateMonster, RefreshDatabase;
 
+    private MonsterListService $monsterListService;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->monsterListService = (new MonsterListServiceFactory)->build();
+    }
+
     public function test_normal_map_resolves_the_regular_monsters_cache(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $gameMap = $character->map->gameMap;
         $monster = $this->createMonster(['game_map_id' => $gameMap->id]);
 
-        $list = resolve(MonsterListService::class)->getMonstersForCharacterAsList($character->refresh());
+        $list = $this->monsterListService->getMonstersForCharacterAsList($character->refresh());
 
         $this->assertTrue(collect($list)->contains('id', $monster->id));
     }
@@ -41,7 +51,7 @@ class MonsterListServiceTest extends TestCase
         $monster = $this->createMonster(['game_map_id' => $gameMap->id]);
         $this->createMonster(['game_map_id' => $otherMap->id]);
 
-        $effectiveMonster = resolve(MonsterListService::class)->getMonsterForFight($character->refresh(), $monster->id);
+        $effectiveMonster = $this->monsterListService->getMonsterForFight($character->refresh(), $monster->id);
 
         $this->assertSame($monster->id, $effectiveMonster['id']);
         $this->assertTrue(Cache::has(MonsterCacheKey::forGameMap($gameMap->id)));
@@ -66,7 +76,7 @@ class MonsterListServiceTest extends TestCase
 
         $this->createMonster(['game_map_id' => $gameMap->id]);
 
-        resolve(MonsterListService::class)->getMonstersForCharacterAsList($character->refresh());
+        $this->monsterListService->getMonstersForCharacterAsList($character->refresh());
 
         $this->assertTrue(Cache::has(MonsterCacheKey::LOCATION_MONSTERS->value));
         $this->assertArrayHasKey('location-'.$location->id, Cache::get(MonsterCacheKey::LOCATION_MONSTERS->value));
@@ -86,7 +96,7 @@ class MonsterListServiceTest extends TestCase
 
         $monster = $this->createMonster(['game_map_id' => $gameMap->id]);
 
-        $list = resolve(MonsterListService::class)->getMonstersForCharacterAsList($character->refresh());
+        $list = $this->monsterListService->getMonstersForCharacterAsList($character->refresh());
 
         $this->assertTrue(collect($list)->contains('id', $monster->id));
     }
@@ -108,7 +118,7 @@ class MonsterListServiceTest extends TestCase
             'only_for_location_type' => LocationType::CAVE_OF_MEMORIES->value,
         ]);
 
-        $list = resolve(MonsterListService::class)->getMonstersForCharacterAsList($character->refresh());
+        $list = $this->monsterListService->getMonstersForCharacterAsList($character->refresh());
 
         $this->assertTrue(collect($list)->contains('id', $weeklyMonster->id));
     }
@@ -130,7 +140,7 @@ class MonsterListServiceTest extends TestCase
 
         $this->createMonster(['game_map_id' => $gameMap->id]);
 
-        resolve(MonsterListService::class)->getMonstersForCharacterAsList($character->refresh());
+        $this->monsterListService->getMonstersForCharacterAsList($character->refresh());
 
         $cache = Cache::get(MonsterCacheKey::LOCATION_MONSTERS->value);
 
@@ -160,7 +170,7 @@ class MonsterListServiceTest extends TestCase
 
         $character->map->update(['game_map_id' => $generatedMap->id]);
 
-        $list = resolve(MonsterListService::class)->getMonstersForCharacterAsList($character->refresh());
+        $list = $this->monsterListService->getMonstersForCharacterAsList($character->refresh());
 
         $this->assertTrue(collect($list)->contains('id', $monster->id));
     }
@@ -188,7 +198,7 @@ class MonsterListServiceTest extends TestCase
 
         $character->map->update(['game_map_id' => $generatedMap->id]);
 
-        $list = resolve(MonsterListService::class)->getMonstersForCharacterAsList($character->refresh());
+        $list = $this->monsterListService->getMonstersForCharacterAsList($character->refresh());
 
         $this->assertTrue(collect($list)->contains('id', $monster->id));
     }
@@ -224,7 +234,7 @@ class MonsterListServiceTest extends TestCase
 
         $character->map->update(['game_map_id' => $generatedMap->id]);
 
-        $effectiveMonster = resolve(MonsterListService::class)->getMonsterForFight($character->refresh(), $monster->id);
+        $effectiveMonster = $this->monsterListService->getMonsterForFight($character->refresh(), $monster->id);
 
         // Rolled 0.10 x the 2.0 Map Gem World monster multiplier (0.20), plus the personal negative bonus at level 200 (0.03) = 0.23.
         $this->assertSame(123, $effectiveMonster['str']);
@@ -250,7 +260,7 @@ class MonsterListServiceTest extends TestCase
 
         $monster = $this->createMonster(['game_map_id' => $gameMap->id, 'str' => 100, 'damage_stat' => 'str']);
 
-        $effectiveMonster = resolve(MonsterListService::class)->getMonsterForFight($character->refresh(), $monster->id);
+        $effectiveMonster = $this->monsterListService->getMonsterForFight($character->refresh(), $monster->id);
 
         $this->assertSame(110, $effectiveMonster['str']);
     }
@@ -287,7 +297,7 @@ class MonsterListServiceTest extends TestCase
             'damage_stat' => 'str',
         ]);
 
-        $effectiveMonster = resolve(MonsterListService::class)->getMonsterForFight($character->refresh(), $weeklyMonster->id);
+        $effectiveMonster = $this->monsterListService->getMonsterForFight($character->refresh(), $weeklyMonster->id);
 
         $this->assertSame(100, $effectiveMonster['str']);
     }

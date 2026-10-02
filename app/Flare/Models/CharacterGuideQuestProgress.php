@@ -5,6 +5,7 @@ namespace App\Flare\Models;
 use Database\Factories\CharacterGuideQuestProgressFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CharacterGuideQuestProgress extends Model
 {
@@ -30,9 +31,9 @@ class CharacterGuideQuestProgress extends Model
     /**
      * Return the Character that owns this progress record.
      *
-     * @return mixed
+     * @return BelongsTo
      */
-    public function character()
+    public function character(): BelongsTo
     {
         return $this->belongsTo(Character::class);
     }
@@ -40,9 +41,9 @@ class CharacterGuideQuestProgress extends Model
     /**
      * Return the Guide Quest represented by this progress record.
      *
-     * @return mixed
+     * @return BelongsTo
      */
-    public function guideQuest()
+    public function guideQuest(): BelongsTo
     {
         return $this->belongsTo(GuideQuest::class);
     }
@@ -50,9 +51,9 @@ class CharacterGuideQuestProgress extends Model
     /**
      * Return the persisted current walkthrough step.
      *
-     * @return mixed
+     * @return BelongsTo
      */
-    public function currentStep()
+    public function currentStep(): BelongsTo
     {
         return $this->belongsTo(GuideQuestWalkthroughStep::class, 'current_guide_quest_walkthrough_step_id');
     }

@@ -11,7 +11,9 @@ use App\Game\Core\Chance\RandomNumberGenerator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Mockery;
+use Tests\Setup\Battle\ServerFight\ElementalAttackFactory;
 use Tests\Setup\Battle\ServerFight\MonsterAttackFactory;
+use Tests\Setup\Battle\ServerFight\MonsterSpecialAttackFactory;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 
@@ -309,6 +311,78 @@ class MonsterAttackTest extends TestCase
             'message' => 'Test Monster misses!',
             'type' => 'enemy-action',
         ], $monsterAttack->getMessages());
+    }
+
+    public function test_monster_elemental_attack_applies_the_monsters_cached_penetration_to_character_atonement(): void
+    {
+        $character = (new CharacterFactory())->createBaseCharacter()->getCharacter();
+        Cache::put('character-sheet-'.$character->id, [
+            'level' => $character->level,
+            'health' => 1000,
+            'affix_damage_reduction' => 0.0,
+            'elemental_atonement' => [
+                'atonements' => ['Fire' => 0.75, 'Water' => 0.0, 'Ice' => 0.0],
+                'highest_element' => ['name' => 'Fire', 'damage' => 0.75],
+            ],
+        ]);
+
+        $canHit = Mockery::mock(CanHit::class);
+        $canHit->shouldReceive('canMonsterHitPlayer')->once()->andReturn(false);
+        $canHit->shouldReceive('canMonsterCastSpell')->once()->andReturn(false);
+
+        $healedCharacterHealth = 0;
+        $healedMonsterHealth = 0;
+        $playerHealing = Mockery::mock(PlayerHealing::class);
+        $playerHealing->shouldReceive('setCharacterHealth')->andReturnUsing(function ($health) use (&$healedCharacterHealth) {
+            $healedCharacterHealth = $health;
+        });
+        $playerHealing->shouldReceive('setMonsterHealth')->andReturnUsing(function ($health) use (&$healedMonsterHealth) {
+            $healedMonsterHealth = $health;
+        });
+        $playerHealing->shouldReceive('healInBattle');
+        $playerHealing->shouldReceive('lifeSteal');
+        $playerHealing->shouldReceive('getCharacterHealth')->andReturnUsing(function () use (&$healedCharacterHealth) {
+            return $healedCharacterHealth;
+        });
+        $playerHealing->shouldReceive('getMonsterHealth')->andReturnUsing(function () use (&$healedMonsterHealth) {
+            return $healedMonsterHealth;
+        });
+        $playerHealing->shouldReceive('getMessages')->andReturn([]);
+        $playerHealing->shouldReceive('clearMessages');
+
+        $monsterAttack = $this->monsterAttackFactory->buildMonsterAttack(
+            playerHealing: $playerHealing,
+            canHit: $canHit,
+            elementalAttack: (new ElementalAttackFactory())->buildElementalAttack(),
+            monsterSpecialAttack: (new MonsterSpecialAttackFactory())->buildMonsterSpecialAttack(),
+        );
+        $monsterAttack->setCharacterHealth(1000);
+        $monsterAttack->setMonsterHealth(1000);
+
+        $monsterRandomNumberGenerator = Mockery::mock(RandomNumberGenerator::class);
+        $monsterRandomNumberGenerator->shouldReceive('numberBetween')->andReturnUsing(fn ($min, $max) => $min);
+        $monster = (new ServerMonster(new ChanceCalculator($monsterRandomNumberGenerator), $monsterRandomNumberGenerator))->setMonster([
+            'name' => 'Raid Monster',
+            'is_raid_monster' => true,
+            'is_raid_boss' => false,
+            'fire_atonement' => 1.0,
+            'ice_atonement' => 0.5,
+            'water_atonement' => 0.5,
+            'fire_penetration' => 0.2,
+            'ice_penetration' => 0.1,
+            'water_penetration' => 0.1,
+            'criticality' => 0.0,
+            'attack_range' => '100-100',
+            'increases_damage_by' => null,
+            'max_affix_damage' => 0,
+            'damage_stat' => 'str',
+            'str' => 10,
+            'raid_special_attack_type' => null,
+        ]);
+
+        $monsterAttack->monsterAttack($monster, $character, 'attack');
+
+        $this->assertSame(955, $monsterAttack->getCharacterHealth());
     }
 
     public function test_get_last_rolled_attack_returns_zero_by_default(): void

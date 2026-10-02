@@ -4,11 +4,12 @@ import { EventSystemProvider } from 'event-system/components/event-system-provid
 import React from 'react';
 import { ServiceContainer } from 'service-container-provider/service-container';
 
-import { EchoHandlerProvider } from '../websocket-handler/components/echo-handler-provider';
 import GuideQuestProvider from './components/guide-quests/components/guide-quest-provider';
 import GuideWalkthroughProvider from './components/guide-quests/walkthrough/components/guide-walkthrough-provider';
 import BaseSidePeek from './components/side-peeks/base/base-side-peek';
 import GameSection from './game-section';
+
+import { EchoHandlerProvider } from 'websockets/components/echo-handler-provider';
 
 import GameDataProvider from 'game-data/components/game-data-provider';
 

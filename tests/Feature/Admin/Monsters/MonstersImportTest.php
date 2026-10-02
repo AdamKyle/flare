@@ -25,6 +25,7 @@ class MonstersImportTest extends TestCase
         'life_stealing_resistance', 'quest_item_id', 'quest_item_drop_chance', 'is_celestial_entity',
         'celestial_type', 'gold_cost', 'gold_dust_cost', 'shards', 'is_raid_monster', 'is_raid_boss',
         'raid_special_attack_type', 'fire_atonement', 'ice_atonement', 'water_atonement',
+        'fire_penetration', 'ice_penetration', 'water_penetration',
     ];
 
     public function test_valid_workbook_writes_every_managed_field_group(): void
@@ -56,8 +57,53 @@ class MonstersImportTest extends TestCase
         $this->assertSame($map->id, $monster->game_map_id);
         $this->assertSame($questItem->id, $monster->quest_item_id);
         $this->assertEquals(0.5, $monster->quest_item_drop_chance);
-        $this->assertTrue((bool) $monster->can_cast);
-        $this->assertTrue((bool) $monster->is_celestial_entity);
+        $this->assertTrue($monster->can_cast);
+        $this->assertTrue($monster->is_celestial_entity);
+    }
+
+    public function test_valid_workbook_persists_elemental_penetration(): void
+    {
+        $this->createGameMap(['name' => 'Import Map']);
+
+        $row = $this->minimalMonsterImportRow([
+            'fire_atonement' => 0.5,
+            'ice_atonement' => 0.2,
+            'fire_penetration' => 0.2,
+            'ice_penetration' => 0.1,
+            'water_penetration' => 0,
+        ]);
+
+        $rows = collect([
+            collect(self::HEADERS),
+            collect(array_map(fn ($header) => $row[$header] ?? null, self::HEADERS)),
+        ]);
+
+        $sheet = new MonstersSheet;
+        $sheet->collection($rows);
+
+        $this->assertTrue($sheet->wasSuccessful());
+        $monster = Monster::where('name', 'Import Monster')->first();
+        $this->assertSame(0.2, $monster->fire_penetration);
+        $this->assertSame(0.1, $monster->ice_penetration);
+        $this->assertSame(0.0, $monster->water_penetration);
+    }
+
+    public function test_negative_elemental_penetration_is_rejected(): void
+    {
+        $this->createGameMap(['name' => 'Import Map']);
+
+        $row = $this->minimalMonsterImportRow(['ice_penetration' => -0.1]);
+
+        $rows = collect([
+            collect(self::HEADERS),
+            collect(array_map(fn ($header) => $row[$header] ?? null, self::HEADERS)),
+        ]);
+
+        $sheet = new MonstersSheet;
+        $sheet->collection($rows);
+
+        $this->assertFalse($sheet->wasSuccessful());
+        $this->assertSame(0, Monster::count());
     }
 
     public function test_missing_required_field_is_rejected(): void
@@ -252,7 +298,7 @@ class MonstersImportTest extends TestCase
 
         $this->assertTrue($sheet->wasSuccessful());
         $monster = Monster::where('name', 'Import Monster')->first();
-        $this->assertFalse((bool) $monster->can_cast);
+        $this->assertFalse($monster->can_cast);
     }
 
     public function test_validation_failure_produces_zero_writes(): void

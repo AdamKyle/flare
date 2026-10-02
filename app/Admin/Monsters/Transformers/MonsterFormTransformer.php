@@ -8,6 +8,9 @@ class MonsterFormTransformer
 {
     /**
      * Transform a Monster into its Admin save-response / form-value representation.
+     *
+     * @param Monster $monster
+     * @return array
      */
     public function transform(Monster $monster): array
     {
@@ -67,6 +70,9 @@ class MonsterFormTransformer
             'fire_atonement' => $monster->fire_atonement,
             'ice_atonement' => $monster->ice_atonement,
             'water_atonement' => $monster->water_atonement,
+            'fire_penetration' => $monster->fire_penetration,
+            'ice_penetration' => $monster->ice_penetration,
+            'water_penetration' => $monster->water_penetration,
         ];
     }
 }

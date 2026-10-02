@@ -1,7 +1,8 @@
 import { useActivityTimeout } from 'api-handler/hooks/use-activity-timeout';
 import { useApiHandler } from 'api-handler/hooks/use-api-handler';
-import { AxiosError, AxiosRequestConfig } from 'axios';
-import { useCallback, useEffect, useState } from 'react';
+import { resolveApiErrorMessage } from 'api-handler/utils/resolve-api-error-message';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { GuideWalkthroughEvent } from '../../../../../guide-quests/walkthrough/enums/guide-walkthrough-event';
 import { useGuideWalkthroughEventEmitter } from '../../../../../guide-quests/walkthrough/hooks/use-guide-walkthrough-event-emitter';
@@ -9,7 +10,6 @@ import { CharacterInventoryApiUrls } from '../../../api/enums/character-inventor
 import UseEquipItemApiDefinition from '../definitions/use-equip-item-api-definition';
 import UseEquipItemApiResponseDefinition from '../definitions/use-equip-item-api-response-definition';
 import UseEquipItemParamsDefinition from '../definitions/use-equip-item-params-definition';
-import UseGetInventoryItemComparisonDefinition from '../definitions/use-equip-item-request-params-definition';
 import UseEquipItemRequestParamsDefinition from '../definitions/use-equip-item-request-params-definition';
 
 export const useEquipItem = ({
@@ -23,68 +23,103 @@ export const useEquipItem = ({
   const [error, setError] = useState<UseEquipItemApiDefinition['error']>(null);
   const [loading, setLoading] = useState(false);
   const [requestParams, setRequestParams] =
-    useState<UseGetInventoryItemComparisonDefinition>({
+    useState<UseEquipItemRequestParamsDefinition>({
       position: null,
       slot_id: 0,
       equip_type: null,
     });
 
-  const url = getUrl(CharacterInventoryApiUrls.CHARACTER_EQUIP_ITEM, {
-    character: character_id,
-  });
-
-  const equipSelectedItem = useCallback(
-    async () => {
-      if (requestParams.slot_id === 0) {
-        return null;
-      }
-
-      setLoading(true);
-      setError(null);
-
-      try {
-        const result = await apiHandler.post<
-          UseEquipItemApiResponseDefinition,
-          AxiosRequestConfig<UseEquipItemRequestParamsDefinition>,
-          UseEquipItemRequestParamsDefinition
-        >(url, {
-          slot_id: requestParams.slot_id,
-          position: requestParams.position,
-          equip_type: requestParams.equip_type,
-        });
-
-        guideWalkthroughEventEmitter.emit(
-          GuideWalkthroughEvent.ITEM_EQUIPPED,
-          undefined
-        );
-        on_success(result.message);
-
-        setLoading(false);
-      } catch (err) {
-        if (err instanceof AxiosError) {
-          handleInactivity({
-            setError,
-            response: err,
-          });
-
-          setError(err.response?.data || null);
-        }
-      } finally {
-        setLoading(false);
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [apiHandler, url, requestParams]
-  );
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const onSuccessRef = useRef(on_success);
 
   useEffect(() => {
-    if (character_id <= 0) {
+    onSuccessRef.current = on_success;
+  }, [on_success]);
+
+  useEffect(() => {
+    return () => {
+      const activeController = abortControllerRef.current;
+
+      abortControllerRef.current = null;
+      activeController?.abort();
+    };
+  }, []);
+
+  const equipSelectedItem = useCallback(async (): Promise<void> => {
+    if (character_id <= 0 || requestParams.slot_id === 0) {
       return;
     }
 
-    equipSelectedItem().catch(() => {});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [equipSelectedItem, requestParams]);
+    abortControllerRef.current?.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const result = await apiHandler.post<
+        UseEquipItemApiResponseDefinition,
+        AxiosRequestConfig<UseEquipItemRequestParamsDefinition>,
+        UseEquipItemRequestParamsDefinition
+      >(
+        getUrl(CharacterInventoryApiUrls.CHARACTER_EQUIP_ITEM, {
+          character: character_id,
+        }),
+        {
+          slot_id: requestParams.slot_id,
+          position: requestParams.position,
+          equip_type: requestParams.equip_type,
+        },
+        { signal: controller.signal }
+      );
+
+      if (abortControllerRef.current !== controller) {
+        return;
+      }
+
+      guideWalkthroughEventEmitter.emit(
+        GuideWalkthroughEvent.ITEM_EQUIPPED,
+        undefined
+      );
+      onSuccessRef.current(result.message);
+    } catch (requestError) {
+      if (axios.isCancel(requestError)) {
+        return;
+      }
+
+      if (abortControllerRef.current !== controller) {
+        return;
+      }
+
+      setError({
+        message: resolveApiErrorMessage(
+          requestError,
+          'Unable to equip the item.'
+        ),
+      });
+
+      if (requestError instanceof AxiosError) {
+        handleInactivity({ response: requestError, setError });
+      }
+    } finally {
+      if (abortControllerRef.current === controller) {
+        abortControllerRef.current = null;
+        setLoading(false);
+      }
+    }
+  }, [
+    apiHandler,
+    character_id,
+    getUrl,
+    guideWalkthroughEventEmitter,
+    handleInactivity,
+    requestParams,
+  ]);
+
+  useEffect(() => {
+    void equipSelectedItem();
+  }, [equipSelectedItem]);
 
   return {
     error,

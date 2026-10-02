@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
 use Mockery;
 use Mockery\MockInterface;
+use Tests\Setup\Monster\BuildMonsterCacheServiceFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameLocationGemParamter;
 use Tests\Traits\CreateGameMap;
@@ -28,12 +29,28 @@ class BuildMonsterCacheServiceTest extends TestCase
 {
     use CreateGameLocationGemParamter, CreateGameMap, CreateGameMapGemParamter, CreateGem, CreateLocation, CreateMonster, RefreshDatabase;
 
+    private ?BuildMonsterCacheService $buildMonsterCacheService;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->buildMonsterCacheService = (new BuildMonsterCacheServiceFactory)->build();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->buildMonsterCacheService = null;
+    }
+
     public function test_build_cache_creates_the_regular_monster_cache(): void
     {
         $gameMap = $this->createGameMap(['name' => 'Regular Cache Map', 'default' => false]);
         $this->createMonster(['game_map_id' => $gameMap->id]);
 
-        resolve(BuildMonsterCacheService::class)->buildCache();
+        $this->buildMonsterCacheService->buildCache();
 
         $this->assertTrue(Cache::has(MonsterCacheKey::forGameMap($gameMap->id)));
         $this->assertNotEmpty(Cache::get(MonsterCacheKey::forGameMap($gameMap->id))['data']);
@@ -47,7 +64,7 @@ class BuildMonsterCacheServiceTest extends TestCase
             'only_for_location_type' => LocationType::ALCHEMY_CHURCH->value,
         ]);
 
-        resolve(BuildMonsterCacheService::class)->buildWeeklyFightCache();
+        $this->buildMonsterCacheService->buildWeeklyFightCache();
 
         $cache = Cache::get(MonsterCacheKey::WEEKLY_MONSTERS->value);
 
@@ -66,7 +83,7 @@ class BuildMonsterCacheServiceTest extends TestCase
             'only_for_location_type' => LocationType::CAVE_OF_MEMORIES->value,
         ]);
 
-        resolve(BuildMonsterCacheService::class)->buildLocationCache();
+        $this->buildMonsterCacheService->buildLocationCache();
 
         $cache = Cache::get(MonsterCacheKey::LOCATION_MONSTERS->value);
         $cached = collect($cache['location-'.$location->id]['data'])->firstWhere('id', $monster->id);
@@ -79,7 +96,7 @@ class BuildMonsterCacheServiceTest extends TestCase
         $gameMap = $this->createGameMap(['name' => 'Raid Cache Map', 'default' => false]);
         $this->createMonster(['game_map_id' => $gameMap->id, 'is_raid_boss' => true]);
 
-        resolve(BuildMonsterCacheService::class)->buildRaidCache();
+        $this->buildMonsterCacheService->buildRaidCache();
 
         $this->assertNotEmpty(Cache::get(MonsterCacheKey::RAID_MONSTERS->value)[$gameMap->name]['data']);
     }
@@ -89,14 +106,14 @@ class BuildMonsterCacheServiceTest extends TestCase
         $gameMap = $this->createGameMap(['name' => 'Celestial Cache Map', 'default' => false]);
         $this->createMonster(['game_map_id' => $gameMap->id, 'is_celestial_entity' => true]);
 
-        resolve(BuildMonsterCacheService::class)->buildCelestialCache();
+        $this->buildMonsterCacheService->buildCelestialCache();
 
         $this->assertNotEmpty(Cache::get(MonsterCacheKey::CELESTIALS->value)[$gameMap->name]['data']);
     }
 
     public function test_build_all_never_creates_the_old_special_location_monsters_cache(): void
     {
-        resolve(BuildMonsterCacheService::class)->buildAll();
+        $this->buildMonsterCacheService->buildAll();
 
         $this->assertFalse(Cache::has('special-location-monsters'));
     }
@@ -110,7 +127,7 @@ class BuildMonsterCacheServiceTest extends TestCase
 
         $monster = $this->createMonster(['game_map_id' => $gameMap->id, 'str' => 10]);
 
-        resolve(BuildMonsterCacheService::class)->buildCache();
+        $this->buildMonsterCacheService->buildCache();
 
         $cached = collect(Cache::get(MonsterCacheKey::forGameMap($gameMap->id))['data'])
             ->firstWhere('id', $monster->id);
@@ -132,7 +149,7 @@ class BuildMonsterCacheServiceTest extends TestCase
 
         $monster = $this->createMonster(['game_map_id' => $gameMap->id, 'str' => 10]);
 
-        resolve(BuildMonsterCacheService::class)->buildLocationCache();
+        $this->buildMonsterCacheService->buildLocationCache();
 
         $cached = collect(Cache::get(MonsterCacheKey::LOCATION_MONSTERS->value)['location-'.$location->id]['data'])
             ->firstWhere('id', $monster->id);
@@ -158,7 +175,7 @@ class BuildMonsterCacheServiceTest extends TestCase
             'game_map_gem_paramter_id' => $profile->id,
         ]);
 
-        resolve(BuildMonsterCacheService::class)->buildCache();
+        $this->buildMonsterCacheService->buildCache();
 
         $cached = collect(Cache::get(MonsterCacheKey::forGameMap($generatedMap->id))['data'])
             ->firstWhere('id', $monster->id);
@@ -175,7 +192,7 @@ class BuildMonsterCacheServiceTest extends TestCase
 
         $raidBoss = $this->createMonster(['game_map_id' => $gameMap->id, 'is_raid_boss' => true, 'str' => 10]);
 
-        resolve(BuildMonsterCacheService::class)->buildRaidCache();
+        $this->buildMonsterCacheService->buildRaidCache();
 
         $cached = collect(Cache::get(MonsterCacheKey::RAID_MONSTERS->value)[$gameMap->name]['data'])
             ->firstWhere('id', $raidBoss->id);
@@ -192,7 +209,7 @@ class BuildMonsterCacheServiceTest extends TestCase
 
         $celestial = $this->createMonster(['game_map_id' => $gameMap->id, 'is_celestial_entity' => true, 'str' => 10]);
 
-        resolve(BuildMonsterCacheService::class)->buildCelestialCache();
+        $this->buildMonsterCacheService->buildCelestialCache();
 
         $cached = collect(Cache::get(MonsterCacheKey::CELESTIALS->value)[$gameMap->name]['data'])
             ->firstWhere('id', $celestial->id);
@@ -213,7 +230,7 @@ class BuildMonsterCacheServiceTest extends TestCase
             'str' => 10,
         ]);
 
-        resolve(BuildMonsterCacheService::class)->buildWeeklyFightCache();
+        $this->buildMonsterCacheService->buildWeeklyFightCache();
 
         $cached = collect(Cache::get(MonsterCacheKey::WEEKLY_MONSTERS->value)['location-type-'.LocationType::ALCHEMY_CHURCH->value]['data'])
             ->firstWhere('id', $weeklyMonster->id);
@@ -238,7 +255,7 @@ class BuildMonsterCacheServiceTest extends TestCase
             'str' => 10,
         ]);
 
-        resolve(BuildMonsterCacheService::class)->buildLocationCache();
+        $this->buildMonsterCacheService->buildLocationCache();
 
         $cached = collect(Cache::get(MonsterCacheKey::LOCATION_MONSTERS->value)['location-'.$location->id]['data'])
             ->firstWhere('id', $caveMonster->id);
@@ -261,7 +278,7 @@ class BuildMonsterCacheServiceTest extends TestCase
         $gemTwo = $this->createLocationGeneratedGem($profileTwo, ['enemy_strength_increase' => 0.2]);
         $profileTwo->update(['rolled_gem_id' => $gemTwo->id]);
 
-        resolve(BuildMonsterCacheService::class)->buildLocationCache();
+        $this->buildMonsterCacheService->buildLocationCache();
 
         $cache = Cache::get(MonsterCacheKey::LOCATION_MONSTERS->value);
 
@@ -274,9 +291,9 @@ class BuildMonsterCacheServiceTest extends TestCase
         $gameMap = $this->createGameMap(['name' => 'Invalidate Cache Map', 'default' => false]);
         $this->createMonster(['game_map_id' => $gameMap->id]);
 
-        resolve(BuildMonsterCacheService::class)->buildAll();
+        $this->buildMonsterCacheService->buildAll();
 
-        resolve(BuildMonsterCacheService::class)->invalidateGemAffectedCaches();
+        $this->buildMonsterCacheService->invalidateGemAffectedCaches();
 
         $this->assertFalse(Cache::has(MonsterCacheKey::forGameMap($gameMap->id)));
         $this->assertFalse(Cache::has(MonsterCacheKey::LOCATION_MONSTERS->value));
@@ -292,7 +309,7 @@ class BuildMonsterCacheServiceTest extends TestCase
         $this->createMonster(['game_map_id' => $mapA->id]);
         $this->createMonster(['game_map_id' => $mapB->id]);
 
-        resolve(BuildMonsterCacheService::class)->rebuildMapCache($mapA);
+        $this->buildMonsterCacheService->rebuildMapCache($mapA);
 
         $this->assertTrue(Cache::has(MonsterCacheKey::forGameMap($mapA->id)));
         $this->assertFalse(Cache::has(MonsterCacheKey::forGameMap($mapB->id)));
@@ -308,7 +325,7 @@ class BuildMonsterCacheServiceTest extends TestCase
 
         $monster = $this->createMonster(['game_map_id' => $gameMap->id, 'health_range' => '100-200']);
 
-        resolve(BuildMonsterCacheService::class)->buildCache();
+        $this->buildMonsterCacheService->buildCache();
 
         $cached = collect(Cache::get(MonsterCacheKey::forGameMap($gameMap->id))['data'])
             ->firstWhere('id', $monster->id);
@@ -325,7 +342,7 @@ class BuildMonsterCacheServiceTest extends TestCase
 
         $monster = $this->createMonster(['game_map_id' => $gameMap->id, 'attack_range' => '10-20']);
 
-        resolve(BuildMonsterCacheService::class)->buildCache();
+        $this->buildMonsterCacheService->buildCache();
 
         $cached = collect(Cache::get(MonsterCacheKey::forGameMap($gameMap->id))['data'])
             ->firstWhere('id', $monster->id);
@@ -345,7 +362,7 @@ class BuildMonsterCacheServiceTest extends TestCase
 
         $monster = $this->createMonster(['game_map_id' => $gameMap->id, 'healing_percentage' => 0.2]);
 
-        resolve(BuildMonsterCacheService::class)->buildCache();
+        $this->buildMonsterCacheService->buildCache();
 
         $cached = collect(Cache::get(MonsterCacheKey::forGameMap($gameMap->id))['data'])
             ->firstWhere('id', $monster->id);
@@ -362,7 +379,7 @@ class BuildMonsterCacheServiceTest extends TestCase
 
         $monster = $this->createMonster(['game_map_id' => $gameMap->id, 'spell_evasion' => 0.5]);
 
-        resolve(BuildMonsterCacheService::class)->buildCache();
+        $this->buildMonsterCacheService->buildCache();
 
         $cached = collect(Cache::get(MonsterCacheKey::forGameMap($gameMap->id))['data'])
             ->firstWhere('id', $monster->id);
@@ -379,7 +396,7 @@ class BuildMonsterCacheServiceTest extends TestCase
 
         $monster = $this->createMonster(['game_map_id' => $gameMap->id, 'affix_resistance' => 0.5]);
 
-        resolve(BuildMonsterCacheService::class)->buildCache();
+        $this->buildMonsterCacheService->buildCache();
 
         $cached = collect(Cache::get(MonsterCacheKey::forGameMap($gameMap->id))['data'])
             ->firstWhere('id', $monster->id);
@@ -396,7 +413,7 @@ class BuildMonsterCacheServiceTest extends TestCase
 
         $monster = $this->createMonster(['game_map_id' => $gameMap->id, 'entrancing_chance' => 0.5]);
 
-        resolve(BuildMonsterCacheService::class)->buildCache();
+        $this->buildMonsterCacheService->buildCache();
 
         $cached = collect(Cache::get(MonsterCacheKey::forGameMap($gameMap->id))['data'])
             ->firstWhere('id', $monster->id);
@@ -413,7 +430,7 @@ class BuildMonsterCacheServiceTest extends TestCase
 
         $monster = $this->createMonster(['game_map_id' => $gameMap->id, 'devouring_light_chance' => 0.5]);
 
-        resolve(BuildMonsterCacheService::class)->buildCache();
+        $this->buildMonsterCacheService->buildCache();
 
         $cached = collect(Cache::get(MonsterCacheKey::forGameMap($gameMap->id))['data'])
             ->firstWhere('id', $monster->id);
@@ -430,7 +447,7 @@ class BuildMonsterCacheServiceTest extends TestCase
 
         $monster = $this->createMonster(['game_map_id' => $gameMap->id, 'devouring_darkness_chance' => 0.5]);
 
-        resolve(BuildMonsterCacheService::class)->buildCache();
+        $this->buildMonsterCacheService->buildCache();
 
         $cached = collect(Cache::get(MonsterCacheKey::forGameMap($gameMap->id))['data'])
             ->firstWhere('id', $monster->id);
@@ -447,7 +464,7 @@ class BuildMonsterCacheServiceTest extends TestCase
 
         $monster = $this->createMonster(['game_map_id' => $gameMap->id, 'ambush_chance' => 0.5]);
 
-        resolve(BuildMonsterCacheService::class)->buildCache();
+        $this->buildMonsterCacheService->buildCache();
 
         $cached = collect(Cache::get(MonsterCacheKey::forGameMap($gameMap->id))['data'])
             ->firstWhere('id', $monster->id);
@@ -464,7 +481,7 @@ class BuildMonsterCacheServiceTest extends TestCase
 
         $monster = $this->createMonster(['game_map_id' => $gameMap->id, 'ambush_resistance' => 0.5]);
 
-        resolve(BuildMonsterCacheService::class)->buildCache();
+        $this->buildMonsterCacheService->buildCache();
 
         $cached = collect(Cache::get(MonsterCacheKey::forGameMap($gameMap->id))['data'])
             ->firstWhere('id', $monster->id);
@@ -481,7 +498,7 @@ class BuildMonsterCacheServiceTest extends TestCase
 
         $monster = $this->createMonster(['game_map_id' => $gameMap->id, 'counter_chance' => 0.5]);
 
-        resolve(BuildMonsterCacheService::class)->buildCache();
+        $this->buildMonsterCacheService->buildCache();
 
         $cached = collect(Cache::get(MonsterCacheKey::forGameMap($gameMap->id))['data'])
             ->firstWhere('id', $monster->id);
@@ -498,7 +515,7 @@ class BuildMonsterCacheServiceTest extends TestCase
 
         $monster = $this->createMonster(['game_map_id' => $gameMap->id, 'counter_resistance' => 0.5]);
 
-        resolve(BuildMonsterCacheService::class)->buildCache();
+        $this->buildMonsterCacheService->buildCache();
 
         $cached = collect(Cache::get(MonsterCacheKey::forGameMap($gameMap->id))['data'])
             ->firstWhere('id', $monster->id);
@@ -515,7 +532,7 @@ class BuildMonsterCacheServiceTest extends TestCase
 
         $monster = $this->createMonster(['game_map_id' => $gameMap->id, 'quest_item_drop_chance' => 0.5]);
 
-        resolve(BuildMonsterCacheService::class)->buildCache();
+        $this->buildMonsterCacheService->buildCache();
 
         $cached = collect(Cache::get(MonsterCacheKey::forGameMap($gameMap->id))['data'])
             ->firstWhere('id', $monster->id);
@@ -532,7 +549,7 @@ class BuildMonsterCacheServiceTest extends TestCase
 
         $monster = $this->createMonster(['game_map_id' => $gameMap->id, 'xp' => 100]);
 
-        resolve(BuildMonsterCacheService::class)->buildCache();
+        $this->buildMonsterCacheService->buildCache();
 
         $cached = collect(Cache::get(MonsterCacheKey::forGameMap($gameMap->id))['data'])
             ->firstWhere('id', $monster->id);
@@ -549,7 +566,7 @@ class BuildMonsterCacheServiceTest extends TestCase
 
         $monster = $this->createMonster(['game_map_id' => $gameMap->id, 'gold' => 100]);
 
-        resolve(BuildMonsterCacheService::class)->buildCache();
+        $this->buildMonsterCacheService->buildCache();
 
         $cached = collect(Cache::get(MonsterCacheKey::forGameMap($gameMap->id))['data'])
             ->firstWhere('id', $monster->id);
@@ -574,7 +591,7 @@ class BuildMonsterCacheServiceTest extends TestCase
             'water_atonement' => 0,
         ]);
 
-        resolve(BuildMonsterCacheService::class)->buildCache();
+        $this->buildMonsterCacheService->buildCache();
 
         $cached = collect(Cache::get(MonsterCacheKey::forGameMap($gameMap->id))['data'])
             ->firstWhere('id', $monster->id);
@@ -607,7 +624,7 @@ class BuildMonsterCacheServiceTest extends TestCase
             'water_atonement' => 0,
         ]);
 
-        resolve(BuildMonsterCacheService::class)->buildLocationCache();
+        $this->buildMonsterCacheService->buildLocationCache();
 
         $cached = collect(Cache::get(MonsterCacheKey::LOCATION_MONSTERS->value)['location-'.$location->id]['data'])
             ->firstWhere('id', $monster->id);
@@ -641,13 +658,121 @@ class BuildMonsterCacheServiceTest extends TestCase
             'water_atonement' => 0.6,
         ]);
 
-        resolve(BuildMonsterCacheService::class)->buildLocationCache();
+        $this->buildMonsterCacheService->buildLocationCache();
 
         $cached = collect(Cache::get(MonsterCacheKey::LOCATION_MONSTERS->value)['location-'.$location->id]['data'])
             ->firstWhere('id', $monster->id);
 
         $this->assertSame(0.6, $cached['water_atonement']);
         $this->assertSame(0.0, $cached['ice_atonement']);
+    }
+
+    public function test_raid_cache_preserves_persisted_monster_elemental_penetration(): void
+    {
+        $gameMap = $this->createGameMap(['name' => 'Raid Penetration Map', 'default' => false]);
+        $raidMonster = $this->createMonster([
+            'game_map_id' => $gameMap->id,
+            'is_raid_monster' => true,
+            'fire_atonement' => 0.3,
+            'ice_atonement' => 0.5,
+            'water_atonement' => 0.2,
+            'fire_penetration' => 0.1,
+            'ice_penetration' => 0.2,
+            'water_penetration' => 0.1,
+        ]);
+
+        $this->buildMonsterCacheService->buildRaidCache();
+
+        $cached = collect(Cache::get(MonsterCacheKey::RAID_MONSTERS->value)[$gameMap->name]['data'])
+            ->firstWhere('id', $raidMonster->id);
+
+        $this->assertSame(0.1, $cached['fire_penetration']);
+        $this->assertSame(0.2, $cached['ice_penetration']);
+        $this->assertSame(0.1, $cached['water_penetration']);
+    }
+
+    public function test_raid_cache_preserves_persisted_raid_boss_elemental_penetration(): void
+    {
+        $gameMap = $this->createGameMap(['name' => 'Raid Boss Penetration Map', 'default' => false]);
+        $raidBoss = $this->createMonster([
+            'game_map_id' => $gameMap->id,
+            'is_raid_boss' => true,
+            'fire_atonement' => 0.275,
+            'ice_atonement' => 0.55,
+            'water_atonement' => 0.275,
+            'fire_penetration' => 0.12,
+            'ice_penetration' => 0.24,
+            'water_penetration' => 0.12,
+        ]);
+
+        $this->buildMonsterCacheService->buildRaidCache();
+
+        $cached = collect(Cache::get(MonsterCacheKey::RAID_MONSTERS->value)[$gameMap->name]['data'])
+            ->firstWhere('id', $raidBoss->id);
+
+        $this->assertSame(0.12, $cached['fire_penetration']);
+        $this->assertSame(0.24, $cached['ice_penetration']);
+        $this->assertSame(0.12, $cached['water_penetration']);
+    }
+
+    public function test_weekly_fight_cache_preserves_persisted_elemental_penetration(): void
+    {
+        $gameMap = $this->createGameMap(['name' => 'Weekly Penetration Map', 'default' => false]);
+        $weeklyMonster = $this->createMonster([
+            'game_map_id' => $gameMap->id,
+            'only_for_location_type' => LocationType::ALCHEMY_CHURCH->value,
+            'fire_atonement' => 0.62,
+            'ice_atonement' => 0.2,
+            'water_atonement' => 0.018,
+            'fire_penetration' => 0.25,
+            'ice_penetration' => 0.125,
+            'water_penetration' => 0.125,
+        ]);
+
+        $this->buildMonsterCacheService->buildWeeklyFightCache();
+
+        $cached = collect(Cache::get(MonsterCacheKey::WEEKLY_MONSTERS->value)['location-type-'.LocationType::ALCHEMY_CHURCH->value]['data'])
+            ->firstWhere('id', $weeklyMonster->id);
+
+        $this->assertSame(0.25, $cached['fire_penetration']);
+        $this->assertSame(0.125, $cached['ice_penetration']);
+        $this->assertSame(0.125, $cached['water_penetration']);
+    }
+
+    public function test_weekly_fight_cache_keeps_monsters_without_atonement_at_zero_penetration(): void
+    {
+        $gameMap = $this->createGameMap(['name' => 'Weekly No Atonement Map', 'default' => false]);
+        $weeklyMonster = $this->createMonster([
+            'game_map_id' => $gameMap->id,
+            'only_for_location_type' => LocationType::ALCHEMY_CHURCH->value,
+            'fire_atonement' => 0,
+            'ice_atonement' => 0,
+            'water_atonement' => 0,
+        ]);
+
+        $this->buildMonsterCacheService->buildWeeklyFightCache();
+
+        $cached = collect(Cache::get(MonsterCacheKey::WEEKLY_MONSTERS->value)['location-type-'.LocationType::ALCHEMY_CHURCH->value]['data'])
+            ->firstWhere('id', $weeklyMonster->id);
+
+        $this->assertSame(0.0, $cached['fire_penetration']);
+        $this->assertSame(0.0, $cached['ice_penetration']);
+        $this->assertSame(0.0, $cached['water_penetration']);
+    }
+
+    public function test_regular_monster_cache_keeps_unassigned_elemental_penetration_at_zero(): void
+    {
+        $gameMap = $this->createGameMap(['name' => 'Zero Penetration Map', 'default' => false]);
+        $monster = $this->createMonster(['game_map_id' => $gameMap->id]);
+
+        $this->buildMonsterCacheService->buildCache();
+
+        $cached = collect(Cache::get(MonsterCacheKey::forGameMap($gameMap->id))['data'])
+            ->firstWhere('id', $monster->id);
+
+        $this->assertSame(0.0, $cached['fire_penetration']);
+        $this->assertSame(0.0, $cached['ice_penetration']);
+        $this->assertSame(0.0, $cached['water_penetration']);
     }
 
     public function test_event_map_cache_retains_the_regular_and_easier_structure(): void
@@ -662,7 +787,7 @@ class BuildMonsterCacheServiceTest extends TestCase
         ]);
         $this->createMonster(['game_map_id' => $eventMap->id]);
 
-        resolve(BuildMonsterCacheService::class)->buildCache();
+        $this->buildMonsterCacheService->buildCache();
 
         $cache = Cache::get(MonsterCacheKey::forGameMap($eventMap->id));
 
@@ -677,10 +802,10 @@ class BuildMonsterCacheServiceTest extends TestCase
         $gameMap = $this->createGameMap(['name' => 'Revision Bump Map', 'default' => false]);
         $this->createMonster(['game_map_id' => $gameMap->id]);
 
-        $monsterCacheRevisionService = resolve(MonsterCacheRevisionService::class);
+        $monsterCacheRevisionService = new MonsterCacheRevisionService;
         $revisionBefore = $monsterCacheRevisionService->current();
 
-        resolve(BuildMonsterCacheService::class)->buildAll();
+        $this->buildMonsterCacheService->buildAll();
 
         $this->assertSame($revisionBefore + 1, $monsterCacheRevisionService->current());
     }
@@ -690,7 +815,7 @@ class BuildMonsterCacheServiceTest extends TestCase
         $gameMap = $this->createGameMap(['name' => 'Failed Rebuild Map', 'default' => false]);
         $this->createMonster(['game_map_id' => $gameMap->id]);
 
-        $monsterCacheRevisionService = resolve(MonsterCacheRevisionService::class);
+        $monsterCacheRevisionService = new MonsterCacheRevisionService;
         $revisionBefore = $monsterCacheRevisionService->current();
 
         $failingAreaGemEffectService = Mockery::mock(AreaGemEffectService::class, function (MockInterface $mock): void {
@@ -698,8 +823,8 @@ class BuildMonsterCacheServiceTest extends TestCase
         });
 
         $buildMonsterCacheService = new BuildMonsterCacheService(
-            resolve(Manager::class),
-            resolve(MonsterTransformer::class),
+            new Manager,
+            new MonsterTransformer,
             $failingAreaGemEffectService,
             $monsterCacheRevisionService,
         );

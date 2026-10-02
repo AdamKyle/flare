@@ -7,7 +7,6 @@ use App\Game\GuideQuests\Values\GuideQuestWalkthroughEvent;
 use App\Game\GuideQuests\Values\GuideQuestWalkthroughStepType;
 use App\Game\GuideQuests\Values\GuideQuestWalkthroughTarget;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 use Maatwebsite\Excel\Concerns\ToCollection;
 
@@ -22,29 +21,24 @@ class GuideQuestWalkthroughStepsSheet implements ToCollection
     public function collection(Collection $rows): void
     {
         $headings = $rows->shift()?->toArray() ?? [];
-        $groupedSteps = [];
 
-        foreach ($rows as $row) {
-            $step = array_combine($headings, $row->toArray());
-            $guideQuestName = $step['guide_quest_name'] ?? null;
+        $stepsByGuideQuestName = $rows
+            ->map(fn (Collection $row): array => array_combine($headings, $row->toArray()))
+            ->reject(fn (array $step): bool => blank($step['guide_quest_name'] ?? null))
+            ->groupBy('guide_quest_name');
 
-            if (blank($guideQuestName)) {
-                continue;
-            }
+        $normalizedStepsByGuideQuest = $stepsByGuideQuestName->map(
+            fn (Collection $steps, string $guideQuestName): array => [
+                'guide_quest' => GuideQuest::where('name', $guideQuestName)->firstOrFail(),
+                'steps' => $steps->sortBy('position')->values()->map(
+                    fn (array $step, int $index): array => $this->normalizeStep($step, $index + 1)
+                )->all(),
+            ],
+        );
 
-            $groupedSteps[$guideQuestName][] = $step;
-        }
-
-        foreach ($groupedSteps as $guideQuestName => $steps) {
-            $guideQuest = GuideQuest::where('name', $guideQuestName)->firstOrFail();
-            $orderedSteps = collect($steps)->sortBy('position')->values()->map(
-                fn (array $step, int $index): array => $this->normalizeStep($step, $index + 1)
-            )->all();
-
-            DB::transaction(function () use ($guideQuest, $orderedSteps): void {
-                $guideQuest->walkthroughSteps()->delete();
-                $guideQuest->walkthroughSteps()->createMany($orderedSteps);
-            });
+        foreach ($normalizedStepsByGuideQuest as $normalizedSteps) {
+            $normalizedSteps['guide_quest']->walkthroughSteps()->delete();
+            $normalizedSteps['guide_quest']->walkthroughSteps()->createMany($normalizedSteps['steps']);
         }
     }
 

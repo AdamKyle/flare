@@ -13,6 +13,8 @@ class StoreMonsterRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
+     *
+     * @return bool
      */
     public function authorize(): bool
     {
@@ -21,6 +23,8 @@ class StoreMonsterRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
+     *
+     * @return array
      */
     public function rules(): array
     {
@@ -79,11 +83,16 @@ class StoreMonsterRequest extends FormRequest
             'fire_atonement' => 'nullable|numeric|min:0',
             'ice_atonement' => 'nullable|numeric|min:0',
             'water_atonement' => 'nullable|numeric|min:0',
+            'fire_penetration' => 'nullable|numeric|min:0',
+            'ice_penetration' => 'nullable|numeric|min:0',
+            'water_penetration' => 'nullable|numeric|min:0',
         ];
     }
 
     /**
      * Get the error messages for the defined validation rules.
+     *
+     * @return array
      */
     public function messages(): array
     {
@@ -96,23 +105,24 @@ class StoreMonsterRequest extends FormRequest
 
     /**
      * Normalize present boolean fields before validation.
+     *
+     * @return void
      */
     protected function prepareForValidation(): void
     {
-        $booleanKeys = ['can_cast', 'is_celestial_entity', 'is_raid_monster', 'is_raid_boss'];
-        $normalized = [];
-
-        foreach ($booleanKeys as $key) {
-            if ($this->has($key)) {
-                $normalized[$key] = $this->boolean($key);
-            }
-        }
+        $normalized = collect(['can_cast', 'is_celestial_entity', 'is_raid_monster', 'is_raid_boss'])
+            ->filter(fn (string $key): bool => $this->has($key))
+            ->mapWithKeys(fn (string $key): array => [$key => $this->boolean($key)])
+            ->all();
 
         $this->merge($normalized);
     }
 
     /**
      * Configure the validator instance to enforce raid Monster/boss mutual exclusion.
+     *
+     * @param Validator $validator
+     * @return void
      */
     public function withValidator(Validator $validator): void
     {

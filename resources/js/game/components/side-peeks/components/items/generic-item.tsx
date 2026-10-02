@@ -3,6 +3,7 @@ import React, { ReactNode } from 'react';
 
 import ReadOnlyItemCard from './read-only-item-card';
 import GenericItemComponentProps from './types/generic-item-component-props';
+import { isQuestItem } from './utils/is-quest-item';
 import { EquippableItemWithBase } from '../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
 import BaseQuestItemDefinition from '../../../../api-definitions/items/quest-item-definitions/base-quest-item-definition';
 import { InventoryItemTypes } from '../../../character-sheet/partials/character-inventory/enums/inventory-item-types';
@@ -42,6 +43,24 @@ const GenericItem = ({
   const getAc = (equippableItem: EquippableItemWithBase): number =>
     equippableItem.raw_ac ?? equippableItem.base_ac ?? 0;
 
+  const renderSocketAmount = (
+    equippableItem: EquippableItemWithBase
+  ): ReactNode => {
+    if (equippableItem.socket_amount <= 0) {
+      return null;
+    }
+
+    return (
+      <>
+        {' '}
+        |{' '}
+        <span>
+          <strong>Sockets</strong>: {equippableItem.socket_amount}
+        </span>
+      </>
+    );
+  };
+
   const renderEquippableDetails = (
     equippableItem: EquippableItemWithBase
   ): ReactNode => {
@@ -58,15 +77,7 @@ const GenericItem = ({
         <span>
           <strong>AC</strong>: {getAc(equippableItem)}
         </span>
-        {equippableItem.socket_amount > 0 ? (
-          <>
-            {' '}
-            |{' '}
-            <span>
-              <strong>Sockets</strong>: {equippableItem.socket_amount}
-            </span>
-          </>
-        ) : null}
+        {renderSocketAmount(equippableItem)}
       </>
     );
   };
@@ -96,8 +107,6 @@ const GenericItem = ({
     );
   };
 
-  const isQuest = item.type === InventoryItemTypes.QUEST;
-
   const renderQuestItemCard = (
     questItem: BaseQuestItemDefinition
   ): ReactNode => (
@@ -112,10 +121,10 @@ const GenericItem = ({
     />
   );
 
-  if (isQuest) {
+  if (isQuestItem(item)) {
     return (
       <div className="grid grid-cols-1 items-start gap-3">
-        {renderQuestItemCard(item as BaseQuestItemDefinition)}
+        {renderQuestItemCard(item)}
       </div>
     );
   }
@@ -155,7 +164,7 @@ const GenericItem = ({
           </div>
           <p className={clsx('my-2', itemColor)}>{item.description}</p>
           <div id={detailsId} className={clsx('text-sm', itemColor)}>
-            {renderEquippableDetails(item as EquippableItemWithBase)}
+            {renderEquippableDetails(item)}
           </div>
         </div>
       </button>

@@ -7,6 +7,7 @@ use App\Game\Monsters\Services\MonsterGemEffectContextService;
 use App\Game\Monsters\Values\MonsterCacheKey;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use League\Fractal\Manager;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateMonster;
@@ -14,6 +15,22 @@ use Tests\Traits\CreateMonster;
 class MonsterGemEffectContextServiceTest extends TestCase
 {
     use CreateGameMap, CreateMonster, RefreshDatabase;
+
+    private ?MonsterGemEffectContextService $monsterGemEffectContextService;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->monsterGemEffectContextService = new MonsterGemEffectContextService(new Pagination(new Manager));
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->monsterGemEffectContextService = null;
+    }
 
     public function test_for_monster_exposes_to_hit_base_criticality_spell_damage_and_affix_damage_changes(): void
     {
@@ -46,7 +63,7 @@ class MonsterGemEffectContextServiceTest extends TestCase
             ]],
         ]);
 
-        $contexts = (new MonsterGemEffectContextService(resolve(Pagination::class)))->forMonster($monster);
+        $contexts = $this->monsterGemEffectContextService->forMonster($monster);
 
         $changedFields = collect($contexts[0]['changed_values'])->pluck('field')->all();
 
@@ -93,7 +110,7 @@ class MonsterGemEffectContextServiceTest extends TestCase
             ],
         ]);
 
-        $summary = (new MonsterGemEffectContextService(resolve(Pagination::class)))->summary($monster);
+        $summary = $this->monsterGemEffectContextService->summary($monster);
 
         $this->assertSame(2, $summary['count']);
         $this->assertSame('map', $summary['preview']['type']);
@@ -124,16 +141,14 @@ class MonsterGemEffectContextServiceTest extends TestCase
             'Paginated Locations' => ['data' => $rows],
         ]);
 
-        $service = new MonsterGemEffectContextService(resolve(Pagination::class));
-
-        $firstPage = $service->paginate($monster, 10, 1);
+        $firstPage = $this->monsterGemEffectContextService->paginate($monster, 10, 1);
 
         $this->assertCount(10, $firstPage['data']);
         $this->assertSame('Location 01', $firstPage['data'][0]['label']);
         $this->assertTrue($firstPage['meta']['can_load_more']);
         $this->assertSame(11, $firstPage['meta']['pagination']['total']);
 
-        $secondPage = $service->paginate($monster, 10, 2);
+        $secondPage = $this->monsterGemEffectContextService->paginate($monster, 10, 2);
 
         $this->assertCount(1, $secondPage['data']);
         $this->assertSame('Location 11', $secondPage['data'][0]['label']);
@@ -163,7 +178,7 @@ class MonsterGemEffectContextServiceTest extends TestCase
             ]],
         ]);
 
-        $summary = (new MonsterGemEffectContextService(resolve(Pagination::class)))->summary($monster);
+        $summary = $this->monsterGemEffectContextService->summary($monster);
 
         $this->assertSame(0, $summary['count']);
         $this->assertNull($summary['preview']);

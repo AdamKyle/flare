@@ -2,37 +2,32 @@
 
 namespace App\Game\Gems\Providers;
 
-use App\Flare\Transformers\Serializer\PlainDataSerializer;
-use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
-use App\Game\Character\CharacterInventory\Transformers\CharacterGemsTransformer;
+use App\Game\Gems\Contracts\CharacterGemDetails;
 use App\Game\Gems\Contracts\CharacterGemEffects;
+use App\Game\Gems\Contracts\CharacterGemRollFacts;
+use App\Game\Gems\Contracts\GemAbilityDuplicateQuery;
 use App\Game\Gems\Progression\Contracts\CharacterAreaGemEffects;
 use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
-use App\Game\Gems\Services\AttachedGemService;
+use App\Game\Gems\Services\CharacterGemDetailsService;
 use App\Game\Gems\Services\CharacterGemEffectService;
+use App\Game\Gems\Services\CharacterGemRollService;
+use App\Game\Gems\Services\GemAbilityDuplicateService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
-use League\Fractal\Manager;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
     /**
-     * Register any application services.
+     * Bind the Gems module's public contracts to their implementations.
      *
      * @return void
      */
     public function register(): void
     {
-        $this->app->bind(AttachedGemService::class, function ($app) {
-            return new AttachedGemService(
-                $app->make(CharacterGemsTransformer::class),
-                $app->make(Manager::class),
-                $app->make(PlainDataSerializer::class),
-                $app->make(CharacterInventoryService::class)
-            );
-        });
-
         $this->app->bind(CharacterAreaGemEffects::class, CharacterAreaGemEffectService::class);
         $this->app->bind(CharacterGemEffects::class, CharacterGemEffectService::class);
+        $this->app->bind(GemAbilityDuplicateQuery::class, GemAbilityDuplicateService::class);
+        $this->app->bind(CharacterGemDetails::class, CharacterGemDetailsService::class);
+        $this->app->bind(CharacterGemRollFacts::class, CharacterGemRollService::class);
     }
 
     /**

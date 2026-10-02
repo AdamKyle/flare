@@ -18,12 +18,14 @@ trait CreateMonstersWorkbookFile
         'life_stealing_resistance', 'quest_item_id', 'quest_item_drop_chance', 'is_celestial_entity',
         'celestial_type', 'gold_cost', 'gold_dust_cost', 'shards', 'is_raid_monster', 'is_raid_boss',
         'raid_special_attack_type', 'fire_atonement', 'ice_atonement', 'water_atonement',
+        'fire_penetration', 'ice_penetration', 'water_penetration',
     ];
 
     /**
      * Build a real, on-disk Monsters import workbook fixture from named row values.
      *
-     * @param array<int, array<string, mixed>> $rowsByHeaderName Each row's values, keyed by header name; any header not present in a row is written blank.
+     * @param array $rowsByHeaderName
+     * @return UploadedFile
      */
     public function createMonstersWorkbookFile(array $rowsByHeaderName): UploadedFile
     {

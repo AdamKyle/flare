@@ -6,9 +6,14 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Create the ordered Guide Quest walkthrough steps table.
+     *
+     * @return void
+     */
     public function up(): void
     {
-        Schema::create('guide_quest_walkthrough_steps', function (Blueprint $table) {
+        Schema::create('guide_quest_walkthrough_steps', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('guide_quest_id')->constrained()->cascadeOnDelete();
             $table->unsignedInteger('position');
@@ -23,6 +28,11 @@ return new class extends Migration
         });
     }
 
+    /**
+     * Drop the Guide Quest walkthrough steps table.
+     *
+     * @return void
+     */
     public function down(): void
     {
         Schema::dropIfExists('guide_quest_walkthrough_steps');

@@ -27,6 +27,7 @@ use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
 use App\Game\Maps\Transformers\CondensedKingdomTransformer;
 use App\Game\Maps\Transformers\LocationsTransformer;
 use App\Game\Monsters\Services\MonsterListService;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Facades\Storage;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection as LeagueCollection;
@@ -35,15 +36,24 @@ class LocationService
 {
     use CanPlayerMassEmbezzle, KingdomCache, LiveCharacterCount, UpdateRaidMonstersForLocation;
 
-    /**
-     * @var bool | false
-     */
     private bool $canSettle = false;
 
     private bool $isEventBasedUpdate = false;
 
     private ?Location $location = null;
 
+    /**
+     * @param CoordinatesCache $coordinatesCache
+     * @param CharacterCacheData $characterCacheData
+     * @param UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes
+     * @param QuestItemTransformer $questItemTransformer
+     * @param LocationsTransformer $locationTransformer
+     * @param CondensedKingdomTransformer $condensedKingdomTransformer
+     * @param PlainDataSerializer $plainArraySerializer
+     * @param Pagination $pagination
+     * @param Manager $manager
+     * @param MonsterListService $monsterListService
+     */
     public function __construct(
         private readonly CoordinatesCache $coordinatesCache,
         private readonly CharacterCacheData $characterCacheData,
@@ -58,11 +68,14 @@ class LocationService
     ) {}
 
     /**
-     * Get location data
+     * Build the Character's current map tiles, position, movement timeout, locations, and kingdoms.
+     *
+     * @param Character $character
+     * @param Raid|null $raid
+     * @return array
      */
     public function getMapData(Character $character, ?Raid $raid = null): array
     {
-
         $this->locationBasedEvents($character);
 
         $gameMap = $character->map->gameMap;
@@ -75,24 +88,23 @@ class LocationService
             'time_out_details' => $this->getMapTimeOutDetails($character),
             'locations' => $this->fetchLocationData($character),
             'coordinates' => $this->coordinatesCache->getFromCache(),
-            //            'celestial_id' => $this->getCelestialEntityId($character),
-            //            'can_settle_kingdom' => $this->canSettle,
             'character_kingdoms' => $this->getKingdoms($character),
             'npc_kingdoms' => $this->getNpcKingdoms($character),
             'enemy_kingdoms' => $this->getCondensedEnemyKingdoms($character),
             'has_conjurable_celestials' => Monster::conjurableOnMap($character->map->game_map_id)->exists(),
-            //            'characters_on_map' => $this->getActiveUsersCountForMap($character),
-            //            'lockedLocationType' => is_null($lockedLocation) ? null : $lockedLocation->type,
-            //            'is_event_based' => $this->isEventBasedUpdate,
-            //            'can_access_hell_forged_shop' => $character->map->gameMap->mapType()->isHell(),
-            //            'can_access_purgatory_chains_shop' =>  $character->map->gameMap->mapType()->isPurgatory(),
-            //            'can_access_twisted_earth_shop' => $character->map->gameMap->mapType()->isTwistedMemories(),
         ];
     }
 
+    /**
+     * Build the Character's map broadcast payload, optionally including the map's locations and raid-corrupted locations.
+     *
+     * @param Character $character
+     * @param bool $includeLocationData
+     * @param Raid|null $raid
+     * @return array
+     */
     public function getLocationData(Character $character, bool $includeLocationData = true, ?Raid $raid = null): array
     {
-
         $this->locationBasedEvents($character);
 
         $this->kingdomManagement($character->map->gameMap);
@@ -114,7 +126,7 @@ class LocationService
             'npc_kingdoms' => Kingdom::select('id', 'x_position', 'y_position', 'npc_owned', 'name')->whereNull('character_id')->where('game_map_id', $character->map->game_map_id)->where('npc_owned', true)->get(),
             'other_kingdoms' => $this->getEnemyKingdoms($character),
             'characters_on_map' => $this->getActiveUsersCountForMap($character),
-            'lockedLocationType' => is_null($lockedLocation) ? null : $lockedLocation->type,
+            'lockedLocationType' => $lockedLocation?->type,
             'is_event_based' => $this->isEventBasedUpdate,
             'can_access_hell_forged_shop' => $map->mapType()->isHell(),
             'can_access_purgatory_chains_shop' => $map->mapType()->isPurgatory(),
@@ -132,17 +144,14 @@ class LocationService
     }
 
     /**
-     * Gets locked location details.
+     * Return the paginated quest Items that drop at the Location, filtered by name.
+     *
+     * @param Location $location
+     * @param int $perPage
+     * @param int $page
+     * @param string $searchText
+     * @return array
      */
-    protected function getLockedLocation(Character $character): ?Location
-    {
-        return Location::where('x', $character->map->character_position_x)
-            ->where('y', $character->map->character_position_y)
-            ->where('game_map_id', $character->map->game_map_id)
-            ->whereNotNull('required_quest_item_id')
-            ->first();
-    }
-
     public function getDroppableItems(Location $location, int $perPage = 10, int $page = 1, string $searchText = ''): array
     {
         $items = ItemModel::where('drop_location_id', $location->id)->where('name', 'LIKE', '%'.$searchText.'%')->get();
@@ -150,6 +159,12 @@ class LocationService
         return $this->pagination->buildPaginatedDate($items, $this->questItemTransformer, $perPage, $page);
     }
 
+    /**
+     * Return the quest Item required to access the Game Map, when it has one.
+     *
+     * @param GameMap $gameMap
+     * @return array|null
+     */
     public function getMapRequiredItem(GameMap $gameMap): ?array
     {
         $requiredItem = $gameMap->requiredItem();
@@ -161,6 +176,13 @@ class LocationService
         return $this->questItemTransformer->transform($requiredItem);
     }
 
+    /**
+     * Return the Location's factual details, including its Game Map and any supplied Gem context.
+     *
+     * @param Location $location
+     * @param array|null $gemContext
+     * @return array
+     */
     public function getLocationDetails(Location $location, ?array $gemContext = null): array
     {
         return [
@@ -185,41 +207,29 @@ class LocationService
         ];
     }
 
+    /**
+     * Return the kingdoms, locations, and coordinates the Character can teleport to.
+     *
+     * @param Character $character
+     * @return array
+     */
     public function getTeleportLocations(Character $character): array
     {
         return [
             'character_kingdoms' => $this->getKingdoms($character),
             'npc_kingdoms' => $this->getNpcKingdoms($character),
-            'enemy_kingdoms' => [], // $this->getEnemyKingdoms($character),
+            'enemy_kingdoms' => [],
             'locations' => $this->fetchLocationData($character),
             'coordinates' => $this->coordinatesCache->getFromCache(),
         ];
     }
 
-    protected function getNpcKingdoms(Character $character): array
-    {
-        $kingdoms = Kingdom::whereNull('character_id')
-            ->where('game_map_id', $character->map->game_map_id)
-            ->where('npc_owned', true)
-            ->get();
-
-        return $kingdoms->map(fn (Kingdom $kingdom) => $this->condensedKingdomTransformer->transform($kingdom))->all();
-    }
-
     /**
-     * Fetch the condensed rows for other characters' kingdoms on the same map.
+     * Return the Character's map position.
+     *
+     * @param Map $map
+     * @return array
      */
-    protected function getCondensedEnemyKingdoms(Character $character): array
-    {
-        $kingdoms = Kingdom::where('game_map_id', $character->map->game_map_id)
-            ->where('npc_owned', false)
-            ->whereNotNull('character_id')
-            ->where('character_id', '!=', $character->id)
-            ->get();
-
-        return $kingdoms->map(fn (Kingdom $kingdom) => $this->condensedKingdomTransformer->transform($kingdom))->all();
-    }
-
     public function getCharacterPositionData(Map $map): array
     {
         return [
@@ -228,32 +238,18 @@ class LocationService
         ];
     }
 
-    private function getMapTimeOutDetails(Character $character): array
-    {
-        $canMoveAgainAt = $character->can_move_again_at;
-        $timeLeft = is_null($canMoveAgainAt) ? 0 : max(0, now()->diffInSeconds($character->can_move_again_at));
-
-        return [
-            'can_move' => $character->can_move,
-            'time_left' => $timeLeft,
-            'show_timer' => $timeLeft > 0,
-        ];
-    }
-
     /**
-     * Fire off location based events.
+     * Fire the location-based status, crafting, event goal, and Monster list updates for the Character's position.
+     *
+     * @param Character $character
+     * @return void
      */
     public function locationBasedEvents(Character $character): void
     {
         $this->processLocation($character);
 
-        // In case automation is running, this way the timer updates.
         event(new UpdateCharacterStatus($character));
-
-        // Update location based crafting options:
         event(new UpdateLocationBasedCraftingOptions($character->user));
-
-        // Update location based event goals
         event(new UpdateLocationBasedEventGoals($character->user));
 
         $this->updateMonstersList($character, $this->location);
@@ -261,10 +257,12 @@ class LocationService
 
     /**
      * Fetch location data for a character based on their map.
+     *
+     * @param Character $character
+     * @return array
      */
     public function fetchLocationData(Character $character): array
     {
-
         $gameMap = $character->map->gameMap;
 
         $locations = Location::where('game_map_id', $gameMap->id)->get();
@@ -277,11 +275,13 @@ class LocationService
     }
 
     /**
-     * Find corrupted locations for a raid.
+     * Fetch the corrupted locations for a raid.
+     *
+     * @param Raid|null $raid
+     * @return array
      */
     public function fetchCorruptedLocationData(?Raid $raid): array
     {
-
         if (is_null($raid)) {
             return [];
         }
@@ -296,31 +296,95 @@ class LocationService
     }
 
     /**
-     * Is there a celestial entity at the characters' location?
+     * Return the quest-item-locked Location at the Character's position, when there is one.
+     *
+     * @param Character $character
+     * @return Location|null
      */
-    private function getCelestialEntityId(Character $character): ?int
+    private function getLockedLocation(Character $character): ?Location
     {
-
-        $fight = CelestialFight::with('monster')->accessibleToCharacter($character)->join('monsters', function ($join) use ($character) {
-            $join->on('monsters.id', 'celestial_fights.monster_id')
-                ->where('celestial_fights.x_position', $character->map->character_position_x)
-                ->where('celestial_fights.y_position', $character->map->character_position_y)
-                ->where('monsters.game_map_id', $character->map->gameMap->id);
-        })->select('celestial_fights.id')->first();
-
-        if (! is_null($fight)) {
-            return $fight->id;
-        }
-
-        return null;
+        return Location::where('x', $character->map->character_position_x)
+            ->where('y', $character->map->character_position_y)
+            ->where('game_map_id', $character->map->game_map_id)
+            ->whereNotNull('required_quest_item_id')
+            ->first();
     }
 
     /**
-     * Processes the location.
+     * Return the condensed rows for NPC-owned kingdoms on the Character's map.
      *
-     * We will fetch the location information for the character position.
+     * @param Character $character
+     * @return array
+     */
+    private function getNpcKingdoms(Character $character): array
+    {
+        $kingdoms = Kingdom::whereNull('character_id')
+            ->where('game_map_id', $character->map->game_map_id)
+            ->where('npc_owned', true)
+            ->get();
+
+        return $kingdoms->map(fn (Kingdom $kingdom): array => $this->condensedKingdomTransformer->transform($kingdom))->all();
+    }
+
+    /**
+     * Return the condensed rows for other characters' kingdoms on the same map.
      *
-     * This includes port details and any relevant adventures the location might have.
+     * @param Character $character
+     * @return array
+     */
+    private function getCondensedEnemyKingdoms(Character $character): array
+    {
+        $kingdoms = Kingdom::where('game_map_id', $character->map->game_map_id)
+            ->where('npc_owned', false)
+            ->whereNotNull('character_id')
+            ->where('character_id', '!=', $character->id)
+            ->get();
+
+        return $kingdoms->map(fn (Kingdom $kingdom): array => $this->condensedKingdomTransformer->transform($kingdom))->all();
+    }
+
+    /**
+     * Return whether the Character can move and how many seconds remain on their movement timeout.
+     *
+     * @param Character $character
+     * @return array
+     */
+    private function getMapTimeOutDetails(Character $character): array
+    {
+        $canMoveAgainAt = $character->can_move_again_at;
+        $timeLeft = is_null($canMoveAgainAt) ? 0 : max(0, now()->diffInSeconds($character->can_move_again_at));
+
+        return [
+            'can_move' => $character->can_move,
+            'time_left' => $timeLeft,
+            'show_timer' => $timeLeft > 0,
+        ];
+    }
+
+    /**
+     * Return the id of the accessible Celestial fight at the Character's position, when there is one.
+     *
+     * @param Character $character
+     * @return int|null
+     */
+    private function getCelestialEntityId(Character $character): ?int
+    {
+        return CelestialFight::with('monster')
+            ->accessibleToCharacter($character)
+            ->join('monsters', fn (JoinClause $join): JoinClause => $join->on('monsters.id', 'celestial_fights.monster_id')
+                ->where('celestial_fights.x_position', $character->map->character_position_x)
+                ->where('celestial_fights.y_position', $character->map->character_position_y)
+                ->where('monsters.game_map_id', $character->map->gameMap->id))
+            ->select('celestial_fights.id')
+            ->first()
+            ?->id;
+    }
+
+    /**
+     * Resolve the Location at the Character's position.
+     *
+     * @param Character $character
+     * @return void
      */
     private function processLocation(Character $character): void
     {
@@ -331,11 +395,10 @@ class LocationService
     }
 
     /**
-     * Determines the action the player can take.
+     * Allow settling a kingdom when the Character is not on a Location and not inside a generated Gem World.
      *
-     * Based on the character position, if there is a kingdom or not.
-     * We determine the action the player can take. That is, can they settle?
-     * Can they attack the kingdom or can they manage the kingdom?
+     * @param GameMap $gameMap
+     * @return void
      */
     private function kingdomManagement(GameMap $gameMap): void
     {

@@ -52,12 +52,18 @@ const CharacterGemCompactSummary = ({
     );
   };
 
+  const renderModifierSummary = (): ReactNode => {
+    if (!modifierSummary) {
+      return null;
+    }
+
+    return <p className="text-sm leading-relaxed">{modifierSummary}</p>;
+  };
+
   return (
     <div className="space-y-1">
       {renderAbility()}
-      {modifierSummary ? (
-        <p className="text-sm leading-relaxed">{modifierSummary}</p>
-      ) : null}
+      {renderModifierSummary()}
     </div>
   );
 };

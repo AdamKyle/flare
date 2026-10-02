@@ -54,4 +54,7 @@ export default interface MonsterFormDefinition {
   fire_atonement: number | null;
   ice_atonement: number | null;
   water_atonement: number | null;
+  fire_penetration: number | null;
+  ice_penetration: number | null;
+  water_penetration: number | null;
 }

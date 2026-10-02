@@ -1,8 +1,8 @@
 import React, { ReactNode } from 'react';
 
+import GemTierRollDetailsProps from './types/gem-tier-roll-details-props';
 import { characterGemModifierLabels } from '../../../../../../../../reusable-components/character-gem/enums/character-gem-modifier-type';
 import GemAbilityDetails from '../../../../../../../../reusable-components/character-gem/gem-ability-details';
-import GemTierDefinition from '../api/definitions/gem-tier-definition';
 
 import { formatNumberWithCommas } from 'game-utils/format-number';
 
@@ -10,11 +10,6 @@ import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
 import GeneralToolTip from 'ui/tool-tips/general-tool-tip';
-
-interface GemTierRollDetailsProps {
-  tier: GemTierDefinition;
-  tier_number: number;
-}
 
 const formatRange = (
   minimum: number,
@@ -33,6 +28,28 @@ const formatRange = (
 const formatModifierValue = (value: number, percentage: boolean): string =>
   `${formatNumberWithCommas(value)}${percentage ? '%' : ''}`;
 
+const renderPossibleAbilities = (
+  tier: GemTierRollDetailsProps['tier']
+): ReactNode => {
+  if (tier.possible_abilities.length === 0) {
+    return null;
+  }
+
+  return (
+    <section aria-labelledby="possible-gem-abilities" className="space-y-3">
+      <h3
+        id="possible-gem-abilities"
+        className="text-mango-tango-600 dark:text-mango-tango-300 text-sm font-semibold"
+      >
+        Possible Gem Abilities
+      </h3>
+      {tier.possible_abilities.map((ability) => (
+        <GemAbilityDetails key={ability.id} ability={ability} />
+      ))}
+    </section>
+  );
+};
+
 const GemTierRollDetails = ({
   tier,
   tier_number: tierNumber,
@@ -47,19 +64,7 @@ const GemTierRollDetails = ({
       </p>
     </div>
 
-    {tier.possible_abilities.length > 0 ? (
-      <section aria-labelledby="possible-gem-abilities" className="space-y-3">
-        <h3
-          id="possible-gem-abilities"
-          className="text-mango-tango-600 dark:text-mango-tango-300 text-sm font-semibold"
-        >
-          Possible Gem Abilities
-        </h3>
-        {tier.possible_abilities.map((ability) => (
-          <GemAbilityDetails key={ability.id} ability={ability} />
-        ))}
-      </section>
-    ) : null}
+    {renderPossibleAbilities(tier)}
 
     <section aria-labelledby="possible-gem-modifiers" className="space-y-3">
       <h3

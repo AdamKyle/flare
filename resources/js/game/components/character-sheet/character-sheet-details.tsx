@@ -13,6 +13,7 @@ import XpBar from '../actions/components/character-details/xp-bar';
 
 import {
   formatNumberWithCommas,
+  formatPercent,
   shortenNumber,
 } from 'game-utils/format-number';
 
@@ -307,13 +308,38 @@ const CharacterSheetDetails = (
           </p>
           <Dl>
             <Dt>Fire:</Dt>
-            <Dd>{characterData.elemental_atonements.atonements.fire * 100}%</Dd>
+            <Dd>
+              {formatPercent(
+                characterData.elemental_atonements.atonements.fire
+              )}
+            </Dd>
             <Dt>Ice:</Dt>
-            <Dd>{characterData.elemental_atonements.atonements.ice * 100}%</Dd>
+            <Dd>
+              {formatPercent(characterData.elemental_atonements.atonements.ice)}
+            </Dd>
             <Dt>Water:</Dt>
             <Dd>
-              {characterData.elemental_atonements.atonements.water * 100}%
+              {formatPercent(
+                characterData.elemental_atonements.atonements.water
+              )}
             </Dd>
+          </Dl>
+          <h3 className="text-danube-700 dark:text-danube-300 mt-5">
+            Elemental Penetration
+          </h3>
+          <Separator />
+          <p className="my-2">
+            Elemental Penetration reduces an enemy&apos;s matching elemental
+            Atonement before that resistance is applied to your elemental Gem
+            damage. Effective resistance cannot fall below 0%.
+          </p>
+          <Dl>
+            <Dt>Fire:</Dt>
+            <Dd>{formatPercent(characterData.elemental_penetration.fire)}</Dd>
+            <Dt>Ice:</Dt>
+            <Dd>{formatPercent(characterData.elemental_penetration.ice)}</Dd>
+            <Dt>Water:</Dt>
+            <Dd>{formatPercent(characterData.elemental_penetration.water)}</Dd>
           </Dl>
         </div>
         <div>

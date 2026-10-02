@@ -25,6 +25,32 @@ class MonstersExportTest extends TestCase
         $this->assertStringContainsString('<th>quest_item_id</th>', $html);
     }
 
+    public function test_export_includes_elemental_penetration_after_water_atonement(): void
+    {
+        $map = $this->createGameMap(['name' => 'Penetration Export Map']);
+        $this->createMonster([
+            'name' => 'Penetrating Monster',
+            'game_map_id' => $map->id,
+            'fire_atonement' => 0.3,
+            'ice_atonement' => 0.5,
+            'water_atonement' => 0.2,
+            'fire_penetration' => 0.1231,
+            'ice_penetration' => 0.2462,
+            'water_penetration' => 0.1236,
+        ]);
+
+        $html = (new MonstersSheet)->view()->render();
+
+        $this->assertMatchesRegularExpression(
+            '/<th>water_atonement<\/th>\s*<th>fire_penetration<\/th>\s*<th>ice_penetration<\/th>\s*<th>water_penetration<\/th>/',
+            $html,
+        );
+        $this->assertMatchesRegularExpression(
+            '/<td>0\.2<\/td>\s*<td>0\.1231<\/td>\s*<td>0\.2462<\/td>\s*<td>0\.1236<\/td>/',
+            $html,
+        );
+    }
+
     public function test_can_use_artifacts_is_not_exported(): void
     {
         $this->createMonster(['name' => 'No Artifacts Monster']);

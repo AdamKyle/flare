@@ -4,6 +4,7 @@ import FactionLoyaltyWarningNoticeDefinition from '../../../game/components/fact
 import ActiveAutomationDefinition from 'game-data/api-data-definitions/character/active-automation-definition';
 import CurrencyLimitsDefinition from 'game-data/api-data-definitions/character/currency-limits-definition';
 import ElementalAtonementDefinition from 'game-data/api-data-definitions/character/elemental-atonement-definition';
+import ElementalPenetrationDefinition from 'game-data/api-data-definitions/character/elemental-penetration-definition';
 import GemProgressionSummaryDefinition from 'game-data/api-data-definitions/character/gem-progression-summary-definition';
 import InventoryCountDefinition from 'game-data/api-data-definitions/character/inventory-counts-definition';
 import { ReincarnationInfoDefinition } from 'game-data/api-data-definitions/character/reincarnation-info-definition';
@@ -60,6 +61,7 @@ export default interface CharacterSheetDefinition {
   inventory_count: InventoryCountDefinition;
   resistance_info: ResistanceInfoDefinition;
   elemental_atonements: ElementalAtonementDefinition;
+  elemental_penetration: ElementalPenetrationDefinition;
   reincarnation_info: ReincarnationInfoDefinition;
   active_boons: ActiveBoonDefinition[];
   gem_world_introduction_acknowledged_at: string | null;

@@ -18,8 +18,6 @@ use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Items\Enricher\EquippableEnricher;
 use App\Game\Core\Items\Enricher\ItemEnricherFactory;
 use App\Game\Core\Items\Transformers\Api\UsableItemTransformer as ApiUsableItemTransformer;
-use App\Game\Core\Items\Transformers\EquippableItemTransformer;
-use App\Game\Core\Items\Transformers\ItemTransformer;
 use App\Game\Core\Items\Transformers\QuestItemTransformer;
 use App\Game\Core\Items\Transformers\UsableItemTransformer;
 use App\Game\Shop\Events\BuyItemEvent;
@@ -35,6 +33,7 @@ use Illuminate\Support\Facades\Event;
 use League\Fractal\Manager;
 use Mockery;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\Setup\Items\ItemTransformerFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
@@ -60,7 +59,7 @@ class ShopServiceTest extends TestCase
 
         $manager = new Manager;
         $randomNumberGenerator = new PhpRandomNumberGenerator;
-        $equippableItemTransformer = new EquippableItemTransformer;
+        $equippableItemTransformer = (new ItemTransformerFactory)->buildEquippableItemTransformer();
         $questItemTransformer = new QuestItemTransformer;
         $inventorySetService = new InventorySetService(new SetHandsValidation);
         $skillBonusService = new SkillBonusService(new SkillBonusContextService);
@@ -91,7 +90,7 @@ class ShopServiceTest extends TestCase
                 new InventorySetOptionTransformer,
             ),
             new CharacterInventoryCountTransformer,
-            new ItemTransformer($itemEnricherFactory),
+            (new ItemTransformerFactory)->buildItemTransformer($itemEnricherFactory),
             new Pagination($manager),
         );
     }

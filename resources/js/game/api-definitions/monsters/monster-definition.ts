@@ -48,6 +48,10 @@ export default interface MonsterDefinition {
   ice_atonement: number | null;
   water_atonement: number | null;
 
+  fire_penetration: number | null;
+  ice_penetration: number | null;
+  water_penetration: number | null;
+
   life_stealing_resistance: number;
 
   raid_special_attack_type: number | null;

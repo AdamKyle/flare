@@ -6,8 +6,7 @@ use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Game\Core\Items\Enricher\ItemEnricherFactory;
 use App\Game\Core\Items\Values\ItemUniqueness;
-use App\Game\Gems\Services\GemAbilityDuplicateService;
-use App\Game\Gems\Transformers\CharacterGemTransformer;
+use App\Game\Gems\Contracts\GemAbilityDuplicateQuery;
 use App\Game\Maps\Transformers\LocationTransformer;
 use League\Fractal\Resource\Item as ItemResource;
 use League\Fractal\TransformerAbstract;
@@ -16,28 +15,22 @@ class ItemTransformer extends TransformerAbstract
 {
     protected array $defaultIncludes = ['drop_location'];
 
-    private readonly ItemSocketTransformer $itemSocketTransformer;
-
-    private readonly GemAbilityDuplicateService $gemAbilityDuplicateService;
-
     /**
      * @param ItemEnricherFactory $itemEnricherFactory
-     * @param ItemSocketTransformer|null $itemSocketTransformer
-     * @param GemAbilityDuplicateService|null $gemAbilityDuplicateService
+     * @param ItemSocketTransformer $itemSocketTransformer
+     * @param GemAbilityDuplicateQuery $gemAbilityDuplicateQuery
      */
     public function __construct(
         private readonly ItemEnricherFactory $itemEnricherFactory,
-        ?ItemSocketTransformer $itemSocketTransformer = null,
-        ?GemAbilityDuplicateService $gemAbilityDuplicateService = null,
-    ) {
-        $this->itemSocketTransformer = $itemSocketTransformer
-            ?? new ItemSocketTransformer(new CharacterGemTransformer);
-        $this->gemAbilityDuplicateService = $gemAbilityDuplicateService
-            ?? new GemAbilityDuplicateService;
-    }
+        private readonly ItemSocketTransformer $itemSocketTransformer,
+        private readonly GemAbilityDuplicateQuery $gemAbilityDuplicateQuery,
+    ) {}
 
     /**
-     * Gets the response data for the character sheet
+     * Transform an enriched Item into its full API detail payload, including sockets and duplicate Gem Ability warnings.
+     *
+     * @param Item $item
+     * @return array
      */
     public function transform(Item $item): array
     {
@@ -128,15 +121,20 @@ class ItemTransformer extends TransformerAbstract
             'ignores_caps' => $item->ignores_caps,
             'sockets' => $this->itemSocketTransformer->transform($item),
             'socket_amount' => $item->socket_count,
-            'duplicate_gem_abilities' => $this->gemAbilityDuplicateService->duplicateActiveAbilities([$item]),
+            'duplicate_gem_abilities' => $this->gemAbilityDuplicateQuery->forItem($item->id)->toArray(),
             'item_skills' => $itemSkills,
             'item_skill_progressions' => $itemSkillProgressions,
         ];
     }
 
+    /**
+     * Include the Location that drops the Item, when it has one.
+     *
+     * @param Item $item
+     * @return ItemResource|null
+     */
     public function includeDropLocation(Item $item): ?ItemResource
     {
-
         $location = $item->dropLocation;
 
         if (is_null($location)) {

@@ -1,7 +1,7 @@
 import UsePaginatedApiHandler from 'api-handler/hooks/use-paginated-api-handler';
 import { AnimatePresence } from 'framer-motion';
 import { debounce } from 'lodash';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useUseAlchemyItemApi } from './api/hooks/use-use-alchemy-item-api';
 import { useUseCurrencyCacheApi } from './api/hooks/use-use-currency-cache-api';
@@ -88,7 +88,7 @@ const UsableItems = ({
     setFilters({ [initial_filter]: true });
   }, [initial_filter, setFilters]);
 
-  const handleUseSuccess = (): void => {
+  const handleUseSuccess = useCallback((): void => {
     setRefresh((previousValue) => !previousValue);
 
     if (mutationSource === 'detail') {
@@ -98,7 +98,7 @@ const UsableItems = ({
     setDetailQuantityMode(false);
     setDetailQuantity(1);
     setMutationSource(null);
-  };
+  }, [mutationSource, setRefresh]);
 
   const handleGemScrollActivated = (source: 'list' | 'detail'): void => {
     setRefresh((previousValue) => !previousValue);
@@ -223,27 +223,32 @@ const UsableItems = ({
     setFilters({});
   };
 
-  const handleUseOne = (slotId: number, source: 'list' | 'detail'): void => {
-    setActingSlotId(slotId);
-    setMutationSource(source);
-    void submitAlchemyItemUse(slotId, false);
-  };
+  const handleUseOne = useCallback(
+    (slotId: number, source: 'list' | 'detail'): void => {
+      setActingSlotId(slotId);
+      setMutationSource(source);
+      void submitAlchemyItemUse(slotId, false);
+    },
+    [submitAlchemyItemUse]
+  );
 
-  const handleUseAll = (slotId: number, source: 'list' | 'detail'): void => {
-    setActingSlotId(slotId);
-    setMutationSource(source);
-    void submitAlchemyItemUse(slotId, true);
-  };
+  const handleUseAll = useCallback(
+    (slotId: number, source: 'list' | 'detail'): void => {
+      setActingSlotId(slotId);
+      setMutationSource(source);
+      void submitAlchemyItemUse(slotId, true);
+    },
+    [submitAlchemyItemUse]
+  );
 
-  const handleUseQuantity = (
-    slotId: number,
-    quantity: number,
-    source: 'list' | 'detail'
-  ): void => {
-    setActingSlotId(slotId);
-    setMutationSource(source);
-    void submitManyItemsUse(Array(quantity).fill(slotId));
-  };
+  const handleUseQuantity = useCallback(
+    (slotId: number, quantity: number, source: 'list' | 'detail'): void => {
+      setActingSlotId(slotId);
+      setMutationSource(source);
+      void submitManyItemsUse(Array(quantity).fill(slotId));
+    },
+    [submitManyItemsUse]
+  );
 
   const usingSlotId = using || usingMany ? actingSlotId : null;
 
@@ -347,7 +352,6 @@ const UsableItems = ({
     }
 
     return options;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     itemToView,
     detailLegalUseCount,
@@ -355,6 +359,9 @@ const UsableItems = ({
     detailQuantity,
     using,
     usingMany,
+    handleUseOne,
+    handleUseAll,
+    handleUseQuantity,
   ]);
 
   useSidePeekOptions(detailOptions);
@@ -461,6 +468,39 @@ const UsableItems = ({
     );
   };
 
+  const renderUseFeedback = () => {
+    const useFailure = useError ?? useManyError;
+
+    if (!useFailure && !useSuccessMessage) {
+      return null;
+    }
+
+    return (
+      <Alert variant={useFailure ? AlertVariant.DANGER : AlertVariant.SUCCESS}>
+        {useFailure ?? useSuccessMessage}
+      </Alert>
+    );
+  };
+
+  const renderScrollSubfilter = () => {
+    if (activeFilter !== 'scrolls') {
+      return null;
+    }
+
+    return (
+      <Dropdown
+        items={SCROLL_SUBFILTERS}
+        pre_selected_item={
+          SCROLL_SUBFILTERS.find(
+            (subfilter) => subfilter.value === scrollSubfilter
+          ) ?? SCROLL_SUBFILTERS[0]
+        }
+        selection_placeholder={'Scroll type'}
+        on_select={handleScrollSubfilterChange}
+      />
+    );
+  };
+
   const renderUsableItemView = () => {
     if (!itemToView) {
       return null;
@@ -478,17 +518,7 @@ const UsableItems = ({
         <InventoryStackBody>
           <div className="flex flex-col gap-3 px-4">
             <UsableItem item={itemToView} />
-            {(useError || useManyError || useSuccessMessage) && (
-              <Alert
-                variant={
-                  useError || useManyError
-                    ? AlertVariant.DANGER
-                    : AlertVariant.SUCCESS
-                }
-              >
-                {useError ?? useManyError ?? useSuccessMessage}
-              </Alert>
-            )}
+            {renderUseFeedback()}
             {isSpecialItem && <SpecialUsableItemGuidance item={itemToView} />}
             {renderGemScrollAction()}
             {renderCurrencyCacheFeedback()}
@@ -528,18 +558,7 @@ const UsableItems = ({
             on_select={handleFilterChange}
             on_clear={handleClearFilters}
           />
-          {activeFilter === 'scrolls' && (
-            <Dropdown
-              items={SCROLL_SUBFILTERS}
-              pre_selected_item={
-                SCROLL_SUBFILTERS.find(
-                  (subfilter) => subfilter.value === scrollSubfilter
-                ) ?? SCROLL_SUBFILTERS[0]
-              }
-              selection_placeholder={'Scroll type'}
-              on_select={handleScrollSubfilterChange}
-            />
-          )}
+          {renderScrollSubfilter()}
         </div>
         <div className="px-4">{renderCurrencyCacheFeedback()}</div>
         <div className="min-h-0 flex-1" aria-busy={loading}>

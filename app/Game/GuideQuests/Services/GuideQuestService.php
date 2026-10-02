@@ -18,14 +18,14 @@ use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\HandleCharacterLevelUp;
 use App\Game\Events\Values\EventType;
 use App\Game\GuideQuests\Events\ShowGuideQuestCompletedToast;
+use App\Game\GuideQuests\Values\GuideQuestRequiredItemSource;
+use App\Game\GuideQuests\Values\GuideQuestWalkthroughStatus;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Support\Facades\Log;
 
 class GuideQuestService
 {
     use HandleCharacterLevelUp;
-
-    private GuideQuestRequirementsService $guideQuestRequirementsService;
 
     private array $completedAttributes = [];
 
@@ -34,17 +34,15 @@ class GuideQuestService
      * @param BattleRewardProcessingQueueManager $battleRewardProcessingQueueManager
      */
     public function __construct(
-        GuideQuestRequirementsService $guideQuestRequirementsService,
+        private readonly GuideQuestRequirementsService $guideQuestRequirementsService,
         private readonly BattleRewardProcessingQueueManager $battleRewardProcessingQueueManager,
-    ) {
-        $this->guideQuestRequirementsService = $guideQuestRequirementsService;
-    }
+    ) {}
 
     /**
      * Return the Character's currently applicable Guide Quests.
      *
      * @param Character $character
-     * @return GuideQuest[]
+     * @return array
      */
     public function getCurrentQuestsForCharacter(Character $character): array
     {
@@ -59,7 +57,6 @@ class GuideQuestService
      */
     public function fetchQuestForCharacter(Character $character): array
     {
-
         $quests = $this->fetchNextGuideQuest($character);
 
         $canHandIn = [];
@@ -95,34 +92,6 @@ class GuideQuestService
     }
 
     /**
-     * Append lightweight Character walkthrough status without exposing step definitions.
-     *
-     * @param Character $character
-     * @param GuideQuest $guideQuest
-     * @return void
-     */
-    private function appendWalkthroughStatus(Character $character, GuideQuest $guideQuest): void
-    {
-        $progress = CharacterGuideQuestProgress::where('character_id', $character->id)
-            ->where('guide_quest_id', $guideQuest->id)
-            ->first();
-
-        if (! is_null($progress?->walkthrough_completed_at)) {
-            $guideQuest->setAttribute('walkthrough_status', 'completed');
-
-            return;
-        }
-
-        if (! is_null($progress?->started_at)) {
-            $guideQuest->setAttribute('walkthrough_status', 'in_progress');
-
-            return;
-        }
-
-        $guideQuest->setAttribute('walkthrough_status', 'not_started');
-    }
-
-    /**
      * Acknowledge attention for the Character's currently applicable Guide Quests.
      *
      * @param Character $character
@@ -137,53 +106,6 @@ class GuideQuestService
             ->whereNotNull('hand_in_ready_at')
             ->whereNull('attention_acknowledged_at')
             ->update(['attention_acknowledged_at' => now()]);
-    }
-
-    /**
-     * Persist the first transition into a hand-in-ready state.
-     *
-     * @param Character $character
-     * @param GuideQuest $guideQuest
-     * @param bool $canHandIn
-     * @return void
-     */
-    private function recordNewHandInAttention(
-        Character $character,
-        GuideQuest $guideQuest,
-        bool $canHandIn,
-    ): void {
-        if (! $canHandIn) {
-            return;
-        }
-
-        CharacterGuideQuestProgress::firstOrCreate(
-            [
-                'character_id' => $character->id,
-                'guide_quest_id' => $guideQuest->id,
-            ],
-            ['hand_in_ready_at' => now()],
-        );
-
-        CharacterGuideQuestProgress::where('character_id', $character->id)
-            ->where('guide_quest_id', $guideQuest->id)
-            ->whereNull('hand_in_ready_at')
-            ->update(['hand_in_ready_at' => now()]);
-    }
-
-    /**
-     * Determine whether current Guide Quests have unacknowledged ready attention.
-     *
-     * @param Character $character
-     * @param array $quests
-     * @return bool
-     */
-    private function hasUnacknowledgedAttention(Character $character, array $quests): bool
-    {
-        return CharacterGuideQuestProgress::where('character_id', $character->id)
-            ->whereIn('guide_quest_id', collect($quests)->pluck('id'))
-            ->whereNotNull('hand_in_ready_at')
-            ->whereNull('attention_acknowledged_at')
-            ->exists();
     }
 
     /**
@@ -221,31 +143,7 @@ class GuideQuestService
             return false;
         }
 
-        $enqueueResult = $this->battleRewardProcessingQueueManager->enqueue(
-            $character,
-            BattleRewardRequestPriority::FIRST,
-            BattleRewardRequestSourceType::GUIDE_QUEST,
-            implode(':', [
-                BattleRewardRequestSourceType::GUIDE_QUEST->value,
-                $character->id,
-                $quest->id,
-            ]),
-            [
-                'character_id' => $character->id,
-                'guide_quest_id' => $quest->id,
-            ],
-        );
-
-        if (! $enqueueResult->successful()) {
-            $failure = $enqueueResult->failure();
-
-            Log::channel('reward_processing')->error('Guide Quest reward enqueue failed.', [
-                'character_id' => $character->id,
-                'guide_quest_id' => $quest->id,
-                'exception_class' => is_null($failure) ? null : $failure::class,
-                'exception_message' => $failure?->getMessage(),
-            ]);
-
+        if (! $this->enqueueGuideQuestReward($character, $quest)) {
             $completion->delete();
 
             return false;
@@ -265,21 +163,9 @@ class GuideQuestService
      */
     public function processQueuedRewards(Character $character, GuideQuest $quest): void
     {
-        $gold = $character->gold + $quest->gold_reward;
-        $goldDust = $character->gold_dust + $quest->gold_dust_reward;
-        $shards = $character->shards + $quest->shards_reward;
-
-        if ($gold >= CurrencyLimit::MAX_GOLD) {
-            $gold = CurrencyLimit::MAX_GOLD;
-        }
-
-        if ($goldDust >= CurrencyLimit::MAX_GOLD_DUST) {
-            $goldDust = CurrencyLimit::MAX_GOLD_DUST;
-        }
-
-        if ($shards >= CurrencyLimit::MAX_SHARDS) {
-            $shards = CurrencyLimit::MAX_SHARDS;
-        }
+        $gold = min($character->gold + $quest->gold_reward, CurrencyLimit::MAX_GOLD);
+        $goldDust = min($character->gold_dust + $quest->gold_dust_reward, CurrencyLimit::MAX_GOLD_DUST);
+        $shards = min($character->shards + $quest->shards_reward, CurrencyLimit::MAX_SHARDS);
 
         $character = $this->giveXP($character, $quest);
 
@@ -291,17 +177,9 @@ class GuideQuestService
 
         $character = $character->refresh();
 
-        if ($quest->gold_reward > 0) {
-            event(new ServerMessageEvent($character->user, 'Rewarded with: '.number_format($quest->gold_reward).' Gold. You now have: '.number_format($character->gold)));
-        }
-
-        if ($quest->gold_dust_reward > 0) {
-            event(new ServerMessageEvent($character->user, 'Rewarded with: '.number_format($quest->gold_dust_reward).' Gold Dust. You now have: '.number_format($character->gold_dust)));
-        }
-
-        if ($quest->shards_reward > 0) {
-            event(new ServerMessageEvent($character->user, 'Rewarded with: '.number_format($quest->shards_reward).' Shards. You now have: '.number_format($character->shards)));
-        }
+        $this->announceCurrencyReward($character, $quest->gold_reward, 'Gold', $character->gold);
+        $this->announceCurrencyReward($character, $quest->gold_dust_reward, 'Gold Dust', $character->gold_dust);
+        $this->announceCurrencyReward($character, $quest->shards_reward, 'Shards', $character->shards);
 
         event(new UpdateTopBarEvent($character));
     }
@@ -316,17 +194,13 @@ class GuideQuestService
      */
     public function canHandInQuest(Character $character, GuideQuest $quest, bool $ignoreAutomation = false): bool
     {
-
         $this->completedAttributes = [];
 
-        $alreadyCompleted = $character->questsCompleted()->where('guide_quest_id', $quest->id)->first();
-        $stats = ['str', 'dex', 'dur', 'int', 'chr', 'agi', 'focus'];
-
-        if (! is_null($alreadyCompleted)) {
+        if ($character->questsCompleted()->where('guide_quest_id', $quest->id)->exists()) {
             return false;
         }
 
-        if ($character->currentAutomations()->where('type', AutomationType::EXPLORING->value)->get()->isNotEmpty() && ! $ignoreAutomation) {
+        if (! $ignoreAutomation && $character->currentAutomations()->where('type', AutomationType::EXPLORING->value)->exists()) {
             return false;
         }
 
@@ -334,7 +208,161 @@ class GuideQuestService
             return false;
         }
 
-        $this->completedAttributes = $this->guideQuestRequirementsService->requiredLevelCheck($character, $quest)
+        $this->completedAttributes = $this->resolveCompletedRequirements($character, $quest);
+
+        if (empty($this->completedAttributes)) {
+            return false;
+        }
+
+        $difference = array_diff($this->requiredAttributeNames($quest), $this->completedAttributes);
+
+        $this->guideQuestRequirementsService->resetFinishedRequirements();
+
+        return empty($difference);
+    }
+
+    /**
+     * Append lightweight Character walkthrough status without exposing step definitions.
+     *
+     * @param Character $character
+     * @param GuideQuest $guideQuest
+     * @return void
+     */
+    private function appendWalkthroughStatus(Character $character, GuideQuest $guideQuest): void
+    {
+        $progress = CharacterGuideQuestProgress::where('character_id', $character->id)
+            ->where('guide_quest_id', $guideQuest->id)
+            ->first();
+
+        if (! is_null($progress?->walkthrough_completed_at)) {
+            $guideQuest->setAttribute('walkthrough_status', GuideQuestWalkthroughStatus::COMPLETED->value);
+
+            return;
+        }
+
+        if (! is_null($progress?->started_at)) {
+            $guideQuest->setAttribute('walkthrough_status', GuideQuestWalkthroughStatus::IN_PROGRESS->value);
+
+            return;
+        }
+
+        $guideQuest->setAttribute('walkthrough_status', GuideQuestWalkthroughStatus::NOT_STARTED->value);
+    }
+
+    /**
+     * Persist the first transition into a hand-in-ready state.
+     *
+     * @param Character $character
+     * @param GuideQuest $guideQuest
+     * @param bool $canHandIn
+     * @return void
+     */
+    private function recordNewHandInAttention(Character $character, GuideQuest $guideQuest, bool $canHandIn): void
+    {
+        if (! $canHandIn) {
+            return;
+        }
+
+        CharacterGuideQuestProgress::firstOrCreate(
+            [
+                'character_id' => $character->id,
+                'guide_quest_id' => $guideQuest->id,
+            ],
+            ['hand_in_ready_at' => now()],
+        );
+
+        CharacterGuideQuestProgress::where('character_id', $character->id)
+            ->where('guide_quest_id', $guideQuest->id)
+            ->whereNull('hand_in_ready_at')
+            ->update(['hand_in_ready_at' => now()]);
+    }
+
+    /**
+     * Determine whether current Guide Quests have unacknowledged ready attention.
+     *
+     * @param Character $character
+     * @param array $quests
+     * @return bool
+     */
+    private function hasUnacknowledgedAttention(Character $character, array $quests): bool
+    {
+        return CharacterGuideQuestProgress::where('character_id', $character->id)
+            ->whereIn('guide_quest_id', collect($quests)->pluck('id'))
+            ->whereNotNull('hand_in_ready_at')
+            ->whereNull('attention_acknowledged_at')
+            ->exists();
+    }
+
+    /**
+     * Queue the Guide Quest reward, logging the failure when the reward cannot be queued.
+     *
+     * @param Character $character
+     * @param GuideQuest $quest
+     * @return bool
+     */
+    private function enqueueGuideQuestReward(Character $character, GuideQuest $quest): bool
+    {
+        $enqueueResult = $this->battleRewardProcessingQueueManager->enqueue(
+            $character,
+            BattleRewardRequestPriority::FIRST,
+            BattleRewardRequestSourceType::GUIDE_QUEST,
+            implode(':', [
+                BattleRewardRequestSourceType::GUIDE_QUEST->value,
+                $character->id,
+                $quest->id,
+            ]),
+            [
+                'character_id' => $character->id,
+                'guide_quest_id' => $quest->id,
+            ],
+        );
+
+        if ($enqueueResult->successful()) {
+            return true;
+        }
+
+        $failure = $enqueueResult->failure();
+
+        Log::channel('reward_processing')->error('Guide Quest reward enqueue failed.', [
+            'character_id' => $character->id,
+            'guide_quest_id' => $quest->id,
+            'exception_class' => is_null($failure) ? null : $failure::class,
+            'exception_message' => $failure?->getMessage(),
+        ]);
+
+        return false;
+    }
+
+    /**
+     * Tell the Character about a positive currency reward and their new total.
+     *
+     * @param Character $character
+     * @param int|null $reward
+     * @param string $currencyName
+     * @param int $total
+     * @return void
+     */
+    private function announceCurrencyReward(Character $character, ?int $reward, string $currencyName, int $total): void
+    {
+        if ($reward <= 0) {
+            return;
+        }
+
+        event(new ServerMessageEvent($character->user, 'Rewarded with: '.number_format($reward).' '.$currencyName.'. You now have: '.number_format($total)));
+    }
+
+    /**
+     * Resolve which of the Guide Quest's requirements the Character has already met.
+     *
+     * @param Character $character
+     * @param GuideQuest $quest
+     * @return array
+     */
+    private function resolveCompletedRequirements(Character $character, GuideQuest $quest): array
+    {
+        $stats = ['str', 'dex', 'dur', 'int', 'chr', 'agi', 'focus'];
+
+        return $this->guideQuestRequirementsService->requiredLevelCheck($character, $quest)
             ->requiredReincarnatedAmount($character, $quest)
             ->requiredQuest($character, $quest)
             ->requiredSkillCheck($character, $quest)
@@ -370,20 +398,6 @@ class GuideQuestService
             ->requiredBatchCraftingExperienceHours($character, $quest)
             ->requiredBatchCraftedItems($character, $quest)
             ->getFinishedRequirements();
-
-        if (! empty($this->completedAttributes)) {
-            $requiredAttributes = $this->requiredAttributeNames($quest);
-
-            $difference = array_diff($requiredAttributes, $this->completedAttributes);
-
-            $this->guideQuestRequirementsService->resetFinishedRequirements();
-
-            if (empty($difference)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -395,7 +409,6 @@ class GuideQuestService
      */
     private function giveXP(Character $character, GuideQuest $guideQuest): Character
     {
-
         if ($guideQuest->xp_reward <= 0) {
             return $character;
         }
@@ -435,24 +448,38 @@ class GuideQuestService
         }
 
         foreach ($quest->required_batch_crafted_items as $requiredBatchCraftedItem) {
-            if (($requiredBatchCraftedItem['source'] ?? 'inventory') === 'alchemy_bag') {
-                if (! $this->consumeRequiredAlchemyBagItems($character, $requiredBatchCraftedItem)) {
-                    return false;
-                }
-
-                continue;
-            }
-
-            $slotIds = $this->guideQuestRequirementsService->matchingBatchCraftedItemSlotIds($character, $requiredBatchCraftedItem);
-
-            if (count($slotIds) < $requiredBatchCraftedItem['amount']) {
+            if (! $this->consumeRequiredItem($character, $requiredBatchCraftedItem)) {
                 return false;
             }
-
-            $character->inventory->slots()
-                ->whereIn('id', $slotIds)
-                ->delete();
         }
+
+        return true;
+    }
+
+    /**
+     * Consume one required item entry from the inventory or Alchemy Bag source it names.
+     *
+     * @param Character $character
+     * @param array $requiredBatchCraftedItem
+     * @return bool
+     */
+    private function consumeRequiredItem(Character $character, array $requiredBatchCraftedItem): bool
+    {
+        $source = GuideQuestRequiredItemSource::tryFrom($requiredBatchCraftedItem['source'] ?? '') ?? GuideQuestRequiredItemSource::INVENTORY;
+
+        if ($source === GuideQuestRequiredItemSource::ALCHEMY_BAG) {
+            return $this->consumeRequiredAlchemyBagItems($character, $requiredBatchCraftedItem);
+        }
+
+        $slotIds = $this->guideQuestRequirementsService->matchingBatchCraftedItemSlotIds($character, $requiredBatchCraftedItem);
+
+        if (count($slotIds) < $requiredBatchCraftedItem['amount']) {
+            return false;
+        }
+
+        $character->inventory->slots()
+            ->whereIn('id', $slotIds)
+            ->delete();
 
         return true;
     }
@@ -481,21 +508,32 @@ class GuideQuestService
                 break;
             }
 
-            if ($alchemyBagSlot->amount <= $remainingAmountToConsume) {
-                $remainingAmountToConsume -= $alchemyBagSlot->amount;
-                $alchemyBagSlot->delete();
-
-                continue;
-            }
-
-            $alchemyBagSlot->update([
-                'amount' => $alchemyBagSlot->amount - $remainingAmountToConsume,
-            ]);
-
-            $remainingAmountToConsume = 0;
+            $remainingAmountToConsume = $this->consumeFromAlchemyBagSlot($alchemyBagSlot, $remainingAmountToConsume);
         }
 
         return $remainingAmountToConsume === 0;
+    }
+
+    /**
+     * Take up to the remaining amount from one Alchemy Bag slot and return what is still left to consume.
+     *
+     * @param AlchemyBagSlot $alchemyBagSlot
+     * @param int $remainingAmountToConsume
+     * @return int
+     */
+    private function consumeFromAlchemyBagSlot(AlchemyBagSlot $alchemyBagSlot, int $remainingAmountToConsume): int
+    {
+        if ($alchemyBagSlot->amount <= $remainingAmountToConsume) {
+            $alchemyBagSlot->delete();
+
+            return $remainingAmountToConsume - $alchemyBagSlot->amount;
+        }
+
+        $alchemyBagSlot->update([
+            'amount' => $alchemyBagSlot->amount - $remainingAmountToConsume,
+        ]);
+
+        return 0;
     }
 
     /**
@@ -512,68 +550,107 @@ class GuideQuestService
     }
 
     /**
-     * Resolve the Character's next regular and event Guide Quests.
+     * Resolve the Character's next regular and event or new-feature Guide Quests.
      *
      * @param Character $character
      * @return array
      */
     private function fetchNextGuideQuest(Character $character): array
     {
+        return array_values(array_filter([
+            $this->fetchNextRegularGuideQuest($character),
+            $this->fetchNextFeatureGuideQuest($character),
+        ]));
+    }
 
-        $winterEvent = Event::where('type', EventType::WINTER_EVENT)->first();
-        $delusionalEvent = Event::where('type', EventType::DELUSIONAL_MEMORIES_EVENT)->first();
-        $unlocksAtLevelQuest = GuideQuest::where('unlock_at_level', '<=', $character->level)->whereNull('only_during_event')->whereNull('parent_id')->orderBy('unlock_at_level', 'asc')->first();
-        $nextGuideQuest = null;
+    /**
+     * Resolve the Character's next level-unlocked or running-event Guide Quest.
+     *
+     * @param Character $character
+     * @return GuideQuest|null
+     */
+    private function fetchNextFeatureGuideQuest(Character $character): ?GuideQuest
+    {
+        $activeEventTypes = $this->activeGuideQuestEventTypes();
+        $unlocksAtLevelQuest = $this->unlocksAtLevelGuideQuest($character, $activeEventTypes);
 
-        if (! is_null($winterEvent)) {
-            $unlocksAtLevelQuest = GuideQuest::where('unlock_at_level', '>=', $character->level)->where('only_during_event', EventType::WINTER_EVENT)->whereNull('parent_id')->orderBy('unlock_at_level', 'asc')->first();
+        $nextGuideQuest = is_null($unlocksAtLevelQuest) ? null : $this->fetchNextEventQuest($character, $unlocksAtLevelQuest);
+
+        if (! is_null($nextGuideQuest)) {
+            return $nextGuideQuest;
         }
 
-        if (! is_null($delusionalEvent)) {
-            $unlocksAtLevelQuest = GuideQuest::where('unlock_at_level', '>=', $character->level)->where('only_during_event', EventType::DELUSIONAL_MEMORIES_EVENT)->whereNull('parent_id')->orderBy('unlock_at_level', 'asc')->first();
-        }
-
-        if (! is_null($unlocksAtLevelQuest)) {
-            $nextGuideQuest = $this->fetchNextEventQuest($character, $unlocksAtLevelQuest);
-        }
-
-        if (! is_null($winterEvent) && is_null($nextGuideQuest)) {
-            $eventGuideQuest = GuideQuest::where('only_during_event', EventType::WINTER_EVENT)->whereNull('parent_id')->first();
+        foreach ($activeEventTypes as $eventType) {
+            $eventGuideQuest = $this->fetchNextEventRootQuest($character, $eventType);
 
             if (! is_null($eventGuideQuest)) {
-                $nextGuideQuest = $this->fetchNextEventQuest($character, $eventGuideQuest);
+                return $eventGuideQuest;
             }
         }
 
-        if (! is_null($delusionalEvent) && is_null($nextGuideQuest)) {
-            $delusionalEventQuest = GuideQuest::where('only_during_event', EventType::DELUSIONAL_MEMORIES_EVENT)->whereNull('parent_id')->first();
+        return null;
+    }
 
-            if (! is_null($delusionalEventQuest)) {
-                $nextGuideQuest = $this->fetchNextEventQuest($character, $delusionalEventQuest);
-            }
+    /**
+     * Return the running events that own Guide Quest chains, in precedence order.
+     *
+     * @return array
+     */
+    private function activeGuideQuestEventTypes(): array
+    {
+        return array_values(array_filter(
+            [EventType::WINTER_EVENT, EventType::DELUSIONAL_MEMORIES_EVENT],
+            fn (int $eventType): bool => Event::where('type', $eventType)->exists(),
+        ));
+    }
+
+    /**
+     * Resolve the level-unlocked Guide Quest, preferring the latest running event's chain when one is running.
+     *
+     * @param Character $character
+     * @param array $activeEventTypes
+     * @return GuideQuest|null
+     */
+    private function unlocksAtLevelGuideQuest(Character $character, array $activeEventTypes): ?GuideQuest
+    {
+        if (empty($activeEventTypes)) {
+            return GuideQuest::where('unlock_at_level', '<=', $character->level)
+                ->whereNull('only_during_event')
+                ->whereNull('parent_id')
+                ->orderBy('unlock_at_level', 'asc')
+                ->first();
         }
 
-        $regularGuideQuest = $this->fetchNextRegularGuideQuest($character);
-        $newFeatureGuideQuest = $nextGuideQuest;
+        return GuideQuest::where('unlock_at_level', '>=', $character->level)
+            ->where('only_during_event', $activeEventTypes[array_key_last($activeEventTypes)])
+            ->whereNull('parent_id')
+            ->orderBy('unlock_at_level', 'asc')
+            ->first();
+    }
 
-        $guideQuests = [];
+    /**
+     * Resolve the Character's next incomplete quest from the root of an event's Guide Quest chain.
+     *
+     * @param Character $character
+     * @param int $eventType
+     * @return GuideQuest|null
+     */
+    private function fetchNextEventRootQuest(Character $character, int $eventType): ?GuideQuest
+    {
+        $eventGuideQuest = GuideQuest::where('only_during_event', $eventType)->whereNull('parent_id')->first();
 
-        if (! is_null($regularGuideQuest)) {
-            $guideQuests[] = $regularGuideQuest;
+        if (is_null($eventGuideQuest)) {
+            return null;
         }
 
-        if (! is_null($newFeatureGuideQuest)) {
-            $guideQuests[] = $newFeatureGuideQuest;
-        }
-
-        return $guideQuests;
+        return $this->fetchNextEventQuest($character, $eventGuideQuest);
     }
 
     /**
      * Resolve the Character's next incomplete regular (non-event) Guide Quest.
      *
      * @param Character $character
-     * @return ?GuideQuest
+     * @return GuideQuest|null
      */
     private function fetchNextRegularGuideQuest(Character $character): ?GuideQuest
     {
@@ -600,14 +677,11 @@ class GuideQuestService
     }
 
     /**
-     * Depth-first search for the first incomplete regular guide quest.
-     *
-     * Only descends into a quest's children once the quest itself is
-     * completed, so a child is never returned before its parent.
+     * Find the first incomplete regular Guide Quest depth-first, never returning a child before its parent is complete.
      *
      * @param GuideQuest $quest
      * @param array $completedGuideQuestIds
-     * @return ?GuideQuest
+     * @return GuideQuest|null
      */
     private function findNextIncompleteRegularGuideQuest(GuideQuest $quest, array $completedGuideQuestIds): ?GuideQuest
     {
@@ -637,7 +711,7 @@ class GuideQuestService
      *
      * @param Character $character
      * @param GuideQuest $initialEventGuideQuest
-     * @return ?GuideQuest
+     * @return GuideQuest|null
      */
     private function fetchNextEventQuest(Character $character, GuideQuest $initialEventGuideQuest): ?GuideQuest
     {
@@ -659,54 +733,28 @@ class GuideQuestService
     }
 
     /**
-     * List the Guide Quest's populated `required_*` attribute names.
+     * List the Guide Quest's populated `required_*` attribute names that are checked as completable requirements.
      *
      * @param GuideQuest $quest
      * @return array
      */
     private function requiredAttributeNames(GuideQuest $quest): array
     {
+        $attributesCheckedThroughCompanions = [
+            'required_skill',
+            'required_passive_skill',
+            'required_faction_id',
+            'required_secondary_skill',
+            'required_skill_type',
+            'required_kingdom_building_id',
+            'required_batch_crafting_type',
+        ];
 
-        $requiredAttributes = [];
-
-        $attributes = $quest->getAttributes();
-
-        foreach ($attributes as $key => $value) {
-            if ($key === 'required_skill') {
-                continue;
-            }
-
-            if ($key === 'required_passive_skill') {
-                continue;
-            }
-
-            if ($key === 'required_faction_id') {
-                continue;
-            }
-
-            if ($key === 'required_secondary_skill') {
-                continue;
-            }
-
-            if ($key === 'required_skill_type') {
-                continue;
-            }
-
-            if ($key === 'required_kingdom_building_id') {
-                continue;
-            }
-
-            if ($key === 'required_batch_crafting_type') {
-                continue;
-            }
-
-            if (str_contains($key, 'required') !== false) {
-                if (! is_null($attributes[$key])) {
-                    $requiredAttributes[] = $key;
-                }
-            }
-        }
-
-        return $requiredAttributes;
+        return collect($quest->getAttributes())
+            ->filter(fn (mixed $value, string $key): bool => str_contains($key, 'required')
+                && ! in_array($key, $attributesCheckedThroughCompanions, true)
+                && ! is_null($value))
+            ->keys()
+            ->all();
     }
 }

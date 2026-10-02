@@ -13,6 +13,19 @@ const PlayerLocationDetailStack = ({
 }: PlayerLocationDetailStackProps): ReactNode => {
   const [nestedGameMapId, setNestedGameMapId] = useState<number | null>(null);
 
+  const renderNestedGameMap = (): ReactNode => {
+    if (nestedGameMapId === null) {
+      return null;
+    }
+
+    return (
+      <PlayerGameMapDetailStack
+        game_map_id={nestedGameMapId}
+        on_close={() => setNestedGameMapId(null)}
+      />
+    );
+  };
+
   return (
     <StackedCard
       on_close={onClose}
@@ -27,12 +40,7 @@ const PlayerLocationDetailStack = ({
           />
         </div>
 
-        {nestedGameMapId !== null ? (
-          <PlayerGameMapDetailStack
-            game_map_id={nestedGameMapId}
-            on_close={() => setNestedGameMapId(null)}
-          />
-        ) : null}
+        {renderNestedGameMap()}
       </div>
     </StackedCard>
   );

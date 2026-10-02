@@ -1,13 +1,10 @@
-import React, { ReactNode } from 'react';
+import React from 'react';
 
+import GuideQuestProviderProps from './types/guide-quest-provider-props';
 import { useGuideQuests } from '../api/hooks/use-guide-quests';
 import { GuideQuestContext } from '../context/guide-quest-context';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
-
-interface GuideQuestProviderProps {
-  children: ReactNode;
-}
 
 const GuideQuestProvider = ({ children }: GuideQuestProviderProps) => {
   const { gameData } = useGameData();

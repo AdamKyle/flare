@@ -56,6 +56,17 @@ class MonsterPlayerFight
 
     private MonsterListService $monsterListService;
 
+    /**
+     * @param BuildMonster $buildMonster
+     * @param CharacterCacheData $characterCacheData
+     * @param DelveMonsterService $delveMonsterService
+     * @param Voidance $voidance
+     * @param Ambush $ambush
+     * @param Attack $attack
+     * @param BuildMonsterCacheService $buildMonsterCacheService
+     * @param ElementAttackData $elementAttackData
+     * @param MonsterListService $monsterListService
+     */
     public function __construct(
         BuildMonster $buildMonster,
         CharacterCacheData $characterCacheData,
@@ -81,9 +92,10 @@ class MonsterPlayerFight
     }
 
     /**
-     * Set the character.
+     * Set the Character for a fight whose setup already exists in the cache.
      *
-     * - Useful for rank fights where the setup is already done and in the cache.
+     * @param Character $character
+     * @return MonsterPlayerFight
      */
     public function setCharacter(Character $character): MonsterPlayerFight
     {
@@ -95,11 +107,12 @@ class MonsterPlayerFight
     }
 
     /**
-     * Set up the fight.
+     * Set up the fight, returning an error result when the Monster cannot be found.
      *
-     * - Can return an error if the monster is not found.
-     *
-     * @return array|$this
+     * @param Character $character
+     * @param array $params
+     * @param bool $shouldIncreaseStrength
+     * @return MonsterPlayerFight|array
      */
     public function setUpFight(Character $character, array $params, bool $shouldIncreaseStrength = false): MonsterPlayerFight|array
     {
@@ -115,20 +128,26 @@ class MonsterPlayerFight
             return $this->errorResult('No monster was found.');
         }
 
-        if ($shouldIncreaseStrength && ! isset($params['cached_monster'])) {
+        if (! $shouldIncreaseStrength || isset($params['cached_monster'])) {
+            return $this;
+        }
 
-            $this->monster = $this->delveMonsterService->createMonster($this->monster, $character);
+        $this->monster = $this->delveMonsterService->createMonster($this->monster, $character);
 
-            if ($params['pack_size'] > 1) {
-                Cache::put('delve-monster-'.$character->id.'-'.$this->monster['id'].'-fight', $this->monster, 900);
-            }
+        if ($params['pack_size'] > 1) {
+            Cache::put('delve-monster-'.$character->id.'-'.$this->monster['id'].'-fight', $this->monster, 900);
         }
 
         return $this;
     }
 
     /**
-     * Set up  the raid fight
+     * Set up a raid fight against the supplied raid Monster payload.
+     *
+     * @param Character $character
+     * @param array $raidMonster
+     * @param string $attackType
+     * @return MonsterPlayerFight
      */
     public function setUpRaidFight(Character $character, array $raidMonster, string $attackType): MonsterPlayerFight
     {
@@ -143,7 +162,10 @@ class MonsterPlayerFight
     }
 
     /**
-     * Delete the cache data for the character
+     * Delete the cached Character sheet data for the Character.
+     *
+     * @param Character $character
+     * @return void
      */
     public function deleteCharacterCache(Character $character): void
     {
@@ -151,7 +173,9 @@ class MonsterPlayerFight
     }
 
     /**
-     * Get the battle messages.
+     * Return the accumulated battle messages.
+     *
+     * @return array
      */
     public function getBattleMessages(): array
     {
@@ -161,7 +185,9 @@ class MonsterPlayerFight
     }
 
     /**
-     * Reset all battle messages.
+     * Reset the battle messages of this fight and its collaborators.
+     *
+     * @return void
      */
     public function resetBattleMessages(): void
     {
@@ -173,7 +199,9 @@ class MonsterPlayerFight
     }
 
     /**
-     * get the monster.
+     * Return the Monster payload for this fight.
+     *
+     * @return array
      */
     public function getMonster(): array
     {
@@ -181,7 +209,9 @@ class MonsterPlayerFight
     }
 
     /**
-     * Get the character health.
+     * Return the Character's current fight health.
+     *
+     * @return int
      */
     public function getCharacterHealth(): int
     {
@@ -189,20 +219,29 @@ class MonsterPlayerFight
     }
 
     /**
-     * Get the monster health.
+     * Return the Monster's current fight health.
+     *
+     * @return int
      */
     public function getMonsterHealth(): int
     {
         return $this->attack->getMonsterHealth();
     }
 
+    /**
+     * Return the Monster's most recently rolled attack.
+     *
+     * @return int
+     */
     public function getMonsterLastRolledAttack(): int
     {
         return $this->attack->getMonsterLastRolledAttack();
     }
 
     /**
-     * Base Fight Setup.
+     * Build the Monster, apply voidance and ambush, and return the initial fight state.
+     *
+     * @return array
      */
     public function fightSetUp(): array
     {
@@ -213,11 +252,7 @@ class MonsterPlayerFight
         $monster = $this->buildMonster->buildMonster($this->monster, $characterStatReductionAffixes, $skillReduction, $resistanceReduction);
 
         if (! is_null($this->forcedCurrentMonsterHealth)) {
-            $currentMonsterHealth = $this->forcedCurrentMonsterHealth;
-
-            if (! is_null($this->forcedMaxMonsterHealth)) {
-                $currentMonsterHealth = min($currentMonsterHealth, $this->forcedMaxMonsterHealth);
-            }
+            $currentMonsterHealth = min($this->forcedCurrentMonsterHealth, $this->forcedMaxMonsterHealth ?? $this->forcedCurrentMonsterHealth);
 
             $monster->setHealth(max($currentMonsterHealth, 0));
         }
@@ -257,36 +292,33 @@ class MonsterPlayerFight
     }
 
     /**
-     * Fight the monster.
+     * Fight the Monster, returning true only when the Character won.
      *
-     * - Returns true if the character won.
-     * - Returns false if the character lost or took too long or if neither side won.
-     *
-     * Use the methods here to determine based on health who won.
+     * @param bool $onlyOnce
+     * @param string|null $attackType
+     * @return bool
      */
     public function fightMonster(bool $onlyOnce = false, ?string $attackType = null): bool
     {
-
         if (! is_null($attackType)) {
             $this->attackType = $attackType;
         }
 
-        if (Cache::has('monster-fight-'.$this->character->id) && is_null($this->forcedCurrentMonsterHealth)) {
-            $data = Cache::get('monster-fight-'.$this->character->id);
+        $hasCachedFight = Cache::has('monster-fight-'.$this->character->id) && is_null($this->forcedCurrentMonsterHealth);
 
-            $this->monster = $data['monster'];
-        } else {
+        $data = $hasCachedFight ? Cache::get('monster-fight-'.$this->character->id) : $this->fightSetUp();
 
-            $data = $this->fightSetUp();
-
-            $this->monster = $data['monster'];
-        }
+        $this->monster = $data['monster'];
 
         return $this->processAttack($data, $onlyOnce);
     }
 
     /**
-     * Process the attack on the monster.
+     * Process one attack exchange from the supplied fight state, returning true only when the Character won.
+     *
+     * @param array $data
+     * @param bool $onlyOnce
+     * @return bool
      */
     public function processAttack(array $data, bool $onlyOnce = false): bool
     {
@@ -323,7 +355,10 @@ class MonsterPlayerFight
     }
 
     /**
-     * Do the actual attack
+     * Run the attack against the server Monster, returning true only when the Character won.
+     *
+     * @param ServerMonster $monster
+     * @return bool
      */
     private function doAttack(ServerMonster $monster): bool
     {
@@ -350,6 +385,10 @@ class MonsterPlayerFight
 
     /**
      * Fetch the Monster the Character is fighting, using the same contextual cache as the Monster list.
+     *
+     * @param Character $character
+     * @param int $monsterId
+     * @return array
      */
     private function fetchMonster(Character $character, int $monsterId): array
     {
@@ -369,7 +408,10 @@ class MonsterPlayerFight
     }
 
     /**
-     * Augment a cached Monster payload with the elemental atonement data needed for combat.
+     * Augment a cached Monster payload with the elemental atonement and penetration data needed for combat.
+     *
+     * @param array $monster
+     * @return array
      */
     private function augmentWithElementalData(array $monster): array
     {
@@ -379,12 +421,17 @@ class MonsterPlayerFight
 
         $monster['elemental_atonement'] = $elementalData;
         $monster['highest_element'] = $this->elementAttackData->getHighestElementName($elementalData, $this->elementAttackData->getHighestElementDamage($elementalData));
+        $monster['elemental_penetration'] = $serverMonster->getElementalPenetrationData();
 
         return $monster;
     }
 
     /**
-     * Fetches a celestial.
+     * Fetch a cached Celestial on the Character's map.
+     *
+     * @param Map $map
+     * @param int $monsterId
+     * @return array|null
      */
     private function fetchCelestial(Map $map, int $monsterId): ?array
     {
@@ -406,7 +453,10 @@ class MonsterPlayerFight
     }
 
     /**
-     * Merges the battle messages.
+     * Append the supplied messages to the battle messages.
+     *
+     * @param array $messages
+     * @return void
      */
     private function mergeMessages(array $messages): void
     {
@@ -414,11 +464,9 @@ class MonsterPlayerFight
     }
 
     /**
-     * Fetch the character's typed max health from the cache.
+     * Fetch the Character's max health from the Character sheet cache as an integer.
      *
-     * `getCachedCharacterData()` is a deliberately polymorphic accessor
-     * shared across the battle system; this is the one boundary that
-     * narrows its `mixed` return to the `int` this class needs.
+     * @return int
      */
     private function getMaxCharacterHealth(): int
     {

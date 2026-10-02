@@ -23,7 +23,7 @@ use App\Game\Character\CharacterInventory\Services\InventorySetService;
 use App\Game\Character\CharacterInventory\Services\UseItemService;
 use App\Game\Core\Items\Enricher\ItemEnricherFactory;
 use App\Game\Core\Items\Values\ItemType;
-use App\Game\Gems\Services\GemAbilityDuplicateService;
+use App\Game\Gems\Contracts\GemAbilityDuplicateQuery;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -36,13 +36,13 @@ class CharacterInventoryController extends Controller
      * @param CharacterInventoryService $characterInventoryService
      * @param InventorySetService $inventorySetService
      * @param UseItemService $useItemService
-     * @param GemAbilityDuplicateService $gemAbilityDuplicateService
+     * @param GemAbilityDuplicateQuery $gemAbilityDuplicateQuery
      */
     public function __construct(
         private readonly CharacterInventoryService $characterInventoryService,
         private readonly InventorySetService $inventorySetService,
         private readonly UseItemService $useItemService,
-        private readonly GemAbilityDuplicateService $gemAbilityDuplicateService,
+        private readonly GemAbilityDuplicateQuery $gemAbilityDuplicateQuery,
     ) {}
 
     /**
@@ -132,14 +132,12 @@ class CharacterInventoryController extends Controller
      */
     public function getSetItems(PaginationRequest $request, Character $character): JsonResponse
     {
-        $characterInventoryService = $this->characterInventoryService->setCharacter($character);
-        $payload = $characterInventoryService->getSetItems($request->per_page, $request->page, $request->search_text, $request->filters);
+        $payload = $this->characterInventoryService->setCharacter($character)->getSetItems($request->per_page, $request->page, $request->search_text, $request->filters);
         $setId = $request->filters['set_id'] ?? null;
-        $inventorySet = is_null($setId) ? null : $characterInventoryService->findOwnedInventorySet($setId);
 
-        $payload['duplicate_gem_abilities'] = is_null($inventorySet)
+        $payload['duplicate_gem_abilities'] = is_null($setId)
             ? []
-            : $this->gemAbilityDuplicateService->duplicateActiveAbilitiesForSet($character, $inventorySet);
+            : $this->gemAbilityDuplicateQuery->forInventorySet($character->id, $setId)->toArray();
 
         return response()->json($payload);
     }
@@ -191,7 +189,7 @@ class CharacterInventoryController extends Controller
         }
 
         $payload = $itemEnricherFactory->buildItemData($slot->item, $slot);
-        $payload['duplicate_gem_abilities'] = $this->gemAbilityDuplicateService->duplicateActiveAbilitiesForOwnedItem($character, $slot->item);
+        $payload['duplicate_gem_abilities'] = $this->gemAbilityDuplicateQuery->forOwnedItem($character->id, $slot->item->id)->toArray();
 
         return response()->json($payload);
     }

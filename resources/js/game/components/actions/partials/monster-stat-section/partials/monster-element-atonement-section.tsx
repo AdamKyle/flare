@@ -18,8 +18,15 @@ const MonsterElementalAtonementSection = (props: MonsterSectionProps) => {
   const water = monster.water_atonement ?? 0;
   const ice = monster.ice_atonement ?? 0;
 
+  const firePenetration = monster.fire_penetration ?? 0;
+  const icePenetration = monster.ice_penetration ?? 0;
+  const waterPenetration = monster.water_penetration ?? 0;
+
   const allZero =
     isNilOrZeroValue(fire) && isNilOrZeroValue(water) && isNilOrZeroValue(ice);
+
+  const hasPenetration =
+    firePenetration > 0 || icePenetration > 0 || waterPenetration > 0;
 
   if (allZero) {
     return null;
@@ -64,7 +71,7 @@ const MonsterElementalAtonementSection = (props: MonsterSectionProps) => {
           {renderLabel(
             'Fire Atonement',
             'Fire Atonement',
-            'When this monster is atoned to Fire, a percentage of its attack is dealt as fire damage. Equip Water-based gems to resist fire damage, and rely on strong Armour to mitigate the rest.'
+            'Reduces incoming Fire elemental damage. Matching Fire Penetration lowers the Fire Atonement used to resist that attack. Elemental strengths and weaknesses are calculated separately.'
           )}
         </Dt>
         <Dd>{formatPercent(fire)}</Dd>
@@ -83,7 +90,7 @@ const MonsterElementalAtonementSection = (props: MonsterSectionProps) => {
           {renderLabel(
             'Water Atonement',
             'Water Atonement',
-            'When this monster is atoned to Water, a percentage of its attack is dealt as water damage. Equip Ice-based gems to resist water damage, and rely on strong Armour to mitigate the rest.'
+            'Reduces incoming Water elemental damage. Matching Water Penetration lowers the Water Atonement used to resist that attack. Elemental strengths and weaknesses are calculated separately.'
           )}
         </Dt>
         <Dd>{formatPercent(water)}</Dd>
@@ -102,7 +109,7 @@ const MonsterElementalAtonementSection = (props: MonsterSectionProps) => {
           {renderLabel(
             'Ice Atonement',
             'Ice Atonement',
-            'When this monster is atoned to Ice, a percentage of its attack is dealt as ice damage. Equip Fire-based gems to resist ice damage, and rely on strong Armour to mitigate the rest.'
+            'Reduces incoming Ice elemental damage. Matching Ice Penetration lowers the Ice Atonement used to resist that attack. Elemental strengths and weaknesses are calculated separately.'
           )}
         </Dt>
         <Dd>{formatPercent(ice)}</Dd>
@@ -137,6 +144,47 @@ const MonsterElementalAtonementSection = (props: MonsterSectionProps) => {
     );
   };
 
+  const renderPenetration = () => {
+    if (!hasPenetration) {
+      return null;
+    }
+
+    return (
+      <>
+        <h3 className="text-mango-tango-500 dark:text-mango-tango-300 mt-5">
+          Elemental Penetration
+        </h3>
+        <Separator />
+        <Dl>
+          <Dt>
+            {renderLabel(
+              'Fire Penetration',
+              'Fire Penetration',
+              "Reduces the target's Fire Atonement when resolving Fire elemental damage."
+            )}
+          </Dt>
+          <Dd>{formatPercent(firePenetration)}</Dd>
+          <Dt>
+            {renderLabel(
+              'Ice Penetration',
+              'Ice Penetration',
+              "Reduces the target's Ice Atonement when resolving Ice elemental damage."
+            )}
+          </Dt>
+          <Dd>{formatPercent(icePenetration)}</Dd>
+          <Dt>
+            {renderLabel(
+              'Water Penetration',
+              'Water Penetration',
+              "Reduces the target's Water Atonement when resolving Water elemental damage."
+            )}
+          </Dt>
+          <Dd>{formatPercent(waterPenetration)}</Dd>
+        </Dl>
+      </>
+    );
+  };
+
   return (
     <>
       <h3 className="text-mango-tango-500 dark:text-mango-tango-300 mt-5">
@@ -149,6 +197,7 @@ const MonsterElementalAtonementSection = (props: MonsterSectionProps) => {
         {renderIce()}
         {renderAtonedToElement()}
       </Dl>
+      {renderPenetration()}
     </>
   );
 };

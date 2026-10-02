@@ -47,10 +47,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-
-        // Register development based commands.
         $this->commands([
-            // After Deployment Commands
             AddBatchCraftingSetToPlayers::class,
             AddHolyStacksToItems::class,
             BackfillCompletedPanelDismissals::class,
@@ -68,7 +65,6 @@ class AppServiceProvider extends ServiceProvider
             RemoveAllGuideQuestsForRebuild::class,
             CreateGemWorlds::class,
 
-            // Development Commands:
             CreateCharacter::class,
             CreateTestCharacters::class,
             MaxOutCharacter::class,

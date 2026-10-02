@@ -1,15 +1,10 @@
 import React, { useEffect, useState } from 'react';
 
+import ManageGuideQuestWalkthroughProps from './types/manage-guide-quest-walkthrough-props';
 import { GuideQuestWalkthroughStepDefinition } from '../api/definitions/guide-quest-definition';
-import GuideQuestResponseDefinition from '../api/definitions/guide-quest-response-defintion';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
-
-interface ManageGuideQuestWalkthroughProps {
-  data: GuideQuestResponseDefinition;
-  on_update: (steps: GuideQuestWalkthroughStepDefinition[]) => void;
-}
 
 const emptyStep = (position: number): GuideQuestWalkthroughStepDefinition => ({
   position,

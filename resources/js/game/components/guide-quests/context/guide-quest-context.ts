@@ -1,7 +1,7 @@
 import { createContext } from 'react';
 
-import { useGuideQuests } from '../api/hooks/use-guide-quests';
+import UseGuideQuestsDefinition from '../api/hooks/definitions/use-guide-quests-definition';
 
-export const GuideQuestContext = createContext<ReturnType<
-  typeof useGuideQuests
-> | null>(null);
+export const GuideQuestContext = createContext<UseGuideQuestsDefinition | null>(
+  null
+);

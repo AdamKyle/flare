@@ -3,7 +3,6 @@
 namespace App\Game\GuideQuests\Controllers\Api;
 
 use App\Flare\Models\GuideQuest;
-use App\Flare\Models\GuideQuestWalkthroughStep;
 use App\Flare\Models\User;
 use App\Game\GuideQuests\Requests\GuideQuestWalkthroughProgressRequest;
 use App\Game\GuideQuests\Services\GuideQuestWalkthroughService;
@@ -50,11 +49,10 @@ class GuideQuestWalkthroughController extends Controller
         User $user,
         GuideQuest $guideQuest,
     ): JsonResponse {
-        $step = GuideQuestWalkthroughStep::find($request->validated('step_id'));
         $updated = $this->guideQuestWalkthroughService->updateProgress(
             $user->character,
             $guideQuest,
-            $step,
+            $request->validated('step_id'),
             $request->validated('completed'),
         );
 

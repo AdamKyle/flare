@@ -1,6 +1,6 @@
 import { useApiHandler } from 'api-handler/hooks/use-api-handler';
-import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { useState } from 'react';
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import UseManageMultipleSelectedItemsApiParams from './deffinitions/use-manage-multiple-selected-items-api-params';
 import UseManageMultipleSelectedItemsDefinition from './deffinitions/use-manage-multiple-selected-items-definition';
@@ -18,47 +18,89 @@ export const useManageMultipleSelectedItemsApi =
       useState<UseManageMultipleSelectedItemsDefinition['error']>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-    const handleSelection = (
-      params: UseManageMultipleSelectedItemsApiParams
-    ) => {
-      const url = getUrl(params.url, { character: params.character_id });
+    const abortControllerRef = useRef<AbortController | null>(null);
 
-      processApiCall(url, params.apiParams, params.onSuccess).catch(() => {});
-    };
+    useEffect(() => {
+      return () => {
+        const activeController = abortControllerRef.current;
 
-    const processApiCall = async (
-      url: string,
-      params: ItemSelectedType,
-      onSuccess: (inventory_count: InventoryCountDefinition) => void
-    ) => {
-      setLoading(true);
+        abortControllerRef.current = null;
+        activeController?.abort();
+      };
+    }, []);
 
-      try {
-        const result = await apiHandler.post<
-          UseManageMultipleSelectedItemsResponse,
-          AxiosRequestConfig<
-            AxiosResponse<UseManageMultipleSelectedItemsResponse>
-          >,
-          ItemSelectedType
-        >(url, {
-          mode: params.mode,
-          ids: params.ids,
-          exclude: params.exclude,
-        });
+    const processApiCall = useCallback(
+      async (
+        url: string,
+        params: ItemSelectedType,
+        onSuccess: (inventory_count: InventoryCountDefinition) => void
+      ): Promise<void> => {
+        abortControllerRef.current?.abort();
+        const controller = new AbortController();
+        abortControllerRef.current = controller;
 
-        onSuccess(result.inventory_count);
+        setLoading(true);
+        setError(null);
+        setSuccessMessage(null);
 
-        setSuccessMessage(result.message);
+        try {
+          const result = await apiHandler.post<
+            UseManageMultipleSelectedItemsResponse,
+            AxiosRequestConfig<
+              AxiosResponse<UseManageMultipleSelectedItemsResponse>
+            >,
+            ItemSelectedType
+          >(
+            url,
+            {
+              mode: params.mode,
+              ids: params.ids,
+              exclude: params.exclude,
+            },
+            { signal: controller.signal }
+          );
 
-        setLoading(false);
-      } catch (err) {
-        setLoading(false);
+          if (abortControllerRef.current !== controller) {
+            return;
+          }
 
-        if (err instanceof AxiosError) {
-          setError(err.response?.data);
+          onSuccess(result.inventory_count);
+
+          setSuccessMessage(result.message);
+        } catch (err) {
+          if (axios.isCancel(err)) {
+            return;
+          }
+
+          if (abortControllerRef.current !== controller) {
+            return;
+          }
+
+          if (err instanceof AxiosError && err.response?.data) {
+            setError(err.response.data);
+
+            return;
+          }
+
+          setError({ message: 'Unable to update the selected items.' });
+        } finally {
+          if (abortControllerRef.current === controller) {
+            abortControllerRef.current = null;
+            setLoading(false);
+          }
         }
-      }
-    };
+      },
+      [apiHandler]
+    );
+
+    const handleSelection = useCallback(
+      (params: UseManageMultipleSelectedItemsApiParams) => {
+        const url = getUrl(params.url, { character: params.character_id });
+
+        void processApiCall(url, params.apiParams, params.onSuccess);
+      },
+      [getUrl, processApiCall]
+    );
 
     return {
       handleSelection,

@@ -53,4 +53,7 @@ export default interface MonsterFormStateDefinition {
   fire_atonement: string;
   ice_atonement: string;
   water_atonement: string;
+  fire_penetration: string;
+  ice_penetration: string;
+  water_penetration: string;
 }

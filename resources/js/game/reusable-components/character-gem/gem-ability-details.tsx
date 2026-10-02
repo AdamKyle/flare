@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 
-import GameGemAbilityDefinition from '../../api-definitions/gems/game-gem-ability-definition';
+import GemAbilityDetailsProps from './types/gem-ability-details-props';
 import { gemAbilityEffectTypeLabel } from '../gem-ability/enums/gem-ability-effect-type';
 import { gemAbilityScalingSourceLabel } from '../gem-ability/enums/gem-ability-scaling-source';
 import {
@@ -14,10 +14,6 @@ import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
 import GeneralToolTip from 'ui/tool-tips/general-tool-tip';
-
-interface GemAbilityDetailsProps {
-  ability: GameGemAbilityDefinition;
-}
 
 const GemAbilityDetails = ({ ability }: GemAbilityDetailsProps): ReactNode => {
   const typeLabel = gemAbilityTypeLabel(ability.ability_type);
@@ -44,6 +40,26 @@ const GemAbilityDetails = ({ ability }: GemAbilityDetailsProps): ReactNode => {
           Triggers on
         </Dt>
         <Dd>{ability.attack_types.join(', ')}</Dd>
+      </>
+    );
+  };
+
+  const renderProcChance = (): ReactNode => {
+    if (procChance === null) {
+      return null;
+    }
+
+    return (
+      <>
+        <Dt>
+          <GeneralToolTip
+            label="Proc Chance"
+            message={`After a matching combat action completes, this ability has a ${procChance} chance to activate, provided both you and the monster are still alive.`}
+            placement="auto"
+          />
+          Proc Chance
+        </Dt>
+        <Dd>{procChance}</Dd>
       </>
     );
   };
@@ -110,19 +126,7 @@ const GemAbilityDetails = ({ ability }: GemAbilityDetailsProps): ReactNode => {
         <Dt>Effect</Dt>
         <Dd>{gemAbilityEffectTypeLabel(ability.effect_type)}</Dd>
         {renderTriggersOn()}
-        {procChance !== null ? (
-          <>
-            <Dt>
-              <GeneralToolTip
-                label="Proc Chance"
-                message={`After a matching combat action completes, this ability has a ${procChance} chance to activate, provided both you and the monster are still alive.`}
-                placement="auto"
-              />
-              Proc Chance
-            </Dt>
-            <Dd>{procChance}</Dd>
-          </>
-        ) : null}
+        {renderProcChance()}
         {renderEffectScaling()}
       </Dl>
     </section>

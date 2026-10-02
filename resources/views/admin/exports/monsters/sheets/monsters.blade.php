@@ -46,6 +46,9 @@
             <th>fire_atonement</th>
             <th>ice_atonement</th>
             <th>water_atonement</th>
+            <th>fire_penetration</th>
+            <th>ice_penetration</th>
+            <th>water_penetration</th>
             <th>is_raid_monster</th>
             <th>is_raid_boss</th>
             <th>raid_special_attack_type</th>
@@ -101,6 +104,9 @@
                 <td>{{ $monster->fire_atonement }}</td>
                 <td>{{ $monster->ice_atonement }}</td>
                 <td>{{ $monster->water_atonement }}</td>
+                <td>{{ $monster->fire_penetration }}</td>
+                <td>{{ $monster->ice_penetration }}</td>
+                <td>{{ $monster->water_penetration }}</td>
                 <td>{{ $monster->is_raid_monster }}</td>
                 <td>{{ $monster->is_raid_boss }}</td>
                 <td>{{ $monster->raid_special_attack_type }}</td>

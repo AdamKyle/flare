@@ -5,7 +5,7 @@ import ServerMessagesProps from '../components/server-messages/definitions/serve
 
 import { ComponentFromProps, TabTupleFromProps } from 'ui/tabs/types/tab-item';
 
-type Params = {
+interface BuildTabsParams {
   chatComponent: ComponentFromProps<MessagesProps>;
   serverComponent: ComponentFromProps<ServerMessagesProps>;
   explorationComponent: ComponentFromProps<ExplorationMessageProps>;
@@ -16,10 +16,10 @@ type Params = {
   explorationProps: ExplorationMessageProps;
   unreadServer: boolean;
   unreadExploration: boolean;
-};
+}
 
 const buildTabs = (
-  params: Params
+  params: BuildTabsParams
 ): Readonly<
   TabTupleFromProps<
     [MessagesProps, ServerMessagesProps, ExplorationMessageProps]

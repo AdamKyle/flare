@@ -3,7 +3,6 @@
 namespace App\Game\Skills\Services;
 
 use App\Flare\Models\Character;
-use App\Flare\Models\GameGemAbility;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\GemBagSlot;
 use App\Flare\Models\Skill;
@@ -14,8 +13,10 @@ use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Gems\Builders\GemBuilder;
-use App\Game\Gems\Services\CharacterGemRollService;
-use App\Game\Gems\Transformers\CharacterGemTransformer;
+use App\Game\Gems\Contracts\CharacterGemDetails;
+use App\Game\Gems\Contracts\CharacterGemRollFacts;
+use App\Game\Gems\Values\GemAbilitySnapshot;
+use App\Game\Gems\Values\GemModifierRange;
 use App\Game\Gems\Values\GemTierValue;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Types\CraftingMessageTypes;
@@ -31,20 +32,20 @@ class GemService
     /**
      * @param GemBuilder $gemBuilder
      * @param ChanceCalculator $chanceCalculator
-     * @param CharacterGemTransformer $gemTransformer
+     * @param CharacterGemDetails $characterGemDetails
      * @param ServerMessageBuilder $serverMessageBuilder
      * @param CharacterGemSlotsTransformer $characterGemSlotsTransformer
      * @param SkillBonusService $skillBonusService
-     * @param CharacterGemRollService $characterGemRollService
+     * @param CharacterGemRollFacts $characterGemRollFacts
      */
     public function __construct(
         private readonly GemBuilder $gemBuilder,
         private readonly ChanceCalculator $chanceCalculator,
-        private readonly CharacterGemTransformer $gemTransformer,
+        private readonly CharacterGemDetails $characterGemDetails,
         private readonly ServerMessageBuilder $serverMessageBuilder,
         private readonly CharacterGemSlotsTransformer $characterGemSlotsTransformer,
         private readonly SkillBonusService $skillBonusService,
-        private readonly CharacterGemRollService $characterGemRollService,
+        private readonly CharacterGemRollFacts $characterGemRollFacts,
     ) {}
 
     /**
@@ -57,27 +58,15 @@ class GemService
     public function generateGem(Character $character, int $tier): array
     {
         if (! $this->gemBuilder->canBuildTier($tier)) {
-            return $this->errorResult('No enabled Gem abilities are available for Tier 1 crafting.') + [
-                'craft_succeeded' => false,
-                'crafted_gem' => null,
-                'crafted_gem_preview' => null,
-            ];
+            return $this->craftNotAttemptedResult('No enabled Gem abilities are available for Tier 1 crafting.');
         }
 
         if (! $this->canAffordCost($character, $tier)) {
-            return $this->errorResult('You do not have the required currencies to craft this item.') + [
-                'craft_succeeded' => false,
-                'crafted_gem' => null,
-                'crafted_gem_preview' => null,
-            ];
+            return $this->craftNotAttemptedResult('You do not have the required currencies to craft this item.');
         }
 
         if (! $character->canAddToGemBag(1)) {
-            return $this->errorResult('Your Gem Bag is full. Use or remove gems before crafting more.') + [
-                'craft_succeeded' => false,
-                'crafted_gem' => null,
-                'crafted_gem_preview' => null,
-            ];
+            return $this->craftNotAttemptedResult('Your Gem Bag is full. Use or remove gems before crafting more.');
         }
 
         $character = $this->payForGem($character, $tier);
@@ -104,7 +93,7 @@ class GemService
 
         return $this->successResult([
             'craft_succeeded' => true,
-            'crafted_gem' => $this->gemTransformer->transform($gemBagEntry->gem),
+            'crafted_gem' => $this->characterGemDetails->forGemIds([$gemBagEntry->gem_id])[0]->toArray(),
             'crafted_gem_preview' => $this->characterGemSlotsTransformer->transform($gemBagEntry),
             'message' => $this->serverMessageBuilder->buildWithAdditionalInformation(CraftingMessageTypes::CRAFTED_GEM, $gemBagEntry->gem->name),
         ]);
@@ -119,30 +108,12 @@ class GemService
     public function getCraftableTiers(Character $character): array
     {
         $craftableSkill = $this->getCraftingSkill($character);
-        $craftableTiers = [];
 
-        foreach (GemTierValue::$values as $tier) {
-            $tierValue = (new GemTierValue($tier))->maxForTier();
-
-            if ($craftableSkill->level >= $tierValue['min_level']) {
-                $craftableTiers[] = [
-                    ...$tierValue,
-                    'base_chance' => $tierValue['chance'],
-                    'chance' => $this->effectiveCraftChance($craftableSkill, $tierValue['chance']),
-                    'possible_modifiers' => $this->characterGemRollService->possibleModifierRangesForTier($tier),
-                    'possible_abilities' => $tier === GemTierValue::TIER_ONE
-                        ? GameGemAbility::where('enabled', true)
-                            ->orderBy('name')
-                            ->get()
-                            ->map(fn (GameGemAbility $ability): array => $this->gemTransformer->transformAbility($ability))
-                            ->values()
-                            ->all()
-                        : [],
-                ];
-            }
-        }
-
-        return $craftableTiers;
+        return collect(GemTierValue::$values)
+            ->filter(fn (int $tier): bool => $craftableSkill->level >= (new GemTierValue($tier))->maxForTier()['min_level'])
+            ->map(fn (int $tier): array => $this->craftableTier($craftableSkill, $tier))
+            ->values()
+            ->all();
     }
 
     /**
@@ -160,6 +131,47 @@ class GemService
             'next_level_xp' => $skill->xp_max,
             'skill_name' => $skill->name,
             'level' => $skill->level,
+        ];
+    }
+
+    /**
+     * Build one craftable tier with its Skill-adjusted chance and the canonical roll facts for that tier.
+     *
+     * @param Skill $craftableSkill
+     * @param int $tier
+     * @return array
+     */
+    private function craftableTier(Skill $craftableSkill, int $tier): array
+    {
+        $tierValue = (new GemTierValue($tier))->maxForTier();
+
+        return [
+            ...$tierValue,
+            'base_chance' => $tierValue['chance'],
+            'chance' => $this->effectiveCraftChance($craftableSkill, $tierValue['chance']),
+            'possible_modifiers' => array_map(
+                fn (GemModifierRange $range): array => $range->toArray(),
+                $this->characterGemRollFacts->possibleModifierRanges($tier),
+            ),
+            'possible_abilities' => array_map(
+                fn (GemAbilitySnapshot $ability): array => $ability->toArray(),
+                $this->characterGemRollFacts->possibleAbilities($tier),
+            ),
+        ];
+    }
+
+    /**
+     * Build the error result returned when a gem craft is refused before any cost is paid.
+     *
+     * @param string $message
+     * @return array
+     */
+    private function craftNotAttemptedResult(string $message): array
+    {
+        return $this->errorResult($message) + [
+            'craft_succeeded' => false,
+            'crafted_gem' => null,
+            'crafted_gem_preview' => null,
         ];
     }
 

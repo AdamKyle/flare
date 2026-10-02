@@ -62,6 +62,9 @@ export const MONSTER_STEP_FIELD_IDS: ReadonlyArray<
     { field: 'fire_atonement', id: 'monster-fire-atonement' },
     { field: 'ice_atonement', id: 'monster-ice-atonement' },
     { field: 'water_atonement', id: 'monster-water-atonement' },
+    { field: 'fire_penetration', id: 'monster-fire-penetration' },
+    { field: 'ice_penetration', id: 'monster-ice-penetration' },
+    { field: 'water_penetration', id: 'monster-water-penetration' },
     { field: 'is_raid_boss', id: 'monster-is-raid-boss' },
   ],
 ];

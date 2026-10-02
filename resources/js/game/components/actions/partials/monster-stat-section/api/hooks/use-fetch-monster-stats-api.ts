@@ -1,6 +1,6 @@
 import { useApiHandler } from 'api-handler/hooks/use-api-handler';
-import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { useCallback, useEffect, useState } from 'react';
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { MonsterApiUrls } from '../enums/monster-api-urls';
 import SetMonsterPartsDefinition from './definitions/set-monster-params-definition';
@@ -18,8 +18,9 @@ export const useFetchMonsterStatsApi =
     const [data, setData] = useState<MonsterDetailDefinition | null>(null);
     const [error, setError] =
       useState<UseFetchMonsterStatsApiDefinition['error']>(null);
+    const abortControllerRef = useRef<AbortController | null>(null);
 
-    let url = null;
+    let url: string | null = null;
 
     if (characterId && monsterId) {
       url = getUrl(MonsterApiUrls.STATS, {
@@ -36,11 +37,26 @@ export const useFetchMonsterStatsApi =
       []
     );
 
-    const fetchMonsterStats = useCallback(async () => {
+    useEffect(() => {
+      return () => {
+        const activeController = abortControllerRef.current;
+
+        abortControllerRef.current = null;
+        activeController?.abort();
+      };
+    }, []);
+
+    const fetchMonsterStats = useCallback(async (): Promise<void> => {
       if (!characterId || !monsterId || !url) {
+        abortControllerRef.current?.abort();
+        abortControllerRef.current = null;
         setLoading(false);
         return;
       }
+
+      abortControllerRef.current?.abort();
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
 
       setLoading(true);
       setError(null);
@@ -49,22 +65,37 @@ export const useFetchMonsterStatsApi =
         const result = await apiHandler.get<
           MonsterDetailDefinition,
           AxiosRequestConfig<AxiosResponse<MonsterDetailDefinition>>
-        >(url);
+        >(url, { signal: controller.signal });
+
+        if (abortControllerRef.current !== controller) {
+          return;
+        }
 
         setData(result);
-      } catch (err) {
+      } catch (requestError) {
+        if (axios.isCancel(requestError)) {
+          return;
+        }
+
+        if (abortControllerRef.current !== controller) {
+          return;
+        }
+
         setData(null);
 
-        if (err instanceof AxiosError) {
-          setError(err.response?.data || null);
+        if (requestError instanceof AxiosError) {
+          setError(requestError.response?.data || null);
         }
       } finally {
-        setLoading(false);
+        if (abortControllerRef.current === controller) {
+          abortControllerRef.current = null;
+          setLoading(false);
+        }
       }
     }, [apiHandler, url, characterId, monsterId]);
 
     useEffect(() => {
-      fetchMonsterStats().catch(() => {});
+      void fetchMonsterStats();
     }, [fetchMonsterStats]);
 
     return {

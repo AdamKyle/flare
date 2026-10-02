@@ -6,250 +6,258 @@ use App\Flare\Models\Character;
 use App\Flare\Models\CharacterGemModifier;
 use App\Flare\Models\Gem;
 use App\Flare\Models\InventorySet;
+use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
-use App\Game\Core\Items\Values\ItemUniqueness;
+use App\Flare\Models\SetSlot;
+use App\Game\Gems\Contracts\GemAbilityDuplicateQuery;
 use App\Game\Gems\Values\CharacterGemModifierType;
+use App\Game\Gems\Values\DuplicateGemAbility;
+use App\Game\Gems\Values\DuplicateGemAbilityItem;
+use App\Game\Gems\Values\DuplicateGemAbilityReport;
+use App\Game\Gems\Values\GemAbilityOccurrence;
+use App\Game\Gems\Values\GemAbilityOwnershipSource;
 use App\Game\Gems\Values\GemAbilityType;
+use App\Game\Gems\Values\OwnedGemItem;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Collection;
 
-class GemAbilityDuplicateService
+class GemAbilityDuplicateService implements GemAbilityDuplicateQuery
 {
     /**
-     * Return the first deterministic Active Gem Ability modifier for every ability id.
+     * Return the first deterministic Active Gem Ability modifier id for every ability across the Items.
      *
      * @param iterable $items
      * @return array
      */
     public function firstActiveModifierIds(iterable $items): array
     {
+        $ownedGemItems = collect($items)
+            ->filter()
+            ->map(fn (Item $item): OwnedGemItem => new OwnedGemItem($item, GemAbilityOwnershipSource::INVENTORY))
+            ->all();
+
         return array_values(array_map(
-            fn (array $occurrences): int => $occurrences[0]['modifier']->id,
-            $this->groupAbilityOccurrences($items, GemAbilityType::ACTIVE),
+            fn (array $occurrences): int => $occurrences[0]->modifier->id,
+            $this->groupActiveAbilityOccurrences($ownedGemItems),
         ));
     }
 
     /**
-     * Return duplicate Active Gem Abilities and the Items containing them.
+     * Return duplicate Active Gem Abilities socketed within a single Item.
      *
-     * @param iterable $items
+     * @param int $itemId
+     * @return DuplicateGemAbilityReport
+     */
+    public function forItem(int $itemId): DuplicateGemAbilityReport
+    {
+        $item = Item::with($this->itemRelationships())->find($itemId);
+
+        if (is_null($item)) {
+            return new DuplicateGemAbilityReport([]);
+        }
+
+        return $this->buildReport([new OwnedGemItem($item, GemAbilityOwnershipSource::INVENTORY)]);
+    }
+
+    /**
+     * Return the Character's duplicate Active Gem Abilities that include the given owned Item.
+     *
+     * @param int $characterId
+     * @param int $itemId
+     * @return DuplicateGemAbilityReport
+     */
+    public function forOwnedItem(int $characterId, int $itemId): DuplicateGemAbilityReport
+    {
+        $duplicates = $this->buildReport($this->ownedGemItems($characterId))->duplicates;
+
+        return new DuplicateGemAbilityReport(array_values(array_filter(
+            $duplicates,
+            fn (DuplicateGemAbility $duplicate): bool => $duplicate->includesItem($itemId),
+        )));
+    }
+
+    /**
+     * Return the Character's duplicate Active Gem Abilities that include an Item from the given Inventory Set.
+     *
+     * @param int $characterId
+     * @param int $inventorySetId
+     * @return DuplicateGemAbilityReport
+     */
+    public function forInventorySet(int $characterId, int $inventorySetId): DuplicateGemAbilityReport
+    {
+        $duplicates = $this->buildReport($this->ownedGemItems($characterId))->duplicates;
+
+        return new DuplicateGemAbilityReport(array_values(array_filter(
+            $duplicates,
+            fn (DuplicateGemAbility $duplicate): bool => $duplicate->includesInventorySet($inventorySetId),
+        )));
+    }
+
+    /**
+     * Load every Item the Character owns across inventory, equipped gear, and Inventory Sets.
+     *
+     * @param int $characterId
      * @return array
      */
-    public function duplicateActiveAbilities(iterable $items): array
+    private function ownedGemItems(int $characterId): array
     {
-        $groups = array_filter(
-            $this->groupAbilityOccurrences($items, GemAbilityType::ACTIVE),
+        $character = Character::with([
+            'inventory.slots.item' => fn (Relation $query): Relation => $query->with($this->itemRelationships()),
+            'inventorySets.slots.item' => fn (Relation $query): Relation => $query->with($this->itemRelationships()),
+        ])->find($characterId);
+
+        if (is_null($character)) {
+            return [];
+        }
+
+        return [
+            ...$this->inventoryGemItems($character),
+            ...$this->inventorySetGemItems($character),
+        ];
+    }
+
+    /**
+     * Build the owned-Item entries for the Character's inventory and equipped slots.
+     *
+     * @param Character $character
+     * @return array
+     */
+    private function inventoryGemItems(Character $character): array
+    {
+        return $character->inventory->slots
+            ->filter(fn (InventorySlot $slot): bool => ! is_null($slot->item))
+            ->map(fn (InventorySlot $slot): OwnedGemItem => new OwnedGemItem(
+                $slot->item,
+                $slot->equipped ? GemAbilityOwnershipSource::EQUIPPED : GemAbilityOwnershipSource::INVENTORY,
+            ))
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Build the owned-Item entries for every Item stored in the Character's Inventory Sets.
+     *
+     * @param Character $character
+     * @return array
+     */
+    private function inventorySetGemItems(Character $character): array
+    {
+        return $character->inventorySets
+            ->flatMap(fn (InventorySet $inventorySet): array => $inventorySet->slots
+                ->filter(fn (SetSlot $slot): bool => ! is_null($slot->item))
+                ->map(fn (SetSlot $slot): OwnedGemItem => new OwnedGemItem(
+                    $slot->item,
+                    $inventorySet->is_equipped ? GemAbilityOwnershipSource::EQUIPPED : GemAbilityOwnershipSource::SET,
+                    $inventorySet->id,
+                    $inventorySet->name,
+                ))
+                ->values()
+                ->all())
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Build the report of Active Gem Abilities that occur more than once across the owned Items.
+     *
+     * @param array $ownedGemItems
+     * @return DuplicateGemAbilityReport
+     */
+    private function buildReport(array $ownedGemItems): DuplicateGemAbilityReport
+    {
+        $duplicateGroups = array_filter(
+            $this->groupActiveAbilityOccurrences($ownedGemItems),
             fn (array $occurrences): bool => count($occurrences) > 1,
         );
 
-        return array_values(array_map(
-            fn (array $occurrences): array => $this->transformDuplicateGroup($occurrences),
-            $groups,
-        ));
+        return new DuplicateGemAbilityReport(array_values(array_map(
+            fn (array $occurrences): DuplicateGemAbility => $this->buildDuplicate($occurrences),
+            $duplicateGroups,
+        )));
     }
 
     /**
-     * Return character-wide duplicate Active abilities that contain the viewed owned Item.
+     * Group every socketed Active Gem Ability occurrence by canonical ability id, in deterministic Item order.
      *
-     * @param Character $character
-     * @param Item $item
+     * @param array $ownedGemItems
      * @return array
      */
-    public function duplicateActiveAbilitiesForOwnedItem(Character $character, Item $item): array
+    private function groupActiveAbilityOccurrences(array $ownedGemItems): array
     {
-        $duplicates = $this->duplicateActiveAbilities($this->buildOwnedItemContext($character));
-
-        return array_values(array_filter(
-            $duplicates,
-            fn (array $duplicate): bool => collect($duplicate['items'])->contains('item_id', $item->id),
-        ));
+        return collect($ownedGemItems)
+            ->sortBy(fn (OwnedGemItem $ownedGemItem): int => $ownedGemItem->item->id)
+            ->flatMap(fn (OwnedGemItem $ownedGemItem): array => $this->activeAbilityOccurrences($ownedGemItem))
+            ->groupBy(fn (GemAbilityOccurrence $occurrence): int => $occurrence->modifier->game_gem_ability_id)
+            ->map(fn (Collection $occurrences): array => $occurrences->all())
+            ->all();
     }
 
     /**
-     * Return character-wide duplicate Active abilities that contain an Item from the selected Set.
+     * Return the Active Gem Ability occurrences socketed into one owned Item, in socket and roll order.
      *
-     * @param Character $character
-     * @param InventorySet $inventorySet
+     * @param OwnedGemItem $ownedGemItem
      * @return array
      */
-    public function duplicateActiveAbilitiesForSet(Character $character, InventorySet $inventorySet): array
+    private function activeAbilityOccurrences(OwnedGemItem $ownedGemItem): array
     {
-        $duplicates = $this->duplicateActiveAbilities($this->buildOwnedItemContext($character));
+        $ownedGemItem->item->loadMissing($this->itemRelationships());
 
-        return array_values(array_filter(
-            $duplicates,
-            fn (array $duplicate): bool => collect($duplicate['items'])->contains('set_id', $inventorySet->id),
-        ));
+        return $ownedGemItem->item->sockets
+            ->sortBy('id')
+            ->pluck('gem')
+            ->filter(fn (?Gem $gem): bool => ! is_null($gem) && $gem->domain === Gem::DOMAIN_CHARACTER)
+            ->flatMap(fn (Gem $gem): array => $gem->characterModifiers->sortBy(['roll_position', 'id'])->all())
+            ->filter(fn (CharacterGemModifier $modifier): bool => $this->isActiveAbility($modifier))
+            ->map(fn (CharacterGemModifier $modifier): GemAbilityOccurrence => new GemAbilityOccurrence($modifier, $ownedGemItem))
+            ->values()
+            ->all();
     }
 
     /**
-     * Build the eager-loaded Item and ownership-location context for a Character.
+     * Determine whether a modifier references an Active Gem Ability.
      *
-     * @param Character $character
+     * @param CharacterGemModifier $modifier
+     * @return bool
+     */
+    private function isActiveAbility(CharacterGemModifier $modifier): bool
+    {
+        return $modifier->modifier_type === CharacterGemModifierType::GEM_ABILITY
+            && ! is_null($modifier->gameGemAbility)
+            && $modifier->gameGemAbility->ability_type === GemAbilityType::ACTIVE;
+    }
+
+    /**
+     * Build one duplicate Active Gem Ability group with each affected Item listed once.
+     *
+     * @param array $occurrences
+     * @return DuplicateGemAbility
+     */
+    private function buildDuplicate(array $occurrences): DuplicateGemAbility
+    {
+        $ability = $occurrences[0]->modifier->gameGemAbility;
+
+        $items = collect($occurrences)
+            ->map(fn (GemAbilityOccurrence $occurrence): OwnedGemItem => $occurrence->ownedGemItem)
+            ->unique(fn (OwnedGemItem $ownedGemItem): int => $ownedGemItem->item->id)
+            ->map(fn (OwnedGemItem $ownedGemItem): DuplicateGemAbilityItem => DuplicateGemAbilityItem::fromOwnedGemItem($ownedGemItem))
+            ->values()
+            ->all();
+
+        return new DuplicateGemAbility($ability->id, $ability->name, count($occurrences), $items);
+    }
+
+    /**
+     * Return the Item relationships needed to resolve socketed Gem Abilities and affected-Item presentation.
+     *
      * @return array
      */
-    private function buildOwnedItemContext(Character $character): array
+    private function itemRelationships(): array
     {
-        $itemRelationships = [
+        return [
             'itemPrefix',
             'itemSuffix',
             'appliedHolyStacks',
             'sockets.gem.characterModifiers.gameGemAbility',
-        ];
-
-        $character->load([
-            'inventory.slots.item' => fn ($query) => $query->with($itemRelationships),
-            'inventorySets.slots.item' => fn ($query) => $query->with($itemRelationships),
-        ]);
-
-        $ownedItems = [];
-
-        foreach ($character->inventory->slots as $slot) {
-            if (is_null($slot->item)) {
-                continue;
-            }
-
-            $ownedItems[] = [
-                'item' => $slot->item,
-                'source' => $slot->equipped ? 'equipped' : 'inventory',
-                'set_id' => null,
-                'set_name' => null,
-            ];
-        }
-
-        foreach ($character->inventorySets as $inventorySet) {
-            foreach ($inventorySet->slots as $slot) {
-                if (is_null($slot->item)) {
-                    continue;
-                }
-
-                $ownedItems[] = [
-                    'item' => $slot->item,
-                    'source' => $inventorySet->is_equipped ? 'equipped' : 'set',
-                    'set_id' => $inventorySet->id,
-                    'set_name' => $inventorySet->name,
-                ];
-            }
-        }
-
-        return $ownedItems;
-    }
-
-    /**
-     * Group socketed Character Gem Ability occurrences by canonical ability id.
-     *
-     * @param iterable $items
-     * @param GemAbilityType $abilityType
-     * @return array
-     */
-    private function groupAbilityOccurrences(iterable $items, GemAbilityType $abilityType): array
-    {
-        $groups = [];
-        $sortedItems = collect($items)
-            ->filter()
-            ->map(fn (Item|array $item): array => $item instanceof Item ? [
-                'item' => $item,
-                'source' => 'inventory',
-                'set_id' => null,
-                'set_name' => null,
-            ] : $item)
-            ->sortBy(fn (array $itemContext): int => $itemContext['item']->id);
-
-        foreach ($sortedItems as $itemContext) {
-            $item = $itemContext['item'];
-            $item->loadMissing([
-                'itemPrefix',
-                'itemSuffix',
-                'appliedHolyStacks',
-                'sockets.gem.characterModifiers.gameGemAbility',
-            ]);
-
-            foreach ($item->sockets->sortBy('id') as $socket) {
-                $gem = $socket->gem;
-
-                if (is_null($gem) || $gem->domain !== Gem::DOMAIN_CHARACTER) {
-                    continue;
-                }
-
-                foreach ($gem->characterModifiers->sortBy(['roll_position', 'id']) as $modifier) {
-                    if (! $this->matchesAbilityType($modifier, $abilityType)) {
-                        continue;
-                    }
-
-                    $groups[$modifier->game_gem_ability_id][] = [
-                        'modifier' => $modifier,
-                        'item_context' => $itemContext,
-                    ];
-                }
-            }
-        }
-
-        return $groups;
-    }
-
-    /**
-     * Determine whether a modifier references the requested Gem Ability type.
-     *
-     * @param CharacterGemModifier $modifier
-     * @param GemAbilityType $abilityType
-     * @return bool
-     */
-    private function matchesAbilityType(CharacterGemModifier $modifier, GemAbilityType $abilityType): bool
-    {
-        return $modifier->modifier_type === CharacterGemModifierType::GEM_ABILITY
-            && ! is_null($modifier->gameGemAbility)
-            && $modifier->gameGemAbility->ability_type === $abilityType;
-    }
-
-    /**
-     * Transform one duplicate group into API-safe warning metadata.
-     *
-     * @param array $occurrences
-     * @return array
-     */
-    private function transformDuplicateGroup(array $occurrences): array
-    {
-        $ability = $occurrences[0]['modifier']->gameGemAbility;
-        $items = collect($occurrences)
-            ->pluck('item_context')
-            ->unique(fn (array $itemContext): int => $itemContext['item']->id)
-            ->values()
-            ->map(fn (array $itemContext): array => $this->transformItem($itemContext))
-            ->all();
-
-        return [
-            'ability' => [
-                'id' => $ability->id,
-                'name' => $ability->name,
-            ],
-            'count' => count($occurrences),
-            'items' => $items,
-        ];
-    }
-
-    /**
-     * Transform an affected Item with the canonical fields used by item-color presentation.
-     *
-     * @param array $itemContext
-     * @return array
-     */
-    private function transformItem(array $itemContext): array
-    {
-        $item = $itemContext['item'];
-
-        return [
-            'item_id' => $item->id,
-            'name' => $item->affix_name,
-            'affix_count' => $item->affix_count,
-            'is_unique' => ItemUniqueness::fromItem($item)->isUnique(),
-            'is_mythic' => $item->is_mythic,
-            'is_cosmic' => $item->is_cosmic,
-            'holy_stacks_applied' => $item->holy_stacks_applied,
-            'holy_level' => $item->holy_level,
-            'type' => $item->type,
-            'usable' => $item->usable,
-            'damages_kingdoms' => $item->damages_kingdoms,
-            'source' => $itemContext['source'],
-            'set_id' => $itemContext['set_id'],
-            'set_name' => $itemContext['set_name'],
         ];
     }
 }

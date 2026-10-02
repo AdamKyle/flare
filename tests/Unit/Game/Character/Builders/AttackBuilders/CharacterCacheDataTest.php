@@ -6,6 +6,7 @@ use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Combat\Values\AttackType;
 use App\Game\Core\Items\Values\ItemType;
+use App\Game\Gems\Values\CharacterGemModifierType;
 use ErrorException;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Repository;
@@ -14,7 +15,9 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Mockery;
 use Tests\Setup\Battle\ServerFight\BuildMonsterFactory;
+use Tests\Setup\Character\CharacterCacheDataFactory;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\Setup\Gems\FixedCharacterGemEffects;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
@@ -33,7 +36,7 @@ class CharacterCacheDataTest extends TestCase
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
 
-        $this->characterCacheData = resolve(CharacterCacheData::class);
+        $this->characterCacheData = (new CharacterCacheDataFactory)->build();
     }
 
     protected function tearDown(): void
@@ -216,6 +219,35 @@ class CharacterCacheDataTest extends TestCase
         $data = $this->characterCacheData->characterSheetCache($character);
 
         $this->assertNotEmpty($data);
+    }
+
+    public function test_character_sheet_cache_contains_gem_derived_elemental_atonement(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $characterCacheData = (new CharacterCacheDataFactory)->build(new FixedCharacterGemEffects([
+            CharacterGemModifierType::FIRE_ATONEMENT->value => 0.75,
+            CharacterGemModifierType::ICE_ATONEMENT->value => 0.25,
+        ]));
+
+        $data = $characterCacheData->characterSheetCache($character);
+
+        $this->assertSame(['Fire' => 0.75, 'Water' => 0.0, 'Ice' => 0.25], $data['elemental_atonement']['atonements']);
+        $this->assertSame('Fire', $data['elemental_atonement']['highest_element']['name']);
+    }
+
+    public function test_character_sheet_cache_contains_gem_derived_elemental_penetration(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $characterCacheData = (new CharacterCacheDataFactory)->build(new FixedCharacterGemEffects([
+            CharacterGemModifierType::FIRE_PENETRATION->value => 0.3,
+            CharacterGemModifierType::WATER_PENETRATION->value => 0.1,
+        ]));
+
+        $data = $characterCacheData->characterSheetCache($character);
+
+        $this->assertSame(['Fire' => 0.3, 'Water' => 0.1, 'Ice' => 0.0], $data['elemental_penetration']);
     }
 
     public function test_character_sheet_cache_weapon_attack_includes_claw_damage()

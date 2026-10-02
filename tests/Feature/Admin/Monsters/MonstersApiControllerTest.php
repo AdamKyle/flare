@@ -3,10 +3,10 @@
 namespace Tests\Feature\Admin\Monsters;
 
 use App\Game\Maps\Values\LocationType;
-use App\Game\Monsters\Services\BuildMonsterCacheService;
 use App\Game\Monsters\Values\MonsterCacheKey;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use Tests\Setup\Monster\BuildMonsterCacheServiceFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGameMapGemParamter;
@@ -67,6 +67,8 @@ class MonstersApiControllerTest extends TestCase
             'max_spell_damage' => 50,
             'is_raid_monster' => true,
             'fire_atonement' => 0.25,
+            'fire_penetration' => 0.12,
+            'ice_penetration' => 0.06,
         ]);
 
         $response = $this->actingAs($admin)->call('GET', "/api/admin/monsters/{$monster->id}", [], [], [], ['HTTP_ACCEPT' => 'application/json']);
@@ -84,6 +86,9 @@ class MonstersApiControllerTest extends TestCase
         $this->assertSame(50, $data['spells_and_affixes']['max_spell_damage']);
         $this->assertTrue($data['raid_and_special']['is_raid_monster']);
         $this->assertEquals(0.25, $data['raid_and_special']['fire_atonement']);
+        $this->assertEquals(0.12, $data['raid_and_special']['fire_penetration']);
+        $this->assertEquals(0.06, $data['raid_and_special']['ice_penetration']);
+        $this->assertEquals(0.0, $data['raid_and_special']['water_penetration']);
 
         // Static persisted values only — no per-map/combat scaling applied by this contract.
         $this->assertSame($monster->str, $data['combat']['str']);
@@ -100,7 +105,7 @@ class MonstersApiControllerTest extends TestCase
 
         $monster = $this->createMonster(['game_map_id' => $gameMap->id, 'str' => 10]);
 
-        resolve(BuildMonsterCacheService::class)->buildCache();
+        (new BuildMonsterCacheServiceFactory)->build()->buildCache();
 
         $response = $this->actingAs($admin)->call('GET', "/api/admin/monsters/{$monster->id}", [], [], [], ['HTTP_ACCEPT' => 'application/json']);
         $data = json_decode($response->getContent(), true);
@@ -121,7 +126,7 @@ class MonstersApiControllerTest extends TestCase
 
         $monster = $this->createMonster(['game_map_id' => $gameMap->id, 'is_raid_monster' => true]);
 
-        resolve(BuildMonsterCacheService::class)->buildAll();
+        (new BuildMonsterCacheServiceFactory)->build()->buildAll();
 
         $response = $this->actingAs($admin)->call('GET', "/api/admin/monsters/{$monster->id}", [], [], [], ['HTTP_ACCEPT' => 'application/json']);
         $data = json_decode($response->getContent(), true);
@@ -143,7 +148,7 @@ class MonstersApiControllerTest extends TestCase
             'only_for_location_type' => LocationType::ALCHEMY_CHURCH->value,
         ]);
 
-        resolve(BuildMonsterCacheService::class)->buildAll();
+        (new BuildMonsterCacheServiceFactory)->build()->buildAll();
 
         $response = $this->actingAs($admin)->call('GET', "/api/admin/monsters/{$monster->id}", [], [], [], ['HTTP_ACCEPT' => 'application/json']);
         $data = json_decode($response->getContent(), true);
@@ -165,7 +170,7 @@ class MonstersApiControllerTest extends TestCase
             'only_for_location_type' => LocationType::CAVE_OF_MEMORIES->value,
         ]);
 
-        resolve(BuildMonsterCacheService::class)->buildAll();
+        (new BuildMonsterCacheServiceFactory)->build()->buildAll();
 
         $response = $this->actingAs($admin)->call('GET', "/api/admin/monsters/{$monster->id}", [], [], [], ['HTTP_ACCEPT' => 'application/json']);
         $data = json_decode($response->getContent(), true);
@@ -184,7 +189,7 @@ class MonstersApiControllerTest extends TestCase
 
         $monster = $this->createMonster(['game_map_id' => $gameMap->id, 'is_celestial_entity' => true]);
 
-        resolve(BuildMonsterCacheService::class)->buildAll();
+        (new BuildMonsterCacheServiceFactory)->build()->buildAll();
 
         $response = $this->actingAs($admin)->call('GET', "/api/admin/monsters/{$monster->id}", [], [], [], ['HTTP_ACCEPT' => 'application/json']);
         $data = json_decode($response->getContent(), true);
@@ -231,11 +236,17 @@ class MonstersApiControllerTest extends TestCase
             'fire_atonement' => 0.2,
             'ice_atonement' => 0.3,
             'water_atonement' => 0.4,
+            'fire_penetration' => 0.05,
+            'ice_penetration' => 0.05,
+            'water_penetration' => 0.1,
         ]);
 
         $response = $this->actingAs($admin)->call('POST', '/api/admin/monsters', $payload, [], [], ['HTTP_ACCEPT' => 'application/json']);
 
         $response->assertStatus(201);
+        $this->assertEquals(0.05, $response->json('fire_penetration'));
+        $this->assertEquals(0.05, $response->json('ice_penetration'));
+        $this->assertEquals(0.1, $response->json('water_penetration'));
         $this->assertDatabaseHas('monsters', [
             'name' => 'New Monster',
             'game_map_id' => $gameMap->id,
@@ -254,6 +265,9 @@ class MonstersApiControllerTest extends TestCase
             'is_raid_boss' => false,
             'raid_special_attack_type' => 0,
             'fire_atonement' => 0.2,
+            'fire_penetration' => 0.05,
+            'ice_penetration' => 0.05,
+            'water_penetration' => 0.1,
         ]);
     }
 
@@ -281,11 +295,13 @@ class MonstersApiControllerTest extends TestCase
             'is_raid_boss' => true,
             'raid_special_attack_type' => 1,
             'ice_atonement' => 0.9,
+            'ice_penetration' => 0.24,
         ]);
 
         $response = $this->actingAs($admin)->call('PUT', "/api/admin/monsters/{$monster->id}", $payload, [], [], ['HTTP_ACCEPT' => 'application/json']);
 
         $response->assertStatus(200);
+        $this->assertEquals(0.24, $response->json('ice_penetration'));
         $this->assertDatabaseHas('monsters', [
             'id' => $monster->id,
             'name' => 'Renamed Monster',
@@ -303,6 +319,7 @@ class MonstersApiControllerTest extends TestCase
             'is_raid_boss' => true,
             'raid_special_attack_type' => 1,
             'ice_atonement' => 0.9,
+            'ice_penetration' => 0.24,
         ]);
     }
 
@@ -320,6 +337,21 @@ class MonstersApiControllerTest extends TestCase
 
         $response->assertStatus(422);
         $response->assertJsonValidationErrors('is_raid_boss');
+    }
+
+    public function test_store_rejects_negative_elemental_penetration(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $gameMap = $this->createGameMap();
+
+        $payload = $this->minimalMonsterFormPayload($gameMap->id, [
+            'water_penetration' => -0.1,
+        ]);
+
+        $response = $this->actingAs($admin)->call('POST', '/api/admin/monsters', $payload, [], [], ['HTTP_ACCEPT' => 'application/json']);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors('water_penetration');
     }
 
     public function test_quest_item_drop_chance_normalizes_to_zero_without_a_quest_item(): void
@@ -639,7 +671,7 @@ class MonstersApiControllerTest extends TestCase
 
         $monster = $this->createMonster(['game_map_id' => $gameMap->id, 'is_raid_monster' => true]);
 
-        resolve(BuildMonsterCacheService::class)->buildAll();
+        (new BuildMonsterCacheServiceFactory)->build()->buildAll();
 
         $response = $this->actingAs($admin)->call('GET', "/api/admin/monsters/{$monster->id}/gem-effect-contexts", [], [], [], ['HTTP_ACCEPT' => 'application/json']);
         $data = json_decode($response->getContent(), true);

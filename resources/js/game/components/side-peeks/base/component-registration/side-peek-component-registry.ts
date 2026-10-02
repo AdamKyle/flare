@@ -464,5 +464,4 @@ export const SidePeekComponentRegistry: {
     props: {} as AdminLocationGemRollDetailSidePeekProps,
     content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
   },
-  // Add more components here
 };

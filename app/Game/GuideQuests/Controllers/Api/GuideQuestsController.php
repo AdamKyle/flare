@@ -10,13 +10,17 @@ use Illuminate\Http\JsonResponse;
 
 class GuideQuestsController extends Controller
 {
-    private GuideQuestService $guideQuestService;
+    /**
+     * @param GuideQuestService $guideQuestService
+     */
+    public function __construct(private readonly GuideQuestService $guideQuestService) {}
 
-    public function __construct(GuideQuestService $guideQuestService)
-    {
-        $this->guideQuestService = $guideQuestService;
-    }
-
+    /**
+     * Return the user's Character's current Guide Quests with hand-in eligibility and requirement progress.
+     *
+     * @param User $user
+     * @return JsonResponse
+     */
     public function getCurrentQuest(User $user): JsonResponse
     {
         return response()->json([
@@ -24,23 +28,27 @@ class GuideQuestsController extends Controller
         ]);
     }
 
+    /**
+     * Hand in the Guide Quest for the user's Character and return the next Guide Quests, or a 422 when requirements are unmet.
+     *
+     * @param User $user
+     * @param GuideQuest $guideQuest
+     * @return JsonResponse
+     */
     public function handInQuest(User $user, GuideQuest $guideQuest): JsonResponse
     {
         $character = $user->character;
-        $response = $this->guideQuestService->handInQuest($character, $guideQuest);
 
-        $message = 'You have completed the quest: "'.$guideQuest->name.'". On to the next! Below is the next quest for you to do!';
-
-        if ($response) {
+        if (! $this->guideQuestService->handInQuest($character, $guideQuest)) {
             return response()->json([
-                'message' => $message,
-                ...$this->guideQuestService->fetchQuestForCharacter($character),
-            ]);
+                'message' => 'You cannot hand in this guide quest. You must meet all the requirements first.',
+            ], 422);
         }
 
         return response()->json([
-            'message' => 'You cannot hand in this guide quest. You must meet all the requirements first.',
-        ], 422);
+            'message' => 'You have completed the quest: "'.$guideQuest->name.'". On to the next! Below is the next quest for you to do!',
+            ...$this->guideQuestService->fetchQuestForCharacter($character),
+        ]);
     }
 
     /**

@@ -21,13 +21,20 @@ class MonsterImportControllerTest extends TestCase
         $this->createGameMap(['name' => 'Import Map']);
 
         $file = $this->createMonstersWorkbookFile([
-            $this->minimalMonsterImportRow(['name' => 'Imported Monster']),
+            $this->minimalMonsterImportRow([
+                'name' => 'Imported Monster',
+                'water_atonement' => 0.5,
+                'water_penetration' => 0.25,
+            ]),
         ]);
 
         $response = $this->actingAs($admin)->call('POST', '/api/admin/monsters/import', [], [], ['monsters_import' => $file], ['HTTP_ACCEPT' => 'application/json']);
 
         $response->assertStatus(200);
-        $this->assertDatabaseHas('monsters', ['name' => 'Imported Monster']);
+        $this->assertDatabaseHas('monsters', [
+            'name' => 'Imported Monster',
+            'water_penetration' => 0.25,
+        ]);
     }
 
     public function test_invalid_workbook_reports_failure_and_writes_nothing(): void

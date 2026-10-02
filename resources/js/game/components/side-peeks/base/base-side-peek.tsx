@@ -70,33 +70,41 @@ const BaseSidePeek = () => {
     [setOptions, clearOptions]
   );
 
-  return (
-    <AnimatePresence>
-      {componentProps.is_open && (
-        <SidePeek
-          key="side-peek"
-          title={componentProps.title}
-          is_open={componentProps.is_open}
-          on_close={closeSidePeek}
-          close_button_data_guide_target={GuideTargets.SIDE_PEEK_CLOSE}
-          allow_clicking_outside={componentProps.allow_clicking_outside}
-          footer={
-            sidePeekOptions.length > 0 ? (
-              <SidePeekOptionsFooter options={sidePeekOptions} />
-            ) : undefined
-          }
-        >
-          <SidePeekOptionsContext.Provider value={optionsContextValue}>
-            <div className={outerWrapperClassName}>
-              <div className={contentWrapperClassName}>
-                {ComponentToRender && <ComponentToRender {...componentProps} />}
-              </div>
+  const renderFooter = () => {
+    if (sidePeekOptions.length === 0) {
+      return undefined;
+    }
+
+    return <SidePeekOptionsFooter options={sidePeekOptions} />;
+  };
+
+  const renderSidePeek = () => {
+    if (!componentProps.is_open) {
+      return null;
+    }
+
+    return (
+      <SidePeek
+        key="side-peek"
+        title={componentProps.title}
+        is_open={componentProps.is_open}
+        on_close={closeSidePeek}
+        close_button_data_guide_target={GuideTargets.SIDE_PEEK_CLOSE}
+        allow_clicking_outside={componentProps.allow_clicking_outside}
+        footer={renderFooter()}
+      >
+        <SidePeekOptionsContext.Provider value={optionsContextValue}>
+          <div className={outerWrapperClassName}>
+            <div className={contentWrapperClassName}>
+              {ComponentToRender && <ComponentToRender {...componentProps} />}
             </div>
-          </SidePeekOptionsContext.Provider>
-        </SidePeek>
-      )}
-    </AnimatePresence>
-  );
+          </div>
+        </SidePeekOptionsContext.Provider>
+      </SidePeek>
+    );
+  };
+
+  return <AnimatePresence>{renderSidePeek()}</AnimatePresence>;
 };
 
 export default BaseSidePeek;

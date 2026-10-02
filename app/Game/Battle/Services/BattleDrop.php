@@ -684,7 +684,7 @@ class BattleDrop
     }
 
     /**
-     * Give a quest Item to the player, locking the character's inventory row for the duration of the ownership check and slot creation so concurrent drop processes cannot both insert the same quest item.
+     * Give a quest Item to the player when they can hold it, sending a linked quest-item Server Message and a global announcement.
      *
      * @param Character $character
      * @param Item $item

@@ -11,6 +11,11 @@ class GuideQuestWalkthroughStepFactory extends Factory
 {
     protected $model = GuideQuestWalkthroughStep::class;
 
+    /**
+     * Define the default model state.
+     *
+     * @return array
+     */
     public function definition(): array
     {
         return [

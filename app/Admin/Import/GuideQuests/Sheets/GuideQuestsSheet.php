@@ -10,163 +10,157 @@ use App\Flare\Models\GuideQuest;
 use App\Flare\Models\Item;
 use App\Flare\Models\PassiveSkill;
 use App\Flare\Models\Quest;
+use App\Game\Automation\BatchCrafting\Enums\BatchCraftingType;
 use App\Game\Core\Items\Values\AlchemyItemType;
 use App\Game\Core\Items\Values\ArmourType;
 use App\Game\Core\Items\Values\ItemType;
+use App\Game\GuideQuests\Values\GuideQuestRequiredItemSource;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use InvalidArgumentException;
 use Maatwebsite\Excel\Concerns\ToCollection;
 
 class GuideQuestsSheet implements ToCollection
 {
-    private const ALLOWED_BATCH_CRAFTING_TYPES = [
-        'craft',
-        'craft_and_enchant',
-        'alchemy',
-        'trinketry',
-    ];
-
     /**
      * Import guide quest rows from the uploaded spreadsheet and persist them.
+     *
+     * @param Collection $rows
+     * @return void
      */
     public function collection(Collection $rows): void
     {
-        foreach ($rows as $index => $row) {
-            if ($index !== 0) {
-                $guideQuest = array_combine($rows[0]->toArray(), $row->toArray());
+        if ($rows->isEmpty()) {
+            return;
+        }
 
-                $guideQuestData = $this->returnCleanAffix($guideQuest);
+        $headings = $rows->first()->toArray();
 
-                if (is_null($guideQuestData)) {
-                    continue;
-                } else {
-                    $foundGuideQuest = GuideQuest::where('name', $guideQuestData['name'])->first();
+        foreach ($rows->skip(1) as $row) {
+            $guideQuestData = $this->cleanGuideQuestRow(array_combine($headings, $row->toArray()));
 
-                    if (! is_null($foundGuideQuest)) {
-                        $foundGuideQuest->update($guideQuestData);
-                    } else {
-                        GuideQuest::create($guideQuestData);
-                    }
-                }
-            }
+            GuideQuest::updateOrCreate(['name' => $guideQuestData['name']], $guideQuestData);
         }
     }
 
     /**
      * Build a clean guide quest payload from a raw spreadsheet row, resolving related requirements.
      *
+     * @param array $data
      * @return array
      */
-    protected function returnCleanAffix(array $data)
+    private function cleanGuideQuestRow(array $data): array
     {
-
-        $gameMap = GameMap::where('name', $data['required_game_map_id'])->first();
-        $beOnMap = GameMap::where('name', $data['be_on_game_map'])->first();
-        $skill = GameSkill::where('name', $data['required_skill'])->first();
-        $secondarySkill = GameSkill::where('name', $data['required_secondary_skill'])->first();
-        $passiveSkill = PassiveSkill::where('name', $data['required_passive_skill'])->first();
-        $faction = Faction::whereHas('gameMap', function ($query) use ($data) {
-            $query->where('name', $data['required_faction_id']);
-        })->first();
-        $requiredItem = Item::where('name', $data['required_quest_item_id'])->where('type', 'quest')->first();
-        $secondaryItem = Item::where('name', $data['secondary_quest_item_id'])->where('type', 'quest')->first();
-        $quest = Quest::where('name', $data['required_quest_id'])->first();
-        $kingdomBuilding = GameBuilding::where('name', $data['required_kingdom_building_id'])->first();
-        $parentGuideQuest = GuideQuest::where('name', $data['parent_id'])->first();
         $data['intro_text'] = $this->decodeStructuredContent($data['intro_text'] ?? null, 'intro_text');
         $data['desktop_instructions'] = $this->decodeStructuredContent($data['desktop_instructions'] ?? null, 'desktop_instructions');
         $data['mobile_instructions'] = $this->decodeStructuredContent($data['mobile_instructions'] ?? null, 'mobile_instructions');
 
-        if (
-            blank($data['required_batch_crafting_type'] ?? null) ||
-            ! in_array($data['required_batch_crafting_type'], self::ALLOWED_BATCH_CRAFTING_TYPES, true) ||
-            blank($data['required_batch_crafting_hours'] ?? null) ||
-            (int) $data['required_batch_crafting_hours'] < 1
-        ) {
-            $data['required_batch_crafting_type'] = null;
-            $data['required_batch_crafting_hours'] = null;
-        }
-
+        $data = $this->normalizeBatchCraftingRequirement($data);
         $data['required_batch_crafted_items'] = $this->requiredBatchCraftedItems($data);
 
-        if (is_null($skill)) {
-            $data['required_skill_level'] = null;
-            $data['required_skill'] = null;
-        } else {
-            $data['required_skill'] = $skill->id;
-        }
+        $data = $this->applyResolvedRecord($data, 'required_skill', GameSkill::where('name', $data['required_skill'])->first(), ['required_skill_level']);
+        $data = $this->applyResolvedRecord($data, 'required_secondary_skill', GameSkill::where('name', $data['required_secondary_skill'])->first(), ['required_secondary_skill_level']);
+        $data = $this->applyResolvedRecord($data, 'required_passive_skill', PassiveSkill::where('name', $data['required_passive_skill'])->first(), ['required_passive_level']);
+        $data = $this->applyResolvedRecord($data, 'required_faction_id', $this->findFactionByMapName($data['required_faction_id']), ['required_faction_level']);
+        $data = $this->applyResolvedRecord($data, 'required_quest_item_id', Item::where('name', $data['required_quest_item_id'])->where('type', 'quest')->first());
+        $data = $this->applyResolvedRecord($data, 'secondary_quest_item_id', Item::where('name', $data['secondary_quest_item_id'])->where('type', 'quest')->first());
+        $data = $this->applyResolvedRecord($data, 'required_quest_id', Quest::where('name', $data['required_quest_id'])->first());
+        $data = $this->applyResolvedRecord($data, 'required_game_map_id', GameMap::where('name', $data['required_game_map_id'])->first());
+        $data = $this->applyResolvedRecord($data, 'required_kingdom_building_id', GameBuilding::where('name', $data['required_kingdom_building_id'])->first(), ['required_kingdom_building_level']);
+        $data = $this->applyResolvedRecord($data, 'be_on_game_map', GameMap::where('name', $data['be_on_game_map'])->first());
+        $data = $this->applyResolvedRecord($data, 'parent_id', GuideQuest::where('name', $data['parent_id'])->first());
 
-        if (is_null($secondarySkill)) {
-            $data['required_secondary_skill_level'] = null;
-            $data['required_secondary_skill'] = null;
-        } else {
-            $data['required_secondary_skill'] = $secondarySkill->id;
-        }
-
-        if (is_null($passiveSkill)) {
-            $data['required_passive_level'] = null;
-            $data['required_passive_skill'] = null;
-        } else {
-            $data['required_passive_skill'] = $passiveSkill->id;
-        }
-
-        if (is_null($faction)) {
-            $data['required_faction_id'] = null;
-            $data['required_faction_level'] = null;
-        } else {
-            $data['required_faction_id'] = $faction->id;
-        }
-
-        if (is_null($requiredItem)) {
-            $data['required_quest_item_id'] = null;
-        } else {
-            $data['required_quest_item_id'] = $requiredItem->id;
-        }
-
-        if (is_null($secondaryItem)) {
-            $data['secondary_quest_item_id'] = null;
-        } else {
-            $data['secondary_quest_item_id'] = $secondaryItem->id;
-        }
-
-        if (is_null($quest)) {
-            $data['required_quest_id'] = null;
-        } else {
-            $data['required_quest_id'] = $quest->id;
-        }
-
-        if (is_null($gameMap)) {
-            $data['required_game_map_id'] = null;
-        } else {
-            $data['required_game_map_id'] = $gameMap->id;
-        }
-
-        if (is_null($kingdomBuilding)) {
-            $data['required_kingdom_building_id'] = null;
-            $data['required_kingdom_building_level'] = null;
-        } else {
-            $data['required_kingdom_building_id'] = $kingdomBuilding->id;
-        }
-
-        if (is_null($beOnMap)) {
-            $data['be_on_game_map'] = null;
-        } else {
-            $data['be_on_game_map'] = $beOnMap->id;
-        }
-
-        if (is_null($parentGuideQuest)) {
-            $data['parent_id'] = null;
-        } else {
-            $data['parent_id'] = $parentGuideQuest->id;
-        }
-
-        $data['required_event_goal_crafting_participation'] = blank($data['required_event_goal_crafting_participation'] ?? null)
-            ? null
-            : (int) $data['required_event_goal_crafting_participation'];
-        $data['required_event_goal_enchanting_participation'] = blank($data['required_event_goal_enchanting_participation'] ?? null)
-            ? null
-            : (int) $data['required_event_goal_enchanting_participation'];
+        $data['required_event_goal_crafting_participation'] = $this->nullableInteger($data['required_event_goal_crafting_participation'] ?? null);
+        $data['required_event_goal_enchanting_participation'] = $this->nullableInteger($data['required_event_goal_enchanting_participation'] ?? null);
 
         return $data;
+    }
+
+    /**
+     * Replace a named relationship cell with the resolved record id, clearing it and its companion cells when nothing matches.
+     *
+     * @param array $data
+     * @param string $key
+     * @param Model|null $record
+     * @param array $companionKeys
+     * @return array
+     */
+    private function applyResolvedRecord(array $data, string $key, ?Model $record, array $companionKeys = []): array
+    {
+        if (is_null($record)) {
+            return [...$data, ...array_fill_keys([$key, ...$companionKeys], null)];
+        }
+
+        $data[$key] = $record->id;
+
+        return $data;
+    }
+
+    /**
+     * Find the Faction belonging to the Game Map with the given name.
+     *
+     * @param string|null $gameMapName
+     * @return Faction|null
+     */
+    private function findFactionByMapName(?string $gameMapName): ?Faction
+    {
+        return Faction::whereHas('gameMap', fn (Builder $query): Builder => $query->where('name', $gameMapName))->first();
+    }
+
+    /**
+     * Clear the Batch Crafting requirement unless it names a Guide Quest batch type and at least one hour.
+     *
+     * @param array $data
+     * @return array
+     */
+    private function normalizeBatchCraftingRequirement(array $data): array
+    {
+        $batchCraftingType = BatchCraftingType::tryFrom($data['required_batch_crafting_type'] ?? '');
+        $batchCraftingHours = $this->nullableInteger($data['required_batch_crafting_hours'] ?? null);
+
+        $isValidRequirement = in_array($batchCraftingType, $this->guideQuestBatchCraftingTypes(), true)
+            && ! is_null($batchCraftingHours)
+            && $batchCraftingHours >= 1;
+
+        if ($isValidRequirement) {
+            return $data;
+        }
+
+        $data['required_batch_crafting_type'] = null;
+        $data['required_batch_crafting_hours'] = null;
+
+        return $data;
+    }
+
+    /**
+     * Return the Batch Crafting types a Guide Quest may require experience in.
+     *
+     * @return array
+     */
+    private function guideQuestBatchCraftingTypes(): array
+    {
+        return [
+            BatchCraftingType::CRAFT,
+            BatchCraftingType::CRAFT_AND_ENCHANT,
+            BatchCraftingType::ALCHEMY,
+            BatchCraftingType::TRINKETRY,
+        ];
+    }
+
+    /**
+     * Normalize a numeric spreadsheet cell to a whole number, returning null when the cell is blank or not numeric.
+     *
+     * @param mixed $value
+     * @return int|null
+     */
+    private function nullableInteger(mixed $value): ?int
+    {
+        if (blank($value) || ! is_numeric($value)) {
+            return null;
+        }
+
+        return intval($value);
     }
 
     /**
@@ -185,13 +179,16 @@ class GuideQuestsSheet implements ToCollection
         $decoded = json_decode($content, true);
 
         if (! is_array($decoded)) {
-            throw new \InvalidArgumentException('Guide Quest '.$field.' must contain valid structured JSON.');
+            throw new InvalidArgumentException('Guide Quest '.$field.' must contain valid structured JSON.');
         }
 
-        foreach ($decoded as $block) {
-            if (! is_array($block) || ! isset($block['id'], $block['content'])) {
-                throw new \InvalidArgumentException('Guide Quest '.$field.' contains an invalid content block.');
-            }
+        $hasInvalidBlock = array_any(
+            $decoded,
+            fn (mixed $block): bool => ! is_array($block) || ! isset($block['id'], $block['content']),
+        );
+
+        if ($hasInvalidBlock) {
+            throw new InvalidArgumentException('Guide Quest '.$field.' contains an invalid content block.');
         }
 
         return $decoded;
@@ -199,58 +196,72 @@ class GuideQuestsSheet implements ToCollection
 
     /**
      * Resolve the required batch crafted items configured for the guide quest row.
+     *
+     * @param array $data
+     * @return array|null
      */
     private function requiredBatchCraftedItems(array $data): ?array
     {
-        $requiredBatchCraftedItems = [];
+        $requiredItems = array_values(array_filter([
+            $this->requiredItemForRow($data, 1),
+            $this->requiredItemForRow($data, 2),
+        ]));
 
-        for ($row = 1; $row <= 2; $row++) {
-            $source = $data['required_item_'.$row.'_source'] ?? null;
-            $itemName = $data['required_item_'.$row.'_name'] ?? ($data['required_batch_crafted_item_'.$row.'_name'] ?? null);
-            $itemType = $data['required_item_'.$row.'_type'] ?? ($data['required_batch_crafted_item_'.$row.'_type'] ?? null);
-            $amount = $data['required_item_'.$row.'_amount'] ?? ($data['required_batch_crafted_item_'.$row.'_amount'] ?? null);
-
-            if (blank($itemName) && blank($itemType) && blank($amount)) {
-                continue;
-            }
-
-            if (blank($itemName) || blank($itemType) || blank($amount) || (int) $amount < 1) {
-                continue;
-            }
-
-            $source = blank($source) ? 'inventory' : $source;
-
-            if (! in_array($source, ['inventory', 'alchemy_bag'], true)) {
-                continue;
-            }
-
-            $item = $source === 'alchemy_bag'
-                ? $this->findAlchemyRequirementItem($itemName, $itemType)
-                : $this->findInventoryRequirementItem($itemName, $itemType);
-
-            if (is_null($item)) {
-                continue;
-            }
-
-            $requiredBatchCraftedItems[] = [
-                'source' => $source,
-                'item_id' => $item->id,
-                'amount' => (int) $amount,
-                'must_be_enchanted' => $source === 'alchemy_bag'
-                    ? false
-                    : filter_var($data['required_item_'.$row.'_must_be_enchanted'] ?? ($data['required_batch_crafted_item_'.$row.'_must_be_enchanted'] ?? false), FILTER_VALIDATE_BOOLEAN),
-            ];
-        }
-
-        if (empty($requiredBatchCraftedItems)) {
+        if (empty($requiredItems)) {
             return null;
         }
 
-        return $requiredBatchCraftedItems;
+        return $requiredItems;
+    }
+
+    /**
+     * Resolve one numbered required-item column group into its persisted requirement, or null when it is incomplete or invalid.
+     *
+     * @param array $data
+     * @param int $row
+     * @return array|null
+     */
+    private function requiredItemForRow(array $data, int $row): ?array
+    {
+        $itemName = $data['required_item_'.$row.'_name'] ?? ($data['required_batch_crafted_item_'.$row.'_name'] ?? null);
+        $itemType = $data['required_item_'.$row.'_type'] ?? ($data['required_batch_crafted_item_'.$row.'_type'] ?? null);
+        $amount = $this->nullableInteger($data['required_item_'.$row.'_amount'] ?? ($data['required_batch_crafted_item_'.$row.'_amount'] ?? null));
+
+        if (blank($itemName) || blank($itemType) || is_null($amount) || $amount < 1) {
+            return null;
+        }
+
+        $sourceValue = $data['required_item_'.$row.'_source'] ?? null;
+        $source = blank($sourceValue) ? GuideQuestRequiredItemSource::INVENTORY : GuideQuestRequiredItemSource::tryFrom($sourceValue);
+
+        if (is_null($source)) {
+            return null;
+        }
+
+        $item = $source === GuideQuestRequiredItemSource::ALCHEMY_BAG
+            ? $this->findAlchemyRequirementItem($itemName, $itemType)
+            : $this->findInventoryRequirementItem($itemName, $itemType);
+
+        if (is_null($item)) {
+            return null;
+        }
+
+        $mustBeEnchanted = $data['required_item_'.$row.'_must_be_enchanted'] ?? ($data['required_batch_crafted_item_'.$row.'_must_be_enchanted'] ?? false);
+
+        return [
+            'source' => $source->value,
+            'item_id' => $item->id,
+            'amount' => $amount,
+            'must_be_enchanted' => $source === GuideQuestRequiredItemSource::INVENTORY && filter_var($mustBeEnchanted, FILTER_VALIDATE_BOOLEAN),
+        ];
     }
 
     /**
      * Resolve the craftable inventory item matching the required item name and type.
+     *
+     * @param string $itemName
+     * @param string $itemType
+     * @return Item|null
      */
     private function findInventoryRequirementItem(string $itemName, string $itemType): ?Item
     {
@@ -258,44 +269,50 @@ class GuideQuestsSheet implements ToCollection
             return null;
         }
 
+        $matchingTypes = [
+            $itemType,
+            ...array_filter(
+                $this->validBatchCraftedItemTypes(),
+                fn (string $validType): bool => $this->batchCraftedItemTypeName($validType) === $itemType,
+            ),
+        ];
+
         return Item::where('name', $itemName)
             ->where('can_craft', true)
             ->whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
             ->where('type', '!=', 'alchemy')
-            ->where(function ($query) use ($itemType) {
-                $query->where('type', $itemType);
-
-                foreach ($this->validBatchCraftedItemTypes() as $validType) {
-                    if ($this->batchCraftedItemTypeName($validType) === $itemType) {
-                        $query->orWhere('type', $validType);
-                    }
-                }
-            })
+            ->whereIn('type', $matchingTypes)
             ->first();
     }
 
     /**
      * Resolve the alchemy item matching the required item name and alchemy type.
+     *
+     * @param string $itemName
+     * @param string $itemType
+     * @return Item|null
      */
     private function findAlchemyRequirementItem(string $itemName, string $itemType): ?Item
     {
+        $matchingAlchemyTypes = [
+            $itemType,
+            ...array_keys(array_filter(
+                $this->alchemyItemTypeNames(),
+                fn (string $alchemyTypeName): bool => $alchemyTypeName === $itemType,
+            )),
+        ];
+
         return Item::where('name', $itemName)
             ->where('type', 'alchemy')
-            ->where(function ($query) use ($itemType) {
-                $query->where('alchemy_type', $itemType);
-
-                foreach ($this->alchemyItemTypeNames() as $alchemyType => $alchemyTypeName) {
-                    if ($alchemyTypeName === $itemType) {
-                        $query->orWhere('alchemy_type', $alchemyType);
-                    }
-                }
-            })
+            ->whereIn('alchemy_type', $matchingAlchemyTypes)
             ->first();
     }
 
     /**
      * Return the item types that are valid for a required batch crafted item.
+     *
+     * @return array
      */
     private function validBatchCraftedItemTypes(): array
     {
@@ -312,14 +329,19 @@ class GuideQuestsSheet implements ToCollection
 
     /**
      * Return the human readable names for the valid batch crafted item types.
+     *
+     * @return array
      */
     private function validBatchCraftedItemTypeNames(): array
     {
-        return array_map(fn (string $type) => $this->batchCraftedItemTypeName($type), $this->validBatchCraftedItemTypes());
+        return array_map(fn (string $type): string => $this->batchCraftedItemTypeName($type), $this->validBatchCraftedItemTypes());
     }
 
     /**
      * Resolve the human readable name for a single batch crafted item type.
+     *
+     * @param string $type
+     * @return string
      */
     private function batchCraftedItemTypeName(string $type): string
     {
@@ -333,6 +355,8 @@ class GuideQuestsSheet implements ToCollection
 
     /**
      * Return the human readable names for the alchemy item types.
+     *
+     * @return array
      */
     private function alchemyItemTypeNames(): array
     {

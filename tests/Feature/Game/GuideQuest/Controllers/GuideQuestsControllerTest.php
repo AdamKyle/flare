@@ -15,6 +15,7 @@ use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use RuntimeException;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\Setup\GuideQuest\GuideQuestServiceFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGuideQuest;
 use Tests\Traits\CreateItem;
@@ -33,7 +34,7 @@ class GuideQuestsControllerTest extends TestCase
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
-        $this->guideQuestService = resolve(GuideQuestService::class);
+        $this->guideQuestService = (new GuideQuestServiceFactory)->build();
     }
 
     protected function tearDown(): void
@@ -66,9 +67,9 @@ class GuideQuestsControllerTest extends TestCase
 
         $queueManager = Mockery::mock(BattleRewardProcessingQueueManager::class);
         $queueManager->shouldReceive('enqueue')->once()->andReturn(BattleRewardEnqueueResult::failed(new RuntimeException('database is unavailable')));
-        $this->app->instance(BattleRewardProcessingQueueManager::class, $queueManager);
+        $guideQuestService = (new GuideQuestServiceFactory)->build($queueManager);
 
-        $result = resolve(GuideQuestService::class)->handInQuest($character, $quest);
+        $result = $guideQuestService->handInQuest($character, $quest);
 
         $this->assertFalse($result);
         $this->assertSame(0, QuestsCompleted::where('character_id', $character->id)->where('guide_quest_id', $quest->id)->count());

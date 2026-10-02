@@ -1,101 +1,59 @@
-import { AxiosError } from 'axios';
-import { Driver } from 'driver.js';
-import { useEventSystem } from 'event-system/hooks/use-event-system';
-import React, {
-  ReactNode,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useRef } from 'react';
 
+import GuideWalkthroughProviderProps from './types/guide-walkthrough-provider-props';
 import { GuideQuestWalkthroughStepDefinition } from '../../api/definitions/guide-quest-walkthrough-definition';
-import { useGuideQuestWalkthroughApi } from '../../api/hooks/use-guide-quest-walkthrough-api';
 import { GuideWalkthroughContext } from '../context/guide-walkthrough-context';
-import { presentGuideStep } from '../driver/driver-adapter';
-import { GuideWalkthroughEvent } from '../enums/guide-walkthrough-event';
+import { GuideWalkthroughAdvanceResult } from '../enums/guide-walkthrough-advance-result';
 import { GuideWalkthroughStepType } from '../enums/guide-walkthrough-step-type';
-import GuideWalkthroughEventMap from '../events/guide-walkthrough-event-map';
-import { GUIDE_WALKTHROUGH_EVENT_EMITTER } from '../events/guide-walkthrough-events';
+import { useGuideTargetClickAdvancement } from '../hooks/use-guide-target-click-advancement';
+import { useGuideWalkthroughDriver } from '../hooks/use-guide-walkthrough-driver';
+import { useGuideWalkthroughEventAdvancement } from '../hooks/use-guide-walkthrough-event-advancement';
+import { useGuideWalkthroughProgress } from '../hooks/use-guide-walkthrough-progress';
+import { useGuideWalkthroughStepTarget } from '../hooks/use-guide-walkthrough-step-target';
 import { useWalkthroughScrollLock } from '../hooks/use-walkthrough-scroll-lock';
-import {
-  isAsyncGuideTarget,
-  isStateDependentGuideTarget,
-} from '../registry/guide-targets';
-import {
-  resolveActiveGuideTarget,
-  waitForActiveGuideTarget,
-} from '../utils/resolve-active-guide-target';
-
-import { useGameData } from 'game-data/hooks/use-game-data';
-
-interface GuideWalkthroughProviderProps {
-  children: ReactNode;
-}
-
-const OPTIONAL_TARGET_WAIT_MS = 400;
-const ASYNC_TARGET_WAIT_MS = 3000;
+import { resolveNextAvailableGuideStepIndex } from '../utils/resolve-next-available-guide-step-index';
 
 const GuideWalkthroughProvider = ({
   children,
 }: GuideWalkthroughProviderProps) => {
-  const { gameData } = useGameData();
-  const userId = gameData?.character?.user_id ?? 0;
-  const { fetchWalkthrough, saveProgress } =
-    useGuideQuestWalkthroughApi(userId);
-  const eventSystem = useEventSystem();
-  const eventEmitter = useMemo(
-    () =>
-      eventSystem.fetchOrCreateEventEmitter<GuideWalkthroughEventMap>(
-        GUIDE_WALKTHROUGH_EVENT_EMITTER
-      ),
-    [eventSystem]
-  );
-  const driverRef = useRef<Driver | null>(null);
-  const targetRef = useRef<HTMLElement | null>(null);
-  const clickHandlerRef = useRef<(() => void) | null>(null);
-  const eventHandlerRef = useRef<(() => void) | null>(null);
-  const eventNameRef = useRef<GuideWalkthroughEvent | null>(null);
+  const {
+    steps,
+    stepIndex,
+    activeGuideQuestId,
+    loading,
+    error,
+    loadWalkthrough,
+    advanceToStep,
+    resetWalkthrough,
+    reportWalkthroughError,
+  } = useGuideWalkthroughProgress();
+  const { presentDriverStep, destroyDriver } = useGuideWalkthroughDriver();
+  const { bindTargetClick, unbindTargetClick } =
+    useGuideTargetClickAdvancement();
+  const { bindStepEvent, unbindStepEvent } =
+    useGuideWalkthroughEventAdvancement();
+
   const advancingRef = useRef(false);
-  const [steps, setSteps] = useState<GuideQuestWalkthroughStepDefinition[]>([]);
-  const [stepIndex, setStepIndex] = useState(0);
-  const [activeGuideQuestId, setActiveGuideQuestId] = useState<number | null>(
-    null
-  );
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+
+  const activeStep =
+    activeGuideQuestId === null ? null : (steps[stepIndex] ?? null);
 
   useWalkthroughScrollLock(activeGuideQuestId !== null);
 
-  const cleanPresentation = useCallback(() => {
-    driverRef.current?.destroy();
-    driverRef.current = null;
+  const cleanPresentation = useCallback((): void => {
+    destroyDriver();
+    unbindTargetClick();
+    unbindStepEvent();
+  }, [destroyDriver, unbindStepEvent, unbindTargetClick]);
 
-    if (targetRef.current && clickHandlerRef.current) {
-      targetRef.current.removeEventListener('click', clickHandlerRef.current);
-    }
-
-    if (eventNameRef.current && eventHandlerRef.current) {
-      eventEmitter.off(eventNameRef.current, eventHandlerRef.current);
-    }
-
-    targetRef.current = null;
-    clickHandlerRef.current = null;
-    eventHandlerRef.current = null;
-    eventNameRef.current = null;
-  }, [eventEmitter]);
-
-  const closeWalkthrough = useCallback(() => {
+  const closeWalkthrough = useCallback((): void => {
     cleanPresentation();
-    setActiveGuideQuestId(null);
-    setSteps([]);
-    setStepIndex(0);
+    resetWalkthrough();
     advancingRef.current = false;
-  }, [cleanPresentation]);
+  }, [cleanPresentation, resetWalkthrough]);
 
   const advance = useCallback(
-    async (skipUnavailableOptionalSteps = false) => {
+    async (skipUnavailableOptionalSteps = false): Promise<void> => {
       if (activeGuideQuestId === null || advancingRef.current) {
         return;
       }
@@ -103,166 +61,95 @@ const GuideWalkthroughProvider = ({
       advancingRef.current = true;
       cleanPresentation();
 
-      let nextIndex = stepIndex + 1;
-      let nextStep = steps[nextIndex];
-
-      if (skipUnavailableOptionalSteps) {
-        while (
-          nextStep?.target &&
-          (nextStep.optional_if_target_missing ||
-            isStateDependentGuideTarget(nextStep.target)) &&
-          !resolveActiveGuideTarget(nextStep.target)
-        ) {
-          nextIndex += 1;
-          nextStep = steps[nextIndex];
-        }
-      }
+      const nextIndex = skipUnavailableOptionalSteps
+        ? resolveNextAvailableGuideStepIndex(steps, stepIndex + 1)
+        : stepIndex + 1;
 
       try {
-        if (!nextStep) {
-          await saveProgress(activeGuideQuestId, null, true);
-          closeWalkthrough();
-          return;
-        }
+        const result = await advanceToStep(nextIndex);
 
-        await saveProgress(activeGuideQuestId, nextStep.id, false);
-        setStepIndex(nextIndex);
+        if (
+          result === GuideWalkthroughAdvanceResult.COMPLETED ||
+          result === GuideWalkthroughAdvanceResult.FAILED
+        ) {
+          closeWalkthrough();
+        }
       } finally {
         advancingRef.current = false;
       }
     },
     [
       activeGuideQuestId,
+      advanceToStep,
       cleanPresentation,
       closeWalkthrough,
-      saveProgress,
       stepIndex,
       steps,
     ]
   );
 
-  useEffect(() => {
-    const step = steps[stepIndex];
+  const presentStep = useCallback(
+    (
+      step: GuideQuestWalkthroughStepDefinition,
+      target: HTMLElement | null
+    ): void => {
+      const handleAdvance = () => void advance();
 
-    if (!step || activeGuideQuestId === null) {
-      return;
-    }
-
-    let cancelled = false;
-
-    const present = async (): Promise<void> => {
-      const targetIsOptional =
-        !!step.target &&
-        (step.optional_if_target_missing ||
-          isStateDependentGuideTarget(step.target));
-      const targetWaitMs = step.target
-        ? isAsyncGuideTarget(step.target)
-          ? ASYNC_TARGET_WAIT_MS
-          : targetIsOptional
-            ? OPTIONAL_TARGET_WAIT_MS
-            : undefined
-        : undefined;
-      const target = step.target
-        ? await waitForActiveGuideTarget(step.target, targetWaitMs)
-        : null;
-
-      if (cancelled) {
-        return;
-      }
-
-      if (step.target && !target) {
-        if (targetIsOptional) {
-          await advance(true);
-          return;
-        }
-
-        setError(
-          'This walkthrough target is not available. You can close the guide and keep playing.'
-        );
-        closeWalkthrough();
-        return;
-      }
-
-      targetRef.current = target;
-      driverRef.current = presentGuideStep({
+      presentDriverStep({
         step,
         element: target,
-        on_continue: () => void advance(),
+        on_continue: handleAdvance,
         on_close: closeWalkthrough,
       });
 
       if (step.step_type === GuideWalkthroughStepType.CLICK && target) {
-        const handleClick = () => void advance();
-        clickHandlerRef.current = handleClick;
-        target.addEventListener('click', handleClick, { once: true });
+        bindTargetClick(target, handleAdvance);
       }
 
       if (
         step.step_type === GuideWalkthroughStepType.EVENT &&
         step.required_event
       ) {
-        const handleEvent = () => void advance();
-        eventHandlerRef.current = handleEvent;
-        eventNameRef.current = step.required_event;
-        eventEmitter.on(step.required_event, handleEvent);
-      }
-    };
-
-    void present();
-
-    return () => {
-      cancelled = true;
-
-      cleanPresentation();
-    };
-  }, [
-    activeGuideQuestId,
-    advance,
-    cleanPresentation,
-    closeWalkthrough,
-    eventEmitter,
-    stepIndex,
-    steps,
-  ]);
-
-  const startWalkthrough = useCallback(
-    async (guideQuestId: number): Promise<boolean> => {
-      closeWalkthrough();
-      setLoading(true);
-      setError(null);
-
-      try {
-        const walkthrough = await fetchWalkthrough(guideQuestId);
-        const firstStep = walkthrough.steps[0];
-
-        if (!firstStep) {
-          setError('This walkthrough has no steps.');
-          return false;
-        }
-
-        await saveProgress(guideQuestId, firstStep.id, false);
-        setSteps(walkthrough.steps);
-        setStepIndex(0);
-        setActiveGuideQuestId(guideQuestId);
-
-        return true;
-      } catch (requestError) {
-        if (requestError instanceof AxiosError) {
-          setError(
-            requestError.response?.data?.message ??
-              'Unable to start this walkthrough.'
-          );
-        }
-
-        return false;
-      } finally {
-        setLoading(false);
+        bindStepEvent(step.required_event, handleAdvance);
       }
     },
-    [closeWalkthrough, fetchWalkthrough, saveProgress]
+    [
+      advance,
+      bindStepEvent,
+      bindTargetClick,
+      closeWalkthrough,
+      presentDriverStep,
+    ]
   );
 
-  useEffect(() => cleanPresentation, [cleanPresentation]);
+  const skipOptionalStep = useCallback(
+    (): Promise<void> => advance(true),
+    [advance]
+  );
+
+  const failMissingTarget = useCallback((): void => {
+    reportWalkthroughError(
+      'This walkthrough target is not available. You can close the guide and keep playing.'
+    );
+    closeWalkthrough();
+  }, [closeWalkthrough, reportWalkthroughError]);
+
+  useGuideWalkthroughStepTarget({
+    step: activeStep,
+    on_target_resolved: presentStep,
+    on_optional_target_missing: skipOptionalStep,
+    on_required_target_missing: failMissingTarget,
+    on_step_cleanup: cleanPresentation,
+  });
+
+  const startWalkthrough = useCallback(
+    (guideQuestId: number): Promise<boolean> => {
+      closeWalkthrough();
+
+      return loadWalkthrough(guideQuestId);
+    },
+    [closeWalkthrough, loadWalkthrough]
+  );
 
   return (
     <GuideWalkthroughContext.Provider

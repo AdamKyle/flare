@@ -1,8 +1,9 @@
 import { useActivityTimeout } from 'api-handler/hooks/use-activity-timeout';
 import { useApiHandler } from 'api-handler/hooks/use-api-handler';
-import { AxiosError, AxiosRequestConfig } from 'axios';
+import { resolveApiErrorMessage } from 'api-handler/utils/resolve-api-error-message';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import { isNil } from 'lodash';
-import { useState, useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { match } from 'ts-pattern';
 
 import { ItemActions } from '../../../../../../reusable-components/item/enums/item-actions';
@@ -23,75 +24,97 @@ export const useProcessItemAction = (): UseProcessItemActionDefinition => {
       character_id: 0,
       on_success: () => {},
     });
-  const [error, setError] = useState<
-    UseProcessItemActionDefinition['error'] | null
-  >(null);
+  const [error, setError] =
+    useState<UseProcessItemActionDefinition['error']>(null);
   const [loading, setLoading] = useState(false);
 
-  const fetchUrlForAction = (): string | null => {
-    if (isNil(requestData.action_type)) {
-      return null;
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    return () => {
+      const activeController = abortControllerRef.current;
+
+      abortControllerRef.current = null;
+      activeController?.abort();
+    };
+  }, []);
+
+  const processInventoryItemAction = useCallback(async (): Promise<void> => {
+    const { action_type, item_id, character_id, on_success } = requestData;
+
+    if (isNil(action_type) || !item_id) {
+      return;
     }
 
-    return match(requestData.action_type)
+    const url = match(action_type)
       .with(ItemActions.SELL, () =>
         getUrl(CharacterInventoryApiUrls.CHARACTER_INVENTORY_SELL_ITEM, {
-          character: requestData.character_id,
+          character: character_id,
         })
       )
       .with(ItemActions.DESTROY, () =>
         getUrl(CharacterInventoryApiUrls.CHARACTER_INVENTORY_DESTROY_ITEM, {
-          character: requestData.character_id,
+          character: character_id,
         })
       )
       .with(ItemActions.DISENCHANT, () =>
         getUrl(CharacterInventoryApiUrls.CHARACTER_INVENTORY_DISENCHANT_ITEM, {
-          character: requestData.character_id,
+          character: character_id,
         })
       )
       .otherwise(() => null);
-  };
-
-  const processInventoryItemAction = useCallback(async () => {
-    if (isNil(requestData.action_type) || !requestData.item_id) {
-      return;
-    }
-
-    const url = fetchUrlForAction();
 
     if (!url) {
       return;
     }
 
-    try {
-      setLoading(true);
+    abortControllerRef.current?.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
 
+    setLoading(true);
+
+    try {
       const result = await apiHandler.post<
         UseProcessItemActionResponseDefinition,
-        AxiosRequestConfig<UseProcessItemActionResponseDefinition>,
+        AxiosRequestConfig<UseProcessItemActionRequestDefinition>,
         UseProcessItemActionRequestDefinition
-      >(url, {
-        item_id: requestData.item_id,
+      >(url, { item_id }, { signal: controller.signal });
+
+      if (abortControllerRef.current !== controller) {
+        return;
+      }
+
+      on_success(result.message);
+    } catch (requestError) {
+      if (axios.isCancel(requestError)) {
+        return;
+      }
+
+      if (abortControllerRef.current !== controller) {
+        return;
+      }
+
+      setError({
+        message: resolveApiErrorMessage(
+          requestError,
+          'Unable to complete the item action.'
+        ),
       });
 
-      requestData.on_success(result.message);
-    } catch (err) {
-      if (err instanceof AxiosError) {
-        handleInactivity({
-          setError: setError,
-          response: err,
-        });
-
-        setError(err.response?.data || null);
+      if (requestError instanceof AxiosError) {
+        handleInactivity({ response: requestError, setError });
       }
     } finally {
-      setLoading(false);
+      if (abortControllerRef.current === controller) {
+        abortControllerRef.current = null;
+        setLoading(false);
+      }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [requestData]);
+  }, [apiHandler, getUrl, handleInactivity, requestData]);
 
   useEffect(() => {
-    processInventoryItemAction().catch(() => {});
+    void processInventoryItemAction();
   }, [processInventoryItemAction]);
 
   const resetError = () => {

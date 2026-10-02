@@ -7,8 +7,8 @@ trait CreateMonsterImportRow
     /**
      * Build a minimal, otherwise-valid Monsters import row, keyed by header name.
      *
-     * @param array<string, mixed> $overrides Values to override on top of the minimal valid row.
-     * @return array<string, mixed> Row values keyed by header name.
+     * @param array $overrides
+     * @return array
      */
     public function minimalMonsterImportRow(array $overrides = []): array
     {
@@ -34,6 +34,9 @@ trait CreateMonsterImportRow
             'is_celestial_entity' => 'false',
             'is_raid_monster' => 'false',
             'is_raid_boss' => 'false',
+            'fire_penetration' => 0,
+            'ice_penetration' => 0,
+            'water_penetration' => 0,
         ], $overrides);
     }
 }

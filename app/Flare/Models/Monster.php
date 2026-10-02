@@ -6,6 +6,8 @@ use Database\Factories\MonsterFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Monster extends Model
 {
@@ -64,6 +66,9 @@ class Monster extends Model
         'fire_atonement',
         'ice_atonement',
         'water_atonement',
+        'fire_penetration',
+        'ice_penetration',
+        'water_penetration',
         'life_stealing_resistance',
         'only_for_location_type',
     ];
@@ -113,6 +118,9 @@ class Monster extends Model
         'fire_atonement' => 'float',
         'ice_atonement' => 'float',
         'water_atonement' => 'float',
+        'fire_penetration' => 'float',
+        'ice_penetration' => 'float',
+        'water_penetration' => 'float',
         'is_raid_monster' => 'boolean',
         'is_raid_boss' => 'boolean',
         'raid_special_attack_type' => 'integer',
@@ -120,16 +128,33 @@ class Monster extends Model
         'only_for_location_type' => 'integer',
     ];
 
-    public function questItem()
+    /**
+     * Return the quest item this Monster can drop.
+     *
+     * @return HasOne
+     */
+    public function questItem(): HasOne
     {
         return $this->hasOne(Item::class, 'id', 'quest_item_id');
     }
 
-    public function gameMap()
+    /**
+     * Return the Game Map this Monster belongs to.
+     *
+     * @return BelongsTo
+     */
+    public function gameMap(): BelongsTo
     {
         return $this->belongsTo(GameMap::class, 'game_map_id', 'id');
     }
 
+    /**
+     * Limit the query to conjurable Celestials on the given Game Map.
+     *
+     * @param Builder $query
+     * @param int $gameMapId
+     * @return Builder
+     */
     public function scopeConjurableOnMap(Builder $query, int $gameMapId): Builder
     {
         return $query
@@ -138,7 +163,12 @@ class Monster extends Model
             ->where('game_map_id', $gameMapId);
     }
 
-    protected static function newFactory()
+    /**
+     * Return the factory used to create Monsters.
+     *
+     * @return MonsterFactory
+     */
+    protected static function newFactory(): MonsterFactory
     {
         return MonsterFactory::new();
     }

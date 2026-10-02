@@ -20,8 +20,6 @@ use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Items\Enricher\EquippableEnricher;
 use App\Game\Core\Items\Enricher\ItemEnricherFactory;
 use App\Game\Core\Items\Transformers\Api\UsableItemTransformer as ApiUsableItemTransformer;
-use App\Game\Core\Items\Transformers\EquippableItemTransformer;
-use App\Game\Core\Items\Transformers\ItemTransformer;
 use App\Game\Core\Items\Transformers\QuestItemTransformer;
 use App\Game\Core\Items\Transformers\UsableItemTransformer;
 use App\Game\Core\Values\ValidEquipPositionsValue;
@@ -38,6 +36,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use League\Fractal\Manager;
 use Mockery;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\Setup\Items\ItemTransformerFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
 
@@ -54,7 +53,7 @@ class MarketBoardBatchCraftingTest extends TestCase
         $manager = new Manager;
         $plainDataSerializer = new PlainDataSerializer;
         $randomNumberGenerator = new PhpRandomNumberGenerator;
-        $equippableItemTransformer = new EquippableItemTransformer;
+        $equippableItemTransformer = (new ItemTransformerFactory)->buildEquippableItemTransformer();
         $questItemTransformer = new QuestItemTransformer;
         $apiUsableItemTransformer = new ApiUsableItemTransformer;
         $inventorySetService = new InventorySetService(new SetHandsValidation);
@@ -95,7 +94,7 @@ class MarketBoardBatchCraftingTest extends TestCase
         $this->marketBoard = new MarketBoard(
             $equipItemService,
             $comparisonService,
-            new MarketRealtimePublisher($manager, new MarketItemsTransformer(new ItemTransformer($itemEnricherFactory))),
+            new MarketRealtimePublisher($manager, new MarketItemsTransformer((new ItemTransformerFactory)->buildItemTransformer($itemEnricherFactory))),
             new CharacterInventoryCountTransformer,
         );
     }

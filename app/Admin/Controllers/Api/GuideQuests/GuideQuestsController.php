@@ -38,6 +38,7 @@ class GuideQuestsController
      * @param GuideQuestTransformer $guideQuestTransformer
      * @param GuideQuestDetailTransformer $guideQuestDetailTransformer
      * @param GuideQuestService $guideQuestService
+     * @param GuideQuestWalkthroughService $guideQuestWalkthroughService
      */
     public function __construct(
         private readonly Pagination $pagination,
@@ -105,7 +106,7 @@ class GuideQuestsController
     }
 
     /**
-     * Replace a Guide Quest's ordered walkthrough steps transactionally.
+     * Replace a Guide Quest's ordered walkthrough steps with the validated steps.
      *
      * @param GuideQuestWalkthroughRequest $request
      * @param GuideQuest $guideQuest

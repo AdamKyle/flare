@@ -70,7 +70,7 @@ const MonsterRaidFields = ({
           id="monster-fire-atonement"
           label="Fire Atonement"
           value={state.fire_atonement}
-          on_change={(v) => onChange('fire_atonement', v)}
+          on_change={(value) => onChange('fire_atonement', value)}
           min={0}
           error={errors.fire_atonement}
         />
@@ -78,7 +78,7 @@ const MonsterRaidFields = ({
           id="monster-ice-atonement"
           label="Ice Atonement"
           value={state.ice_atonement}
-          on_change={(v) => onChange('ice_atonement', v)}
+          on_change={(value) => onChange('ice_atonement', value)}
           min={0}
           error={errors.ice_atonement}
         />
@@ -86,9 +86,36 @@ const MonsterRaidFields = ({
           id="monster-water-atonement"
           label="Water Atonement"
           value={state.water_atonement}
-          on_change={(v) => onChange('water_atonement', v)}
+          on_change={(value) => onChange('water_atonement', value)}
           min={0}
           error={errors.water_atonement}
+        />
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-3">
+        <NumberField
+          id="monster-fire-penetration"
+          label="Fire Penetration"
+          value={state.fire_penetration}
+          on_change={(value) => onChange('fire_penetration', value)}
+          min={0}
+          error={errors.fire_penetration}
+        />
+        <NumberField
+          id="monster-ice-penetration"
+          label="Ice Penetration"
+          value={state.ice_penetration}
+          on_change={(value) => onChange('ice_penetration', value)}
+          min={0}
+          error={errors.ice_penetration}
+        />
+        <NumberField
+          id="monster-water-penetration"
+          label="Water Penetration"
+          value={state.water_penetration}
+          on_change={(value) => onChange('water_penetration', value)}
+          min={0}
+          error={errors.water_penetration}
         />
       </div>
     </div>

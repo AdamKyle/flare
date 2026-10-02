@@ -14,6 +14,7 @@ use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\Reductions
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\CharacterAttack\Transformers\CharacterAttackDataTransformer;
 use App\Game\Core\Combat\Values\ElementAttackData;
+use App\Game\Gems\Contracts\CharacterGemEffects;
 use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
 use App\Game\Gems\Progression\Services\GemProgressionEffectService;
 use App\Game\Gems\Services\AreaGemEffectService;
@@ -25,28 +26,34 @@ use Tests\Setup\Gems\EmptyCharacterGemEffects;
 class CharacterCacheDataFactory
 {
     /**
-     * Build a real CharacterCacheData instance with real collaborators for tests.
+     * Build a real CharacterCacheData instance with real collaborators for tests, using empty Gem effects unless others are supplied.
+     *
+     * @param CharacterGemEffects|null $characterGemEffects
+     * @return CharacterCacheData
      */
-    public function build(): CharacterCacheData
+    public function build(?CharacterGemEffects $characterGemEffects = null): CharacterCacheData
     {
-        $characterGemEffects = new EmptyCharacterGemEffects;
+        $characterGemEffects ??= new EmptyCharacterGemEffects;
 
         return new CharacterCacheData(
             new Manager(),
             new PlainDataSerializer(),
             new CharacterAttackDataTransformer(),
-            $this->buildCharacterStatBuilder(),
+            $this->buildCharacterStatBuilder($characterGemEffects),
             new SkillBonusService(new SkillBonusContextService),
             $characterGemEffects,
         );
     }
 
     /**
-     * Build a real CharacterStatBuilder instance with real collaborators for tests.
+     * Build a real CharacterStatBuilder instance with real collaborators for tests, using empty Gem effects unless others are supplied.
+     *
+     * @param CharacterGemEffects|null $characterGemEffects
+     * @return CharacterStatBuilder
      */
-    public function buildCharacterStatBuilder(): CharacterStatBuilder
+    public function buildCharacterStatBuilder(?CharacterGemEffects $characterGemEffects = null): CharacterStatBuilder
     {
-        $characterGemEffects = new EmptyCharacterGemEffects;
+        $characterGemEffects ??= new EmptyCharacterGemEffects;
 
         return new CharacterStatBuilder(
             new DefenceBuilder(),

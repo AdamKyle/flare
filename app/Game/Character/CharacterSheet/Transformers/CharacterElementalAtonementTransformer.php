@@ -4,18 +4,26 @@ namespace App\Game\Character\CharacterSheet\Transformers;
 
 use App\Flare\Models\Character;
 use App\Flare\Transformers\BaseTransformer;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 
 class CharacterElementalAtonementTransformer extends BaseTransformer
 {
     /**
-     * Build the character's elemental atonement and dominant element data.
+     * @param CharacterCacheData $characterCacheData
+     */
+    public function __construct(
+        private readonly CharacterCacheData $characterCacheData,
+    ) {}
+
+    /**
+     * Return the Character's cached elemental atonement and dominant element, the same values battle uses.
      *
      * @param Character $character
      * @return array
      */
     public function transform(Character $character): array
     {
-        $elementalAtonement = $character->getInformation()->buildElementalAtonement();
+        $elementalAtonement = $this->characterCacheData->getCachedCharacterData($character, 'elemental_atonement');
 
         if (is_null($elementalAtonement)) {
             return [
@@ -33,12 +41,16 @@ class CharacterElementalAtonementTransformer extends BaseTransformer
 
         $atonements = $elementalAtonement['atonements'];
 
-        $elementalAtonement['atonements'] = [
-            'fire' => $atonements['fire'] ?? 0,
-            'ice' => $atonements['ice'] ?? 0,
-            'water' => $atonements['water'] ?? 0,
+        return [
+            'atonements' => [
+                'fire' => $atonements['Fire'] ?? 0,
+                'ice' => $atonements['Ice'] ?? 0,
+                'water' => $atonements['Water'] ?? 0,
+            ],
+            'highest_element' => [
+                'name' => $elementalAtonement['highest_element']['name'],
+                'damage' => $elementalAtonement['highest_element']['damage'],
+            ],
         ];
-
-        return $elementalAtonement;
     }
 }

@@ -16,6 +16,7 @@ class CharacterSheetTransformer extends BaseTransformer
      * @param CharacterCurrenciesTransformer $characterCurrenciesTransformer
      * @param CharacterResistanceInfoTransformer $characterResistanceInfoTransformer
      * @param CharacterElementalAtonementTransformer $characterElementalAtonementTransformer
+     * @param CharacterElementalPenetrationTransformer $characterElementalPenetrationTransformer
      * @param CharacterReincarnationInfoTransformer $characterReincarnationInfoTransformer
      * @param CharacterInventoryCountTransformer $characterInventoryCountTransformer
      * @param CharacterActiveBoonService $characterActiveBoonService
@@ -26,6 +27,7 @@ class CharacterSheetTransformer extends BaseTransformer
         private readonly CharacterCurrenciesTransformer $characterCurrenciesTransformer,
         private readonly CharacterResistanceInfoTransformer $characterResistanceInfoTransformer,
         private readonly CharacterElementalAtonementTransformer $characterElementalAtonementTransformer,
+        private readonly CharacterElementalPenetrationTransformer $characterElementalPenetrationTransformer,
         private readonly CharacterReincarnationInfoTransformer $characterReincarnationInfoTransformer,
         private readonly CharacterInventoryCountTransformer $characterInventoryCountTransformer,
         private readonly CharacterActiveBoonService $characterActiveBoonService,
@@ -47,6 +49,7 @@ class CharacterSheetTransformer extends BaseTransformer
             'inventory_count' => $this->characterInventoryCountTransformer->transform($character),
             'resistance_info' => ['data' => $this->characterResistanceInfoTransformer->transform($character)],
             'elemental_atonements' => $this->characterElementalAtonementTransformer->transform($character),
+            'elemental_penetration' => $this->characterElementalPenetrationTransformer->transform($character),
             'reincarnation_info' => ['data' => $this->characterReincarnationInfoTransformer->transform($character)],
             'active_boons' => $this->characterActiveBoonService->activeBoons($character),
             'currency_limits' => $this->currencyLimits(),

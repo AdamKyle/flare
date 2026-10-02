@@ -64,6 +64,9 @@ export const createMonsterFormState = (
       fire_atonement: '',
       ice_atonement: '',
       water_atonement: '',
+      fire_penetration: '',
+      ice_penetration: '',
+      water_penetration: '',
     };
   }
 
@@ -117,6 +120,9 @@ export const createMonsterFormState = (
     fire_atonement: toStringValue(monster.fire_atonement),
     ice_atonement: toStringValue(monster.ice_atonement),
     water_atonement: toStringValue(monster.water_atonement),
+    fire_penetration: toStringValue(monster.fire_penetration),
+    ice_penetration: toStringValue(monster.ice_penetration),
+    water_penetration: toStringValue(monster.water_penetration),
   };
 };
 
@@ -172,6 +178,9 @@ export const buildMonsterRequestPayload = (
   fire_atonement: toNumberOrNull(state.fire_atonement),
   ice_atonement: toNumberOrNull(state.ice_atonement),
   water_atonement: toNumberOrNull(state.water_atonement),
+  fire_penetration: toNumberOrNull(state.fire_penetration),
+  ice_penetration: toNumberOrNull(state.ice_penetration),
+  water_penetration: toNumberOrNull(state.water_penetration),
 });
 
 type MonsterFormErrors = Partial<
@@ -216,7 +225,10 @@ type MonsterNumberStringField =
   | 'life_stealing_resistance'
   | 'fire_atonement'
   | 'ice_atonement'
-  | 'water_atonement';
+  | 'water_atonement'
+  | 'fire_penetration'
+  | 'ice_penetration'
+  | 'water_penetration';
 
 const NON_NEGATIVE_INTEGER_MESSAGE = 'Enter a whole number of 0 or more.';
 const NON_NEGATIVE_NUMBER_MESSAGE = 'Enter a number of 0 or more.';
@@ -376,6 +388,9 @@ export const validateMonsterRaidStep = (
     'fire_atonement',
     'ice_atonement',
     'water_atonement',
+    'fire_penetration',
+    'ice_penetration',
+    'water_penetration',
   ]);
 
   if (state.is_raid_monster && state.is_raid_boss) {

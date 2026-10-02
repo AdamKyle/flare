@@ -3,7 +3,8 @@ import React from 'react';
 import DefinitionRow from './definition-row';
 import InfoLabel from './info-label';
 import StatRowIntegerProps from './types/stat-row-integer-props';
-import { formatIntWithPlus } from '../../util/format-number';
+
+import { formatIntWithPlus } from 'game-utils/format-number';
 
 const StatRowInteger = ({
   label,

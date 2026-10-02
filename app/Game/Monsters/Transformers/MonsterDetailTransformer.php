@@ -8,15 +8,24 @@ use App\Game\Monsters\Services\MonsterGemEffectContextService;
 
 class MonsterDetailTransformer
 {
+    /**
+     * @param QuestItemTransformer $questItemTransformer
+     * @param MonsterGemEffectContextService $monsterGemEffectContextService
+     */
     public function __construct(
         private readonly QuestItemTransformer $questItemTransformer,
         private readonly MonsterGemEffectContextService $monsterGemEffectContextService,
     ) {}
 
     /**
-     * Transform a Monster into its full factual detail representation.
+     * Transform a Monster into its full factual detail representation, preferring the effective cached payload's elemental values when one is supplied.
+     *
+     * @param Monster $monster
+     * @param array|null $gemEffectContexts
+     * @param array|null $effectiveMonster
+     * @return array
      */
-    public function transform(Monster $monster, ?array $gemEffectContexts = null): array
+    public function transform(Monster $monster, ?array $gemEffectContexts = null, ?array $effectiveMonster = null): array
     {
         $gemEffectSummary = $this->resolveGemEffectSummary($monster, $gemEffectContexts);
 
@@ -27,7 +36,7 @@ class MonsterDetailTransformer
             'probabilities' => $this->probabilities($monster),
             'spells_and_affixes' => $this->spellsAndAffixes($monster),
             'quest_and_celestial' => $this->questAndCelestial($monster),
-            'raid_and_special' => $this->raidAndSpecial($monster),
+            'raid_and_special' => $this->raidAndSpecial($monster, $effectiveMonster),
             'gem_effect_context_count' => $gemEffectSummary['count'],
             'gem_effect_context_preview' => $gemEffectSummary['preview'],
         ];
@@ -35,6 +44,10 @@ class MonsterDetailTransformer
 
     /**
      * Resolve the Gem effect context count/preview summary from an explicit current context or the factual cache-derived service.
+     *
+     * @param Monster $monster
+     * @param array|null $gemEffectContexts
+     * @return array
      */
     private function resolveGemEffectSummary(Monster $monster, ?array $gemEffectContexts): array
     {
@@ -50,6 +63,9 @@ class MonsterDetailTransformer
 
     /**
      * Build the Identity & Placement section.
+     *
+     * @param Monster $monster
+     * @return array
      */
     private function identity(Monster $monster): array
     {
@@ -69,6 +85,9 @@ class MonsterDetailTransformer
 
     /**
      * Build the Core Combat section: base stats.
+     *
+     * @param Monster $monster
+     * @return array
      */
     private function combat(Monster $monster): array
     {
@@ -86,6 +105,9 @@ class MonsterDetailTransformer
 
     /**
      * Build the probability fields.
+     *
+     * @param Monster $monster
+     * @return array
      */
     private function probabilities(Monster $monster): array
     {
@@ -102,6 +124,9 @@ class MonsterDetailTransformer
 
     /**
      * Build the Spells & Affixes section.
+     *
+     * @param Monster $monster
+     * @return array
      */
     private function spellsAndAffixes(Monster $monster): array
     {
@@ -122,6 +147,9 @@ class MonsterDetailTransformer
 
     /**
      * Build the Quest/Celestial section.
+     *
+     * @param Monster $monster
+     * @return array
      */
     private function questAndCelestial(Monster $monster): array
     {
@@ -137,17 +165,33 @@ class MonsterDetailTransformer
     }
 
     /**
-     * Build the Raid & Special Rules section.
+     * Build the Raid & Special Rules section, reading elemental values from the effective cached payload when one is supplied.
+     *
+     * @param Monster $monster
+     * @param array|null $effectiveMonster
+     * @return array
      */
-    private function raidAndSpecial(Monster $monster): array
+    private function raidAndSpecial(Monster $monster, ?array $effectiveMonster): array
     {
+        $elementalSource = $effectiveMonster ?? $monster->only([
+            'fire_atonement',
+            'ice_atonement',
+            'water_atonement',
+            'fire_penetration',
+            'ice_penetration',
+            'water_penetration',
+        ]);
+
         return [
             'is_raid_monster' => $monster->is_raid_monster,
             'is_raid_boss' => $monster->is_raid_boss,
             'raid_special_attack_type' => $monster->raid_special_attack_type,
-            'fire_atonement' => $monster->fire_atonement,
-            'ice_atonement' => $monster->ice_atonement,
-            'water_atonement' => $monster->water_atonement,
+            'fire_atonement' => $elementalSource['fire_atonement'] ?? null,
+            'ice_atonement' => $elementalSource['ice_atonement'] ?? null,
+            'water_atonement' => $elementalSource['water_atonement'] ?? null,
+            'fire_penetration' => $elementalSource['fire_penetration'] ?? null,
+            'ice_penetration' => $elementalSource['ice_penetration'] ?? null,
+            'water_penetration' => $elementalSource['water_penetration'] ?? null,
         ];
     }
 }

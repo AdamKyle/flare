@@ -1,7 +1,8 @@
 import { useActivityTimeout } from 'api-handler/hooks/use-activity-timeout';
 import { useApiHandler } from 'api-handler/hooks/use-api-handler';
-import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { useCallback, useEffect, useState } from 'react';
+import { resolveApiErrorMessage } from 'api-handler/utils/resolve-api-error-message';
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { match } from 'ts-pattern';
 
 import UseAttackMonsterDefinition from './definitions/use-attack-monster-definition';
@@ -45,6 +46,17 @@ export const useAttackMonster = (): UseAttackMonsterDefinition => {
     }
   );
 
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    return () => {
+      const activeController = abortControllerRef.current;
+
+      abortControllerRef.current = null;
+      activeController?.abort();
+    };
+  }, []);
+
   const acknowledgeAttackCooldown = useCallback(() => {
     setAwaitingAttackCooldownConfirmation(false);
   }, []);
@@ -68,123 +80,168 @@ export const useAttackMonster = (): UseAttackMonsterDefinition => {
       })
     );
 
-  const handleInitiateFightRequest = useCallback(async () => {
-    try {
-      const result = await apiHandler.get<
-        UseAttackMonsterInitiationResponse,
-        AxiosRequestConfig<AxiosResponse<UseAttackMonsterInitiationResponse>>
-      >(urlToUse, {
-        params: {
-          attack_type: requestData.attack_type,
-        },
+  const handleBattleRequestFailure = useCallback(
+    (
+      requestError: unknown,
+      controller: AbortController,
+      fallbackMessage: string
+    ): void => {
+      if (axios.isCancel(requestError)) {
+        return;
+      }
+
+      if (abortControllerRef.current !== controller) {
+        return;
+      }
+
+      setError({
+        message: resolveApiErrorMessage(requestError, fallbackMessage),
       });
 
-      setData(result);
-      guideWalkthroughEventEmitter.emit(
-        GuideWalkthroughEvent.FIGHT_STARTED,
-        undefined
-      );
-
-      if (isTerminalBattleResult(result)) {
-        setAwaitingAttackCooldownConfirmation(true);
-      }
-    } catch (err) {
-      if (err instanceof AxiosError) {
-        handleInactivity({
-          response: err,
-          setError,
-        });
-
-        setError(err.response?.data || null);
-      }
-    }
-  }, [
-    apiHandler,
-    guideWalkthroughEventEmitter,
-    handleInactivity,
-    requestData,
-    urlToUse,
-  ]);
-
-  const handleAttackMonster = useCallback(async () => {
-    if (!requestData.attack_type || requestData.monster_id === 0) {
-      return;
-    }
-
-    try {
-      const result = await apiHandler.post<
-        UseAttackMonsterInitiationResponse,
-        AxiosRequestConfig<AxiosResponse<UseAttackMonsterInitiationResponse>>,
-        UseAttackMonsterRequestDefinition
-      >(urlToUse, {
-        attack_type: requestData.attack_type,
-      });
-
-      setData(result);
-      guideWalkthroughEventEmitter.emit(
-        GuideWalkthroughEvent.COMBAT_ACTION_SUCCEEDED,
-        undefined
-      );
-
-      if (isTerminalBattleResult(result)) {
-        setAwaitingAttackCooldownConfirmation(true);
-      }
-    } catch (err) {
-      if (err instanceof AxiosError) {
-        handleInactivity({
-          response: err,
-          setError,
-        });
-
-        setError(err.response?.data || null);
-      }
-    }
-  }, [
-    apiHandler,
-    guideWalkthroughEventEmitter,
-    handleInactivity,
-    requestData,
-    urlToUse,
-  ]);
-
-  const fetchBattleResults = useCallback(
-    async () => {
-      if (requestData.character_id === 0 || requestData.monster_id === 0) {
-        setLoading(false);
-        return;
-      }
-
-      if (requestData.battle_type === BattleType.INITIATE) {
-        setLoading(true);
-
-        handleInitiateFightRequest().finally(() => setLoading(false));
-
-        return;
-      }
-
-      if (requestData.battle_type === BattleType.ATTACK) {
-        setDisableAttackButtons(true);
-
-        handleAttackMonster().finally(() => setDisableAttackButtons(false));
-
-        return;
+      if (requestError instanceof AxiosError) {
+        handleInactivity({ response: requestError, setError });
       }
     },
-    // `reinitializeFight` is intentionally included though unread: toggling it
-    // (Reset Fight / Attack Again) must force a fresh fight request even when
-    // requestData is otherwise unchanged.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [handleInactivity]
+  );
+
+  const handleInitiateFightRequest = useCallback(
+    async (controller: AbortController): Promise<void> => {
+      setLoading(true);
+
+      try {
+        const result = await apiHandler.get<
+          UseAttackMonsterInitiationResponse,
+          AxiosRequestConfig<AxiosResponse<UseAttackMonsterInitiationResponse>>
+        >(urlToUse, {
+          params: {
+            attack_type: requestData.attack_type,
+          },
+          signal: controller.signal,
+        });
+
+        if (abortControllerRef.current !== controller) {
+          return;
+        }
+
+        setData(result);
+        guideWalkthroughEventEmitter.emit(
+          GuideWalkthroughEvent.FIGHT_STARTED,
+          undefined
+        );
+
+        if (isTerminalBattleResult(result)) {
+          setAwaitingAttackCooldownConfirmation(true);
+        }
+      } catch (requestError) {
+        handleBattleRequestFailure(
+          requestError,
+          controller,
+          'Unable to start the fight.'
+        );
+      } finally {
+        if (abortControllerRef.current === controller) {
+          abortControllerRef.current = null;
+          setLoading(false);
+        }
+      }
+    },
     [
-      requestData,
-      reinitializeFight,
-      handleInitiateFightRequest,
-      handleAttackMonster,
+      apiHandler,
+      guideWalkthroughEventEmitter,
+      handleBattleRequestFailure,
+      requestData.attack_type,
+      urlToUse,
     ]
   );
 
+  const handleAttackMonster = useCallback(
+    async (controller: AbortController): Promise<void> => {
+      if (!requestData.attack_type) {
+        abortControllerRef.current = null;
+
+        return;
+      }
+
+      setDisableAttackButtons(true);
+
+      try {
+        const result = await apiHandler.post<
+          UseAttackMonsterInitiationResponse,
+          AxiosRequestConfig<AxiosResponse<UseAttackMonsterInitiationResponse>>,
+          UseAttackMonsterRequestDefinition
+        >(
+          urlToUse,
+          {
+            attack_type: requestData.attack_type,
+          },
+          { signal: controller.signal }
+        );
+
+        if (abortControllerRef.current !== controller) {
+          return;
+        }
+
+        setData(result);
+        guideWalkthroughEventEmitter.emit(
+          GuideWalkthroughEvent.COMBAT_ACTION_SUCCEEDED,
+          undefined
+        );
+
+        if (isTerminalBattleResult(result)) {
+          setAwaitingAttackCooldownConfirmation(true);
+        }
+      } catch (requestError) {
+        handleBattleRequestFailure(
+          requestError,
+          controller,
+          'Unable to complete the attack.'
+        );
+      } finally {
+        if (abortControllerRef.current === controller) {
+          abortControllerRef.current = null;
+          setDisableAttackButtons(false);
+        }
+      }
+    },
+    [
+      apiHandler,
+      guideWalkthroughEventEmitter,
+      handleBattleRequestFailure,
+      requestData.attack_type,
+      urlToUse,
+    ]
+  );
+
+  const fetchBattleResults = useCallback(async (): Promise<void> => {
+    const { character_id, monster_id, battle_type } = requestData;
+
+    if (character_id === 0 || monster_id === 0) {
+      setLoading(false);
+
+      return;
+    }
+
+    abortControllerRef.current?.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
+    if (battle_type === BattleType.INITIATE) {
+      await handleInitiateFightRequest(controller);
+
+      return;
+    }
+
+    if (battle_type === BattleType.ATTACK) {
+      await handleAttackMonster(controller);
+    }
+  }, [handleAttackMonster, handleInitiateFightRequest, requestData]);
+
+  // Toggling `reinitializeFight` (Reset Fight / Attack Again) must force a
+  // fresh fight request even when the request data is otherwise unchanged.
   useEffect(() => {
-    fetchBattleResults().catch(() => {});
-  }, [fetchBattleResults]);
+    void fetchBattleResults();
+  }, [fetchBattleResults, reinitializeFight]);
 
   return {
     loading,

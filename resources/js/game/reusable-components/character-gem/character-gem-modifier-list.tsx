@@ -17,15 +17,22 @@ import GeneralToolTip from 'ui/tool-tips/general-tool-tip';
 const CharacterGemModifierList = ({
   modifiers,
 }: CharacterGemModifierListProps): ReactNode => {
-  const renderModifier = (
-    modifier: CharacterGemModifierDefinition
-  ): { label: string; value: string } | null => {
+  const abilityRows = modifiers.flatMap((modifier) =>
+    modifier.modifier_type === CharacterGemModifierType.GEM_ABILITY &&
+    modifier.ability !== null
+      ? [{ roll_position: modifier.roll_position, ability: modifier.ability }]
+      : []
+  );
+
+  const modifierRows = modifiers.flatMap((modifier) => {
     if (modifier.modifier_type === CharacterGemModifierType.GEM_ABILITY) {
-      return null;
+      return [];
     }
 
-    return formatCharacterGemModifier(modifier);
-  };
+    const formattedModifier = formatCharacterGemModifier(modifier);
+
+    return formattedModifier ? [{ modifier, ...formattedModifier }] : [];
+  });
 
   const renderModifierLabel = (
     modifier: CharacterGemModifierDefinition,
@@ -48,56 +55,60 @@ const CharacterGemModifierList = ({
     );
   };
 
-  const abilities = modifiers.filter(
-    (modifier) =>
-      modifier.modifier_type === CharacterGemModifierType.GEM_ABILITY
-  );
-  const factualModifiers = modifiers.filter(
-    (modifier) =>
-      modifier.modifier_type !== CharacterGemModifierType.GEM_ABILITY
-  );
+  const renderAbilities = (): ReactNode => {
+    if (abilityRows.length === 0) {
+      return null;
+    }
+
+    return (
+      <div className="space-y-4">
+        <h3 className="text-mango-tango-600 dark:text-mango-tango-300 text-xs font-semibold tracking-wide uppercase">
+          Ability
+        </h3>
+        {abilityRows.map((abilityRow) => (
+          <GemAbilityDetails
+            key={abilityRow.roll_position}
+            ability={abilityRow.ability}
+          />
+        ))}
+      </div>
+    );
+  };
+
+  const renderModifiers = (): ReactNode => {
+    if (modifierRows.length === 0) {
+      return null;
+    }
+
+    return (
+      <div className="space-y-2">
+        <h3 className="text-mango-tango-600 dark:text-mango-tango-300 text-xs font-semibold tracking-wide uppercase">
+          Modifiers
+        </h3>
+        <Dl>
+          {modifierRows.map((modifierRow) => (
+            <React.Fragment key={modifierRow.modifier.roll_position}>
+              <Dt>
+                {renderModifierLabel(
+                  modifierRow.modifier,
+                  modifierRow.label,
+                  modifierRow.value
+                )}
+              </Dt>
+              <Dd text_class="font-semibold text-emerald-700 dark:text-emerald-400">
+                {modifierRow.value}
+              </Dd>
+            </React.Fragment>
+          ))}
+        </Dl>
+      </div>
+    );
+  };
 
   return (
     <div className="space-y-5">
-      {abilities.length > 0 ? (
-        <div className="space-y-4">
-          <h3 className="text-mango-tango-600 dark:text-mango-tango-300 text-xs font-semibold tracking-wide uppercase">
-            Ability
-          </h3>
-          {abilities.map((modifier) => (
-            <div key={modifier.roll_position}>
-              {modifier.ability !== null ? (
-                <GemAbilityDetails ability={modifier.ability} />
-              ) : null}
-            </div>
-          ))}
-        </div>
-      ) : null}
-      {factualModifiers.length > 0 ? (
-        <div className="space-y-2">
-          <h3 className="text-mango-tango-600 dark:text-mango-tango-300 text-xs font-semibold tracking-wide uppercase">
-            Modifiers
-          </h3>
-          <Dl>
-            {factualModifiers.map((modifier) => {
-              const row = renderModifier(modifier);
-
-              if (!row) {
-                return null;
-              }
-
-              return (
-                <React.Fragment key={modifier.roll_position}>
-                  <Dt>{renderModifierLabel(modifier, row.label, row.value)}</Dt>
-                  <Dd text_class="font-semibold text-emerald-700 dark:text-emerald-400">
-                    {row.value}
-                  </Dd>
-                </React.Fragment>
-              );
-            })}
-          </Dl>
-        </div>
-      ) : null}
+      {renderAbilities()}
+      {renderModifiers()}
     </div>
   );
 };

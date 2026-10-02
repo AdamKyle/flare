@@ -8,7 +8,6 @@ use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\BattleRewardProcessing\Services\FactionLoyaltyRewardRequestService;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
-use App\Game\Character\CharacterInventory\Transformers\CharacterGemSlotsTransformer;
 use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Items\Builders\RandomAffixGenerator;
@@ -18,12 +17,8 @@ use App\Game\Events\Services\EventGoalsService;
 use App\Game\Events\Services\GlobalEventGoalEligibilityService;
 use App\Game\Events\Services\GlobalEventGoalProgressionService;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
-use App\Game\Gems\Builders\GemBuilder;
 use App\Game\Gems\Contracts\CharacterGemEffects;
 use App\Game\Gems\Progression\Services\CharacterAreaGemEffectService;
-use App\Game\Gems\Services\CharacterGemRollService;
-use App\Game\Gems\Transformers\CharacterGemTransformer;
-use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Npcs\Actions\QueenOfHearts\Services\RandomEnchantmentService;
 use App\Game\Skills\Builders\BaseSkillBuilder;
 use App\Game\Skills\Console\Commands\AssignNewSkillsToPlayers;
@@ -39,7 +34,6 @@ use App\Game\Skills\Services\DisenchantService;
 use App\Game\Skills\Services\EnchantingAffixService;
 use App\Game\Skills\Services\EnchantingService;
 use App\Game\Skills\Services\EnchantItemService;
-use App\Game\Skills\Services\GemService;
 use App\Game\Skills\Services\ItemListCostTransformerService;
 use App\Game\Skills\Services\ItemSkillService;
 use App\Game\Skills\Services\MassDisenchantService;
@@ -199,18 +193,6 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(EventEnchantingItemTransformer::class),
                 $app->make(EnchantingAffixTransformer::class),
                 $app->make(EnchantingAffixService::class),
-            );
-        });
-
-        $this->app->bind(GemService::class, function ($app) {
-            return new GemService(
-                $app->make(GemBuilder::class),
-                $app->make(ChanceCalculator::class),
-                $app->make(CharacterGemTransformer::class),
-                $app->make(ServerMessageBuilder::class),
-                $app->make(CharacterGemSlotsTransformer::class),
-                $app->make(SkillBonusService::class),
-                $app->make(CharacterGemRollService::class),
             );
         });
 

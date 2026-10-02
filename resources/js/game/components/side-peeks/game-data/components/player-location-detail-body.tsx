@@ -3,6 +3,7 @@ import React, { ReactNode, useState } from 'react';
 
 import PlayerGameMapGemSection from './player-game-map-gem-section';
 import PlayerLocationDetailBodyProps from './types/player-location-detail-body-props';
+import AreaGemContextDefinition from '../../../../reusable-components/gems/api/definitions/area-gem-context-definition';
 import GemContextEffectsDetail from '../../../../reusable-components/gems/components/gem-context-effects-detail';
 import GemContextProfileDetail from '../../../../reusable-components/gems/components/gem-context-profile-detail';
 import FactualLink from '../../../../reusable-components/quest-item/partials/factual-link';
@@ -65,6 +66,21 @@ const PlayerLocationDetailBody = ({
     );
   };
 
+  const renderGemDetailContent = (
+    gemContext: AreaGemContextDefinition
+  ): ReactNode => {
+    if (activeGemDetail === 'profile') {
+      return (
+        <GemContextProfileDetail
+          context={gemContext}
+          description="These rolled Gems define the modifiers and rules applied at this Location."
+        />
+      );
+    }
+
+    return <GemContextEffectsDetail context={gemContext} />;
+  };
+
   const renderGemDetail = (): ReactNode => {
     if (!data.gem_context || activeGemDetail === null) {
       return null;
@@ -78,15 +94,44 @@ const PlayerLocationDetailBody = ({
         }
         content_mode={StackedCardContentMode.FULL_BLEED}
       >
-        {activeGemDetail === 'profile' ? (
-          <GemContextProfileDetail
-            context={data.gem_context}
-            description="These rolled Gems define the modifiers and rules applied at this Location."
-          />
-        ) : (
-          <GemContextEffectsDetail context={data.gem_context} />
-        )}
+        {renderGemDetailContent(data.gem_context)}
       </StackedCard>
+    );
+  };
+
+  const renderRequiredQuestItem = (): ReactNode => {
+    if (!data.required_quest_item) {
+      return null;
+    }
+
+    return (
+      <>
+        <Separator />
+        <section>
+          <h2 className="text-marigold-700 dark:text-marigold-500 mb-2 text-base font-semibold">
+            Required Quest Item
+          </h2>
+          <QuestItemFactualPresentation item={data.required_quest_item} />
+        </section>
+      </>
+    );
+  };
+
+  const renderQuestRewardItem = (): ReactNode => {
+    if (!data.quest_reward_item?.data) {
+      return null;
+    }
+
+    return (
+      <>
+        <Separator />
+        <section>
+          <h2 className="text-marigold-700 dark:text-marigold-500 mb-2 text-base font-semibold">
+            Quest Item Reward
+          </h2>
+          <QuestItemFactualPresentation item={data.quest_reward_item.data} />
+        </section>
+      </>
     );
   };
 
@@ -120,29 +165,9 @@ const PlayerLocationDetailBody = ({
         <Dd>{data.is_corrupted ? 'Yes' : 'No'}</Dd>
       </Dl>
 
-      {data.required_quest_item ? (
-        <>
-          <Separator />
-          <section>
-            <h2 className="text-marigold-700 dark:text-marigold-500 mb-2 text-base font-semibold">
-              Required Quest Item
-            </h2>
-            <QuestItemFactualPresentation item={data.required_quest_item} />
-          </section>
-        </>
-      ) : null}
+      {renderRequiredQuestItem()}
 
-      {data.quest_reward_item?.data ? (
-        <>
-          <Separator />
-          <section>
-            <h2 className="text-marigold-700 dark:text-marigold-500 mb-2 text-base font-semibold">
-              Quest Item Reward
-            </h2>
-            <QuestItemFactualPresentation item={data.quest_reward_item.data} />
-          </section>
-        </>
-      ) : null}
+      {renderQuestRewardItem()}
 
       {renderGemSection()}
       {renderGemDetail()}

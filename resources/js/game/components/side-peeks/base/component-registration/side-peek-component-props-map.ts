@@ -143,5 +143,4 @@ export type SidePeekComponentPropsMap = {
   [Registration.ADMIN_LOCATION_GEM_DETAIL]: AdminLocationGemDetailSidePeekProps;
   [Registration.ADMIN_LOCATION_GEM_BULK_ROLL_RESULT]: LocationGemBulkRollResultSidePeekProps;
   [Registration.ADMIN_LOCATION_GEM_ROLL_DETAIL]: AdminLocationGemRollDetailSidePeekProps;
-  // Future components go here
 };

@@ -51,7 +51,7 @@ class GemAbilityDuplicateServiceTest extends TestCase
             ->giveItem($item)
             ->getCharacter();
 
-        $duplicates = (new GemAbilityDuplicateService)->duplicateActiveAbilitiesForOwnedItem($character, $item);
+        $duplicates = (new GemAbilityDuplicateService)->forOwnedItem($character->id, $item->id)->toArray();
 
         $this->assertCount(1, $duplicates);
         $this->assertSame(2, $duplicates[0]['count']);
@@ -89,7 +89,7 @@ class GemAbilityDuplicateServiceTest extends TestCase
             ->giveItem($equippedItem, true, 'helmet')
             ->getCharacter();
 
-        $duplicates = (new GemAbilityDuplicateService)->duplicateActiveAbilitiesForOwnedItem($character, $backpackItem);
+        $duplicates = (new GemAbilityDuplicateService)->forOwnedItem($character->id, $backpackItem->id)->toArray();
         $items = collect($duplicates[0]['items'])->keyBy('item_id');
 
         $this->assertSame('inventory', $items[$backpackItem->id]['source']);
@@ -130,7 +130,7 @@ class GemAbilityDuplicateServiceTest extends TestCase
         $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $firstItem->id]);
         $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $secondItem->id]);
 
-        $duplicates = (new GemAbilityDuplicateService)->duplicateActiveAbilitiesForSet($character, $set);
+        $duplicates = (new GemAbilityDuplicateService)->forInventorySet($character->id, $set->id)->toArray();
 
         $this->assertCount(1, $duplicates);
         $this->assertSame(['set', 'set'], array_column($duplicates[0]['items'], 'source'));
@@ -172,7 +172,7 @@ class GemAbilityDuplicateServiceTest extends TestCase
         ]);
         $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $setItem->id]);
 
-        $duplicates = (new GemAbilityDuplicateService)->duplicateActiveAbilitiesForOwnedItem($character, $backpackItem);
+        $duplicates = (new GemAbilityDuplicateService)->forOwnedItem($character->id, $backpackItem->id)->toArray();
         $items = collect($duplicates[0]['items'])->keyBy('item_id');
 
         $this->assertSame('inventory', $items[$backpackItem->id]['source']);
@@ -214,7 +214,7 @@ class GemAbilityDuplicateServiceTest extends TestCase
         ]);
         $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $setItem->id]);
 
-        $duplicates = (new GemAbilityDuplicateService)->duplicateActiveAbilitiesForSet($character, $set);
+        $duplicates = (new GemAbilityDuplicateService)->forInventorySet($character->id, $set->id)->toArray();
         $affectedItemIds = array_column($duplicates[0]['items'], 'item_id');
         sort($affectedItemIds);
         $expectedItemIds = [$setItem->id, $externalItem->id];
@@ -222,6 +222,39 @@ class GemAbilityDuplicateServiceTest extends TestCase
 
         $this->assertCount(1, $duplicates);
         $this->assertSame($expectedItemIds, $affectedItemIds);
+    }
+
+    public function test_single_item_report_returns_duplicate_copies_socketed_in_that_item(): void
+    {
+        $ability = $this->createGameGemAbility(['name' => 'Flames of the Heretic']);
+        $firstGem = $this->createGem();
+        $secondGem = $this->createGem();
+        $this->createCharacterGemModifier([
+            'gem_id' => $firstGem->id,
+            'roll_position' => 1,
+            'modifier_type' => CharacterGemModifierType::GEM_ABILITY,
+            'amount' => null,
+            'game_gem_ability_id' => $ability->id,
+        ]);
+        $this->createCharacterGemModifier([
+            'gem_id' => $secondGem->id,
+            'roll_position' => 1,
+            'modifier_type' => CharacterGemModifierType::GEM_ABILITY,
+            'amount' => null,
+            'game_gem_ability_id' => $ability->id,
+        ]);
+        $item = $this->createItem(['type' => 'body', 'socket_count' => 2]);
+        $this->createItemSocket(['item_id' => $item->id, 'gem_id' => $firstGem->id]);
+        $this->createItemSocket(['item_id' => $item->id, 'gem_id' => $secondGem->id]);
+
+        $duplicates = (new GemAbilityDuplicateService)->forItem($item->id)->toArray();
+
+        $this->assertSame([
+            'id' => $ability->id,
+            'name' => 'Flames of the Heretic',
+        ], $duplicates[0]['ability']);
+        $this->assertSame(2, $duplicates[0]['count']);
+        $this->assertSame('inventory', $duplicates[0]['items'][0]['source']);
     }
 
     public function test_different_active_abilities_do_not_return_duplicate_groups(): void
@@ -252,7 +285,7 @@ class GemAbilityDuplicateServiceTest extends TestCase
             ->giveItem($item)
             ->getCharacter();
 
-        $duplicates = (new GemAbilityDuplicateService)->duplicateActiveAbilitiesForOwnedItem($character, $item);
+        $duplicates = (new GemAbilityDuplicateService)->forOwnedItem($character->id, $item->id)->toArray();
 
         $this->assertSame([], $duplicates);
     }

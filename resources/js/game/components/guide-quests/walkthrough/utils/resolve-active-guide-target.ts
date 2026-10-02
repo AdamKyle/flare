@@ -35,11 +35,12 @@ export const resolveActiveGuideTarget = (
 
 export const waitForActiveGuideTarget = async (
   target: GuideTarget,
-  timeoutMs: number = 6000
+  timeoutMs: number = 6000,
+  signal?: AbortSignal
 ): Promise<HTMLElement | null> => {
   const startedAt = Date.now();
 
-  while (Date.now() - startedAt < timeoutMs) {
+  while (Date.now() - startedAt < timeoutMs && !signal?.aborted) {
     const element = resolveActiveGuideTarget(target);
 
     if (element) {

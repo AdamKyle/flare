@@ -10,6 +10,7 @@ use App\Flare\Models\ItemSocket;
 use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\Gems\Contracts\CharacterGemEffects;
 use App\Game\Gems\Values\CharacterGemModifierType;
+use App\Game\Gems\Values\GemAbilitySnapshot;
 use App\Game\Gems\Values\GemAbilityType;
 use App\Game\Gems\Values\ResolvedCharacterGemEffects;
 
@@ -51,16 +52,8 @@ class CharacterGemEffectService implements CharacterGemEffects
         $items = $equippedSlots->pluck('item')->filter()->values();
         $activeModifierIds = $this->gemAbilityDuplicateService->firstActiveModifierIds($items);
 
-        foreach ($equippedSlots as $equippedSlot) {
-            $item = $equippedSlot->item;
-
-            if (is_null($item)) {
-                continue;
-            }
-
-            foreach ($item->sockets as $socket) {
-                $this->collectSocketEffects($socket, $item, $activeModifierIds, $amounts, $activeAbilities, $passiveAbilities, $gemDetails);
-            }
+        foreach ($items as $item) {
+            $this->collectItemEffects($item, $activeModifierIds, $amounts, $activeAbilities, $passiveAbilities, $gemDetails);
         }
 
         return new ResolvedCharacterGemEffects(
@@ -69,6 +62,30 @@ class CharacterGemEffectService implements CharacterGemEffects
             $passiveAbilities,
             $gemDetails,
         );
+    }
+
+    /**
+     * Collect the character Gem effects of every socket on one equipped Item.
+     *
+     * @param Item $item
+     * @param array $activeModifierIds
+     * @param array $amounts
+     * @param array $activeAbilities
+     * @param array $passiveAbilities
+     * @param array $gemDetails
+     * @return void
+     */
+    private function collectItemEffects(
+        Item $item,
+        array $activeModifierIds,
+        array &$amounts,
+        array &$activeAbilities,
+        array &$passiveAbilities,
+        array &$gemDetails,
+    ): void {
+        foreach ($item->sockets as $socket) {
+            $this->collectSocketEffects($socket, $item, $activeModifierIds, $amounts, $activeAbilities, $passiveAbilities, $gemDetails);
+        }
     }
 
     /**
@@ -138,32 +155,25 @@ class CharacterGemEffectService implements CharacterGemEffects
             return;
         }
 
+        $gemDetails[] = $this->detail($modifier, $gem, $item, $ability->name);
+
         $snapshot = [
-            'id' => $ability->id,
-            'name' => $ability->name,
-            'description' => $ability->description,
-            'ability_type' => $ability->ability_type->value,
-            'effect_type' => $ability->effect_type->value,
-            'attack_types' => $ability->attack_types,
-            'proc_chance' => $ability->proc_chance,
-            'effect_value' => $ability->effect_value,
-            'scaling_source' => $ability->scaling_source?->value,
-            'enabled' => $ability->enabled,
+            ...GemAbilitySnapshot::fromGameGemAbility($ability)->toArray(),
             'gem_id' => $gem->id,
             'gem_name' => $gem->name,
             'item_id' => $item->id,
             'item_name' => $item->affix_name,
         ];
 
-        if ($ability->ability_type === GemAbilityType::ACTIVE) {
-            if (in_array($modifier->id, $activeModifierIds, true)) {
-                $activeAbilities[] = $snapshot;
-            }
-        } else {
+        if ($ability->ability_type !== GemAbilityType::ACTIVE) {
             $passiveAbilities[] = $snapshot;
+
+            return;
         }
 
-        $gemDetails[] = $this->detail($modifier, $gem, $item, $ability->name);
+        if (in_array($modifier->id, $activeModifierIds, true)) {
+            $activeAbilities[] = $snapshot;
+        }
     }
 
     /**

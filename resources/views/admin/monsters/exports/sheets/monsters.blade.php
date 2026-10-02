@@ -51,6 +51,9 @@
             <th>fire_atonement</th>
             <th>ice_atonement</th>
             <th>water_atonement</th>
+            <th>fire_penetration</th>
+            <th>ice_penetration</th>
+            <th>water_penetration</th>
         </tr>
     </thead>
     <tbody>
@@ -106,6 +109,9 @@
                 <td>{{ $monster->fire_atonement }}</td>
                 <td>{{ $monster->ice_atonement }}</td>
                 <td>{{ $monster->water_atonement }}</td>
+                <td>{{ $monster->fire_penetration }}</td>
+                <td>{{ $monster->ice_penetration }}</td>
+                <td>{{ $monster->water_penetration }}</td>
             </tr>
         @endforeach
     </tbody>

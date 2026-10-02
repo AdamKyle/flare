@@ -11,13 +11,16 @@ class GuideQuestsExport implements WithMultipleSheets
 {
     use Exportable;
 
+    /**
+     * Return the Guide Quest workbook sheets in import order.
+     *
+     * @return array
+     */
     public function sheets(): array
     {
-        $sheets = [];
-
-        $sheets[] = new GuideQuestSheet;
-        $sheets[] = new GuideQuestWalkthroughStepsSheet;
-
-        return $sheets;
+        return [
+            new GuideQuestSheet,
+            new GuideQuestWalkthroughStepsSheet,
+        ];
     }
 }

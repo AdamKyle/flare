@@ -86,6 +86,69 @@ const PlayerMonsterDetailStack = ({
     );
   };
 
+  const renderSelectedContext = (): ReactNode => {
+    if (!selectedContext) {
+      return null;
+    }
+
+    return (
+      <StackedCard
+        on_close={() => setSelectedContext(null)}
+        aria_label={selectedContext.label}
+        content_mode={StackedCardContentMode.FULL_BLEED}
+      >
+        <div className="h-full min-h-0 overflow-y-auto p-4">
+          <MonsterGemEffectContextCard
+            context={selectedContext}
+            navigation={navigation}
+            single_column
+          />
+        </div>
+      </StackedCard>
+    );
+  };
+
+  const renderNestedGameMap = (): ReactNode => {
+    if (nestedGameMapId === null) {
+      return null;
+    }
+
+    return (
+      <PlayerGameMapDetailStack
+        game_map_id={nestedGameMapId}
+        on_close={() => setNestedGameMapId(null)}
+      />
+    );
+  };
+
+  const renderNestedLocation = (): ReactNode => {
+    if (nestedLocationId === null) {
+      return null;
+    }
+
+    return (
+      <PlayerLocationDetailStack
+        location_id={nestedLocationId}
+        on_close={() => setNestedLocationId(null)}
+      />
+    );
+  };
+
+  const renderNestedQuestItem = (): ReactNode => {
+    const questItem = data?.quest_and_celestial.quest_item;
+
+    if (!nestedQuestItemOpen || !questItem) {
+      return null;
+    }
+
+    return (
+      <QuestItemDetailStack
+        quest_item={questItem}
+        on_close={() => setNestedQuestItemOpen(false)}
+      />
+    );
+  };
+
   return (
     <StackedCard
       on_close={onClose}
@@ -97,42 +160,13 @@ const PlayerMonsterDetailStack = ({
           {renderContent()}
         </div>
 
-        {selectedContext ? (
-          <StackedCard
-            on_close={() => setSelectedContext(null)}
-            aria_label={selectedContext.label}
-            content_mode={StackedCardContentMode.FULL_BLEED}
-          >
-            <div className="h-full min-h-0 overflow-y-auto p-4">
-              <MonsterGemEffectContextCard
-                context={selectedContext}
-                navigation={navigation}
-                single_column
-              />
-            </div>
-          </StackedCard>
-        ) : null}
+        {renderSelectedContext()}
 
-        {nestedGameMapId !== null ? (
-          <PlayerGameMapDetailStack
-            game_map_id={nestedGameMapId}
-            on_close={() => setNestedGameMapId(null)}
-          />
-        ) : null}
+        {renderNestedGameMap()}
 
-        {nestedLocationId !== null ? (
-          <PlayerLocationDetailStack
-            location_id={nestedLocationId}
-            on_close={() => setNestedLocationId(null)}
-          />
-        ) : null}
+        {renderNestedLocation()}
 
-        {nestedQuestItemOpen && data?.quest_and_celestial.quest_item ? (
-          <QuestItemDetailStack
-            quest_item={data.quest_and_celestial.quest_item}
-            on_close={() => setNestedQuestItemOpen(false)}
-          />
-        ) : null}
+        {renderNestedQuestItem()}
       </div>
     </StackedCard>
   );

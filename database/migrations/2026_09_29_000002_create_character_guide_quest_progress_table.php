@@ -6,9 +6,14 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Create the Character Guide Quest walkthrough and attention progress table.
+     *
+     * @return void
+     */
     public function up(): void
     {
-        Schema::create('character_guide_quest_progress', function (Blueprint $table) {
+        Schema::create('character_guide_quest_progress', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('character_id')->constrained()->cascadeOnDelete();
             $table->foreignId('guide_quest_id')->constrained()->cascadeOnDelete();
@@ -26,6 +31,11 @@ return new class extends Migration
         });
     }
 
+    /**
+     * Drop the Character Guide Quest progress table.
+     *
+     * @return void
+     */
     public function down(): void
     {
         Schema::dropIfExists('character_guide_quest_progress');

@@ -23,6 +23,7 @@ import { buildSetFooterOptions } from './utils/build-set-footer-options';
 import { resolveSetActionAvailability } from './utils/resolve-set-action-availability';
 import { EquippableItemWithBase } from '../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
 import DuplicateGemAbilityWarning from '../../../../reusable-components/character-gem/duplicate-gem-ability-warning';
+import { DuplicateGemAbilityWarningContext } from '../../../../reusable-components/character-gem/enums/duplicate-gem-ability-warning-context';
 import { useInfiniteScroll } from '../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
 import GenericItemList from '../../components/items/generic-item-list';
 import ItemDetailsStack from '../../item-details/components/item-details-stack';
@@ -387,7 +388,7 @@ const Sets = ({
         {renderSetStatus()}
         <DuplicateGemAbilityWarning
           duplicates={response?.duplicate_gem_abilities ?? []}
-          context="set"
+          context={DuplicateGemAbilityWarningContext.SET}
           on_open_item={setDuplicateItemId}
         />
         {renderActionError()}

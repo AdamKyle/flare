@@ -19,7 +19,6 @@ use App\Game\Core\Items\Builders\RandomAffixGenerator;
 use App\Game\Core\Items\Enricher\EquippableEnricher;
 use App\Game\Core\Items\Enricher\ItemEnricherFactory;
 use App\Game\Core\Items\Transformers\CraftingItemPreviewTransformer;
-use App\Game\Core\Items\Transformers\EquippableItemTransformer;
 use App\Game\Core\Items\Transformers\QuestItemTransformer;
 use App\Game\Core\Items\Transformers\UsableItemTransformer;
 use App\Game\Core\Items\Values\ItemSpecialtyType;
@@ -51,6 +50,7 @@ use Mockery;
 use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterCacheDataFactory;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\Setup\Items\ItemTransformerFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateEvent;
@@ -148,7 +148,7 @@ class EnchantingServiceTest extends TestCase
 
         $itemEnricherFactory = new ItemEnricherFactory(
             new EquippableEnricher(),
-            new EquippableItemTransformer(),
+            (new ItemTransformerFactory)->buildEquippableItemTransformer(),
             new UsableItemTransformer(),
             new QuestItemTransformer(),
             new PlainDataSerializer(),

@@ -2,7 +2,9 @@ import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import React, { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 
-import GuideQuestDefinition from './api/definitions/guide-quest-definition';
+import GuideQuestDefinition, {
+  GuideQuestContentBlockDefinition,
+} from './api/definitions/guide-quest-definition';
 import { useGuideQuestData } from './hooks/use-guide-quest-data';
 import GuideQuestProps from './types/guide-quest-props';
 import { useGuideWalkthrough } from './walkthrough/hooks/use-guide-walkthrough';
@@ -31,30 +33,44 @@ const GuideQuest = ({ on_close }: GuideQuestProps) => {
       return;
     }
 
-    void acknowledgeAttention().then(() => setGuideQuestAttention(false));
+    void acknowledgeAttention().then((acknowledged) => {
+      if (acknowledged) {
+        setGuideQuestAttention(false);
+      }
+    });
   }, [
     acknowledgeAttention,
     data?.has_activity_attention,
     setGuideQuestAttention,
   ]);
 
+  const renderBlockImage = (imageUrl: string | null) => {
+    if (!imageUrl) {
+      return null;
+    }
+
+    return (
+      <img
+        src={imageUrl}
+        alt=""
+        className="max-h-72 max-w-full rounded-sm object-contain"
+      />
+    );
+  };
+
+  const renderBlock = (block: GuideQuestContentBlockDefinition) => (
+    <div key={block.id} className="space-y-3">
+      <ReactMarkdown>{block.content}</ReactMarkdown>
+      {renderBlockImage(block.image_url)}
+    </div>
+  );
+
   const renderBlocks = (blocks: GuideQuestDefinition['intro_text']) => {
     if (!blocks || blocks.length === 0) {
       return null;
     }
 
-    return blocks.map((block) => (
-      <div key={block.id} className="space-y-3">
-        <ReactMarkdown>{block.content}</ReactMarkdown>
-        {block.image_url ? (
-          <img
-            src={block.image_url}
-            alt=""
-            className="max-h-72 max-w-full rounded-sm object-contain"
-          />
-        ) : null}
-      </div>
-    ));
+    return blocks.map(renderBlock);
   };
 
   const handleStartWalkthrough = async (): Promise<void> => {
@@ -67,6 +83,53 @@ const GuideQuest = ({ on_close }: GuideQuestProps) => {
     if (started) {
       on_close();
     }
+  };
+
+  const renderInformation = (instructions: string | null) => {
+    if (!instructions) {
+      return null;
+    }
+
+    return (
+      <section aria-labelledby="guide-quest-information">
+        <h4 id="guide-quest-information" className="mb-2 text-lg font-semibold">
+          Information
+        </h4>
+        <ReactMarkdown>{instructions}</ReactMarkdown>
+      </section>
+    );
+  };
+
+  const renderRequirement = (
+    quest: GuideQuestDefinition,
+    levelComplete: boolean | undefined
+  ) => {
+    if (!quest.required_level) {
+      return <li>Complete the listed Guide Quest requirements.</li>;
+    }
+
+    return (
+      <li>
+        Reach level {quest.required_level}:{' '}
+        {levelComplete ? 'Complete' : 'In progress'}
+      </li>
+    );
+  };
+
+  const renderShowMeButton = (quest: GuideQuestDefinition) => {
+    if (!quest.has_walkthrough) {
+      return null;
+    }
+
+    return (
+      <Button
+        label={walkthrough.loading ? 'Loading guide…' : 'Show me'}
+        aria_busy={walkthrough.loading}
+        disabled={walkthrough.loading}
+        on_click={() => void handleStartWalkthrough()}
+        variant={ButtonVariant.PRIMARY}
+      />
+    );
   };
 
   const renderQuest = (quest: GuideQuestDefinition) => {
@@ -90,17 +153,7 @@ const GuideQuest = ({ on_close }: GuideQuestProps) => {
           </div>
         </section>
 
-        {quest.instructions ? (
-          <section aria-labelledby="guide-quest-information">
-            <h4
-              id="guide-quest-information"
-              className="mb-2 text-lg font-semibold"
-            >
-              Information
-            </h4>
-            <ReactMarkdown>{quest.instructions}</ReactMarkdown>
-          </section>
-        ) : null}
+        {renderInformation(quest.instructions)}
 
         <section aria-labelledby="guide-quest-instructions">
           <h4
@@ -125,14 +178,7 @@ const GuideQuest = ({ on_close }: GuideQuestProps) => {
             Required to Complete
           </h4>
           <ul className="list-disc pl-5">
-            {quest.required_level ? (
-              <li>
-                Reach level {quest.required_level}:{' '}
-                {levelComplete ? 'Complete' : 'In progress'}
-              </li>
-            ) : (
-              <li>Complete the listed Guide Quest requirements.</li>
-            )}
+            {renderRequirement(quest, levelComplete)}
           </ul>
         </section>
 
@@ -148,15 +194,7 @@ const GuideQuest = ({ on_close }: GuideQuestProps) => {
         </section>
 
         <div className="flex flex-col gap-3 pt-2 sm:flex-row">
-          {quest.has_walkthrough ? (
-            <Button
-              label={walkthrough.loading ? 'Loading guide…' : 'Show me'}
-              aria_busy={walkthrough.loading}
-              disabled={walkthrough.loading}
-              on_click={() => void handleStartWalkthrough()}
-              variant={ButtonVariant.PRIMARY}
-            />
-          ) : null}
+          {renderShowMeButton(quest)}
           <Button
             label="Hand In"
             disabled={!handIn?.can_hand_in}
@@ -166,6 +204,43 @@ const GuideQuest = ({ on_close }: GuideQuestProps) => {
         </div>
       </div>
     );
+  };
+
+  const renderQuestSelection = (
+    quests: GuideQuestDefinition[],
+    selectedQuestIdValue: number
+  ) => {
+    if (quests.length <= 1) {
+      return null;
+    }
+
+    return (
+      <div className="mb-4">
+        <label htmlFor="guide-quest-selection" className="mb-1 block">
+          Available Guide Quest
+        </label>
+        <select
+          id="guide-quest-selection"
+          value={selectedQuestIdValue}
+          onChange={(event) => setSelectedQuestId(Number(event.target.value))}
+          className="w-full rounded-sm border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-900"
+        >
+          {quests.map((quest) => (
+            <option key={quest.id} value={quest.id}>
+              {quest.name}
+            </option>
+          ))}
+        </select>
+      </div>
+    );
+  };
+
+  const renderWalkthroughError = () => {
+    if (!walkthrough.error) {
+      return null;
+    }
+
+    return <ApiErrorAlert apiError={walkthrough.error} />;
   };
 
   const renderContent = () => {
@@ -191,33 +266,11 @@ const GuideQuest = ({ on_close }: GuideQuestProps) => {
 
     return (
       <>
-        {data.quests.length > 1 ? (
-          <div className="mb-4">
-            <label htmlFor="guide-quest-selection" className="mb-1 block">
-              Available Guide Quest
-            </label>
-            <select
-              id="guide-quest-selection"
-              value={selectedQuest.id}
-              onChange={(event) =>
-                setSelectedQuestId(Number(event.target.value))
-              }
-              className="w-full rounded-sm border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-900"
-            >
-              {data.quests.map((quest) => (
-                <option key={quest.id} value={quest.id}>
-                  {quest.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        ) : null}
+        {renderQuestSelection(data.quests, selectedQuest.id)}
         <h3 className="text-glacier-900 dark:text-glacier-100 mb-5 text-2xl font-semibold">
           {selectedQuest.name}
         </h3>
-        {walkthrough.error ? (
-          <ApiErrorAlert apiError={walkthrough.error} />
-        ) : null}
+        {renderWalkthroughError()}
         {renderQuest(selectedQuest)}
       </>
     );

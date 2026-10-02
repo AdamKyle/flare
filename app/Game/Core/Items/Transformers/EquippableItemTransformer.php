@@ -6,22 +6,15 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\SetSlot;
 use App\Game\Core\Items\Values\ItemType;
 use App\Game\Core\Items\Values\ItemUniqueness;
-use App\Game\Gems\Transformers\CharacterGemTransformer;
 use Facades\App\Game\Core\Items\Pricing\SellItemCalculator;
 use League\Fractal\TransformerAbstract;
 
 class EquippableItemTransformer extends TransformerAbstract
 {
-    private readonly ItemSocketTransformer $itemSocketTransformer;
-
     /**
-     * @param ItemSocketTransformer|null $itemSocketTransformer
+     * @param ItemSocketTransformer $itemSocketTransformer
      */
-    public function __construct(?ItemSocketTransformer $itemSocketTransformer = null)
-    {
-        $this->itemSocketTransformer = $itemSocketTransformer
-            ?? new ItemSocketTransformer(new CharacterGemTransformer);
-    }
+    public function __construct(private readonly ItemSocketTransformer $itemSocketTransformer) {}
 
     /**
      * Transform a slot holding an enriched equippable Item into its API detail payload.

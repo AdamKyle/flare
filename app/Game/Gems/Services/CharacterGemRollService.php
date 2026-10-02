@@ -5,11 +5,14 @@ namespace App\Game\Gems\Services;
 use App\Flare\Models\GameGemAbility;
 use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Gems\Contracts\CharacterGemRollFacts;
 use App\Game\Gems\Values\CharacterGemModifierType;
 use App\Game\Gems\Values\CharacterGemRoll;
+use App\Game\Gems\Values\GemAbilitySnapshot;
+use App\Game\Gems\Values\GemModifierRange;
 use App\Game\Gems\Values\GemTierValue;
 
-class CharacterGemRollService
+class CharacterGemRollService implements CharacterGemRollFacts
 {
     /**
      * @param RandomNumberGenerator $randomNumberGenerator
@@ -52,25 +55,36 @@ class CharacterGemRollService
     }
 
     /**
-     * Return the canonical modifier pool and amount ranges used when rolling the tier.
+     * Return the canonical non-ability modifier roll ranges for the Gem tier.
      *
      * @param int $tier
      * @return array
      */
-    public function possibleModifierRangesForTier(int $tier): array
+    public function possibleModifierRanges(int $tier): array
     {
         return collect(CharacterGemModifierType::forTier($tier))
             ->reject(fn (CharacterGemModifierType $type): bool => $type === CharacterGemModifierType::GEM_ABILITY)
-            ->map(function (CharacterGemModifierType $type) use ($tier): array {
-                $range = $this->amountRange($tier, $type);
+            ->map(fn (CharacterGemModifierType $type): GemModifierRange => $this->amountRange($tier, $type))
+            ->values()
+            ->all();
+    }
 
-                return [
-                    'modifier_type' => $type->value,
-                    'minimum' => $range['minimum'],
-                    'maximum' => $range['maximum'],
-                    'percentage' => $range['percentage'],
-                ];
-            })
+    /**
+     * Return the enabled Gem Abilities a Tier 1 Gem can roll; other tiers roll no ability.
+     *
+     * @param int $tier
+     * @return array
+     */
+    public function possibleAbilities(int $tier): array
+    {
+        if ($tier !== GemTierValue::TIER_ONE) {
+            return [];
+        }
+
+        return GameGemAbility::where('enabled', true)
+            ->orderBy('name')
+            ->get()
+            ->map(fn (GameGemAbility $ability): GemAbilitySnapshot => GemAbilitySnapshot::fromGameGemAbility($ability))
             ->values()
             ->all();
     }
@@ -194,9 +208,9 @@ class CharacterGemRollService
     private function rollAmount(int $tier, CharacterGemModifierType $modifierType): float
     {
         $range = $this->amountRange($tier, $modifierType);
-        $amount = $this->randomNumberGenerator->numberBetween($range['minimum'], $range['maximum']);
+        $amount = $this->randomNumberGenerator->numberBetween($range->minimum, $range->maximum);
 
-        return $range['percentage'] ? $amount / 100 : $amount;
+        return $range->percentage ? $amount / 100 : $amount;
     }
 
     /**
@@ -204,16 +218,17 @@ class CharacterGemRollService
      *
      * @param int $tier
      * @param CharacterGemModifierType $modifierType
-     * @return array
+     * @return GemModifierRange
      */
-    private function amountRange(int $tier, CharacterGemModifierType $modifierType): array
+    private function amountRange(int $tier, CharacterGemModifierType $modifierType): GemModifierRange
     {
         if ($modifierType->isRawStat()) {
-            return [
-                'minimum' => $tier === GemTierValue::TIER_ONE ? 5 : 25,
-                'maximum' => $tier === GemTierValue::TIER_ONE ? 25 : 100,
-                'percentage' => false,
-            ];
+            return new GemModifierRange(
+                $modifierType,
+                $tier === GemTierValue::TIER_ONE ? 5 : 25,
+                $tier === GemTierValue::TIER_ONE ? 25 : 100,
+                false,
+            );
         }
 
         [$minimum, $maximum] = match ($modifierType) {
@@ -230,10 +245,11 @@ class CharacterGemRollService
             default => [5, 15],
         };
 
-        return [
-            'minimum' => $minimum,
-            'maximum' => $maximum,
-            'percentage' => $modifierType !== CharacterGemModifierType::ADDITIONAL_LEVEL_GAIN,
-        ];
+        return new GemModifierRange(
+            $modifierType,
+            $minimum,
+            $maximum,
+            $modifierType !== CharacterGemModifierType::ADDITIONAL_LEVEL_GAIN,
+        );
     }
 }

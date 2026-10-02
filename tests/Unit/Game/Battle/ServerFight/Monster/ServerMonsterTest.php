@@ -87,6 +87,38 @@ class ServerMonsterTest extends TestCase
         $this->assertSame(42, $monster->getId());
     }
 
+    public function test_get_elemental_penetration_data_returns_the_cached_penetration_values(): void
+    {
+        $randomNumberGenerator = Mockery::mock(RandomNumberGenerator::class);
+
+        $monster = (new ServerMonster(new ChanceCalculator($randomNumberGenerator), $randomNumberGenerator))->setMonster([
+            'fire_penetration' => 0.1,
+            'ice_penetration' => 0.2,
+            'water_penetration' => 0.1,
+        ]);
+
+        $this->assertSame([
+            'fire' => 0.1,
+            'ice' => 0.2,
+            'water' => 0.1,
+        ], $monster->getElementalPenetrationData());
+    }
+
+    public function test_get_elemental_penetration_data_falls_back_to_zero_when_penetration_is_missing(): void
+    {
+        $randomNumberGenerator = Mockery::mock(RandomNumberGenerator::class);
+
+        $monster = (new ServerMonster(new ChanceCalculator($randomNumberGenerator), $randomNumberGenerator))->setMonster([
+            'fire_penetration' => null,
+        ]);
+
+        $this->assertSame([
+            'fire' => 0.0,
+            'ice' => 0.0,
+            'water' => 0.0,
+        ], $monster->getElementalPenetrationData());
+    }
+
     public function test_can_monster_use_elemental_attack_reflects_all_atonements_being_positive(): void
     {
         $randomNumberGenerator = Mockery::mock(RandomNumberGenerator::class);

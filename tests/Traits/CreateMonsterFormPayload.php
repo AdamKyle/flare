@@ -7,9 +7,9 @@ trait CreateMonsterFormPayload
     /**
      * Build a minimal, otherwise-valid Monster Admin form payload.
      *
-     * @param int $gameMapId Game Map id to place the Monster on.
-     * @param array<string, mixed> $overrides Values to override on top of the minimal valid payload.
-     * @return array<string, mixed> Monster Admin form payload.
+     * @param int $gameMapId
+     * @param array $overrides
+     * @return array
      */
     public function minimalMonsterFormPayload(int $gameMapId, array $overrides = []): array
     {
@@ -63,6 +63,9 @@ trait CreateMonsterFormPayload
             'fire_atonement' => null,
             'ice_atonement' => null,
             'water_atonement' => null,
+            'fire_penetration' => null,
+            'ice_penetration' => null,
+            'water_penetration' => null,
         ], $overrides);
     }
 }

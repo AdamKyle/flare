@@ -5,6 +5,7 @@ import React, { ReactNode, useState } from 'react';
 
 import { EquippableItemDetailsDefinition } from '../../../../api-definitions/items/equippable-item-definitions/equippable-item-details-definition';
 import DuplicateGemAbilityWarning from '../../../../reusable-components/character-gem/duplicate-gem-ability-warning';
+import { DuplicateGemAbilityWarningContext } from '../../../../reusable-components/character-gem/enums/duplicate-gem-ability-warning-context';
 import { ItemActions } from '../../../../reusable-components/item/enums/item-actions';
 import ItemAction from '../../../../reusable-components/item/item-action';
 import ListItemOnMarket from '../../../../reusable-components/item/list-item-on-market';
@@ -303,6 +304,34 @@ const InventoryItem = ({
     );
   };
 
+  const renderEquipState = () => {
+    if (item.is_equipped) {
+      return (
+        <p
+          role="status"
+          className="font-semibold text-emerald-700 dark:text-emerald-400"
+          {...equippedStateGuideTarget}
+        >
+          Equipped
+        </p>
+      );
+    }
+
+    return (
+      <div
+        className="flex justify-center sm:justify-end"
+        {...(!isEquipmentRestricted ? equipItemGuideTarget : {})}
+      >
+        <Button
+          on_click={handleViewEquip}
+          label="Equip Item"
+          variant={ButtonVariant.SUCCESS}
+          disabled={isEquipmentRestricted}
+        />
+      </div>
+    );
+  };
+
   const renderActionSection = () => {
     if (processItemActionError) {
       return (
@@ -341,32 +370,20 @@ const InventoryItem = ({
 
     return (
       <div className="flex flex-col items-stretch gap-3 text-center sm:flex-row sm:items-center sm:justify-center sm:gap-6">
-        {item.is_equipped ? (
-          <p
-            role="status"
-            className="font-semibold text-emerald-700 dark:text-emerald-400"
-            {...equippedStateGuideTarget}
-          >
-            Equipped
-          </p>
-        ) : (
-          <div
-            className="flex justify-center sm:justify-end"
-            {...(!isEquipmentRestricted ? equipItemGuideTarget : {})}
-          >
-            <Button
-              on_click={handleViewEquip}
-              label="Equip Item"
-              variant={ButtonVariant.SUCCESS}
-              disabled={isEquipmentRestricted}
-            />
-          </div>
-        )}
+        {renderEquipState()}
 
         <div className="flex items-center justify-center gap-2">
-          <span className="inline-block h-px w-10 bg-gray-300" />
-          <span className="text-sm font-medium text-gray-500">Or</span>
-          <span className="inline-block h-px w-10 bg-gray-300" />
+          <span
+            className="inline-block h-px w-10 bg-gray-300 dark:bg-gray-600"
+            aria-hidden="true"
+          />
+          <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+            Or
+          </span>
+          <span
+            className="inline-block h-px w-10 bg-gray-300 dark:bg-gray-600"
+            aria-hidden="true"
+          />
         </div>
 
         <div
@@ -420,7 +437,7 @@ const InventoryItem = ({
     <DuplicateGemAbilityWarning
       key="duplicate-gem-abilities"
       duplicates={item.duplicate_gem_abilities ?? []}
-      context="item"
+      context={DuplicateGemAbilityWarningContext.ITEM}
       on_open_item={setDuplicateItemId}
     />,
     <SocketsSection
@@ -434,6 +451,44 @@ const InventoryItem = ({
     item.type === InventoryItemTypes.ARTIFACT &&
     item.item_skills.length > 0 &&
     item.item_skill_progressions.length > 0;
+
+  const renderDuplicateGemItemDetails = (): ReactNode => {
+    if (duplicateItemId === null) {
+      return null;
+    }
+
+    const duplicatesForItem = (item.duplicate_gem_abilities ?? []).filter(
+      (duplicate) =>
+        duplicate.items.some(
+          (duplicateItem) => duplicateItem.item_id === duplicateItemId
+        )
+    );
+
+    return (
+      <ItemDetailsStack
+        item_id={duplicateItemId}
+        on_close={() => setDuplicateItemId(null)}
+        duplicate_gem_abilities={duplicatesForItem}
+      />
+    );
+  };
+
+  const renderItemSkillTreeButton = (): ReactNode => {
+    if (!canViewItemSkills) {
+      return null;
+    }
+
+    return (
+      <div className="flex justify-center pt-2">
+        <Button
+          on_click={() => setViewingItemSkills(true)}
+          label="View Ancestral Skill Tree"
+          aria_label="Ancestral Skill Tree"
+          variant={ButtonVariant.PRIMARY}
+        />
+      </div>
+    );
+  };
 
   const renderItemSkillTree = (): ReactNode => {
     if (!viewingItemSkills || !canViewItemSkills) {
@@ -471,16 +526,7 @@ const InventoryItem = ({
 
         <div className="space-y-4">
           {sections}
-          {canViewItemSkills ? (
-            <div className="flex justify-center pt-2">
-              <Button
-                on_click={() => setViewingItemSkills(true)}
-                label="View Ancestral Skill Tree"
-                aria_label="Ancestral Skill Tree"
-                variant={ButtonVariant.PRIMARY}
-              />
-            </div>
-          ) : null}
+          {renderItemSkillTreeButton()}
         </div>
       </div>
       <AnimatePresence mode="wait">{renderEquipItem()}</AnimatePresence>
@@ -491,19 +537,7 @@ const InventoryItem = ({
       </AnimatePresence>
       <AnimatePresence mode="wait">{renderItemSkillTree()}</AnimatePresence>
       <AnimatePresence mode="wait">
-        {duplicateItemId === null ? null : (
-          <ItemDetailsStack
-            item_id={duplicateItemId}
-            on_close={() => setDuplicateItemId(null)}
-            duplicate_gem_abilities={(
-              data?.duplicate_gem_abilities ?? []
-            ).filter((duplicate) =>
-              duplicate.items.some(
-                (duplicateItem) => duplicateItem.item_id === duplicateItemId
-              )
-            )}
-          />
-        )}
+        {renderDuplicateGemItemDetails()}
       </AnimatePresence>
     </>
   );

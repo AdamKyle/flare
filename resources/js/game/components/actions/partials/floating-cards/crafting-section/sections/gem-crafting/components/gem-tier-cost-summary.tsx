@@ -11,10 +11,23 @@ import { formatPercent } from 'game-utils/format-number';
 import GeneralToolTip from 'ui/tool-tips/general-tool-tip';
 
 const tierRoles: Record<number, string> = {
-  1: 'Gem Ability + two raw stats',
-  2: 'Raw stats and direct combat modifiers',
-  3: 'Class Rank, Class Mastery, Weapon Mastery, and class-skill specialization',
-  4: 'One elemental atonement + two reward, penetration, or progression modifiers',
+  1: '1 ability + 2 stats',
+  2: '1 ability + 2 stronger stats',
+  3: '1 ability + 2 advanced modifiers',
+  4: '1 atonement + 2 advanced modifiers',
+};
+
+const renderElementalRule = (tierNumber: number): ReactNode => {
+  if (tierNumber !== 4) {
+    return null;
+  }
+
+  return (
+    <>
+      <dt>Elemental rule</dt>
+      <dd>Penetration always matches the Gem&apos;s atonement.</dd>
+    </>
+  );
 };
 
 const GemTierCostSummary = ({
@@ -28,18 +41,12 @@ const GemTierCostSummary = ({
       <button
         type="button"
         onClick={onOpenDetails}
-        className="text-danube-700 hover:text-danube-600 focus-visible:ring-danube-500 dark:text-danube-300 dark:hover:text-danube-200 inline-flex items-center gap-2 rounded-sm text-right font-medium underline underline-offset-2 focus:outline-none focus-visible:ring-2"
+        className="text-danube-700 hover:text-danube-600 focus-visible:ring-danube-500 dark:text-danube-300 dark:hover:text-danube-200 rounded-sm text-right font-medium underline underline-offset-2 focus:outline-none focus-visible:ring-2"
       >
         {tierRoles[tierNumber]}
-        <i className="fas fa-chevron-right text-xs" aria-hidden="true" />
       </button>
     </dd>
-    {tierNumber === 4 ? (
-      <>
-        <dt>Elemental rule</dt>
-        <dd>Penetration always matches the Gem&apos;s atonement.</dd>
-      </>
-    ) : null}
+    {renderElementalRule(tierNumber)}
     <dt>Gold Dust</dt>
     <dd>
       <CurrencyDisplay
@@ -82,7 +89,7 @@ const GemTierCostSummary = ({
     <dd
       className={clsx('font-semibold tabular-nums', {
         'text-emerald-700 dark:text-emerald-400': tier.chance >= 0.75,
-        'text-amber-700 dark:text-amber-400':
+        'text-mango-tango-700 dark:text-mango-tango-400':
           tier.chance >= 0.5 && tier.chance < 0.75,
         'text-rose-700 dark:text-rose-400': tier.chance < 0.5,
       })}

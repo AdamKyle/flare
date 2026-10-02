@@ -2,10 +2,10 @@
 
 namespace Tests\Feature\Info\Monsters;
 
-use App\Game\Monsters\Services\BuildMonsterCacheService;
 use App\Game\Monsters\Values\MonsterCacheKey;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use Tests\Setup\Monster\BuildMonsterCacheServiceFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGameMapGemParamter;
@@ -39,7 +39,7 @@ class MonstersApiControllerTest extends TestCase
 
         $monster = $this->createMonster(['name' => 'Public Gem Monster', 'game_map_id' => $gameMap->id, 'str' => 10]);
 
-        resolve(BuildMonsterCacheService::class)->buildCache();
+        (new BuildMonsterCacheServiceFactory)->build()->buildCache();
 
         $response = $this->call('GET', "/api/information/monsters/{$monster->id}", [], [], [], ['HTTP_ACCEPT' => 'application/json']);
 

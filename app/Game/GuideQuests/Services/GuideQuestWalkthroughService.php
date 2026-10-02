@@ -6,11 +6,6 @@ use App\Flare\Models\Character;
 use App\Flare\Models\CharacterGuideQuestProgress;
 use App\Flare\Models\GuideQuest;
 use App\Flare\Models\GuideQuestWalkthroughStep;
-use App\Game\GuideQuests\Values\GuideQuestWalkthroughEvent;
-use App\Game\GuideQuests\Values\GuideQuestWalkthroughStepType;
-use App\Game\GuideQuests\Values\GuideQuestWalkthroughTarget;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 
 class GuideQuestWalkthroughService
 {
@@ -61,19 +56,21 @@ class GuideQuestWalkthroughService
      *
      * @param Character $character
      * @param GuideQuest $guideQuest
-     * @param ?GuideQuestWalkthroughStep $step
+     * @param int|null $stepId
      * @param bool $completed
      * @return bool
      */
     public function updateProgress(
         Character $character,
         GuideQuest $guideQuest,
-        ?GuideQuestWalkthroughStep $step,
+        ?int $stepId,
         bool $completed,
     ): bool {
         if (! $this->isApplicable($character, $guideQuest)) {
             return false;
         }
+
+        $step = is_null($stepId) ? null : GuideQuestWalkthroughStep::find($stepId);
 
         if (! is_null($step) && $step->guide_quest_id !== $guideQuest->id) {
             return false;
@@ -95,7 +92,7 @@ class GuideQuestWalkthroughService
     }
 
     /**
-     * Replace a Guide Quest's ordered walkthrough steps after validating controlled values.
+     * Replace a Guide Quest's ordered walkthrough steps with validated step data.
      *
      * @param GuideQuest $guideQuest
      * @param array $steps
@@ -104,13 +101,11 @@ class GuideQuestWalkthroughService
     public function replaceSteps(GuideQuest $guideQuest, array $steps): void
     {
         $normalizedSteps = collect($steps)->values()->map(
-            fn (array $step, int $index): array => $this->validateStep($step, $index + 1)
+            fn (array $step, int $index): array => $this->normalizeStep($step, $index + 1)
         )->all();
 
-        DB::transaction(function () use ($guideQuest, $normalizedSteps): void {
-            $guideQuest->walkthroughSteps()->delete();
-            $guideQuest->walkthroughSteps()->createMany($normalizedSteps);
-        });
+        $guideQuest->walkthroughSteps()->delete();
+        $guideQuest->walkthroughSteps()->createMany($normalizedSteps);
     }
 
     /**
@@ -155,45 +150,21 @@ class GuideQuestWalkthroughService
     }
 
     /**
-     * Validate and normalize one authored walkthrough step.
+     * Normalize one validated walkthrough step into its persisted ordered shape.
      *
      * @param array $step
      * @param int $position
      * @return array
      */
-    private function validateStep(array $step, int $position): array
+    private function normalizeStep(array $step, int $position): array
     {
-        $type = GuideQuestWalkthroughStepType::tryFrom($step['step_type'] ?? '');
-        $target = is_null($step['target'] ?? null) ? null : GuideQuestWalkthroughTarget::tryFrom($step['target']);
-        $event = is_null($step['required_event'] ?? null) ? null : GuideQuestWalkthroughEvent::tryFrom($step['required_event']);
-
-        if (is_null($type)) {
-            throw ValidationException::withMessages(['steps' => 'A walkthrough step has an unknown type.']);
-        }
-
-        if (! is_null($step['target'] ?? null) && is_null($target)) {
-            throw ValidationException::withMessages(['steps' => 'A walkthrough step has an unknown target.']);
-        }
-
-        if (! is_null($step['required_event'] ?? null) && is_null($event)) {
-            throw ValidationException::withMessages(['steps' => 'A walkthrough step has an unknown event.']);
-        }
-
-        if ($type === GuideQuestWalkthroughStepType::CLICK && is_null($target)) {
-            throw ValidationException::withMessages(['steps' => 'Click walkthrough steps require a target.']);
-        }
-
-        if ($type === GuideQuestWalkthroughStepType::EVENT && is_null($event)) {
-            throw ValidationException::withMessages(['steps' => 'Event walkthrough steps require an event.']);
-        }
-
         return [
             'position' => $position,
             'title' => $step['title'],
             'content' => $step['content'],
-            'target' => $target?->value,
-            'step_type' => $type->value,
-            'required_event' => $event?->value,
+            'target' => $step['target'] ?? null,
+            'step_type' => $step['step_type'],
+            'required_event' => $step['required_event'] ?? null,
             'optional_if_target_missing' => $step['optional_if_target_missing'] ?? false,
         ];
     }

@@ -6,6 +6,7 @@ use App\Game\Character\CharacterInventory\Transformers\CharacterGemSlotsTransfor
 use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Chance\PhpRandomNumberGenerator;
 use App\Game\Gems\Builders\GemBuilder;
+use App\Game\Gems\Services\CharacterGemDetailsService;
 use App\Game\Gems\Services\CharacterGemRollService;
 use App\Game\Gems\Transformers\CharacterGemTransformer;
 use App\Game\Messages\Builders\ServerMessageBuilder;
@@ -18,8 +19,9 @@ class GemServiceFactory
     /**
      * Build a real GemService, optionally replacing its random chance or gem building boundaries.
      *
-     * @param ?ChanceCalculator $chanceCalculator
-     * @param ?GemBuilder $gemBuilder
+     * @param ChanceCalculator|null $chanceCalculator
+     * @param GemBuilder|null $gemBuilder
+     * @return GemService
      */
     public function build(?ChanceCalculator $chanceCalculator = null, ?GemBuilder $gemBuilder = null): GemService
     {
@@ -35,7 +37,7 @@ class GemServiceFactory
                 $characterGemRollService,
             ),
             $chanceCalculator ?? new ChanceCalculator($randomNumberGenerator),
-            new CharacterGemTransformer,
+            new CharacterGemDetailsService,
             new ServerMessageBuilder,
             new CharacterGemSlotsTransformer(new CharacterGemTransformer),
             new SkillBonusService(new SkillBonusContextService),

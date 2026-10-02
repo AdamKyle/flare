@@ -2,10 +2,11 @@
 
 namespace App\Flare\Models;
 
+use App\Game\Automation\BatchCrafting\Enums\BatchCraftingType;
 use App\Game\Core\Items\Values\AlchemyItemType;
-use App\Game\Core\Items\Values\ArmourType;
 use App\Game\Core\Items\Values\ItemType;
 use App\Game\Events\Values\EventType;
+use App\Game\GuideQuests\Values\GuideQuestRequiredItemSource;
 use App\Game\Skills\Values\SkillTypeValue;
 use Database\Factories\GuideQuestFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -193,18 +194,22 @@ class GuideQuest extends Model
         return $this->walkthroughSteps()->exists();
     }
 
-    public function getSkillNameAttribute()
+    /**
+     * Return the name of the required primary Skill.
+     *
+     * @return string|null
+     */
+    public function getSkillNameAttribute(): ?string
     {
-        $skill = GameSkill::find($this->required_skill);
-
-        if (! is_null($skill)) {
-            return $skill->name;
-        }
-
-        return null;
+        return GameSkill::find($this->required_skill)?->name;
     }
 
-    public function getSkillTypeNameAttribute()
+    /**
+     * Return the name of the required Skill type.
+     *
+     * @return string|null
+     */
+    public function getSkillTypeNameAttribute(): ?string
     {
         if (is_null($this->required_skill_type)) {
             return null;
@@ -213,106 +218,102 @@ class GuideQuest extends Model
         return SkillTypeValue::getValues()[$this->required_skill_type];
     }
 
-    public function getSecondarySkillNameAttribute()
+    /**
+     * Return the name of the required secondary Skill.
+     *
+     * @return string|null
+     */
+    public function getSecondarySkillNameAttribute(): ?string
     {
-        $skill = GameSkill::find($this->required_secondary_skill);
-
-        if (! is_null($skill)) {
-            return $skill->name;
-        }
-
-        return null;
+        return GameSkill::find($this->required_secondary_skill)?->name;
     }
 
-    public function getQuestNameAttribute()
+    /**
+     * Return the name of the required Quest.
+     *
+     * @return string|null
+     */
+    public function getQuestNameAttribute(): ?string
     {
-        $quest = Quest::find($this->required_quest_id);
-
-        if (! is_null($quest)) {
-            return $quest->name;
-        }
-
-        return null;
+        return Quest::find($this->required_quest_id)?->name;
     }
 
-    public function getPassiveNameAttribute()
+    /**
+     * Return the name of the required Passive Skill.
+     *
+     * @return string|null
+     */
+    public function getPassiveNameAttribute(): ?string
     {
-        $passive = PassiveSkill::find($this->required_passive_skill);
-
-        if (! is_null($passive)) {
-            return $passive->name;
-        }
-
-        return null;
+        return PassiveSkill::find($this->required_passive_skill)?->name;
     }
 
-    public function getQuestItemNameAttribute()
+    /**
+     * Return the display name of the required quest Item.
+     *
+     * @return string|null
+     */
+    public function getQuestItemNameAttribute(): ?string
     {
-        $questItem = Item::where('type', 'quest')->where('id', $this->required_quest_item_id)->first();
-
-        if (! is_null($questItem)) {
-            return $questItem->affix_name;
-        }
-
-        return null;
+        return Item::where('type', 'quest')->where('id', $this->required_quest_item_id)->first()?->affix_name;
     }
 
-    public function getSecondaryQuestItemNameAttribute()
+    /**
+     * Return the display name of the secondary required quest Item.
+     *
+     * @return string|null
+     */
+    public function getSecondaryQuestItemNameAttribute(): ?string
     {
-        $questItem = Item::where('type', 'quest')->where('id', $this->secondary_quest_item_id)->first();
-
-        if (! is_null($questItem)) {
-            return $questItem->affix_name;
-        }
-
-        return null;
+        return Item::where('type', 'quest')->where('id', $this->secondary_quest_item_id)->first()?->affix_name;
     }
 
-    public function getFactionNameAttribute()
+    /**
+     * Return the name of the Game Map whose Faction the Guide Quest requires.
+     *
+     * @return string|null
+     */
+    public function getFactionNameAttribute(): ?string
     {
-        $gameMap = GameMap::find($this->required_faction_id);
-
-        if (! is_null($gameMap)) {
-            return $gameMap->name;
-        }
-
-        return null;
+        return GameMap::find($this->required_faction_id)?->name;
     }
 
-    public function getGameMapNameAttribute()
+    /**
+     * Return the name of the Game Map the Guide Quest requires access to.
+     *
+     * @return string|null
+     */
+    public function getGameMapNameAttribute(): ?string
     {
-        $gameMap = GameMap::find($this->required_game_map_id);
-
-        if (! is_null($gameMap)) {
-            return $gameMap->name;
-        }
-
-        return null;
+        return GameMap::find($this->required_game_map_id)?->name;
     }
 
-    public function getKingdomBuildingNameAttribute()
+    /**
+     * Return the name of the required Kingdom building.
+     *
+     * @return string|null
+     */
+    public function getKingdomBuildingNameAttribute(): ?string
     {
-        $gameBuilding = GameBuilding::find($this->required_kingdom_building_id);
-
-        if (! is_null($gameBuilding)) {
-            return $gameBuilding->name;
-        }
-
-        return null;
+        return GameBuilding::find($this->required_kingdom_building_id)?->name;
     }
 
-    public function getParentQuestNameAttribute()
+    /**
+     * Return the name of the parent Guide Quest.
+     *
+     * @return string|null
+     */
+    public function getParentQuestNameAttribute(): ?string
     {
-        $parentQuest = GuideQuest::find($this->parent_id);
-
-        if (is_null($parentQuest)) {
-            return null;
-        }
-
-        return $parentQuest->name;
+        return GuideQuest::find($this->parent_id)?->name;
     }
 
-    public function getRequiredToBeOnGameMapNameAttribute()
+    /**
+     * Return the name of the Game Map the Character must be on.
+     *
+     * @return string|null
+     */
+    public function getRequiredToBeOnGameMapNameAttribute(): ?string
     {
         if (is_null($this->be_on_game_map)) {
             return null;
@@ -321,59 +322,94 @@ class GuideQuest extends Model
         return GameMap::find($this->be_on_game_map)->name;
     }
 
+    /**
+     * Return the display name of the required Batch Crafting experience type.
+     *
+     * @return string|null
+     */
     public function getRequiredBatchCraftingTypeNameAttribute(): ?string
     {
-        return match ($this->required_batch_crafting_type) {
-            'craft' => 'Craft For Experience',
-            'craft_and_enchant' => 'Craft and Enchant For Experience',
-            'alchemy' => 'Alchemy For Experience',
-            'trinketry' => 'Trinketry For Experience',
+        return match (BatchCraftingType::tryFrom($this->required_batch_crafting_type ?? '')) {
+            BatchCraftingType::CRAFT => 'Craft For Experience',
+            BatchCraftingType::CRAFT_AND_ENCHANT => 'Craft and Enchant For Experience',
+            BatchCraftingType::ALCHEMY => 'Alchemy For Experience',
+            BatchCraftingType::TRINKETRY => 'Trinketry For Experience',
             default => null,
         };
     }
 
+    /**
+     * Return the display details of each required batch-crafted or Alchemy Bag item.
+     *
+     * @return array
+     */
     public function getRequiredBatchCraftedItemNamesAttribute(): array
     {
         if (empty($this->required_batch_crafted_items)) {
             return [];
         }
 
-        return collect($this->required_batch_crafted_items)->map(function (array $requirement, int $requirementIndex): ?array {
-            $item = Item::find($requirement['item_id'] ?? null);
-
-            if (is_null($item)) {
-                return null;
-            }
-
-            $source = $requirement['source'] ?? 'inventory';
-
-            return [
-                'requirement_index' => $requirementIndex,
-                'source' => $source,
-                'item_id' => $item->id,
-                'name' => $item->name,
-                'type' => $item->type,
-                'type_name' => $source === 'alchemy_bag'
-                    ? $this->alchemyItemTypeName($item->alchemy_type)
-                    : $this->batchCraftedItemTypeName($item->type),
-                'amount' => (int) ($requirement['amount'] ?? 0),
-                'must_be_enchanted' => $source === 'alchemy_bag' ? false : (bool) ($requirement['must_be_enchanted'] ?? false),
-            ];
-        })->filter()->values()->all();
+        return collect($this->required_batch_crafted_items)
+            ->map(fn (array $requirement, int $requirementIndex): ?array => $this->requiredBatchCraftedItemDetails($requirement, $requirementIndex))
+            ->filter()
+            ->values()
+            ->all();
     }
 
+    /**
+     * Build the display details of one required item, or null when the Item no longer exists.
+     *
+     * @param array $requirement
+     * @param int $requirementIndex
+     * @return array|null
+     */
+    private function requiredBatchCraftedItemDetails(array $requirement, int $requirementIndex): ?array
+    {
+        $item = Item::find($requirement['item_id'] ?? null);
+
+        if (is_null($item)) {
+            return null;
+        }
+
+        $source = GuideQuestRequiredItemSource::tryFrom($requirement['source'] ?? '') ?? GuideQuestRequiredItemSource::INVENTORY;
+        $isAlchemyBagItem = $source === GuideQuestRequiredItemSource::ALCHEMY_BAG;
+
+        return [
+            'requirement_index' => $requirementIndex,
+            'source' => $requirement['source'] ?? GuideQuestRequiredItemSource::INVENTORY->value,
+            'item_id' => $item->id,
+            'name' => $item->name,
+            'type' => $item->type,
+            'type_name' => $isAlchemyBagItem
+                ? $this->alchemyItemTypeName($item->alchemy_type)
+                : $this->batchCraftedItemTypeName($item->type),
+            'amount' => $requirement['amount'] ?? 0,
+            'must_be_enchanted' => ! $isAlchemyBagItem && ($requirement['must_be_enchanted'] ?? false),
+        ];
+    }
+
+    /**
+     * Return the display name of a craftable Item type.
+     *
+     * @param string $type
+     * @return string
+     */
     private function batchCraftedItemTypeName(string $type): string
     {
         return match ($type) {
             ItemType::DAGGER->value => 'Daggers',
             ItemType::SPELL_DAMAGE->value => 'Spell Damage',
             ItemType::SPELL_HEALING->value => 'Spell Healing',
-            default => in_array($type, ArmourType::allTypes(), true)
-                ? ItemType::getProperNameForType($type)
-                : ItemType::getProperNameForType($type),
+            default => ItemType::getProperNameForType($type),
         };
     }
 
+    /**
+     * Return the display name of an Alchemy Item type.
+     *
+     * @param string|null $alchemyType
+     * @return string
+     */
     private function alchemyItemTypeName(?string $alchemyType): string
     {
         return match ($alchemyType) {
@@ -389,9 +425,13 @@ class GuideQuest extends Model
         };
     }
 
+    /**
+     * Return the event this Guide Quest is only available during, when it has one.
+     *
+     * @return EventType|null
+     */
     public function eventType(): ?EventType
     {
-
         if (is_null($this->only_during_event)) {
             return null;
         }
@@ -399,7 +439,12 @@ class GuideQuest extends Model
         return new EventType($this->only_during_event);
     }
 
-    protected static function newFactory()
+    /**
+     * Return the factory used to create Guide Quests.
+     *
+     * @return GuideQuestFactory
+     */
+    protected static function newFactory(): GuideQuestFactory
     {
         return GuideQuestFactory::new();
     }

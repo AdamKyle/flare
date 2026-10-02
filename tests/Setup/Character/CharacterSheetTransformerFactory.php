@@ -15,6 +15,7 @@ use App\Game\Character\CharacterInventory\Transformers\CharacterInventoryCountTr
 use App\Game\Character\CharacterSheet\Transformers\CharacterBaseDetailsTransformer;
 use App\Game\Character\CharacterSheet\Transformers\CharacterCurrenciesTransformer;
 use App\Game\Character\CharacterSheet\Transformers\CharacterElementalAtonementTransformer;
+use App\Game\Character\CharacterSheet\Transformers\CharacterElementalPenetrationTransformer;
 use App\Game\Character\CharacterSheet\Transformers\CharacterReincarnationInfoTransformer;
 use App\Game\Character\CharacterSheet\Transformers\CharacterResistanceInfoTransformer;
 use App\Game\Character\CharacterSheet\Transformers\CharacterSheetTransformer;
@@ -30,10 +31,13 @@ class CharacterSheetTransformerFactory
 {
     /**
      * Build a real CharacterSheetTransformer instance with real collaborators for tests.
+     *
+     * @return CharacterSheetTransformer
      */
     public function build(): CharacterSheetTransformer
     {
         $manager = new Manager;
+        $characterCacheData = (new CharacterCacheDataFactory)->build();
 
         return new CharacterSheetTransformer(
             (new CharacterSheetBaseInfoTransformerFactory)->build(),
@@ -43,7 +47,8 @@ class CharacterSheetTransformerFactory
             ),
             new CharacterCurrenciesTransformer,
             new CharacterResistanceInfoTransformer($this->buildCharacterStatBuilder()),
-            new CharacterElementalAtonementTransformer,
+            new CharacterElementalAtonementTransformer($characterCacheData),
+            new CharacterElementalPenetrationTransformer($characterCacheData),
             new CharacterReincarnationInfoTransformer,
             new CharacterInventoryCountTransformer,
             new CharacterActiveBoonService($manager, new UsableItemTransformer),
@@ -52,6 +57,8 @@ class CharacterSheetTransformerFactory
 
     /**
      * Build a real CharacterStatBuilder with empty Gem effects for Character Sheet tests.
+     *
+     * @return CharacterStatBuilder
      */
     private function buildCharacterStatBuilder(): CharacterStatBuilder
     {

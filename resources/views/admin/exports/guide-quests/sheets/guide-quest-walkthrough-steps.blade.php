@@ -18,9 +18,9 @@
                 <td>{{ $step->position }}</td>
                 <td>{{ $step->title }}</td>
                 <td>{{ $step->content }}</td>
-                <td>{{ $step->target }}</td>
-                <td>{{ $step->step_type }}</td>
-                <td>{{ $step->required_event }}</td>
+                <td>{{ $step->target?->value }}</td>
+                <td>{{ $step->step_type->value }}</td>
+                <td>{{ $step->required_event?->value }}</td>
                 <td>{{ $step->optional_if_target_missing ? '1' : '0' }}</td>
             </tr>
         @endforeach
