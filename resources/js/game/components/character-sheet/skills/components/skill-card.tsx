@@ -1,6 +1,7 @@
 import React, { ReactNode, useId } from 'react';
 
 import SkillCardProps from './types/skill-card-props';
+import { GuideTargets } from '../../../guide-quests/walkthrough/registry/guide-targets';
 import { skillCardStyles } from '../styles/skill-card-styles';
 
 import Button from 'ui/buttons/button';
@@ -60,7 +61,12 @@ const SkillCard = ({ skill, on_open: onOpen }: SkillCardProps): ReactNode => {
   };
 
   return (
-    <article className={skillCardStyles}>
+    <article
+      className={skillCardStyles}
+      data-guide-target={
+        skill.name === 'Accuracy' ? GuideTargets.ACCURACY_SKILL : undefined
+      }
+    >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="font-semibold">{skill.name}</h3>
         {renderState()}

@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 import { match, P } from 'ts-pattern';
 
 import CharacterClassRanks from './character-class-ranks';
@@ -13,6 +13,7 @@ import { useManageClassRanksVisibility } from './hooks/use-manage-class-ranks-vi
 import { useManageReincarnationVisibility } from './hooks/use-manage-reincarnation-visibility';
 import { useManageSkillsVisibility } from './hooks/use-manage-skills-visibility';
 import CharacterSheetProps from './types/character-sheet-props';
+import { GuideTargets } from '../guide-quests/walkthrough/registry/guide-targets';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 import { useGameData } from 'game-data/hooks/use-game-data';
@@ -30,6 +31,10 @@ const CharacterSheet = (props: CharacterSheetProps): ReactNode => {
   const { showSkills, openSkills, closeSkills } = useManageSkillsVisibility();
   const { showAttackType, attackType, closeAttackDetails } =
     useAttackDetailsVisibility();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, [showSkills]);
 
   const { gameData } = useGameData();
 
@@ -155,6 +160,9 @@ const CharacterSheet = (props: CharacterSheetProps): ReactNode => {
     <ContainerWithTitle
       manageSectionVisibility={renderManageSectionVisibility()}
       title={renderTitle()}
+      close_button_data_guide_target={
+        showInventory ? GuideTargets.CHARACTER_INVENTORY_CLOSE : undefined
+      }
     >
       <Card>{renderCharacterSheetScreen()}</Card>
     </ContainerWithTitle>

@@ -26,7 +26,18 @@ const ProgressBar = (props: ProgressBarProps): ReactNode => {
   return (
     <div className={clsx('w-full', props.additional_css)}>
       <div className="mb-1 flex justify-between text-sm font-medium text-gray-700 dark:text-gray-200">
-        <span id={labelId}>{props.label}</span>
+        {props.on_label_click !== undefined ? (
+          <button
+            id={labelId}
+            type="button"
+            className="text-danube-700 dark:text-danube-300 text-left hover:underline focus-visible:underline"
+            onClick={props.on_label_click}
+          >
+            {props.label}
+          </button>
+        ) : (
+          <span id={labelId}>{props.label}</span>
+        )}
         {props.value_label !== undefined && <span>{props.value_label}</span>}
       </div>
       <div

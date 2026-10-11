@@ -6,5 +6,6 @@ import { StateSetter } from '../../../../../../../types/state-setter-type';
 export default interface UseEquipItemApiDefinition {
   error: AxiosErrorDefinition | null;
   loading: boolean;
+  resetError: () => void;
   setRequestParams: StateSetter<UseEquipItemRequestParamsDefinition>;
 }

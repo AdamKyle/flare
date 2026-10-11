@@ -12,6 +12,8 @@ const MonsterNamePicker = ({
   current_index,
   on_select,
   disabled = false,
+  data_guide_target: dataGuideTarget,
+  data_guide_target_complete: dataGuideTargetComplete,
 }: MonsterNamePickerProps) => {
   const [openSnapshot, setOpenSnapshot] = useState<
     MonsterNameListDefinition[] | null
@@ -90,6 +92,8 @@ const MonsterNamePicker = ({
       focus_selected_on_open
       on_open={handleOpen}
       on_close={handleClose}
+      data_guide_target={dataGuideTarget}
+      data_guide_target_complete={dataGuideTargetComplete}
     />
   );
 };

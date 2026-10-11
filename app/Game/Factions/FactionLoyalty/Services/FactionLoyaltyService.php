@@ -25,7 +25,9 @@ class FactionLoyaltyService
 {
     use ResponseBuilder;
 
-    public function __construct(private readonly RandomNumberGenerator $randomNumberGenerator) {}
+    public function __construct(
+        private readonly RandomNumberGenerator $randomNumberGenerator,
+    ) {}
 
     const CRAFTING_TYPES = [
         'weapon',
@@ -33,6 +35,18 @@ class FactionLoyaltyService
         'ring',
         'spell',
     ];
+
+    /**
+     * Determine whether the Character may pledge to the Faction.
+     */
+    public function canPledge(Character $character, Faction $faction): bool
+    {
+        if ($faction->character_id !== $character->id) {
+            return false;
+        }
+
+        return $faction->maxed;
+    }
 
     /**
      * Get either the npc faction loyalty details that we are helping or the first one for the plane.
@@ -246,7 +260,7 @@ class FactionLoyaltyService
             return $this->errorResult('Nope. Not allowed.');
         }
 
-        if (! $faction->maxed) {
+        if (! $this->canPledge($character, $faction)) {
             return $this->errorResult('You must level the faction to level 5 before being able to assist the fine people of this plane with their tasks.');
         }
 

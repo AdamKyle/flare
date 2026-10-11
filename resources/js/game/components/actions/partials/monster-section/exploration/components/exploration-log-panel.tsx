@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect, useRef } from 'react';
 
 import ExplorationCharacterProgress from './exploration-character-progress';
 import ExplorationCombatSummarySection from './exploration-combat-summary-section';
@@ -6,6 +6,10 @@ import ExplorationCurrenciesSection from './exploration-currencies-section';
 import ExplorationDetailSection from './exploration-detail-section';
 import ExplorationElapsedTime from './exploration-elapsed-time';
 import ExplorationProgressSection from './exploration-progress-section';
+import { GuideWalkthroughEvent } from '../../../../../guide-quests/walkthrough/enums/guide-walkthrough-event';
+import { useGuideTarget } from '../../../../../guide-quests/walkthrough/hooks/use-guide-target';
+import { useGuideWalkthroughEventEmitter } from '../../../../../guide-quests/walkthrough/hooks/use-guide-walkthrough-event-emitter';
+import { GuideTargets } from '../../../../../guide-quests/walkthrough/registry/guide-targets';
 import { useDismissExplorationEnded } from '../api/hooks/use-dismiss-exploration-ended';
 import { useStopExploration } from '../api/hooks/use-stop-exploration';
 import ExplorationLogPanelProps from '../types/exploration-log-panel-props';
@@ -30,6 +34,11 @@ const ExplorationLogPanel = ({
   on_stopped: onStopped,
   on_dismissed: onDismissed,
 }: ExplorationLogPanelProps): ReactNode => {
+  const guideWalkthroughEventEmitter = useGuideWalkthroughEventEmitter();
+  const livePanelGuideTarget = useGuideTarget(
+    GuideTargets.EXPLORATION_LIVE_PANEL
+  );
+  const emittedFightLogIdRef = useRef<number | null>(null);
   const {
     loading: stopping,
     error: stopError,
@@ -48,6 +57,18 @@ const ExplorationLogPanel = ({
     output.current_round_creatures
   );
 
+  useEffect(() => {
+    if (output.fights <= 0 || emittedFightLogIdRef.current === output.id) {
+      return;
+    }
+
+    emittedFightLogIdRef.current = output.id;
+    guideWalkthroughEventEmitter.emit(
+      GuideWalkthroughEvent.EXPLORATION_FIGHT_COMPLETED,
+      undefined
+    );
+  }, [guideWalkthroughEventEmitter, output.fights, output.id]);
+
   const handleCancel = async (): Promise<void> => {
     const stopped = await stop();
 
@@ -65,7 +86,7 @@ const ExplorationLogPanel = ({
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3" {...livePanelGuideTarget}>
       <div className="flex items-center justify-between gap-3">
         <h3 className="text-lg font-semibold">{heading}</h3>
         <p

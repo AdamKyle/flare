@@ -3,4 +3,6 @@ export default interface QuestItemSlotDetailStackProps {
   slot_id: number;
   aria_label: string;
   on_close: () => void;
+  data_guide_target?: string;
+  close_button_data_guide_target?: string;
 }

@@ -2,6 +2,8 @@ import React, { ReactNode, useState } from 'react';
 
 import FactionLoyaltyNpcContent from './faction-loyalty-npc-content';
 import FactionLoyaltyNpcScreenProps from './types/faction-loyalty-npc-screen-props';
+import { GuideWalkthroughEvent } from '../../guide-quests/walkthrough/enums/guide-walkthrough-event';
+import { useGuideWalkthroughEventEmitter } from '../../guide-quests/walkthrough/hooks/use-guide-walkthrough-event-emitter';
 import PlayerNpcDetailStack from '../../side-peeks/game-data/components/player-npc-detail-stack';
 import AssistNpcResponseDefinition from '../api/definitions/assist-npc-response-definition';
 import { useFactionLoyaltyNpcAssistance } from '../api/hooks/use-faction-loyalty-npc-assistance';
@@ -13,6 +15,7 @@ const FactionLoyaltyNpcScreen = ({
   character_id: characterId,
   faction_loyalty_npc_id: factionLoyaltyNpcId,
 }: FactionLoyaltyNpcScreenProps): ReactNode => {
+  const guideWalkthroughEventEmitter = useGuideWalkthroughEventEmitter();
   const { info, loading, refetch } = useFactionLoyaltyContext();
   const {
     submitting,
@@ -44,8 +47,20 @@ const FactionLoyaltyNpcScreen = ({
 
   const handleAssist = async () => {
     setAssistanceMessage(null);
+    const response = await assist(factionLoyaltyNpcId);
 
-    applyAssistanceResponse(await assist(factionLoyaltyNpcId));
+    applyAssistanceResponse(response);
+
+    const assistedNpc = response?.faction_loyalty.faction_loyalty_npcs.find(
+      (npc) => npc.id === factionLoyaltyNpcId
+    );
+
+    if (assistedNpc?.currently_helping) {
+      guideWalkthroughEventEmitter.emit(
+        GuideWalkthroughEvent.FACTION_ASSISTANCE_STARTED,
+        undefined
+      );
+    }
   };
 
   const handleStopAssisting = async () => {

@@ -8,6 +8,10 @@ import { useEffect, useRef } from 'react';
 
 import { useGuideQuestData } from '../../components/guide-quests/hooks/use-guide-quest-data';
 import { useManageGuideQuestsVisibility } from '../../components/guide-quests/hooks/use-manage-guide-quests-visibility';
+import {
+  hasSeenGuideQuest,
+  markGuideQuestSeen,
+} from '../../components/guide-quests/utils/guide-quest-seen-storage';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
 
@@ -19,26 +23,41 @@ const BindGuideQuestsSection = () => {
   const activeRef = useRef(false);
   const autoOpenedRef = useRef(false);
   const { gameData, setGuideQuestAttention } = useGameData();
-  const userId = gameData?.character?.user_id ?? 0;
+  const characterId = gameData?.character?.id ?? 0;
   const { data, loading } = useGuideQuestData();
+  const hasGuideQuestReadyToHandIn =
+    data?.can_hand_in.some((quest) => quest.can_hand_in) ?? false;
 
   useEffect(() => {
-    setGuideQuestAttention(data?.has_activity_attention ?? false);
-  }, [data?.has_activity_attention, setGuideQuestAttention]);
+    setGuideQuestAttention(hasGuideQuestReadyToHandIn);
+  }, [hasGuideQuestReadyToHandIn, setGuideQuestAttention]);
 
   useEffect(() => {
-    if (
-      autoOpenedRef.current ||
-      loading ||
-      userId <= 0 ||
-      (data?.quests.length ?? 0) === 0
-    ) {
+    if (!showGuideQuests || loading || characterId <= 0 || !data) {
+      return;
+    }
+
+    data.quests
+      .filter((quest) => !hasSeenGuideQuest(characterId, quest.id))
+      .forEach((quest) => markGuideQuestSeen(characterId, quest.id));
+  }, [characterId, data, loading, showGuideQuests]);
+
+  useEffect(() => {
+    if (autoOpenedRef.current || loading || characterId <= 0 || !data) {
+      return;
+    }
+
+    const hasUnseenQuest = data.quests.some(
+      (quest) => !hasSeenGuideQuest(characterId, quest.id)
+    );
+
+    if (!hasUnseenQuest) {
       return;
     }
 
     autoOpenedRef.current = true;
     openGuideQuestsScreen();
-  }, [data?.quests.length, loading, openGuideQuestsScreen, userId]);
+  }, [characterId, data, loading, openGuideQuestsScreen]);
 
   useBindScreen({
     when: showGuideQuests,

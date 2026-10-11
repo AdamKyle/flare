@@ -6,4 +6,5 @@ export default interface IconButtonDefinition {
   variant: ButtonVariant;
   onClick: () => void;
   additionalCss?: string;
+  dataGuideTarget?: string;
 }

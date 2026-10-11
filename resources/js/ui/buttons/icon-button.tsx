@@ -16,6 +16,8 @@ const IconButton = ({
   aria_busy,
   center_content,
   status_indicator,
+  data_guide_target: dataGuideTarget,
+  data_guide_target_complete: dataGuideTargetComplete,
 }: IconButtonProps) => {
   const hasIcon = Boolean(icon);
 
@@ -72,6 +74,8 @@ const IconButton = ({
       aria-busy={aria_busy}
       role="button"
       type="button"
+      data-guide-target={dataGuideTarget}
+      data-guide-target-complete={dataGuideTargetComplete ? 'true' : undefined}
     >
       {renderContent()}
     </button>

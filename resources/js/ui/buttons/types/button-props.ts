@@ -7,6 +7,7 @@ interface ButtonBaseProps {
   additional_css?: string;
   aria_label?: string;
   aria_busy?: boolean;
+  data_guide_target?: string;
 }
 
 type ButtonProps<T extends unknown[] = []> = ButtonBaseProps &

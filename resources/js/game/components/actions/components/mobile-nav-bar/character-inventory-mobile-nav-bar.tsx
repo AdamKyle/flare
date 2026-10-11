@@ -5,6 +5,10 @@ import { useOpenCharacterBackpack } from '../../../character-sheet/partials/char
 import { useOpenCharacterGemBag } from '../../../character-sheet/partials/character-inventory/hooks/use-open-character-gem-bag';
 import { useOpenCharacterSets } from '../../../character-sheet/partials/character-inventory/hooks/use-open-character-sets';
 import { useOpenCharacterUsableInventory } from '../../../character-sheet/partials/character-inventory/hooks/use-open-character-usable-inventory';
+import {
+  GuideTarget,
+  GuideTargets,
+} from '../../../guide-quests/walkthrough/registry/guide-targets';
 import { useIsMobile } from '../../partials/actions/hooks/use-is-mobile';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
@@ -59,7 +63,8 @@ const CharacterInventoryMobileNavBar = (): ReactNode => {
   const renderItem = (
     label: string,
     iconClass: string,
-    onClick: () => void
+    onClick: () => void,
+    guideTarget: GuideTarget
   ): ReactNode => {
     return (
       <li className="flex items-stretch justify-center">
@@ -68,6 +73,7 @@ const CharacterInventoryMobileNavBar = (): ReactNode => {
           onClick={onClick}
           aria-label={label}
           className="w-full focus:outline-none"
+          data-guide-target={guideTarget}
         >
           <div className="flex h-full flex-col items-center justify-center">
             <i className={clsx(iconClass, 'text-base')} aria-hidden="true" />
@@ -96,10 +102,30 @@ const CharacterInventoryMobileNavBar = (): ReactNode => {
             className="h-full"
           >
             <ul className="grid h-full grid-cols-4 text-gray-800 dark:text-gray-100">
-              {renderItem('Backpack', 'ra ra-player', handleBackpack)}
-              {renderItem('Usable', 'ra ra-potion', handleUsable)}
-              {renderItem('Gems', 'ra ra-gem', handleGems)}
-              {renderItem('Sets', 'ra ra-helmet', handleSets)}
+              {renderItem(
+                'Backpack',
+                'ra ra-player',
+                handleBackpack,
+                GuideTargets.INVENTORY_BACKPACK
+              )}
+              {renderItem(
+                'Usable',
+                'ra ra-potion',
+                handleUsable,
+                GuideTargets.INVENTORY_USABLE
+              )}
+              {renderItem(
+                'Gems',
+                'ra ra-gem',
+                handleGems,
+                GuideTargets.INVENTORY_GEMS
+              )}
+              {renderItem(
+                'Sets',
+                'ra ra-helmet',
+                handleSets,
+                GuideTargets.INVENTORY_SETS
+              )}
             </ul>
           </nav>
         </div>

@@ -6,6 +6,10 @@ export const fillVariantStyles = (variant: ProgressBarVariant): string => {
   return match(variant)
     .with(ProgressBarVariant.PRIMARY, () => 'bg-danube-500 dark:bg-danube-300')
     .with(
+      ProgressBarVariant.TERRACOTTA,
+      () => 'bg-terracotta-500 dark:bg-terracotta-300'
+    )
+    .with(
       ProgressBarVariant.SUMMER,
       () => 'bg-mango-tango-500 dark:bg-mango-tango-300'
     )

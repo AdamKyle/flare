@@ -1,6 +1,7 @@
 import React, { ReactNode, useState } from 'react';
 
 import FactionDetailScreenProps from './types/faction-detail-screen-props';
+import { GuideTargets } from '../../guide-quests/walkthrough/registry/guide-targets';
 import PledgeResponseDefinition from '../api/definitions/pledge-response-definition';
 import { useFactionPledge } from '../api/hooks/use-faction-pledge';
 
@@ -117,6 +118,7 @@ const FactionDetailScreen = ({
         additional_css="w-full"
         disabled={pledging}
         on_click={() => void handlePledge()}
+        data_guide_target={GuideTargets.FACTION_PLEDGE}
       />
     );
   };
@@ -132,12 +134,16 @@ const FactionDetailScreen = ({
         variant={ButtonVariant.PRIMARY}
         additional_css="w-full"
         on_click={onOpenFactionLoyalty}
+        data_guide_target={GuideTargets.FACTION_LOYALTY_OPEN}
       />
     );
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div
+      className="flex flex-col gap-4"
+      data-guide-target={GuideTargets.FACTION_DETAIL_OVERVIEW}
+    >
       <Dl>
         <Dt>Level</Dt>
         <Dd>{faction.current_level}</Dd>
@@ -153,7 +159,7 @@ const FactionDetailScreen = ({
         <Dd>{isPledged ? 'Yes' : 'No'}</Dd>
       </Dl>
       {renderPledgeFeedback()}
-      {renderPledgeAction(faction.maxed)}
+      {renderPledgeAction(faction.can_pledge)}
       {renderFactionLoyaltyAction()}
     </div>
   );

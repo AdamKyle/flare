@@ -721,11 +721,44 @@ class CharacterInventoryService
      * @param int $perPage
      * @param int $page
      * @param string $searchText
+     * @param array $filters
      * @return array
      */
-    public function fetchCharacterInventory(int $perPage = 10, int $page = 1, string $searchText = ''): array
-    {
+    public function fetchCharacterInventory(
+        int $perPage = 10,
+        int $page = 1,
+        string $searchText = '',
+        array $filters = [],
+    ): array {
         $slots = $this->getInventoryCollection($searchText);
+
+        $itemTypes = $filters['item_types'] ?? [];
+
+        if (is_array($itemTypes) && count($itemTypes) > 0) {
+            $slots = $slots
+                ->filter(fn ($slot) => in_array($slot->item->type, $itemTypes, true))
+                ->values();
+        }
+
+        $rarity = $filters['rarity'] ?? null;
+
+        if (! is_null($rarity)) {
+            $slots = $slots
+                ->filter(function ($slot) use ($rarity): bool {
+                    $item = $slot->item;
+                    $isNormalRarity = ! $item->is_unique && ! $item->is_mythic && ! $item->is_cosmic;
+
+                    return match ($rarity) {
+                        'cosmic' => $item->is_cosmic === true,
+                        'mythic' => $item->is_mythic === true && $item->is_cosmic === false,
+                        'unique' => $item->is_unique === true && $item->is_mythic === false && $item->is_cosmic === false,
+                        'single-enchanted' => $item->affix_count === 1 && $isNormalRarity && $item->holy_stacks_applied === 0,
+                        'dual-enchanted' => $item->affix_count === 2 && $isNormalRarity && $item->holy_stacks_applied === 0,
+                        default => true,
+                    };
+                })
+                ->values();
+        }
 
         return $this->pagination->buildPaginatedDate($slots, $this->equippableItemTransformer, $perPage, $page);
     }

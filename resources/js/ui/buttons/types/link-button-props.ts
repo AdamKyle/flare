@@ -10,4 +10,5 @@ export default interface LinkButtonProps {
   additional_css?: string;
   disabled?: boolean;
   is_external?: boolean;
+  data_guide_target?: string;
 }

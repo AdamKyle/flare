@@ -5,7 +5,6 @@ namespace App\Game\Character\CharacterSheet\Controllers\Api;
 use App\Admin\Events\UpdateAdminChatEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterBoon;
-use App\Flare\Models\Event;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\User;
 use App\Game\Character\Builders\StatDetailsBuilder\StatModifierDetails;
@@ -18,7 +17,8 @@ use App\Game\Core\Events\GlobalTimeOut;
 use App\Game\Core\Jobs\EndGlobalTimeOut;
 use App\Game\Core\Requests\StatDetailsRequest;
 use App\Game\Core\Services\CharacterPassiveSkills;
-use App\Game\Events\Values\EventType;
+use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
+use App\Game\Maps\Values\MapName;
 use App\Game\Skills\Transformers\SkillsTransformer;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
@@ -35,7 +35,7 @@ class CharacterSheetController extends Controller
 
     private CharacterActiveBoonService $characterActiveBoonService;
 
-    public function __construct(Manager $manager, StatModifierDetails $statModifierDetails, CharacterActiveBoonService $characterActiveBoonService)
+    public function __construct(Manager $manager, StatModifierDetails $statModifierDetails, CharacterActiveBoonService $characterActiveBoonService, private readonly FactionLoyaltyService $factionLoyaltyService)
     {
         $this->manager = $manager;
         $this->statModifierDetails = $statModifierDetails;
@@ -141,30 +141,23 @@ class CharacterSheetController extends Controller
 
     public function factions(Character $character)
     {
-        $winterEvent = Event::where('type', EventType::WINTER_EVENT)->first();
+        $factionMapNames = MapName::factionMapNames();
 
-        $delusionalEvent = Event::where('type', EventType::DELUSIONAL_MEMORIES_EVENT)->first();
+        $factionGameMapIds = GameMap::whereIn('name', $factionMapNames)
+            ->pluck('id');
 
-        $removeGameMaps = [];
+        $factionMapOrder = array_flip($factionMapNames);
 
-        if (is_null($winterEvent)) {
+        $factions = $character->factions()
+            ->with('gameMap')
+            ->whereIn('game_map_id', $factionGameMapIds)
+            ->get()
+            ->sortBy(fn ($faction) => $factionMapOrder[$faction->gameMap->name] ?? PHP_INT_MAX)
+            ->values();
 
-            $gameMap = GameMap::where('only_during_event_type', EventType::WINTER_EVENT)->first();
-
-            $removeGameMaps[] = $gameMap->id;
-        }
-
-        if (is_null($delusionalEvent)) {
-
-            $gameMap = GameMap::where('only_during_event_type', EventType::DELUSIONAL_MEMORIES_EVENT)->first();
-
-            $removeGameMaps[] = $gameMap->id;
-        }
-
-        $factions = $character->factions()->whereNotIn('game_map_id', $removeGameMaps)->get();
-
-        $factions = $factions->transform(function ($faction) {
+        $factions = $factions->transform(function ($faction) use ($character) {
             $faction->map_name = $faction->gameMap->name;
+            $faction->can_pledge = $this->factionLoyaltyService->canPledge($character, $faction);
 
             return $faction;
         });

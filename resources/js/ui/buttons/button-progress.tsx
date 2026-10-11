@@ -31,6 +31,7 @@ const ProgressButton = (props: ProgressButtonProps): ReactNode => {
       disabled={props.disabled}
       type="button"
       style={{ position: 'relative' }}
+      data-guide-target={props.data_guide_target}
     >
       <span className="relative z-10">{props.label}</span>
       {(props.announce_progress ?? true) && (

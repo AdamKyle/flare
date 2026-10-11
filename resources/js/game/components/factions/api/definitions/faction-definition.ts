@@ -6,6 +6,7 @@ export default interface FactionDefinition {
   current_points: number;
   points_needed: number;
   maxed: boolean;
+  can_pledge: boolean;
   title: string | null;
   map_name: string;
 }

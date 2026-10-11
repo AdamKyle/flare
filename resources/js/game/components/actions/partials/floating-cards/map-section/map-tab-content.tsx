@@ -5,6 +5,7 @@ import React, { ReactNode } from 'react';
 import GemWorldActions from './gem-world-actions';
 import { MapMovementTypes } from './map-movement-types/map-movement-types';
 import MapTabContentProps from './types/map-tab-content-props';
+import { GuideTargets } from '../../../../guide-quests/walkthrough/registry/guide-targets';
 import Map from '../../../../map-section/map';
 
 import { Alert } from 'ui/alerts/alert';
@@ -155,6 +156,7 @@ const MapTabContent = ({
           label={'Factions'}
           variant={ButtonVariant.PRIMARY}
           additional_css={'w-full'}
+          data_guide_target={GuideTargets.MAP_FACTIONS}
         />
       </div>
       <GemWorldActions {...gemWorldActionsProps} />

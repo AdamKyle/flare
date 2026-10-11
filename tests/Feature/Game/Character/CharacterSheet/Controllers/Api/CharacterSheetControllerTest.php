@@ -2,9 +2,10 @@
 
 namespace Tests\Feature\Game\Character\CharacterSheet\Controllers\Api;
 
+use App\Flare\Models\GameMap;
 use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Items\Values\ItemType;
-use App\Game\Events\Values\EventType;
+use App\Game\Maps\Values\MapName;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
@@ -340,26 +341,50 @@ class CharacterSheetControllerTest extends TestCase
         $this->assertArrayHasKey('automations', $response->json());
     }
 
-    public function test_factions_returns_factions_excluding_inactive_seasonal_event_maps(): void
+    public function test_factions_returns_only_canonical_faction_maps_in_canonical_order(): void
     {
-        $winterMap = $this->createGameMap(['only_during_event_type' => EventType::WINTER_EVENT]);
-        $delusionalMap = $this->createGameMap(['only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT]);
-        $regularMap = $this->createGameMap();
-
         $character = $this->character->getCharacter();
 
-        $this->createFaction(['character_id' => $character->id, 'game_map_id' => $winterMap->id]);
-        $this->createFaction(['character_id' => $character->id, 'game_map_id' => $delusionalMap->id]);
-        $this->createFaction(['character_id' => $character->id, 'game_map_id' => $regularMap->id]);
+        foreach (MapName::factionMapNames() as $mapName) {
+            $gameMap = GameMap::where('name', $mapName)->first();
+
+            if (is_null($gameMap)) {
+                $gameMap = $this->createGameMap(['name' => $mapName]);
+            }
+
+            $character->factions()->firstOrCreate(
+                ['game_map_id' => $gameMap->id],
+                [
+                    'current_level' => 1,
+                    'current_points' => 0,
+                    'points_needed' => 100,
+                    'maxed' => false,
+                ],
+            );
+        }
+
+        $purgatory = GameMap::where('name', MapName::PURGATORY->value)->first();
+
+        if (is_null($purgatory)) {
+            $purgatory = $this->createGameMap(['name' => MapName::PURGATORY->value]);
+        }
+
+        $testGemWorld = $this->createGameMap(['name' => 'Test Gem World']);
+
+        $this->createFaction(['character_id' => $character->id, 'game_map_id' => $purgatory->id]);
+        $this->createFaction(['character_id' => $character->id, 'game_map_id' => $testGemWorld->id]);
 
         $response = $this->actingAs($character->user)
             ->getJson('/api/character-sheet/'.$character->id.'/factions');
 
         $response->assertOk();
         $factions = $response->json('factions');
-        $this->assertCount(1, $factions);
-        $this->assertSame($regularMap->id, $factions[0]['game_map_id']);
-        $this->assertSame($regularMap->name, $factions[0]['map_name']);
+        $mapNames = array_column($factions, 'map_name');
+
+        $this->assertCount(8, $factions);
+        $this->assertSame(MapName::factionMapNames(), $mapNames);
+        $this->assertNotContains(MapName::PURGATORY->value, $mapNames);
+        $this->assertNotContains('Test Gem World', $mapNames);
     }
 
     public function test_skills_returns_character_skills_and_passives(): void

@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 
+import TrainingSkillProgress from './training-skill-progress';
 import CombatStatusCurrency from './types/combat-status-currency';
 import CurrencyDisplay from '../../../../reusable-components/currency/currency-display';
 import { CurrencyDisplayMode } from '../../../../reusable-components/currency/enums/currency-display-mode';
@@ -61,6 +62,7 @@ const CharacterCombatStatus = (): ReactNode => {
         }
         aria_label={`Character level ${displayedLevel} experience progress`}
       />
+      <TrainingSkillProgress />
       <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-gray-800 lg:grid-cols-4 dark:text-gray-200">
         {currencies.map(renderCurrency)}
       </div>

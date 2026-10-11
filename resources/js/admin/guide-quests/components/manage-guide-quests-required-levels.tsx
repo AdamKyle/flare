@@ -67,6 +67,10 @@ const ManageGuideQuestsRequiredLevels = ({
     return getPreselected(skillItems, guideQuest?.required_secondary_skill);
   }, [skillItems, guideQuest?.required_secondary_skill]);
 
+  const preselectedTrainingSkill = useMemo(() => {
+    return getPreselected(skillItems, guideQuest?.required_training_skill);
+  }, [skillItems, guideQuest?.required_training_skill]);
+
   const preselectedSkillType = useMemo(() => {
     return getPreselected(skillTypeItems, guideQuest?.required_skill_type);
   }, [skillTypeItems, guideQuest?.required_skill_type]);
@@ -80,6 +84,50 @@ const ManageGuideQuestsRequiredLevels = ({
         <Input
           default_value={getDefaultString(guideQuest?.required_level)}
           on_change={(value) => handleUpdateFormData('required_level', value)}
+        />
+      </div>
+
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
+          Required Exploration Hours
+        </label>
+        <Input
+          default_value={getDefaultString(
+            guideQuest?.required_exploration_hours
+          )}
+          on_change={(value) =>
+            handleUpdateFormData('required_exploration_hours', value)
+          }
+        />
+      </div>
+
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
+          Required Training Skill
+        </label>
+        <Dropdown
+          items={skillItems}
+          pre_selected_item={preselectedTrainingSkill}
+          on_select={(value) =>
+            handleUpdateFormData('required_training_skill', value)
+          }
+        />
+      </div>
+
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
+          Required Training XP Sacrifice
+        </label>
+        <p className="mb-2 text-xs text-gray-600 dark:text-gray-400">
+          Enter a decimal fraction; 0.10 equals 10%.
+        </p>
+        <Input
+          default_value={getDefaultString(
+            guideQuest?.required_training_xp_sacrifice
+          )}
+          on_change={(value) =>
+            handleUpdateFormData('required_training_xp_sacrifice', value)
+          }
         />
       </div>
 

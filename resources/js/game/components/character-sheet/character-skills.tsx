@@ -5,6 +5,7 @@ import { useCharacterSkills } from './skills/api/hooks/use-character-skills';
 import SkillCardList from './skills/components/skill-card-list';
 import SkillCardListProps from './skills/components/types/skill-card-list-props';
 import { useOpenCharacterSkillDetail } from './skills/hooks/use-open-character-skill-detail';
+import { GuideTargets } from '../guide-quests/walkthrough/registry/guide-targets';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
 
@@ -46,6 +47,7 @@ const CharacterSkills = (): ReactNode => {
   > = [
     {
       label: 'Training Skills',
+      data_guide_target: GuideTargets.TRAINING_SKILLS_TAB,
       component: SkillCardList,
       props: {
         skills: trainingSkills,
@@ -64,7 +66,11 @@ const CharacterSkills = (): ReactNode => {
     },
   ];
 
-  return <PillTabs tabs={tabs} ariaLabel="Skill categories" />;
+  return (
+    <div data-guide-target={GuideTargets.SKILLS_OVERVIEW}>
+      <PillTabs tabs={tabs} ariaLabel="Skill categories" />
+    </div>
+  );
 };
 
 export default CharacterSkills;

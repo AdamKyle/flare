@@ -33,6 +33,7 @@ const FloatingCard = (props: FloatingCardProps) => {
           className="transform cursor-pointer border-none bg-transparent p-0 transition-all duration-300 ease-in-out hover:scale-105"
           onClick={props.close_action}
           aria-label="Close"
+          data-guide-target={props.close_button_data_guide_target}
         >
           <i
             className="fas fa-times-circle rounded-full p-1 text-lg text-rose-600 dark:text-rose-500"

@@ -8,6 +8,7 @@ const ActivitySidePeek = (): ReactNode => {
   const { closeSidePeek } = useCloseSidePeekEmitter();
   const {
     has_new_announcements,
+    has_guide_quest_attention,
     open_announcements,
     open_guide_quests,
     open_donations,
@@ -17,6 +18,7 @@ const ActivitySidePeek = (): ReactNode => {
     <div className="py-4">
       <ActivityContent
         has_new_announcements={has_new_announcements}
+        has_guide_quest_attention={has_guide_quest_attention}
         on_open_announcements={open_announcements}
         on_open_guide_quests={open_guide_quests}
         on_open_donations={open_donations}

@@ -1,6 +1,7 @@
 import React, { ReactNode, useId } from 'react';
 
 import FactionCardProps from './types/faction-card-props';
+import { GuideTargets } from '../../guide-quests/walkthrough/registry/guide-targets';
 import { factionCardStyles } from '../styles/faction-card-styles';
 
 import Button from 'ui/buttons/button';
@@ -69,7 +70,14 @@ const FactionCard = ({
   };
 
   return (
-    <article className={factionCardStyles}>
+    <article
+      className={factionCardStyles}
+      data-guide-target={
+        faction.map_name === 'Surface'
+          ? GuideTargets.SURFACE_FACTION
+          : undefined
+      }
+    >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="font-semibold">{faction.map_name}</h3>
         <div className="flex flex-wrap items-center gap-3">

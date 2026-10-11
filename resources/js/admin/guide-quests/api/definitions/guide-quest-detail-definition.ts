@@ -19,6 +19,10 @@ export default interface GuideQuestDetailDefinition {
   desktop_instructions: GuideQuestContentBlockDefinition[] | null;
   mobile_instructions: GuideQuestContentBlockDefinition[] | null;
   required_level: number | null;
+  required_exploration_hours: number | null;
+  required_training_skill: number | null;
+  training_skill_name: string | null;
+  required_training_xp_sacrifice: number | null;
   required_reincarnation_amount: number | null;
   unlock_at_level: number | null;
   required_skill: number | null;

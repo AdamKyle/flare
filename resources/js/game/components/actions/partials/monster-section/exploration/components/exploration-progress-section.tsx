@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react';
 
 import ExplorationDetailSection from './exploration-detail-section';
+import { GuideTargets } from '../../../../../guide-quests/walkthrough/registry/guide-targets';
 import ExplorationChartPointDefinition from '../types/exploration-chart-point-definition';
 import ExplorationProgressSectionProps from '../types/exploration-progress-section-props';
 import { formatExplorationDuration } from '../utils/format-exploration-duration';
@@ -132,6 +133,7 @@ const ExplorationProgressSection = (
       label: 'Exploration Progress Break Down',
       component: ExplorationProgressBreakDown,
       props,
+      data_guide_target: GuideTargets.EXPLORATION_PROGRESS,
     },
   ] as const;
 

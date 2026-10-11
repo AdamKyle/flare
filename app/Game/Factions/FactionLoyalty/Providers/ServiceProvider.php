@@ -17,7 +17,9 @@ class ServiceProvider extends ApplicationServiceProvider
     public function register()
     {
         $this->app->bind(FactionLoyaltyService::class, function ($app) {
-            return new FactionLoyaltyService($app->make(RandomNumberGenerator::class));
+            return new FactionLoyaltyService(
+                $app->make(RandomNumberGenerator::class),
+            );
         });
 
         $this->app->bind(UpdateFactionLoyaltyService::class, function ($app) {

@@ -19,6 +19,7 @@ const HorizontalIcons = ({
             inventoryButton.onClick();
           }}
           additional_css={inventoryButton.additionalCss}
+          data_guide_target={inventoryButton.dataGuideTarget}
         />
       );
     });

@@ -11,6 +11,7 @@ const MobileActivityPanel = ({
 }: MobileActivityPanelProps): ReactNode => {
   const {
     has_new_announcements,
+    has_guide_quest_attention,
     open_announcements,
     open_guide_quests,
     open_donations,
@@ -20,6 +21,7 @@ const MobileActivityPanel = ({
     <MobilePanel title="Activity" on_close={on_close}>
       <ActivityContent
         has_new_announcements={has_new_announcements}
+        has_guide_quest_attention={has_guide_quest_attention}
         on_open_announcements={open_announcements}
         on_open_guide_quests={open_guide_quests}
         on_open_donations={open_donations}

@@ -1,17 +1,18 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 
 import FactionCard from './faction-card';
 import FactionsScreenProps from './types/factions-screen-props';
+import { GuideTargets } from '../../guide-quests/walkthrough/registry/guide-targets';
 import FactionDefinition from '../api/definitions/faction-definition';
 import { useFetchFactions } from '../api/hooks/use-fetch-factions';
-import { FACTION_LIST_BATCH_SIZE } from '../constants/faction-list-constants';
+import { FACTION_LIST_PAGE_SIZE } from '../constants/faction-list-constants';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
-import { useProgressiveList } from 'ui/infinite-scroll/hooks/use-progressive-list';
-import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
+import Button from 'ui/buttons/button';
+import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const FactionsScreen = ({
@@ -21,15 +22,29 @@ const FactionsScreen = ({
   const { gameData } = useGameData();
   const { factions, loading, error } = useFetchFactions(characterId);
 
-  const { visible_count: visibleCount, handle_scroll: handleScroll } =
-    useProgressiveList({
-      total_items: factions.length,
-      batch_size: FACTION_LIST_BATCH_SIZE,
-      initial_count: FACTION_LIST_BATCH_SIZE,
-    });
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(factions.length / FACTION_LIST_PAGE_SIZE)
+  );
+
+  useEffect(() => {
+    if (currentPage <= totalPages) {
+      return;
+    }
+
+    setCurrentPage(totalPages);
+  }, [currentPage, totalPages]);
+
+  const pageStart = (currentPage - 1) * FACTION_LIST_PAGE_SIZE;
+
+  const visibleFactions = factions.slice(
+    pageStart,
+    pageStart + FACTION_LIST_PAGE_SIZE
+  );
 
   const pledgedFactionId = gameData?.character?.pledged_to_faction_id ?? null;
-  const visibleFactions = factions.slice(0, visibleCount);
 
   const handleOpenFaction = (factionId: number) => {
     const faction = factions.find((candidate) => candidate.id === factionId);
@@ -51,6 +66,37 @@ const FactionsScreen = ({
     </li>
   );
 
+  const renderPagination = (): ReactNode => {
+    if (totalPages <= 1) {
+      return null;
+    }
+
+    return (
+      <div
+        className="flex items-center justify-between gap-3"
+        aria-label="Faction pagination"
+      >
+        <Button
+          label="Previous"
+          variant={ButtonVariant.PRIMARY}
+          disabled={currentPage === 1}
+          on_click={() => setCurrentPage((page) => Math.max(1, page - 1))}
+        />
+        <span className="text-sm text-gray-700 dark:text-gray-300">
+          Page {currentPage} of {totalPages}
+        </span>
+        <Button
+          label="Next"
+          variant={ButtonVariant.PRIMARY}
+          disabled={currentPage === totalPages}
+          on_click={() =>
+            setCurrentPage((page) => Math.min(totalPages, page + 1))
+          }
+        />
+      </div>
+    );
+  };
+
   const renderFactions = (): ReactNode => {
     if (loading) {
       return <InfiniteLoader />;
@@ -69,19 +115,25 @@ const FactionsScreen = ({
     }
 
     return (
-      <InfiniteScroll handle_scroll={handleScroll} additional_css="max-h-64">
+      <div className="flex flex-col gap-3">
         <ul className="flex flex-col gap-3">
           {visibleFactions.map(renderFactionCard)}
         </ul>
+        {renderPagination()}
         <p className="sr-only" role="status" aria-live="polite">
-          Showing {visibleFactions.length} of {factions.length} Factions.
+          Showing {pageStart + 1} to{' '}
+          {Math.min(pageStart + visibleFactions.length, factions.length)} of{' '}
+          {factions.length} Factions.
         </p>
-      </InfiniteScroll>
+      </div>
     );
   };
 
   return (
-    <div className="flex flex-col gap-3">
+    <div
+      className="flex flex-col gap-3"
+      data-guide-target={GuideTargets.FACTIONS_OVERVIEW}
+    >
       <p className="text-sm text-gray-700 dark:text-gray-300">
         Only one Faction can hold your pledge at a time.
       </p>

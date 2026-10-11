@@ -2,6 +2,7 @@ import React, { ReactNode } from 'react';
 
 import SkillContributingItemCard from './skill-contributing-item-card';
 import SkillItemsAffectingListProps from './types/skill-items-affecting-list-props';
+import { GuideTargets } from '../../../guide-quests/walkthrough/registry/guide-targets';
 import SkillItemContributionDefinition from '../api/definitions/skill-item-contribution-definition';
 import { SKILL_LIST_BATCH_SIZE } from '../constants/skill-list-constants';
 
@@ -52,6 +53,7 @@ const SkillItemsAffectingList = ({
     <section
       aria-label="Items affecting this Skill"
       className="flex flex-col gap-2"
+      data-guide-target={GuideTargets.SKILL_ITEMS_AFFECTING}
     >
       <h3 className="font-semibold text-gray-900 dark:text-gray-100">
         Items Affecting This Skill

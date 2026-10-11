@@ -1,10 +1,11 @@
+import clsx from 'clsx';
 import React, { ReactNode } from 'react';
 
 import CharacterActiveBoonIndicator from './character-active-boon-indicator';
 import { useCharacterActiveBoonStatus } from './hooks/use-character-active-boon-status';
-import ActivityStatusIndicator from '../../../activity/components/activity-status-indicator';
 import { useActivityActions } from '../../../activity/hooks/use-activity-actions';
 import { useOpenActivitySidePeek } from '../../../activity/hooks/use-open-activity-side-peek';
+import { GuideTargets } from '../../../guide-quests/walkthrough/registry/guide-targets';
 import { useManageQuestLogVisibility } from '../../../quests/hooks/use-manage-quest-log-visibility';
 import { useManageCharacterCardVisibility } from '../floating-cards/character-details/hooks/use-manage-character-card-visibility';
 import { useManageCraftingCardVisibility } from '../floating-cards/crafting-section/hooks/use-manage-crafting-card-visibility';
@@ -16,7 +17,8 @@ import IconButton from 'ui/buttons/icon-button';
 import IconContainer from 'ui/icon-container/icon-container';
 
 export const IconSection = (): ReactNode => {
-  const { openCharacterCard } = useManageCharacterCardVisibility();
+  const { openCharacterCard, showCharacterCard } =
+    useManageCharacterCardVisibility();
 
   const { openCraftingCard } = useManageCraftingCardVisibility();
 
@@ -30,10 +32,10 @@ export const IconSection = (): ReactNode => {
 
   const { open_activity } = useOpenActivitySidePeek();
 
-  const { has_new_announcements } = useActivityActions();
+  const { has_activity_attention } = useActivityActions();
 
-  const activityAriaLabel = has_new_announcements
-    ? 'Activity, new announcements available'
+  const activityAriaLabel = has_activity_attention
+    ? 'Activity, attention required'
     : 'Activity';
 
   return (
@@ -47,6 +49,8 @@ export const IconSection = (): ReactNode => {
         status_indicator={
           <CharacterActiveBoonIndicator active={hasActiveBoons} />
         }
+        data_guide_target={GuideTargets.CHARACTER_OPEN}
+        data_guide_target_complete={showCharacterCard}
       />
       <IconButton
         label="Craft"
@@ -68,6 +72,7 @@ export const IconSection = (): ReactNode => {
         variant={ButtonVariant.PRIMARY}
         on_click={openMapCard}
         additional_css="w-full lg:w-auto"
+        data_guide_target={GuideTargets.MAP_OPEN}
       />
       <IconButton
         label="Shop"
@@ -78,14 +83,19 @@ export const IconSection = (): ReactNode => {
       />
       <IconButton
         label="Activity"
-        icon={<i className="far fa-bell text-sm" aria-hidden="true"></i>}
+        icon={
+          <i
+            className={clsx('far fa-bell text-sm', {
+              'text-mango-tango-600 dark:text-mango-tango-400 animate-pulse motion-reduce:animate-none':
+                has_activity_attention,
+            })}
+            aria-hidden="true"
+          ></i>
+        }
         variant={ButtonVariant.PRIMARY}
         on_click={open_activity}
         additional_css="w-full lg:w-auto"
         aria_label={activityAriaLabel}
-        status_indicator={
-          <ActivityStatusIndicator active={has_new_announcements} />
-        }
       />
     </IconContainer>
   );

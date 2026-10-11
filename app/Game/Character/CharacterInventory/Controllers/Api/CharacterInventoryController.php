@@ -55,7 +55,12 @@ class CharacterInventoryController extends Controller
     public function inventory(PaginationRequest $request, Character $character): JsonResponse
     {
         return response()->json(
-            $this->characterInventoryService->setCharacter($character)->fetchCharacterInventory($request->per_page, $request->page, $request->search_text)
+            $this->characterInventoryService->setCharacter($character)->fetchCharacterInventory(
+                $request->per_page,
+                $request->page,
+                $request->search_text,
+                $request->filters,
+            )
         );
     }
 
@@ -101,10 +106,10 @@ class CharacterInventoryController extends Controller
 
         return response()->json([
             'equipped' => ['data' => $equipped['data'] ?? []],
-            'weapon_damage' => $character->getInformation()->buildDamage(ItemType::validWeapons()),
-            'spell_damage' => $character->getInformation()->buildDamage(ItemType::SPELL_DAMAGE->value),
-            'healing_amount' => $character->getInformation()->buildHealing(),
-            'defence_amount' => $character->getInformation()->buildDefence(),
+            'weapon_damage' => $this->roundStat($character->getInformation()->buildDamage(ItemType::validWeapons())),
+            'spell_damage' => $this->roundStat($character->getInformation()->buildDamage(ItemType::SPELL_DAMAGE->value)),
+            'healing_amount' => $this->roundStat($character->getInformation()->buildHealing()),
+            'defence_amount' => $this->roundStat($character->getInformation()->buildDefence()),
             'set_name' => $characterInventoryService->getSetName(),
         ]);
     }
@@ -616,5 +621,16 @@ class CharacterInventoryController extends Controller
         unset($result['status']);
 
         return response()->json($result, $status);
+    }
+
+    /**
+     * Round a Character stat or combat value to the nearest whole number.
+     *
+     * @param float|int $value
+     * @return int
+     */
+    private function roundStat(float|int $value): int
+    {
+        return round($value);
     }
 }

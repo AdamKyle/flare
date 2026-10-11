@@ -43,7 +43,7 @@ class CheckForCompleteGuideQuests extends Command
                     if ($this->canHandIn($quest, $data['can_hand_in'])) {
                         event(new ShowGuideQuestCompletedToast($user, true));
 
-                        return;
+                        continue 2;
                     }
                 }
             }

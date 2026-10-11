@@ -89,6 +89,21 @@ export const buildGuideQuestShowSections = (
     rows: [
       { label: 'Required Level', value: guideQuest.required_level },
       {
+        label: 'Required Exploration Hours',
+        value: formatHours(guideQuest.required_exploration_hours),
+      },
+      {
+        label: 'Required Training Skill',
+        value: guideQuest.training_skill_name,
+      },
+      {
+        label: 'Required Training XP Sacrifice',
+        value:
+          guideQuest.required_training_xp_sacrifice === null
+            ? null
+            : `${guideQuest.required_training_xp_sacrifice * 100}%`,
+      },
+      {
         label: 'Required Reincarnations',
         value: guideQuest.required_reincarnation_amount,
       },

@@ -25,6 +25,25 @@ enum MapName: string
         );
     }
 
+    /**
+     * Return the map names that have normal player Factions.
+     *
+     * @return array
+     */
+    public static function factionMapNames(): array
+    {
+        return [
+            self::SURFACE->value,
+            self::LABYRINTH->value,
+            self::DUNGEONS->value,
+            self::ICE_PLANE->value,
+            self::DELUSIONAL_MEMORIES->value,
+            self::HELL->value,
+            self::TWISTED_MEMORIES->value,
+            self::SHADOW_PLANE->value,
+        ];
+    }
+
     public static function kingdomColors(): array
     {
         return [

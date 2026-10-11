@@ -51,6 +51,30 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->factionLoyaltyService = null;
     }
 
+    public function test_can_pledge_requires_the_faction_to_be_maxed(): void
+    {
+        $faction = $this->character->factions()->firstOrFail();
+
+        $faction->update([
+            'maxed' => false,
+        ]);
+        $this->character->user->update([
+            'guide_enabled' => true,
+        ]);
+
+        $this->assertFalse(
+            $this->factionLoyaltyService->canPledge($this->character->refresh(), $faction->refresh())
+        );
+
+        $faction->update([
+            'maxed' => true,
+        ]);
+
+        $this->assertTrue(
+            $this->factionLoyaltyService->canPledge($this->character->refresh(), $faction->refresh())
+        );
+    }
+
     public function test_get_no_faction_loyalty_for_plane()
     {
         $this->createNpc([

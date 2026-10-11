@@ -7,6 +7,7 @@ use App\Flare\Models\BatchCrafting;
 use App\Flare\Models\Character;
 use App\Flare\Models\DelveExploration;
 use App\Flare\Models\DelveLog;
+use App\Flare\Models\ExplorationLog;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GlobalEventGoal;
@@ -91,6 +92,50 @@ class GuideQuestRequirementsService
             if ($lastDelveExploration->started_at->diffInHours($lastDelveExploration->completed_at) >= $quest->required_delve_survival_time) {
                 $this->finishedRequirements[] = 'required_delve_survival_time';
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Determine whether the Character completed an Exploration of the required duration.
+     *
+     * @return $this
+     */
+    public function requiredExplorationHours(Character $character, GuideQuest $quest): GuideQuestRequirementsService
+    {
+        if (is_null($quest->required_exploration_hours)) {
+            return $this;
+        }
+
+        $completedExplorations = ExplorationLog::where('character_id', $character->id)
+            ->whereNotNull('ended_at')
+            ->get();
+
+        if ($completedExplorations->contains(fn (ExplorationLog $log): bool => $log->started_at->diffInMinutes($log->ended_at) >= $quest->required_exploration_hours * 60)) {
+            $this->finishedRequirements[] = 'required_exploration_hours';
+        }
+
+        return $this;
+    }
+
+    /**
+     * Determine whether the required Skill is actively training at the configured XP sacrifice.
+     *
+     * @return $this
+     */
+    public function requiredTrainingSkill(Character $character, GuideQuest $quest): GuideQuestRequirementsService
+    {
+        if (is_null($quest->required_training_skill) || is_null($quest->required_training_xp_sacrifice)) {
+            return $this;
+        }
+
+        $skill = $character->skills()
+            ->where('game_skill_id', $quest->required_training_skill)
+            ->first();
+
+        if (! is_null($skill) && $skill->currently_training && abs($skill->xp_towards - $quest->required_training_xp_sacrifice) < 0.00001) {
+            $this->finishedRequirements[] = 'required_training_xp_sacrifice';
         }
 
         return $this;

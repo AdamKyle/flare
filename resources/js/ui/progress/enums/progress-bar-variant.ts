@@ -5,4 +5,5 @@ export enum ProgressBarVariant {
   ARTIC,
   DE_YORK,
   XP,
+  TERRACOTTA = 'terracotta',
 }

@@ -67,11 +67,13 @@ const buildTabs = (
         activity_icon: bellIconClass,
         icon_styles: bellIconStyles,
         props: explorationProps,
+        data_guide_target: GuideTargets.EXPLORATION_MESSAGES_TAB,
       } as const)
     : ({
         label: 'Exploration',
         component: explorationComponent,
         props: explorationProps,
+        data_guide_target: GuideTargets.EXPLORATION_MESSAGES_TAB,
       } as const);
 
   return [chatTab, serverTab, explorationTab] as const;

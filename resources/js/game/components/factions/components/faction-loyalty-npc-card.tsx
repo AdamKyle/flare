@@ -1,6 +1,7 @@
 import React, { ReactNode, useId } from 'react';
 
 import FactionLoyaltyNpcCardProps from './types/faction-loyalty-npc-card-props';
+import { GuideTargets } from '../../guide-quests/walkthrough/registry/guide-targets';
 import { factionCardStyles } from '../styles/faction-card-styles';
 import { isFactionLoyaltyNpcMastered } from '../utils/is-faction-loyalty-npc-mastered';
 
@@ -66,6 +67,7 @@ const FactionLoyaltyNpcCard = ({
       {renderProgress()}
       <Button
         label="View NPC Tasks"
+        data_guide_target={GuideTargets.FACTION_LOYALTY_NPC}
         aria_label={`View ${factionLoyaltyNpc.npc.real_name}'s tasks`}
         variant={ButtonVariant.PRIMARY}
         additional_css="w-full"

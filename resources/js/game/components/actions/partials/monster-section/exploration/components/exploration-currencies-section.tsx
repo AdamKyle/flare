@@ -5,6 +5,7 @@ import CurrencyDisplay from '../../../../../../reusable-components/currency/curr
 import { CurrencyDisplayMode } from '../../../../../../reusable-components/currency/enums/currency-display-mode';
 import { CurrencyType } from '../../../../../../reusable-components/currency/enums/currency-type';
 import { formatCurrencyText } from '../../../../../../reusable-components/currency/utils/format-currency-text';
+import { GuideTargets } from '../../../../../guide-quests/walkthrough/registry/guide-targets';
 import ExplorationChartPointDefinition from '../types/exploration-chart-point-definition';
 import ExplorationCurrenciesSectionProps from '../types/exploration-currencies-section-props';
 import { formatExplorationDuration } from '../utils/format-exploration-duration';
@@ -159,6 +160,16 @@ const ExplorationCurrenciesChart = ({
 const ExplorationCurrenciesBreakDown = ({
   currencies,
 }: ExplorationCurrenciesSectionProps): ReactNode => {
+  const currencyEntries = resolveCurrencyEntries(currencies);
+
+  if (currencyEntries.length === 0) {
+    return (
+      <p className="text-sm text-gray-600 italic dark:text-gray-400">
+        Currency totals will appear once an encounter rewards them.
+      </p>
+    );
+  }
+
   const renderAmount = (currency: string, amount: number): ReactNode => {
     const currencyType = resolveExplorationCurrencyType(currency);
 
@@ -183,19 +194,12 @@ const ExplorationCurrenciesBreakDown = ({
     </React.Fragment>
   );
 
-  return <Dl>{resolveCurrencyEntries(currencies).map(renderCurrency)}</Dl>;
+  return <Dl>{currencyEntries.map(renderCurrency)}</Dl>;
 };
 
 const ExplorationCurrenciesSection = (
   props: ExplorationCurrenciesSectionProps
 ): ReactNode => {
-  const hasCurrencyEntries =
-    resolveCurrencyEntries(props.currencies).length > 0;
-
-  if (!hasCurrencyEntries) {
-    return null;
-  }
-
   const tabs = [
     {
       label: 'Currencies Gained Chart',
@@ -206,6 +210,7 @@ const ExplorationCurrenciesSection = (
       label: 'Currencies Gained Break Down',
       component: ExplorationCurrenciesBreakDown,
       props,
+      data_guide_target: GuideTargets.EXPLORATION_CURRENCIES,
     },
   ] as const;
 

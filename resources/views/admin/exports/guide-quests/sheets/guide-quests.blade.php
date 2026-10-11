@@ -8,6 +8,9 @@
             <th>desktop_instructions</th>
             <th>mobile_instructions</th>
             <th>required_level</th>
+            <th>required_exploration_hours</th>
+            <th>required_training_skill</th>
+            <th>required_training_xp_sacrifice</th>
             <th>required_reincarnation_amount</th>
             <th>required_skill</th>
             <th>required_skill_level</th>
@@ -19,6 +22,7 @@
             <th>required_class_rank_level</th>
             <th>required_faction_id</th>
             <th>required_faction_level</th>
+            <th>faction_points_per_kill</th>
             <th>required_game_map_id</th>
             <th>required_quest_id</th>
             <th>required_quest_item_id</th>
@@ -88,6 +92,9 @@
                     {{ json_encode($guideQuest->mobile_instructions, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) }}
                 </td>
                 <td>{{ $guideQuest->required_level }}</td>
+                <td>{{ $guideQuest->required_exploration_hours }}</td>
+                <td>{{ !is_null($guideQuest->required_training_skill) ? $guideQuest->training_skill_name : '' }}</td>
+                <td>{{ $guideQuest->required_training_xp_sacrifice }}</td>
                 <td>{{ $guideQuest->required_reincarnation_amount }}</td>
                 <td>{{ !is_null($guideQuest->required_skill) ? $guideQuest->skill_name : '' }}</td>
                 <td>{{ $guideQuest->required_skill_level }}</td>
@@ -99,6 +106,7 @@
                 <td>{{ $guideQuest->required_class_rank_level }}</td>
                 <td>{{ !is_null($guideQuest->required_faction_id) ? $guideQuest->faction_name : '' }}</td>
                 <td>{{ $guideQuest->required_faction_level }}</td>
+                <td>{{ $guideQuest->faction_points_per_kill }}</td>
                 <td>{{ !is_null($guideQuest->required_game_map_id) ? $guideQuest->game_map_name : '' }}</td>
                 <td>{{ !is_null($guideQuest->required_quest_id) ? $guideQuest->quest_name : '' }}</td>
                 <td>{{ !is_null($guideQuest->required_quest_item_id) ? $guideQuest->quest_item_name : '' }}</td>

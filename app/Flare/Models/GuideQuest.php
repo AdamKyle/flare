@@ -29,6 +29,9 @@ class GuideQuest extends Model
         'desktop_instructions',
         'mobile_instructions',
         'required_level',
+        'required_exploration_hours',
+        'required_training_skill',
+        'required_training_xp_sacrifice',
         'required_reincarnation_amount',
         'required_skill',
         'required_skill_level',
@@ -99,6 +102,9 @@ class GuideQuest extends Model
         'desktop_instructions' => 'array',
         'mobile_instructions' => 'array',
         'required_level' => 'integer',
+        'required_exploration_hours' => 'integer',
+        'required_training_skill' => 'integer',
+        'required_training_xp_sacrifice' => 'float',
         'required_reincarnation_amount' => 'integer',
         'required_skill' => 'integer',
         'required_skill_level' => 'integer',
@@ -158,6 +164,7 @@ class GuideQuest extends Model
 
     protected $appends = [
         'skill_name',
+        'training_skill_name',
         'faction_name',
         'game_map_name',
         'quest_name',
@@ -202,6 +209,16 @@ class GuideQuest extends Model
     public function getSkillNameAttribute(): ?string
     {
         return GameSkill::find($this->required_skill)?->name;
+    }
+
+    /**
+     * Return the name of the Skill required for training.
+     *
+     * @return string|null
+     */
+    public function getTrainingSkillNameAttribute(): ?string
+    {
+        return GameSkill::find($this->required_training_skill)?->name;
     }
 
     /**

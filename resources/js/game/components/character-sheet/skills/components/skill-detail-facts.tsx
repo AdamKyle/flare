@@ -1,6 +1,7 @@
 import React, { ReactNode, useId } from 'react';
 
 import SkillDetailFactsProps from './types/skill-detail-facts-props';
+import { GuideTargets } from '../../../guide-quests/walkthrough/registry/guide-targets';
 import SkillFactRowDefinition from '../types/skill-fact-row-definition';
 import { buildSkillModifierRows } from '../utils/build-skill-modifier-rows';
 import { formatSkillPercentage } from '../utils/format-skill-percentage';
@@ -95,7 +96,10 @@ const SkillDetailFacts = ({ skill }: SkillDetailFactsProps): ReactNode => {
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div
+      className="flex flex-col gap-4"
+      data-guide-target={GuideTargets.SKILL_FACTS}
+    >
       {renderDescription()}
       <Dl>
         <Dt>Level</Dt>

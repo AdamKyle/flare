@@ -18,6 +18,7 @@ import MapTabContent from './map-tab-content';
 import { resolveMapCardScreenTitle } from './utils/resolve-map-card-screen-title';
 import ScreenTransition from '../../../../../reusable-components/screen-transition/screen-transition';
 import { useFactionLoyaltyContext } from '../../../../factions/hooks/use-faction-loyalty-context';
+import { GuideTargets } from '../../../../guide-quests/walkthrough/registry/guide-targets';
 import { CharacterPosition } from '../../../../map-section/api/hooks/definitions/base-map-api-definition';
 import { useExitGemWorld } from '../../../../map-section/api/hooks/use-exit-gem-world';
 import { useGemWorldContext } from '../../../../map-section/api/hooks/use-gem-world-context';
@@ -113,6 +114,18 @@ const MapCard = () => {
     error: exitGemWorldError,
     action: exitGemWorld,
   } = useExitGemWorld(characterId);
+
+  useEffect(() => {
+    if (activeScreen === MapCardScreen.MAP) {
+      return;
+    }
+
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'auto',
+    });
+  }, [activeScreen]);
 
   useEffect(() => {
     if (isNil(gameData)) {
@@ -271,6 +284,7 @@ const MapCard = () => {
     <FloatingCard
       title={screenTitle}
       close_action={closeMapCard}
+      close_button_data_guide_target={GuideTargets.MAP_CLOSE}
       back_action={
         activeScreen === MapCardScreen.MAP
           ? undefined

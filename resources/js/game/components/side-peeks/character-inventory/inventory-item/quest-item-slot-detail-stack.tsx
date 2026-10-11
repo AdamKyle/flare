@@ -14,6 +14,8 @@ const QuestItemSlotDetailStack = ({
   slot_id: slotId,
   aria_label: ariaLabel,
   on_close: onClose,
+  data_guide_target: dataGuideTarget,
+  close_button_data_guide_target: closeButtonDataGuideTarget,
 }: QuestItemSlotDetailStackProps): ReactNode => {
   const {
     quest_item: questItem,
@@ -48,8 +50,12 @@ const QuestItemSlotDetailStack = ({
       on_close={onClose}
       aria_label={ariaLabel}
       content_mode={StackedCardContentMode.FULL_BLEED}
+      close_button_data_guide_target={closeButtonDataGuideTarget}
     >
-      <div className="relative flex h-full min-h-0 flex-col overflow-hidden">
+      <div
+        className="relative flex h-full min-h-0 flex-col overflow-hidden"
+        data-guide-target={dataGuideTarget}
+      >
         {renderContent()}
       </div>
     </StackedCard>

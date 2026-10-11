@@ -15,6 +15,8 @@ export default interface SkillDetailDefinition {
   can_train: boolean;
   is_training: boolean;
   xp_towards: number;
+  can_manage_training: boolean;
+  training_restriction_message: string | null;
   is_locked: boolean;
   unit_time_reduction: number;
   building_time_reduction: number;

@@ -10,4 +10,5 @@ export default interface ProgressButtonProps {
   progress_fill_class?: string;
   aria_busy?: boolean;
   announce_progress?: boolean;
+  data_guide_target?: string;
 }

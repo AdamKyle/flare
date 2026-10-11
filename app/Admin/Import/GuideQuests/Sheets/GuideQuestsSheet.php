@@ -60,6 +60,7 @@ class GuideQuestsSheet implements ToCollection
         $data['required_batch_crafted_items'] = $this->requiredBatchCraftedItems($data);
 
         $data = $this->applyResolvedRecord($data, 'required_skill', GameSkill::where('name', $data['required_skill'])->first(), ['required_skill_level']);
+        $data = $this->applyResolvedRecord($data, 'required_training_skill', GameSkill::where('name', $data['required_training_skill'] ?? null)->first(), ['required_training_xp_sacrifice']);
         $data = $this->applyResolvedRecord($data, 'required_secondary_skill', GameSkill::where('name', $data['required_secondary_skill'])->first(), ['required_secondary_skill_level']);
         $data = $this->applyResolvedRecord($data, 'required_passive_skill', PassiveSkill::where('name', $data['required_passive_skill'])->first(), ['required_passive_level']);
         $data = $this->applyResolvedRecord($data, 'required_faction_id', $this->findFactionByMapName($data['required_faction_id']), ['required_faction_level']);
@@ -73,6 +74,8 @@ class GuideQuestsSheet implements ToCollection
 
         $data['required_event_goal_crafting_participation'] = $this->nullableInteger($data['required_event_goal_crafting_participation'] ?? null);
         $data['required_event_goal_enchanting_participation'] = $this->nullableInteger($data['required_event_goal_enchanting_participation'] ?? null);
+        $data['required_exploration_hours'] = $this->positiveNullableInteger($data['required_exploration_hours'] ?? null);
+        $data['required_training_xp_sacrifice'] = $this->trainingXpSacrifice($data['required_training_xp_sacrifice'] ?? null);
 
         return $data;
     }
@@ -161,6 +164,36 @@ class GuideQuestsSheet implements ToCollection
         }
 
         return intval($value);
+    }
+
+    /**
+     * Normalize a positive whole-number spreadsheet requirement.
+     *
+     * @param mixed $value
+     * @return int|null
+     */
+    private function positiveNullableInteger(mixed $value): ?int
+    {
+        $integer = $this->nullableInteger($value);
+
+        return ! is_null($integer) && $integer >= 1 ? $integer : null;
+    }
+
+    /**
+     * Normalize a training XP sacrifice expressed as a decimal fraction.
+     *
+     * @param mixed $value
+     * @return float|null
+     */
+    private function trainingXpSacrifice(mixed $value): ?float
+    {
+        if (blank($value) || ! is_numeric($value)) {
+            return null;
+        }
+
+        $sacrifice = floatval($value);
+
+        return $sacrifice > 0 && $sacrifice <= 1 ? $sacrifice : null;
     }
 
     /**

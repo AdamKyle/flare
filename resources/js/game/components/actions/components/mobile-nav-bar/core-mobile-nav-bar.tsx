@@ -35,12 +35,12 @@ const CoreMobileNavBar = (): ReactNode => {
   const { showQuestLog } = useQuestLogVisibility();
   const { openQuestLog } = useManageQuestLogVisibility();
 
-  const { has_new_announcements } = useActivityActions();
+  const { has_activity_attention } = useActivityActions();
   const reduceMotion = useReducedMotion();
   const [isActivityOpen, setIsActivityOpen] = useState(false);
 
-  const activityAriaLabel = has_new_announcements
-    ? 'Activity, new announcements available'
+  const activityAriaLabel = has_activity_attention
+    ? 'Activity, attention required'
     : 'Activity';
 
   const handleOpenActivity = (): void => {
@@ -248,7 +248,7 @@ const CoreMobileNavBar = (): ReactNode => {
                 activeKey === 'activity',
                 undefined,
                 activityAriaLabel,
-                has_new_announcements
+                has_activity_attention
               )}
             </ul>
           </nav>

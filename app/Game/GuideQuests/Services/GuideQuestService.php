@@ -364,6 +364,8 @@ class GuideQuestService
 
         return $this->guideQuestRequirementsService->requiredLevelCheck($character, $quest)
             ->requiredReincarnatedAmount($character, $quest)
+            ->requiredExplorationHours($character, $quest)
+            ->requiredTrainingSkill($character, $quest)
             ->requiredQuest($character, $quest)
             ->requiredSkillCheck($character, $quest)
             ->requiredSkillCheck($character, $quest, false)
@@ -742,6 +744,7 @@ class GuideQuestService
     {
         $attributesCheckedThroughCompanions = [
             'required_skill',
+            'required_training_skill',
             'required_passive_skill',
             'required_faction_id',
             'required_secondary_skill',

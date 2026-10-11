@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import React, { useId, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 
 import { baseStyles } from './styles/button/base-styles';
 import { variantStyles } from './styles/button/variant-styles';
@@ -11,17 +11,32 @@ const DropDownButtonBase = ({
   variant,
   children,
   on_click,
+  is_open: controlledIsOpen,
+  on_open_change: onOpenChange,
   disabled,
   additional_css,
   aria_label,
 }: DropDownButtonBaseProps) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
   const [isAlignedRight, setIsAlignedRight] = useState(false);
   const idBase = useId();
   const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const suppressEscapeKeyUpRef = useRef(false);
+  const isOpen = controlledIsOpen ?? internalIsOpen;
 
   const buttonId = `${idBase}-button`;
   const menuId = `${idBase}-menu`;
+
+  const updateOpenState = useCallback(
+    (nextIsOpen: boolean): void => {
+      if (controlledIsOpen === undefined) {
+        setInternalIsOpen(nextIsOpen);
+      }
+
+      onOpenChange?.(nextIsOpen);
+    },
+    [controlledIsOpen, onOpenChange]
+  );
 
   const handleToggle = (): void => {
     if (disabled) {
@@ -38,7 +53,7 @@ const DropDownButtonBase = ({
       setIsAlignedRight(willOverflowRight);
     }
 
-    setIsOpen((previousIsOpen) => !previousIsOpen);
+    updateOpenState(!isOpen);
 
     if (on_click) {
       on_click();
@@ -50,8 +65,46 @@ const DropDownButtonBase = ({
       return;
     }
 
-    setIsOpen(false);
+    updateOpenState(false);
   };
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent): void => {
+      if (event.key !== 'Escape') {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+      suppressEscapeKeyUpRef.current = true;
+      updateOpenState(false);
+      buttonRef.current?.focus();
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, updateOpenState]);
+
+  useEffect(() => {
+    const handleKeyUp = (event: globalThis.KeyboardEvent): void => {
+      if (event.key !== 'Escape' || !suppressEscapeKeyUpRef.current) {
+        return;
+      }
+
+      suppressEscapeKeyUpRef.current = false;
+      event.preventDefault();
+      event.stopPropagation();
+    };
+
+    document.addEventListener('keyup', handleKeyUp, true);
+
+    return () => document.removeEventListener('keyup', handleKeyUp, true);
+  }, []);
 
   const renderButton = () => {
     const iconClassName = clsx(
@@ -76,7 +129,6 @@ const DropDownButtonBase = ({
         aria-expanded={isOpen}
         aria-controls={menuId}
         disabled={disabled}
-        role="button"
         type="button"
       >
         <span>{label}</span>

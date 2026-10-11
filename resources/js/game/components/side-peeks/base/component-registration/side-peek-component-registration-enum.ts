@@ -50,8 +50,9 @@ export enum SidePeekComponentRegistrationEnum {
   ACTIVITY = 'ACTIVITY',
 
   /**
-   * Class / Class Mastery Details
+   * Race / Class / Class Mastery Details
    */
+  RACE_DETAIL = 'RACE_DETAIL',
   CLASS_DETAIL = 'CLASS_DETAIL',
   CLASS_MASTERY_DETAIL = 'CLASS_MASTERY_DETAIL',
   CHARACTER_CLASS_RANK_DETAIL = 'CHARACTER_CLASS_RANK_DETAIL',

@@ -109,6 +109,7 @@ import ClassDetailSidePeek from '../../game-data/class-detail-side-peek';
 import ClassMasteryDetailSidePeek from '../../game-data/class-mastery-detail-side-peek';
 import PlayerGameMapDetailSidePeek from '../../game-data/player-game-map-detail-side-peek';
 import PlayerNpcDetailSidePeek from '../../game-data/player-npc-detail-side-peek';
+import RaceDetailSidePeek from '../../game-data/race-detail-side-peek';
 import CharacterClassRankDetailSidePeekProps from '../../game-data/types/character-class-rank-detail-side-peek-props';
 import CharacterClassSpecialtyDetailSidePeekProps from '../../game-data/types/character-class-specialty-detail-side-peek-props';
 import CharacterSkillDetailSidePeekProps from '../../game-data/types/character-skill-detail-side-peek-props';
@@ -116,6 +117,7 @@ import ClassDetailSidePeekProps from '../../game-data/types/class-detail-side-pe
 import ClassMasteryDetailSidePeekProps from '../../game-data/types/class-mastery-detail-side-peek-props';
 import PlayerGameMapDetailSidePeekProps from '../../game-data/types/player-game-map-detail-side-peek-props';
 import PlayerNpcDetailSidePeekProps from '../../game-data/types/player-npc-detail-side-peek-props';
+import RaceDetailSidePeekProps from '../../game-data/types/race-detail-side-peek-props';
 import ItemDetails from '../../item-details/item-details';
 import ItemDetailsProps from '../../item-details/types/item-details-props';
 import AllActiveGemScrollsSidePeek from '../../map-actions/all-active-gem-scrolls/all-active-gem-scrolls-side-peek';
@@ -245,6 +247,10 @@ export const SidePeekComponentRegistry: {
   [SidePeekComponentRegistrationEnum.ACTIVITY]: {
     component: ActivitySidePeek,
     props: {} as ActivitySidePeekProps,
+  },
+  [SidePeekComponentRegistrationEnum.RACE_DETAIL]: {
+    component: RaceDetailSidePeek,
+    props: {} as RaceDetailSidePeekProps,
   },
   [SidePeekComponentRegistrationEnum.CLASS_DETAIL]: {
     component: ClassDetailSidePeek,

@@ -1,9 +1,9 @@
 import { driver, Driver } from 'driver.js';
 import 'driver.js/dist/driver.css';
 
-import { GuideWalkthroughStepType } from '../enums/guide-walkthrough-step-type';
-import { GuideTargets } from '../registry/guide-targets';
+import { GuideWalkthroughInteraction } from '../enums/guide-walkthrough-interaction';
 import PresentGuideStepParams from '../types/present-guide-step-params';
+import { resolveGuideStepInteraction } from '../utils/resolve-guide-step-interaction';
 
 export const presentGuideStep = ({
   step,
@@ -14,10 +14,15 @@ export const presentGuideStep = ({
   const reduceMotion = window.matchMedia(
     '(prefers-reduced-motion: reduce)'
   ).matches;
+  const presentation = resolveGuideStepInteraction(step);
+  const isOpenAndSelect =
+    presentation.interaction === GuideWalkthroughInteraction.OPEN_AND_SELECT;
   const driverInstance = driver({
     animate: !reduceMotion,
     popoverClass: 'tlessa-guide-popover',
     allowClose: true,
+    allowKeyboardControl: !isOpenAndSelect,
+    overlayClickBehavior: isOpenAndSelect ? () => undefined : 'close',
     disableActiveInteraction: false,
     showButtons: ['next', 'close'],
     nextBtnText: 'Continue',
@@ -32,10 +37,10 @@ export const presentGuideStep = ({
     popover: {
       title: step.title,
       description: step.content,
-      side: step.target === GuideTargets.ITEM_ACTIONS ? 'left' : undefined,
-      align: step.target === GuideTargets.ITEM_ACTIONS ? 'start' : undefined,
+      side: presentation.popover_side,
+      align: presentation.popover_align,
       showButtons:
-        step.step_type === GuideWalkthroughStepType.CONTINUE
+        presentation.interaction === GuideWalkthroughInteraction.CONTINUE
           ? ['next', 'close']
           : ['close'],
     },

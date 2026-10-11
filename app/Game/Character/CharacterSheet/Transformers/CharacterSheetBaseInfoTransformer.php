@@ -79,18 +79,18 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'max_level' => $this->getMaxLevel($character),
             'xp' => $character->xp,
             'xp_next' => $character->xp_next,
-            'str_modded' => $characterStatBuilder->statMod('str'),
-            'dur_modded' => $characterStatBuilder->statMod('dur'),
-            'dex_modded' => $characterStatBuilder->statMod('dex'),
-            'chr_modded' => $characterStatBuilder->statMod('chr'),
-            'int_modded' => $characterStatBuilder->statMod('int'),
-            'agi_modded' => $characterStatBuilder->statMod('agi'),
-            'focus_modded' => $characterStatBuilder->statMod('focus'),
-            'attack' => $characterStatBuilder->buildTotalAttack(),
-            'health' => $characterStatBuilder->buildHealth(),
-            'healing_amount' => $characterStatBuilder->buildHealing(),
-            'voided_healing_amount' => $characterStatBuilder->buildHealing(true),
-            'ac' => $characterStatBuilder->buildDefence(),
+            'str_modded' => $this->roundStat($characterStatBuilder->statMod('str')),
+            'dur_modded' => $this->roundStat($characterStatBuilder->statMod('dur')),
+            'dex_modded' => $this->roundStat($characterStatBuilder->statMod('dex')),
+            'chr_modded' => $this->roundStat($characterStatBuilder->statMod('chr')),
+            'int_modded' => $this->roundStat($characterStatBuilder->statMod('int')),
+            'agi_modded' => $this->roundStat($characterStatBuilder->statMod('agi')),
+            'focus_modded' => $this->roundStat($characterStatBuilder->statMod('focus')),
+            'attack' => $this->roundStat($characterStatBuilder->buildTotalAttack()),
+            'health' => $this->roundStat($characterStatBuilder->buildHealth()),
+            'healing_amount' => $this->roundStat($characterStatBuilder->buildHealing()),
+            'voided_healing_amount' => $this->roundStat($characterStatBuilder->buildHealing(true)),
+            'ac' => $this->roundStat($characterStatBuilder->buildDefence()),
             'extra_action_chance' => (new ClassAttackBuilder($character))->buildAttackData(),
             'fight_time_out_mod_bonus' => $characterStatBuilder->buildTimeOutModifier('fight_time_out'),
             'movement_time_out_mod_bonus' => $characterStatBuilder->buildTimeOutModifier('move_time_out'),
@@ -146,6 +146,17 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'is_admin' => $character->user->hasRole('Admin'),
             'inventory_count' => $this->characterInventoryCountTransformer->transform($character),
         ];
+    }
+
+    /**
+     * Round a Character stat or combat value to the nearest whole number.
+     *
+     * @param float|int $value
+     * @return int
+     */
+    private function roundStat(float|int $value): int
+    {
+        return round($value);
     }
 
     /**

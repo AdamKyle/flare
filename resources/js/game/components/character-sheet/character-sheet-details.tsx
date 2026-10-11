@@ -6,10 +6,14 @@ import { StatTypes } from './enums/stat-types';
 import { useManageAttackDetailsBreakdown } from './hooks/use-manage-attack-details-breakdown';
 import { useManageStatDetailsBreakdown } from './hooks/use-manage-stat-details-breakdown';
 import CharacterSheetDetailsProps from './types/character-sheet-details-props';
+import CharacterIdentity from '../../reusable-components/character/components/character-identity';
 import CurrencyDisplay from '../../reusable-components/currency/currency-display';
 import { CurrencyDisplayMode } from '../../reusable-components/currency/enums/currency-display-mode';
 import { CurrencyType } from '../../reusable-components/currency/enums/currency-type';
 import XpBar from '../actions/components/character-details/xp-bar';
+import { GuideTargets } from '../guide-quests/walkthrough/registry/guide-targets';
+import { useOpenClassDetail } from '../side-peeks/game-data/hooks/use-open-class-detail';
+import { useOpenRaceDetail } from '../side-peeks/game-data/hooks/use-open-race-detail';
 
 import {
   formatNumberWithCommas,
@@ -31,6 +35,8 @@ const CharacterSheetDetails = (
 ): ReactNode => {
   const { openAttackDetails } = useManageAttackDetailsBreakdown();
   const { openStatDetails } = useManageStatDetailsBreakdown();
+  const { openRaceDetail } = useOpenRaceDetail();
+  const { openClassDetail } = useOpenClassDetail();
 
   const characterData = props.characterData;
 
@@ -41,15 +47,23 @@ const CharacterSheetDetails = (
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
+      <CharacterIdentity
+        race_id={characterData.race_id}
+        race_name={characterData.race}
+        class_id={characterData.class_id}
+        class_name={characterData.class}
+        on_open_race={openRaceDetail}
+        on_open_class={openClassDetail}
+      />
+      <Separator />
+      <div
+        className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4"
+        data-guide-target={GuideTargets.CHARACTER_SHEET_OVERVIEW}
+      >
         <div>
           <Dl>
             <Dt>Character Name:</Dt>
             <Dd>{characterData.name}</Dd>
-            <Dt>Race:</Dt>
-            <Dd>{characterData.race}</Dd>
-            <Dt>Class:</Dt>
-            <Dd>{characterData.class}</Dd>
             <Dt>Level:</Dt>
             <Dd>
               {formatNumberWithCommas(characterData.level)} /{' '}
@@ -234,6 +248,7 @@ const CharacterSheetDetails = (
                 on_click={() => openStatDetails(StatTypes.STR)}
                 aria_label={'Modded Str Link'}
                 additional_css={'font-bold'}
+                data_guide_target={GuideTargets.CHARACTER_MODIFIED_STAT}
               />
             </Dt>
             <Dd>{shortenNumber(characterData.str_modded)}</Dd>
@@ -367,6 +382,7 @@ const CharacterSheetDetails = (
             label="Manage Skills"
             variant={ButtonVariant.SUCCESS}
             additional_css="w-full my-2"
+            data_guide_target={GuideTargets.CHARACTER_SKILLS}
           />
         </div>
       </div>

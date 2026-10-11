@@ -5,6 +5,7 @@ export default interface ProgressBarProps {
   value: number;
   max: number;
   label: string;
+  on_label_click?: () => void;
   variant: ProgressBarVariant;
   size?: ProgressBarSize;
   value_label?: string;

@@ -18,10 +18,14 @@ export const useActivityActions = (): UseActivityActionsDefinition => {
     openAnnouncements();
   }, [markAnnouncementsSeen, openAnnouncements]);
 
+  const hasNewAnnouncements = gameData?.hasNewAnnouncements ?? false;
+  const hasGuideQuestAttention = gameData?.hasGuideQuestAttention ?? false;
+  const hasActivityAttention = hasNewAnnouncements || hasGuideQuestAttention;
+
   return {
-    has_new_announcements:
-      (gameData?.hasNewAnnouncements ?? false) ||
-      (gameData?.hasGuideQuestAttention ?? false),
+    has_activity_attention: hasActivityAttention,
+    has_new_announcements: hasNewAnnouncements,
+    has_guide_quest_attention: hasGuideQuestAttention,
     open_announcements: handleOpenAnnouncements,
     open_guide_quests: openGuideQuestsScreen,
     open_donations: openDonationScreen,

@@ -31,6 +31,7 @@ const LinkButton = (props: LinkButtonProps): ReactNode => {
       disabled={props.disabled}
       aria-label={props.aria_label}
       role="button"
+      data-guide-target={props.data_guide_target}
     >
       {renderButtonText()}
     </button>

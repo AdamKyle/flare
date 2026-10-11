@@ -1,17 +1,10 @@
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import { AnimatePresence } from 'framer-motion';
 import { isNil } from 'lodash';
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 
-import { EquippableItemDetailsDefinition } from '../../../../api-definitions/items/equippable-item-definitions/equippable-item-details-definition';
-import DuplicateGemAbilityWarning from '../../../../reusable-components/character-gem/duplicate-gem-ability-warning';
-import { DuplicateGemAbilityWarningContext } from '../../../../reusable-components/character-gem/enums/duplicate-gem-ability-warning-context';
-import { ItemActions } from '../../../../reusable-components/item/enums/item-actions';
-import ItemAction from '../../../../reusable-components/item/item-action';
-import ListItemOnMarket from '../../../../reusable-components/item/list-item-on-market';
-import { InventoryItemTypes } from '../../../character-sheet/partials/character-inventory/enums/inventory-item-types';
-import { planeTextItemColors } from '../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
-import { useGuideTarget } from '../../../guide-quests/walkthrough/hooks/use-guide-target';
+import { GuideWalkthroughInteractionSignal } from '../../../guide-quests/walkthrough/enums/guide-walkthrough-interaction-signal';
+import { useGuideWalkthrough } from '../../../guide-quests/walkthrough/hooks/use-guide-walkthrough';
 import { GuideTargets } from '../../../guide-quests/walkthrough/registry/guide-targets';
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
 import InventoryStackBody from '../components/inventory-stack-body';
@@ -34,6 +27,15 @@ import SocketsSection from './partials/item-view/sockets-section';
 import StatsSection from './partials/item-view/stats-section';
 import MoveToSet from './partials/move-to-set/move-to-set';
 import InventoryItemProps from './types/inventory-item-props';
+import { EquippableItemDetailsDefinition } from '../../../../api-definitions/items/equippable-item-definitions/equippable-item-details-definition';
+import DuplicateGemAbilityWarning from '../../../../reusable-components/character-gem/duplicate-gem-ability-warning';
+import { DuplicateGemAbilityWarningContext } from '../../../../reusable-components/character-gem/enums/duplicate-gem-ability-warning-context';
+import { ItemActions } from '../../../../reusable-components/item/enums/item-actions';
+import ItemAction from '../../../../reusable-components/item/item-action';
+import ListItemOnMarket from '../../../../reusable-components/item/list-item-on-market';
+import { InventoryItemTypes } from '../../../character-sheet/partials/character-inventory/enums/inventory-item-types';
+import { planeTextItemColors } from '../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
+import { useGuideTarget } from '../../../guide-quests/walkthrough/hooks/use-guide-target';
 import ItemDetailsStack from '../../item-details/components/item-details-stack';
 
 import { GameDataError } from 'game-data/components/game-data-error';
@@ -62,11 +64,22 @@ const InventoryItem = ({
   const [duplicateItemId, setDuplicateItemId] = useState<number | null>(null);
   const [selectedItemAction, setSelectedItemAction] =
     useState<ItemActions | null>(null);
+  const [isActionsMenuOpen, setIsActionsMenuOpen] = useState(false);
+  const { completeTargetInteraction, registerTargetCleanup } =
+    useGuideWalkthrough();
   const itemDetailsGuideTarget = useGuideTarget(GuideTargets.ITEM_DETAILS);
   const itemActionsGuideTarget = useGuideTarget(GuideTargets.ITEM_ACTIONS);
   const equipItemGuideTarget = useGuideTarget(GuideTargets.ITEM_EQUIP_ACTION);
   const equippedStateGuideTarget = useGuideTarget(
     GuideTargets.ITEM_EQUIPPED_STATE
+  );
+
+  useEffect(
+    () =>
+      registerTargetCleanup(GuideTargets.ITEM_ACTIONS, () => {
+        setIsActionsMenuOpen(false);
+      }),
+    [registerTargetCleanup]
   );
 
   const { error, loading, data, refetch } = useGetInventoryItemDetails({
@@ -157,6 +170,17 @@ const InventoryItem = ({
     }
 
     setSelectedItemAction(action);
+  };
+
+  const handleActionsMenuOpenChange = (isOpen: boolean): void => {
+    setIsActionsMenuOpen(isOpen);
+
+    if (isOpen) {
+      completeTargetInteraction(
+        GuideTargets.ITEM_ACTIONS,
+        GuideWalkthroughInteractionSignal.OPENED
+      );
+    }
   };
 
   const handleClosingActionConfirmation = () => {
@@ -390,7 +414,11 @@ const InventoryItem = ({
           className="flex justify-center sm:justify-start"
           {...itemActionsGuideTarget}
         >
-          <InventoryItemActionButton on_select_action={handleActionSelected} />
+          <InventoryItemActionButton
+            on_select_action={handleActionSelected}
+            is_open={isActionsMenuOpen}
+            on_open_change={handleActionsMenuOpenChange}
+          />
         </div>
       </div>
     );

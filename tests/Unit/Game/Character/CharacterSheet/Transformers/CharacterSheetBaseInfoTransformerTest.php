@@ -77,6 +77,25 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
         $this->assertSame(0, $data['can_craft_again_at']);
     }
 
+    public function test_normal_character_stats_are_serialized_as_integers(): void
+    {
+        $character = $this->character->givePlayerLocation()->getCharacter();
+
+        $data = $this->transformer->transform($character);
+
+        $this->assertIsInt($data['str_modded']);
+        $this->assertIsInt($data['dur_modded']);
+        $this->assertIsInt($data['dex_modded']);
+        $this->assertIsInt($data['chr_modded']);
+        $this->assertIsInt($data['int_modded']);
+        $this->assertIsInt($data['agi_modded']);
+        $this->assertIsInt($data['focus_modded']);
+        $this->assertIsInt($data['health']);
+        $this->assertIsInt($data['healing_amount']);
+        $this->assertIsInt($data['ac']);
+        $this->assertIsFloat($data['extra_action_chance']['chance']);
+    }
+
     public function test_expired_crafting_timestamp_produces_zero_remaining_timeout(): void
     {
         $character = $this->character->givePlayerLocation()->getCharacter();
@@ -372,6 +391,8 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
         ]);
 
         $character = $this->character->givePlayerLocation(16, 16, $purgatoryMap)->getCharacter();
+        $character->update(['str' => 100]);
+        $character = $character->refresh();
 
         $withReduction = $this->transformer->transform($character);
 

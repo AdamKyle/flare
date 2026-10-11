@@ -121,9 +121,14 @@ export const useEquipItem = ({
     void equipSelectedItem();
   }, [equipSelectedItem]);
 
+  const resetError = useCallback((): void => {
+    setError(null);
+  }, []);
+
   return {
     error,
     loading,
+    resetError,
     setRequestParams,
   };
 };

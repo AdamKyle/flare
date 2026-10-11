@@ -116,6 +116,44 @@ class GuideQuestRequirementsServiceTest extends TestCase
         $this->assertContains('required_skill_level', $finishedRequirements);
     }
 
+    public function test_required_training_skill_requires_active_skill_at_configured_xp_sacrifice(): void
+    {
+        $gameSkill = GameSkill::where('name', 'Accuracy')->firstOrFail();
+
+        $guideQuest = $this->createGuideQuest([
+            'required_training_skill' => $gameSkill->id,
+            'required_training_xp_sacrifice' => 0.10,
+        ]);
+
+        $character = $this->character->getCharacter();
+        $accuracy = $character->skills()
+            ->where('game_skill_id', $gameSkill->id)
+            ->firstOrFail();
+
+        $accuracy->update([
+            'currently_training' => true,
+            'xp_towards' => 0.10,
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService
+            ->requiredTrainingSkill($character, $guideQuest)
+            ->getFinishedRequirements();
+
+        $this->assertContains('required_training_xp_sacrifice', $finishedRequirements);
+
+        $this->guideQuestRequirementsService->resetFinishedRequirements();
+
+        $accuracy->update([
+            'xp_towards' => 0.25,
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService
+            ->requiredTrainingSkill($character, $guideQuest)
+            ->getFinishedRequirements();
+
+        $this->assertNotContains('required_training_xp_sacrifice', $finishedRequirements);
+    }
+
     public function test_required_delve_pack_size_returns_false_when_no_delve_row_exists(): void
     {
         $guideQuest = $this->createGuideQuest([
@@ -323,6 +361,42 @@ class GuideQuestRequirementsServiceTest extends TestCase
         $character = $character->refresh();
 
         $finishedRequirements = $this->guideQuestRequirementsService->requiredFactionLevel($character, $guideQuest)->getFinishedRequirements();
+
+        $this->assertContains('required_faction_level', $finishedRequirements);
+    }
+
+    public function test_factions_guide_quest_requires_surface_level_three(): void
+    {
+        $surfaceGameMap = GameMap::where('name', MapName::SURFACE->value)->firstOrFail();
+        $character = $this->character->getCharacter();
+        $surfaceFaction = $character->factions()
+            ->where('game_map_id', $surfaceGameMap->id)
+            ->firstOrFail();
+        $guideQuest = $this->createGuideQuest([
+            'name' => 'Factions',
+            'required_faction_id' => $surfaceGameMap->id,
+            'required_faction_level' => 3,
+            'faction_points_per_kill' => 25,
+        ]);
+
+        $surfaceFaction->update([
+            'current_level' => 2,
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService
+            ->requiredFactionLevel($character->refresh(), $guideQuest)
+            ->getFinishedRequirements();
+
+        $this->assertNotContains('required_faction_level', $finishedRequirements);
+
+        $surfaceFaction->update([
+            'current_level' => 3,
+        ]);
+        $this->guideQuestRequirementsService->resetFinishedRequirements();
+
+        $finishedRequirements = $this->guideQuestRequirementsService
+            ->requiredFactionLevel($character->refresh(), $guideQuest)
+            ->getFinishedRequirements();
 
         $this->assertContains('required_faction_level', $finishedRequirements);
     }

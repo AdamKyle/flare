@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Game\GuideQuest\Controllers\Api;
 
+use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
@@ -158,6 +159,72 @@ class GuideQuestControllerApiTest extends TestCase
 
         $this->assertNotContains('required_batch_crafted_items', $response->json('completed_requirements.0.completed_requirements'));
         $this->assertArrayNotHasKey('slot_ids', $response->json('completed_requirements.0.required_batch_crafted_item_requirements.0'));
+    }
+
+    public function test_training_skill_guide_quest_requires_training_at_percentage_and_required_skill_level(): void
+    {
+        $accuracyGameSkill = GameSkill::where('name', 'Accuracy')->firstOrFail();
+
+        $guideQuest = $this->createGuideQuest([
+            'name' => 'Training Skill',
+            'required_training_skill' => $accuracyGameSkill->id,
+            'required_training_xp_sacrifice' => 0.10,
+            'required_skill' => $accuracyGameSkill->id,
+            'required_skill_level' => 3,
+            'xp_reward' => 20,
+        ]);
+
+        $character = $this->character
+            ->updateUser(['guide_enabled' => true])
+            ->getCharacter();
+
+        $accuracy = $character->skills()
+            ->where('game_skill_id', $accuracyGameSkill->id)
+            ->firstOrFail();
+
+        $accuracy->update([
+            'level' => 2,
+            'currently_training' => true,
+            'xp_towards' => 0.10,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->getJson('/api/character/guide-quest/'.$character->user->id);
+
+        $response->assertOk()
+            ->assertJsonPath('quests.0.id', $guideQuest->id)
+            ->assertJsonPath('quests.0.skill_name', 'Accuracy')
+            ->assertJsonPath('quests.0.training_skill_name', 'Accuracy')
+            ->assertJsonPath('quests.0.required_skill_level', 3)
+            ->assertJsonPath('quests.0.required_training_xp_sacrifice', 0.10)
+            ->assertJsonPath('quests.0.xp_reward', 20)
+            ->assertJsonPath('can_hand_in.0.can_hand_in', false);
+
+        $completedRequirements = $response->json('completed_requirements.0.completed_requirements');
+
+        $this->assertContains('required_training_xp_sacrifice', $completedRequirements);
+        $this->assertNotContains('required_skill_level', $completedRequirements);
+
+        $accuracy->update([
+            'level' => 3,
+            'currently_training' => true,
+            'xp_towards' => 0.10,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->getJson('/api/character/guide-quest/'.$character->user->id);
+
+        $response->assertOk()
+            ->assertJsonPath('can_hand_in.0.can_hand_in', true);
+
+        $completedRequirements = $response->json('completed_requirements.0.completed_requirements');
+
+        $this->assertContains('required_training_xp_sacrifice', $completedRequirements);
+        $this->assertContains('required_skill_level', $completedRequirements);
+
+        $this->actingAs($character->user)
+            ->postJson('/api/guide-quests/hand-in/'.$character->user->id.'/'.$guideQuest->id)
+            ->assertSuccessful();
     }
 
     public function test_fail_to_hand_in_guide_quest()

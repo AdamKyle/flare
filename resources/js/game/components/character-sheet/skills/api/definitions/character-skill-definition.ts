@@ -11,4 +11,5 @@ export default interface CharacterSkillDefinition {
   is_training: boolean;
   is_locked: boolean;
   is_class_skill: boolean;
+  xp_towards: number;
 }

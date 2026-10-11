@@ -6,7 +6,12 @@ import BackpackProps from './types/backpack-props';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
 
-const BackPack = ({ initial_search_text }: BackpackProps): ReactNode => {
+const BackPack = ({
+  initial_search_text,
+  initial_filters,
+  target_position,
+  on_equipment_changed,
+}: BackpackProps): ReactNode => {
   const { gameData, updateCharacter } = useGameData();
 
   const [isShowingInventory, setIsShowingInventory] = useState(true);
@@ -22,6 +27,9 @@ const BackPack = ({ initial_search_text }: BackpackProps): ReactNode => {
         update_character={updateCharacter}
         on_switch_view={setIsShowingInventory}
         initial_search_text={initial_search_text}
+        initial_filters={initial_filters}
+        target_position={target_position}
+        on_equipment_changed={on_equipment_changed}
       />
     );
   }

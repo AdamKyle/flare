@@ -4,7 +4,15 @@ import EquippedSlotProps from './types/equipped-slot-props';
 import { fetchEquippedImage } from './utils/fetch-equipped-image';
 
 const EquippedSlot = (props: EquippedSlotProps): ReactNode => {
-  const { positionName, position, equipped_item, on_open_item_details } = props;
+  const {
+    positionName,
+    position,
+    empty_slot_item_types,
+    equip_position,
+    equipped_item,
+    on_open_item_details,
+    on_open_empty_slot,
+  } = props;
 
   const { path, itemName } = fetchEquippedImage(position, equipped_item);
 
@@ -12,14 +20,21 @@ const EquippedSlot = (props: EquippedSlotProps): ReactNode => {
 
   if (!equipped_item) {
     return (
-      <div
-        className="flex h-16 w-16 items-center justify-center rounded border border-gray-600 text-white"
-        role="img"
-        aria-label={slotLabel}
+      <button
+        type="button"
+        className={
+          'flex h-16 w-16 items-center justify-center rounded border border-gray-600 text-white focus:outline-none ' +
+          'focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 ' +
+          'hover:bg-gray-200 dark:hover:bg-gray-700 dark:focus:ring-gray-500'
+        }
+        onClick={() =>
+          on_open_empty_slot(equip_position, empty_slot_item_types)
+        }
+        aria-label={`${positionName}: Nothing Equipped. Choose equipment`}
         title={slotLabel}
       >
         <img src={path} width={64} alt="" aria-hidden="true" />
-      </div>
+      </button>
     );
   }
 

@@ -19,6 +19,7 @@ const Button = (props: ButtonProps): ReactNode => {
       aria-busy={props.aria_busy}
       role="button"
       type={props.type ?? 'button'}
+      data-guide-target={props.data_guide_target}
     >
       {props.label}
     </button>

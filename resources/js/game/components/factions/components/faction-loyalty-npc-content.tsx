@@ -3,6 +3,7 @@ import React, { ReactNode, useId } from 'react';
 import FactionLoyaltyAutomationSetup from './faction-loyalty-automation-setup';
 import FactionLoyaltyTaskList from './faction-loyalty-task-list';
 import FactionLoyaltyNpcContentProps from './types/faction-loyalty-npc-content-props';
+import { GuideTargets } from '../../guide-quests/walkthrough/registry/guide-targets';
 import { isFactionLoyaltyNpcMastered } from '../utils/is-faction-loyalty-npc-mastered';
 
 import { Alert } from 'ui/alerts/alert';
@@ -64,6 +65,7 @@ const FactionLoyaltyNpcContent = ({
         additional_css="w-full"
         disabled={submitting}
         on_click={onAssist}
+        data_guide_target={GuideTargets.FACTION_ASSIST_NPC}
       />
     );
   };

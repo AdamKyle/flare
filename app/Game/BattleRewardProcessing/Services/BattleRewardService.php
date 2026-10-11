@@ -36,6 +36,7 @@ use App\Game\Messages\Types\CurrenciesMessageTypes;
 use App\Game\Monsters\Services\MonsterListService;
 use App\Game\Skills\Contracts\SkillBonusQuery;
 use App\Game\Skills\Services\SkillService;
+use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use Closure;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Support\Facades\Log;
@@ -69,6 +70,7 @@ class BattleRewardService
      * @param SecondaryRewardService $secondaryRewardService
      * @param BattleGlobalEventParticipation $battleGlobalEventParticipation
      * @param SkillService $skillService
+     * @param UpdateCharacterSkillsService $updateCharacterSkillsService
      * @param BattleRewardLedgerService $battleRewardLedgerService
      * @param BattleRewardMessageContext $battleRewardMessageContext
      * @param RandomAffixGenerator $randomAffixGenerator
@@ -91,6 +93,7 @@ class BattleRewardService
         private readonly SecondaryRewardService $secondaryRewardService,
         private readonly BattleGlobalEventParticipation $battleGlobalEventParticipation,
         private readonly SkillService $skillService,
+        private readonly UpdateCharacterSkillsService $updateCharacterSkillsService,
         private readonly BattleRewardLedgerService $battleRewardLedgerService,
         private readonly BattleRewardMessageContext $battleRewardMessageContext,
         private readonly RandomAffixGenerator $randomAffixGenerator,
@@ -1097,6 +1100,7 @@ class BattleRewardService
                 ->distributeSkillXP($this->monster);
 
             $this->character = $this->character->refresh();
+            $this->broadcastTrainingSkillProgress();
 
             return;
         }
@@ -1106,6 +1110,21 @@ class BattleRewardService
         $this->skillService->setSkillInTraining($this->character)->giveXpToTrainingSkill($this->character, $totalSkillPoints);
 
         $this->character = $this->character->refresh();
+        $this->broadcastTrainingSkillProgress();
+    }
+
+    /**
+     * Broadcast the current Training Skill progress when the Character is actively training.
+     *
+     * @return void
+     */
+    private function broadcastTrainingSkillProgress(): void
+    {
+        if (! $this->character->skills()->where('currently_training', true)->exists()) {
+            return;
+        }
+
+        $this->updateCharacterSkillsService->updateCharacterSkills($this->character);
     }
 
     /**

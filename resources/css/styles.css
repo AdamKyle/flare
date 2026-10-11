@@ -31,6 +31,15 @@
 /* Guide walkthrough presentation. Driver.js remains presentation-only; these
    styles keep its popover consistent with the game's visual language without
    changing Driver's focus, keyboard, or close behavior. */
+/* Driver disables pointer interaction outside the active element. Guide Quest
+   dropdown menus are portaled to document.body, and data-guide-interaction-owner
+   marks the portal as belonging to the active walkthrough interaction. Restore
+   interaction only for that walkthrough-owned portal. */
+body.driver-active [data-guide-interaction-owner],
+body.driver-active [data-guide-interaction-owner] * {
+  pointer-events: auto !important;
+}
+
 .tlessa-guide-popover.driver-popover {
   width: min(24rem, calc(100vw - 2rem));
   max-width: calc(100vw - 2rem);

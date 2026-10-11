@@ -16,7 +16,6 @@ use Illuminate\Contracts\Validation\Validator as RequestValidator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -121,10 +120,6 @@ class RegisterController extends Controller
             $user = $this->create($request->all(), $request->ip());
         } catch (Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
-        }
-
-        if ($user->guide_enabled) {
-            Cache::put('user-show-guide-initial-message-'.$user->id, 'true');
         }
 
         event(new Registered($user));

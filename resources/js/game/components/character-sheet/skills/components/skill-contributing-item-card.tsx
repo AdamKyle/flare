@@ -6,6 +6,7 @@ import {
   resolveItemPositionLabel,
   resolveItemTypeLabel,
 } from '../../../../reusable-components/item/utils/resolve-item-labels';
+import { GuideTargets } from '../../../guide-quests/walkthrough/registry/guide-targets';
 import {
   backpackBaseItemStyles,
   backpackBorderStyles,
@@ -82,6 +83,9 @@ const SkillContributingItemCard = ({
       onClick={() => onOpen(item)}
       aria-labelledby={titleId}
       aria-describedby={detailsId}
+      data-guide-target={
+        isQuestItem ? GuideTargets.SKILL_QUEST_ITEM : undefined
+      }
     >
       <i
         className="ra ra-bone-knife text-2xl text-gray-800 dark:text-gray-600"

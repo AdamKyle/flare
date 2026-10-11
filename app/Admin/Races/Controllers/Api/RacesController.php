@@ -6,16 +6,23 @@ use App\Admin\Races\Requests\RaceIndexRequest;
 use App\Admin\Races\Requests\StoreRaceRequest;
 use App\Admin\Races\Requests\UpdateRaceRequest;
 use App\Admin\Races\Services\RaceService;
-use App\Admin\Races\Transformers\RaceDetailTransformer;
 use App\Admin\Races\Transformers\RaceFormTransformer;
 use App\Admin\Races\Transformers\RaceListTransformer;
 use App\Flare\Models\GameRace;
 use App\Flare\Pagination\Pagination;
+use App\Game\Core\Transformers\RaceDetailTransformer;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 
 class RacesController extends Controller
 {
+    /**
+     * @param RaceService $raceService
+     * @param Pagination $pagination
+     * @param RaceListTransformer $raceListTransformer
+     * @param RaceDetailTransformer $raceDetailTransformer
+     * @param RaceFormTransformer $raceFormTransformer
+     */
     public function __construct(
         private readonly RaceService $raceService,
         private readonly Pagination $pagination,
@@ -26,6 +33,9 @@ class RacesController extends Controller
 
     /**
      * Return the paginated, searchable, sortable Races list.
+     *
+     * @param RaceIndexRequest $request
+     * @return JsonResponse
      */
     public function index(RaceIndexRequest $request): JsonResponse
     {
@@ -38,6 +48,9 @@ class RacesController extends Controller
 
     /**
      * Return the Admin detail representation for the given Race.
+     *
+     * @param GameRace $gameRace
+     * @return JsonResponse
      */
     public function show(GameRace $gameRace): JsonResponse
     {
@@ -46,6 +59,9 @@ class RacesController extends Controller
 
     /**
      * Return the current field values for the given Race, for populating the edit form.
+     *
+     * @param GameRace $gameRace
+     * @return JsonResponse
      */
     public function edit(GameRace $gameRace): JsonResponse
     {
@@ -54,6 +70,9 @@ class RacesController extends Controller
 
     /**
      * Create a new Race from the validated request.
+     *
+     * @param StoreRaceRequest $request
+     * @return JsonResponse
      */
     public function store(StoreRaceRequest $request): JsonResponse
     {
@@ -64,6 +83,10 @@ class RacesController extends Controller
 
     /**
      * Update an existing Race from the validated request.
+     *
+     * @param UpdateRaceRequest $request
+     * @param GameRace $gameRace
+     * @return JsonResponse
      */
     public function update(UpdateRaceRequest $request, GameRace $gameRace): JsonResponse
     {

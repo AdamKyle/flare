@@ -15,7 +15,6 @@ use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class SettingsController extends Controller
@@ -168,8 +167,6 @@ class SettingsController extends Controller
             $user->update([
                 'guide_enabled' => $request->guide_enabled,
             ]);
-
-            Cache::put('user-show-guide-initial-message-'.$user->id, 'true');
         }
 
         return redirect()->back()->with('success', 'Updated character guide setting.');

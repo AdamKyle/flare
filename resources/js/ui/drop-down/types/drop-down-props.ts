@@ -29,4 +29,6 @@ export default interface DropdownProps {
   aria_invalid?: boolean;
   aria_required?: boolean;
   render_item_content?: (item: DropdownItem) => React.ReactNode;
+  data_guide_target?: string;
+  data_guide_target_complete?: boolean;
 }

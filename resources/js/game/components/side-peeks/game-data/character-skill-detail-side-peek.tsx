@@ -10,6 +10,9 @@ import SkillDetailFacts from '../../character-sheet/skills/components/skill-deta
 import SkillItemsAffectingList from '../../character-sheet/skills/components/skill-items-affecting-list';
 import SkillTrainingForm from '../../character-sheet/skills/components/skill-training-form';
 import { SkillBonusItemSource } from '../../character-sheet/skills/enums/skill-bonus-item-source';
+import { GuideWalkthroughEvent } from '../../guide-quests/walkthrough/enums/guide-walkthrough-event';
+import { useGuideWalkthrough } from '../../guide-quests/walkthrough/hooks/use-guide-walkthrough';
+import { GuideTargets } from '../../guide-quests/walkthrough/registry/guide-targets';
 import InventoryItemDetailStack from '../character-inventory/inventory-item/inventory-item-detail-stack';
 import QuestItemSlotDetailStack from '../character-inventory/inventory-item/quest-item-slot-detail-stack';
 
@@ -21,6 +24,7 @@ const CharacterSkillDetailSidePeek = ({
   skill_id: skillId,
   on_training_skills_changed: onTrainingSkillsChanged,
 }: CharacterSkillDetailSidePeekProps): ReactNode => {
+  const { completeRequiredEvent } = useGuideWalkthrough();
   const { skill, loading, error, refetch } = useSkillDetail(
     characterId,
     skillId
@@ -50,8 +54,52 @@ const CharacterSkillDetailSidePeek = ({
 
   const handleTrain = async (xpPercentage: number) => {
     setTrainingMessage(null);
+    const response = await train(skillId, xpPercentage);
 
-    applyTrainingResponse(await train(skillId, xpPercentage));
+    console.log('[GuideWalkthrough] handleTrain: API response received', {
+      skillId,
+      xpPercentage,
+    });
+
+    const accuracy = response?.skills.training_skills.find(
+      (trainingSkill) => trainingSkill.name === 'Accuracy'
+    );
+
+    console.log(
+      '[GuideWalkthrough] handleTrain: Accuracy state from response',
+      {
+        found: accuracy !== undefined,
+        isTraining: accuracy?.is_training ?? null,
+        xpTowards: accuracy?.xp_towards ?? null,
+      }
+    );
+
+    if (
+      accuracy?.is_training &&
+      Math.abs(accuracy.xp_towards - 0.1) < Number.EPSILON
+    ) {
+      console.log(
+        '[GuideWalkthrough] handleTrain: before completeRequiredEvent',
+        {
+          event: GuideWalkthroughEvent.SKILL_TRAINING_STARTED,
+        }
+      );
+
+      const walkthroughEventCompleted = await completeRequiredEvent(
+        GuideWalkthroughEvent.SKILL_TRAINING_STARTED
+      );
+
+      console.log(
+        '[GuideWalkthrough] handleTrain: after completeRequiredEvent',
+        {
+          completed: walkthroughEventCompleted,
+        }
+      );
+    }
+
+    console.log('[GuideWalkthrough] handleTrain: before applyTrainingResponse');
+    applyTrainingResponse(response);
+    console.log('[GuideWalkthrough] handleTrain: after applyTrainingResponse');
   };
 
   const handleCancel = async () => {
@@ -96,6 +144,8 @@ const CharacterSkillDetailSidePeek = ({
           slot_id={selectedItem.slot_id}
           aria_label={selectedItem.name}
           on_close={handleCloseItem}
+          data_guide_target={GuideTargets.SKILL_QUEST_ITEM_DETAILS}
+          close_button_data_guide_target={GuideTargets.SKILL_QUEST_ITEM_CLOSE}
         />
       );
     }

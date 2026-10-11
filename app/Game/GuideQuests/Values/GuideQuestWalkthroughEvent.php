@@ -7,6 +7,9 @@ enum GuideQuestWalkthroughEvent: string
     case FIGHT_STARTED = 'fight-started';
     case COMBAT_ACTION_SUCCEEDED = 'combat-action-succeeded';
     case ITEM_EQUIPPED = 'item-equipped';
+    case EXPLORATION_FIGHT_COMPLETED = 'exploration-fight-completed';
+    case SKILL_TRAINING_STARTED = 'skill-training-started';
+    case FACTION_ASSISTANCE_STARTED = 'faction-assistance-started';
 
     /**
      * Return the Admin-facing event label.
@@ -19,6 +22,9 @@ enum GuideQuestWalkthroughEvent: string
             self::FIGHT_STARTED => 'Fight started',
             self::COMBAT_ACTION_SUCCEEDED => 'Combat action succeeded',
             self::ITEM_EQUIPPED => 'Item equipped',
+            self::EXPLORATION_FIGHT_COMPLETED => 'Exploration fight completed',
+            self::SKILL_TRAINING_STARTED => 'Skill training started',
+            self::FACTION_ASSISTANCE_STARTED => 'Faction assistance started',
         };
     }
 

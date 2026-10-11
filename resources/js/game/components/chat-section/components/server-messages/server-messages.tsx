@@ -71,8 +71,19 @@ const ServerMessages = ({ server_messages }: ServerMessagesProps) => {
   };
 
   const renderMessage = (serverMessage: ServerMessagesDefinition) => {
+    const isFactionBonus =
+      serverMessage.message.startsWith('You gained additional ') &&
+      serverMessage.message.includes(
+        'faction points for the current guide quest.'
+      );
+
     return (
-      <li key={buildServerMessageKey(serverMessage)}>
+      <li
+        key={buildServerMessageKey(serverMessage)}
+        data-guide-target={
+          isFactionBonus ? GuideTargets.SERVER_MESSAGE_FACTION_BONUS : undefined
+        }
+      >
         {renderTimestamp(serverMessage)}
         <span className="font-bold">{renderMessageContent(serverMessage)}</span>
       </li>

@@ -2,6 +2,7 @@ import { GuideQuestWalkthroughStepDefinition } from '../../api/definitions/guide
 import {
   isAsyncGuideTarget,
   isStateDependentGuideTarget,
+  resolveGuideTargetInteraction,
 } from '../registry/guide-targets';
 
 const OPTIONAL_TARGET_WAIT_MS = 400;
@@ -28,6 +29,10 @@ export const resolveGuideStepTargetWaitMs = (
 
   if (isAsyncGuideTarget(step.target)) {
     return ASYNC_TARGET_WAIT_MS;
+  }
+
+  if (resolveGuideTargetInteraction(step.target)?.skip_when_target_missing) {
+    return OPTIONAL_TARGET_WAIT_MS;
   }
 
   if (isOptionalGuideStepTarget(step)) {

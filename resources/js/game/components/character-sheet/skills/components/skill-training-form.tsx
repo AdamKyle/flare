@@ -1,6 +1,9 @@
 import React, { ReactNode, useId, useState } from 'react';
 
 import SkillTrainingFormProps from './types/skill-training-form-props';
+import { GuideWalkthroughInteractionSignal } from '../../../guide-quests/walkthrough/enums/guide-walkthrough-interaction-signal';
+import { useGuideWalkthrough } from '../../../guide-quests/walkthrough/hooks/use-guide-walkthrough';
+import { GuideTargets } from '../../../guide-quests/walkthrough/registry/guide-targets';
 import { skillXpSacrificeOptions } from '../constants/skill-xp-sacrifice-options';
 import { formatSkillPercentage } from '../utils/format-skill-percentage';
 
@@ -19,13 +22,22 @@ const SkillTrainingForm = ({
   on_train: onTrain,
   on_cancel: onCancel,
 }: SkillTrainingFormProps): ReactNode => {
+  const { completeTargetInteraction } = useGuideWalkthrough();
   const [xpPercentage, setXpPercentage] = useState<number | null>(null);
 
   const labelId = useId();
   const helpId = useId();
 
   const handleSelect = (item: DropdownItem) => {
-    setXpPercentage(Number(item.value));
+    const selectedPercentage = Number(item.value);
+    setXpPercentage(selectedPercentage);
+
+    if (Math.abs(selectedPercentage - 0.1) < Number.EPSILON) {
+      completeTargetInteraction(
+        GuideTargets.SKILL_TRAINING_PERCENTAGE,
+        GuideWalkthroughInteractionSignal.SELECTED
+      );
+    }
   };
 
   const handleTrain = () => {
@@ -56,11 +68,17 @@ const SkillTrainingForm = ({
             You are sacrificing {formatSkillPercentage(skill.xp_towards)} of the
             XP you earn to train this Skill.
           </p>
+          {!skill.can_manage_training &&
+            skill.training_restriction_message !== null && (
+              <Alert variant={AlertVariant.WARNING}>
+                {skill.training_restriction_message}
+              </Alert>
+            )}
           <Button
             label="Cancel Training"
             variant={ButtonVariant.DANGER}
             additional_css="w-full"
-            disabled={submitting}
+            disabled={submitting || !skill.can_manage_training}
             on_click={onCancel}
           />
         </div>
@@ -68,7 +86,10 @@ const SkillTrainingForm = ({
     }
 
     return (
-      <div className="flex flex-col gap-3">
+      <div
+        className="flex flex-col gap-3"
+        data-guide-target={GuideTargets.SKILL_TRAINING_SECTION}
+      >
         <label
           id={labelId}
           className="text-sm font-medium text-gray-800 dark:text-gray-200"
@@ -82,8 +103,17 @@ const SkillTrainingForm = ({
           on_select={handleSelect}
           selection_placeholder="Select an XP percentage"
           disabled={submitting}
+          data_guide_target={GuideTargets.SKILL_TRAINING_PERCENTAGE}
+          data_guide_target_complete={
+            xpPercentage !== null &&
+            Math.abs(xpPercentage - 0.1) < Number.EPSILON
+          }
         />
-        <p id={helpId} className="text-xs text-gray-600 dark:text-gray-400">
+        <p
+          id={helpId}
+          className="text-xs text-gray-600 dark:text-gray-400"
+          data-guide-target={GuideTargets.SKILL_XP_SACRIFICE_HELP}
+        >
           This percentage of the XP you earn goes to this Skill instead of your
           Character. Only one Skill can be trained at a time.
         </p>
@@ -93,6 +123,7 @@ const SkillTrainingForm = ({
           additional_css="w-full"
           disabled={submitting || xpPercentage === null}
           on_click={handleTrain}
+          data_guide_target={GuideTargets.SKILL_TRAINING_SUBMIT}
         />
       </div>
     );

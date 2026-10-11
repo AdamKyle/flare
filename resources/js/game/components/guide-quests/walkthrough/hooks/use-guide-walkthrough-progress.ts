@@ -1,6 +1,7 @@
 import { resolveApiErrorMessage } from 'api-handler/utils/resolve-api-error-message';
 import axios from 'axios';
 import { useCallback, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 
 import UseGuideWalkthroughProgressDefinition from './definitions/use-guide-walkthrough-progress-definition';
 import { GuideQuestWalkthroughStepDefinition } from '../../api/definitions/guide-quest-walkthrough-definition';
@@ -105,6 +106,12 @@ export const useGuideWalkthroughProgress =
 
         const nextStep = steps[nextIndex];
 
+        console.log('[GuideWalkthrough] advanceToStep: start', {
+          nextIndex,
+          nextStepId: nextStep?.id ?? null,
+          nextStepTitle: nextStep?.title ?? null,
+        });
+
         try {
           if (!nextStep) {
             await saveProgress(activeGuideQuestId, null, true);
@@ -112,8 +119,46 @@ export const useGuideWalkthroughProgress =
             return GuideWalkthroughAdvanceResult.COMPLETED;
           }
 
+          console.log('[GuideWalkthrough] advanceToStep: before saveProgress', {
+            nextIndex,
+            nextStepId: nextStep.id,
+            nextStepTitle: nextStep.title,
+          });
+
           await saveProgress(activeGuideQuestId, nextStep.id, false);
-          setStepIndex(nextIndex);
+
+          console.log('[GuideWalkthrough] advanceToStep: after saveProgress', {
+            nextIndex,
+            nextStepId: nextStep.id,
+          });
+
+          console.log('[GuideWalkthrough] advanceToStep: before flushSync', {
+            nextIndex,
+            nextStepId: nextStep.id,
+            nextStepTitle: nextStep.title,
+          });
+
+          flushSync(() => {
+            console.log(
+              '[GuideWalkthrough] advanceToStep: inside flushSync before setStepIndex',
+              {
+                nextIndex,
+              }
+            );
+            setStepIndex(nextIndex);
+            console.log(
+              '[GuideWalkthrough] advanceToStep: inside flushSync after setStepIndex',
+              {
+                nextIndex,
+              }
+            );
+          });
+
+          console.log('[GuideWalkthrough] advanceToStep: after flushSync', {
+            nextIndex,
+            nextStepId: nextStep.id,
+            nextStepTitle: nextStep.title,
+          });
 
           return GuideWalkthroughAdvanceResult.ADVANCED;
         } catch (requestError) {

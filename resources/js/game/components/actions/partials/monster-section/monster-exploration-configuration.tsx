@@ -8,6 +8,9 @@ import { explorationAttackTypeOptions } from './exploration/utils/exploration-at
 import MonsterExplorationConfigurationProps from './types/monster-exploration-configuration-props';
 import { ChatStreamEvent } from '../../../chat-section/events/enums/chat-stream-event';
 import { useExplorationMessageEmitter } from '../../../chat-section/events/hooks/use-exploration-message-emitter';
+import { GuideWalkthroughInteractionSignal } from '../../../guide-quests/walkthrough/enums/guide-walkthrough-interaction-signal';
+import { useGuideWalkthrough } from '../../../guide-quests/walkthrough/hooks/use-guide-walkthrough';
+import { GuideTargets } from '../../../guide-quests/walkthrough/registry/guide-targets';
 
 import { AutomationType } from 'game-data/api-data-definitions/character/automation-type';
 
@@ -32,6 +35,7 @@ const MonsterExplorationConfiguration = ({
   on_started: onStarted,
 }: MonsterExplorationConfigurationProps): ReactNode => {
   const explorationMessageEmitter = useExplorationMessageEmitter();
+  const { completeTargetInteraction } = useGuideWalkthrough();
 
   const {
     loading,
@@ -63,11 +67,23 @@ const MonsterExplorationConfiguration = ({
     !blockingAutomation;
 
   const handleTimeSelection = (selectedValue: DropdownItem) => {
-    setSelectedTimeLength(Number(selectedValue.value));
+    const duration = Number(selectedValue.value);
+    setSelectedTimeLength(duration);
+
+    if (duration === 1) {
+      completeTargetInteraction(
+        GuideTargets.EXPLORATION_DURATION,
+        GuideWalkthroughInteractionSignal.SELECTED
+      );
+    }
   };
 
   const handleAttackTypeSelected = (selectedValue: DropdownItem) => {
     setSelectedAttackType(String(selectedValue.value));
+    completeTargetInteraction(
+      GuideTargets.EXPLORATION_ATTACK_TYPE,
+      GuideWalkthroughInteractionSignal.SELECTED
+    );
   };
 
   const handleBeginExploration = () => {
@@ -149,6 +165,8 @@ const MonsterExplorationConfiguration = ({
           on_select={handleTimeSelection}
           selection_placeholder="Select length of time"
           disabled={!!blockingAutomation}
+          data_guide_target={GuideTargets.EXPLORATION_DURATION}
+          data_guide_target_complete={selectedTimeLength === 1}
         />
         <Dropdown
           aria_label="Attack Type"
@@ -156,6 +174,8 @@ const MonsterExplorationConfiguration = ({
           on_select={handleAttackTypeSelected}
           selection_placeholder="Select the attack type"
           disabled={!!blockingAutomation}
+          data_guide_target={GuideTargets.EXPLORATION_ATTACK_TYPE}
+          data_guide_target_complete={selectedAttackType !== null}
         />
 
         {isNil(selectedMonsterId) && !blockingAutomation && (
@@ -171,6 +191,7 @@ const MonsterExplorationConfiguration = ({
         variant={ButtonVariant.SUCCESS}
         additional_css="w-full"
         disabled={!canBeginExploration}
+        data_guide_target={GuideTargets.EXPLORATION_BEGIN}
       />
       <Button
         on_click={on_close}

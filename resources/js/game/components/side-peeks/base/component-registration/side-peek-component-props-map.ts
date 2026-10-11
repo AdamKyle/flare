@@ -59,6 +59,7 @@ import ClassDetailSidePeekProps from '../../game-data/types/class-detail-side-pe
 import ClassMasteryDetailSidePeekProps from '../../game-data/types/class-mastery-detail-side-peek-props';
 import PlayerGameMapDetailSidePeekProps from '../../game-data/types/player-game-map-detail-side-peek-props';
 import PlayerNpcDetailSidePeekProps from '../../game-data/types/player-npc-detail-side-peek-props';
+import RaceDetailSidePeekProps from '../../game-data/types/race-detail-side-peek-props';
 import ItemDetailsProps from '../../item-details/types/item-details-props';
 import AllActiveGemScrollsSidePeekProps from '../../map-actions/all-active-gem-scrolls/types/all-active-gem-scrolls-side-peek-props';
 import ConjureProps from '../../map-actions/conjure/types/conjure-props';
@@ -95,6 +96,7 @@ export type SidePeekComponentPropsMap = {
   [SidePeekComponentRegistrationEnum.CRAFTED_ITEM]: CraftedItemProps;
   [SidePeekComponentRegistrationEnum.ITEM_DETAILS]: ItemDetailsProps;
   [SidePeekComponentRegistrationEnum.ACTIVITY]: ActivitySidePeekProps;
+  [SidePeekComponentRegistrationEnum.RACE_DETAIL]: RaceDetailSidePeekProps;
   [SidePeekComponentRegistrationEnum.CLASS_DETAIL]: ClassDetailSidePeekProps;
   [SidePeekComponentRegistrationEnum.CLASS_MASTERY_DETAIL]: ClassMasteryDetailSidePeekProps;
   [Registration.CHARACTER_CLASS_RANK_DETAIL]: CharacterClassRankDetailSidePeekProps;

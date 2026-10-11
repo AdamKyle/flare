@@ -23,6 +23,9 @@ export default interface GuideQuestDefinition {
   desktop_instructions: GuideQuestContentBlockDefinition[] | null;
   mobile_instructions: GuideQuestContentBlockDefinition[] | null;
   required_level: number | null;
+  required_exploration_hours: number | null;
+  required_training_skill: number | null;
+  required_training_xp_sacrifice: number | null;
   required_skill: number | null;
   required_skill_level: number | null;
   required_faction_id: number | null;

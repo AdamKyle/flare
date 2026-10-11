@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Admin\Races\Transformers;
+namespace App\Game\Core\Transformers;
 
 use App\Flare\Models\GameRace;
 use Illuminate\Support\Facades\Storage;
@@ -8,7 +8,10 @@ use Illuminate\Support\Facades\Storage;
 class RaceDetailTransformer
 {
     /**
-     * Transform a Race into its Admin detail representation.
+     * Transform a Race into its reusable factual detail representation.
+     *
+     * @param GameRace $gameRace
+     * @return array
      */
     public function transform(GameRace $gameRace): array
     {
@@ -21,7 +24,10 @@ class RaceDetailTransformer
     }
 
     /**
-     * Resolve the Race's public image URL, falling back to the knight placeholder image.
+     * Resolve the Race's public image URL with the default portrait fallback.
+     *
+     * @param GameRace $gameRace
+     * @return string
      */
     private function resolveImageUrl(GameRace $gameRace): string
     {

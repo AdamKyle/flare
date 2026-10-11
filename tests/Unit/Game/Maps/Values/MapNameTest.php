@@ -8,6 +8,21 @@ use Tests\TestCase;
 
 class MapNameTest extends TestCase
 {
+    public function test_faction_map_names_returns_only_maps_with_normal_player_factions(): void
+    {
+        $this->assertSame([
+            MapName::SURFACE->value,
+            MapName::LABYRINTH->value,
+            MapName::DUNGEONS->value,
+            MapName::ICE_PLANE->value,
+            MapName::DELUSIONAL_MEMORIES->value,
+            MapName::HELL->value,
+            MapName::TWISTED_MEMORIES->value,
+            MapName::SHADOW_PLANE->value,
+        ], MapName::factionMapNames());
+        $this->assertNotContains(MapName::PURGATORY->value, MapName::factionMapNames());
+    }
+
     public function test_kingdom_color_lookup_matches_configured_map(): void
     {
         $this->assertSame('#879bc2', MapName::kingdomColors()[MapName::SURFACE->value]);

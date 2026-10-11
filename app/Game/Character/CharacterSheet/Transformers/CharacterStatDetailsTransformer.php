@@ -31,24 +31,24 @@ class CharacterStatDetailsTransformer extends BaseTransformer
             'int' => $character->int,
             'agi' => $character->agi,
             'focus' => $character->focus,
-            'health' => $characterStatBuilder->buildHealth(),
-            'voided_health' => $characterStatBuilder->buildhealth(true),
-            'ac' => $characterStatBuilder->buildDefence(),
-            'voided_ac' => $characterStatBuilder->buildDefence(true),
-            'str_modded' => $characterStatBuilder->statMod('str'),
-            'dur_modded' => $characterStatBuilder->statMod('dur'),
-            'dex_modded' => $characterStatBuilder->statMod('dex'),
-            'chr_modded' => $characterStatBuilder->statMod('chr'),
-            'int_modded' => $characterStatBuilder->statMod('int'),
-            'agi_modded' => $characterStatBuilder->statMod('agi'),
-            'focus_modded' => $characterStatBuilder->statMod('focus'),
-            'weapon_attack' => $characterStatBuilder->buildDamage(ItemType::validWeapons()),
-            'voided_weapon_attack' => $characterStatBuilder->buildDamage(ItemType::validWeapons(), true),
-            'ring_damage' => $characterStatBuilder->buildDamage('ring'),
-            'spell_damage' => $characterStatBuilder->buildDamage('spell-damage'),
-            'voided_spell_damage' => $characterStatBuilder->buildDamage('spell-damage', true),
-            'healing_amount' => $characterStatBuilder->buildHealing(),
-            'voided_healing_amount' => $characterStatBuilder->buildHealing(true),
+            'health' => $this->roundStat($characterStatBuilder->buildHealth()),
+            'voided_health' => $this->roundStat($characterStatBuilder->buildhealth(true)),
+            'ac' => $this->roundStat($characterStatBuilder->buildDefence()),
+            'voided_ac' => $this->roundStat($characterStatBuilder->buildDefence(true)),
+            'str_modded' => $this->roundStat($characterStatBuilder->statMod('str')),
+            'dur_modded' => $this->roundStat($characterStatBuilder->statMod('dur')),
+            'dex_modded' => $this->roundStat($characterStatBuilder->statMod('dex')),
+            'chr_modded' => $this->roundStat($characterStatBuilder->statMod('chr')),
+            'int_modded' => $this->roundStat($characterStatBuilder->statMod('int')),
+            'agi_modded' => $this->roundStat($characterStatBuilder->statMod('agi')),
+            'focus_modded' => $this->roundStat($characterStatBuilder->statMod('focus')),
+            'weapon_attack' => $this->roundStat($characterStatBuilder->buildDamage(ItemType::validWeapons())),
+            'voided_weapon_attack' => $this->roundStat($characterStatBuilder->buildDamage(ItemType::validWeapons(), true)),
+            'ring_damage' => $this->roundStat($characterStatBuilder->buildDamage('ring')),
+            'spell_damage' => $this->roundStat($characterStatBuilder->buildDamage('spell-damage')),
+            'voided_spell_damage' => $this->roundStat($characterStatBuilder->buildDamage('spell-damage', true)),
+            'healing_amount' => $this->roundStat($characterStatBuilder->buildHealing()),
+            'voided_healing_amount' => $this->roundStat($characterStatBuilder->buildHealing(true)),
             'devouring_light' => $characterStatBuilder->buildDevouring('devouring_light'),
             'devouring_darkness' => $characterStatBuilder->buildDevouring('devouring_darkness'),
             'holy_bonus' => $characterStatBuilder->holyInfo()->fetchHolyBonus(),
@@ -65,5 +65,16 @@ class CharacterStatDetailsTransformer extends BaseTransformer
             'devouring_light_res' => $characterStatBuilder->holyInfo()->fetchDevouringResistanceBonus(),
             'devouring_darkness_res' => $characterStatBuilder->holyInfo()->fetchDevouringResistanceBonus(),
         ];
+    }
+
+    /**
+     * Round a Character stat or combat value to the nearest whole number.
+     *
+     * @param float|int $value
+     * @return int
+     */
+    private function roundStat(float|int $value): int
+    {
+        return round($value);
     }
 }

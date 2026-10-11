@@ -9,4 +9,6 @@ export default interface MonsterTopSectionProps {
   view_monster_stats: (monsterId: number) => void;
   monsters: MonsterNameListDefinition[];
   monster_selection_disabled?: boolean;
+  monster_selection_guide_target?: string;
+  monster_selection_guide_complete?: boolean;
 }

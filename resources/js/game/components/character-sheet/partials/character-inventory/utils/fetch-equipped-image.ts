@@ -76,19 +76,19 @@ const fetchItemImage = (
         ? imagePath[position] || null
         : imagePath || null;
     })
-    .with({ is_cosmic: true, affix_count: 2 }, () => {
+    .with({ is_cosmic: true }, () => {
       const imagePath = cosmicItemRecord[item.type];
       return isPartialPositionRecord(imagePath)
         ? imagePath[position] || null
         : imagePath || null;
     })
-    .with({ is_mythic: true, affix_count: 2 }, () => {
+    .with({ is_mythic: true }, () => {
       const imagePath = mythicalItemRecord[item.type];
       return isPartialPositionRecord(imagePath)
         ? imagePath[position] || null
         : imagePath || null;
     })
-    .with({ is_unique: true, affix_count: 2 }, () => {
+    .with({ is_unique: true }, () => {
       const imagePath = uniqueItemRecord[item.type];
       return isPartialPositionRecord(imagePath)
         ? imagePath[position] || null

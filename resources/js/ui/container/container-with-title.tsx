@@ -17,6 +17,7 @@ const ContainerWithTitle = (props: ContainerProps): ReactNode => {
             on_click={props.manageSectionVisibility}
             label="Close"
             variant={ButtonVariant.DANGER}
+            data_guide_target={props.close_button_data_guide_target}
           />
         </div>
       </div>

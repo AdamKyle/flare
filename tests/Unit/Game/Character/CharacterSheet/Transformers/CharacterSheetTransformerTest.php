@@ -94,7 +94,19 @@ class CharacterSheetTransformerTest extends TestCase
         $this->assertIsInt($data['shards']);
         $this->assertIsInt($data['copper_coins']);
         $this->assertIsNumeric($data['str_raw']);
-        $this->assertIsNumeric($data['attack']);
+        $this->assertIsInt($data['str_modded']);
+        $this->assertIsInt($data['dur_modded']);
+        $this->assertIsInt($data['dex_modded']);
+        $this->assertIsInt($data['chr_modded']);
+        $this->assertIsInt($data['int_modded']);
+        $this->assertIsInt($data['agi_modded']);
+        $this->assertIsInt($data['focus_modded']);
+        $this->assertIsInt($data['health']);
+        $this->assertIsInt($data['ac']);
+        $this->assertIsInt($data['weapon_attack']);
+        $this->assertIsInt($data['spell_damage']);
+        $this->assertIsInt($data['healing_amount']);
+        $this->assertIsInt($data['ring_damage']);
     }
 
     public function test_transform_preserves_runtime_and_access_state_from_base_info_transformer(): void

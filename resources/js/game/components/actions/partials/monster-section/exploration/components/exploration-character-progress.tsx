@@ -3,6 +3,7 @@ import React, { ReactNode } from 'react';
 import CurrencyDisplay from '../../../../../../reusable-components/currency/currency-display';
 import { CurrencyDisplayMode } from '../../../../../../reusable-components/currency/enums/currency-display-mode';
 import { CurrencyType } from '../../../../../../reusable-components/currency/enums/currency-type';
+import TrainingSkillProgress from '../../../../components/fight-section/training-skill-progress';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
 
@@ -54,6 +55,7 @@ const ExplorationCharacterProgress = (): ReactNode => {
         }
         aria_label={`Character level ${displayedLevel} experience progress`}
       />
+      <TrainingSkillProgress />
       <Dl>
         <Dt>Gold</Dt>
         <Dd>{renderBalance(CurrencyType.GOLD, character.gold)}</Dd>

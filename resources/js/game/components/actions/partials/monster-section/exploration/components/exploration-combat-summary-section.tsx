@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react';
 
 import ExplorationDetailSection from './exploration-detail-section';
+import { GuideTargets } from '../../../../../guide-quests/walkthrough/registry/guide-targets';
 import ExplorationChartPointDefinition from '../types/exploration-chart-point-definition';
 import ExplorationCombatSummarySectionProps from '../types/exploration-combat-summary-section-props';
 import { formatExplorationDuration } from '../utils/format-exploration-duration';
@@ -115,6 +116,7 @@ const ExplorationCombatSummarySection = (
       label: 'Combat Summary Break Down',
       component: ExplorationCombatSummaryBreakDown,
       props,
+      data_guide_target: GuideTargets.EXPLORATION_COMBAT_SUMMARY,
     },
   ] as const;
 

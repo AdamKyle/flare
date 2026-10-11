@@ -2,6 +2,7 @@ import React, { ReactNode } from 'react';
 
 import { CharacterStatTypeDetails } from './character-stat-type-details';
 import CharacterStatTypeBreakdownProps from './types/character-stat-type-breakdown-props';
+import { GuideTargets } from '../../../guide-quests/walkthrough/registry/guide-targets';
 import { getStatName } from '../../enums/stat-types';
 
 import { GameDataError } from 'game-data/components/game-data-error';
@@ -36,12 +37,14 @@ const CharacterStatTypeBreakDown = ({
       manageSectionVisibility={close_stat_type}
       title={`${characterData.name} ${getStatName(stat_type)} break down`}
     >
-      <Card>
-        <CharacterStatTypeDetails
-          stat_type={stat_type}
-          character_id={characterData.id}
-        />
-      </Card>
+      <div data-guide-target={GuideTargets.CHARACTER_STAT_BREAKDOWN}>
+        <Card>
+          <CharacterStatTypeDetails
+            stat_type={stat_type}
+            character_id={characterData.id}
+          />
+        </Card>
+      </div>
     </ContainerWithTitle>
   );
 };

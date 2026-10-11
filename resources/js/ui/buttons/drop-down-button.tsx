@@ -7,6 +7,8 @@ import DropDownProps from 'ui/buttons/types/drop-down-props';
 const DropDownButton = <T,>({
   data,
   on_select,
+  is_open,
+  on_open_change,
   disabled,
 }: DropDownProps<T>) => {
   const itemClassName =
@@ -53,6 +55,8 @@ const DropDownButton = <T,>({
       label={data.dropdown_label}
       variant={ButtonVariant.PRIMARY}
       disabled={disabled}
+      is_open={is_open}
+      on_open_change={on_open_change}
     >
       {renderItems()}
     </DropDownButtonBase>

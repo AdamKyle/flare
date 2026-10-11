@@ -3,6 +3,8 @@ import React, { ReactNode } from 'react';
 
 import { CharacterEquippedApiUrls } from './api/enums/character-equipped-api-urls';
 import useCharacterEquippedItemsApi from './api/hooks/use-character-equipped-items-api';
+import { InventoryPositionDefinition } from './enums/equipment-positions';
+import { InventoryItemTypes } from './enums/inventory-item-types';
 import EquippedSlots from './equipped-slots';
 import { useOpenCharacterBackpack } from './hooks/use-open-character-backpack';
 import { useOpenCharacterGemBag } from './hooks/use-open-character-gem-bag';
@@ -11,6 +13,7 @@ import { useOpenCharacterUsableInventory } from './hooks/use-open-character-usab
 import { useOpenEquippedItemDetails } from './hooks/use-open-equipped-item-details';
 import InventorySectionProps from './types/inventory-section-props';
 import { inventoryIconButtons } from './utils/inventory-icon-buttons';
+import { GuideTargets } from '../../../guide-quests/walkthrough/registry/guide-targets';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 
@@ -47,6 +50,23 @@ const InventorySection = ({
     on_equipment_changed: refetch,
   });
 
+  const handleOpenEmptySlot = (
+    position: InventoryPositionDefinition,
+    itemTypes: InventoryItemTypes[]
+  ): void => {
+    openBackpack({
+      initial_filters: {
+        item_types: itemTypes,
+      },
+      target_position: position,
+      on_equipment_changed: refetch,
+    });
+  };
+
+  const handleOpenBackpack = (): void => {
+    openBackpack({ on_equipment_changed: refetch });
+  };
+
   if (error) {
     return <ApiErrorAlert apiError={error.message} />;
   }
@@ -64,20 +84,27 @@ const InventorySection = ({
   }
 
   return (
-    <div className="relative">
+    <div
+      className="relative"
+      data-guide-target={GuideTargets.CHARACTER_INVENTORY}
+    >
       <MobileIconContainer
         icon_buttons={inventoryIconButtons({
-          openBackpack,
+          openBackpack: handleOpenBackpack,
           openUsableInventory,
           openGemBag,
           openSets,
         })}
       />
 
-      <div className="flex justify-center">
+      <div
+        className="flex justify-center"
+        data-guide-target={GuideTargets.INVENTORY_EQUIPPED_ITEM}
+      >
         <EquippedSlots
           equipped_items={data.equipped_items}
           on_open_item_details={openEquippedItemDetails}
+          on_open_empty_slot={handleOpenEmptySlot}
         />
       </div>
 

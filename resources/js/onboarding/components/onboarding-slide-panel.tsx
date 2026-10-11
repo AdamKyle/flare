@@ -8,7 +8,7 @@ const OnboardingSlidePanel = ({
 }: OnboardingSlidePanelProps): ReactNode => {
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-4 md:px-8 md:py-6">
-      <div className="my-auto flex w-full max-w-2xl flex-col gap-3">
+      <div className="mx-auto my-auto flex w-full max-w-2xl flex-col gap-3">
         <h2
           ref={headingRef}
           tabIndex={-1}

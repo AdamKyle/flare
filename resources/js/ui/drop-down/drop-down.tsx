@@ -78,6 +78,8 @@ const Dropdown = ({
   aria_invalid,
   aria_required,
   render_item_content,
+  data_guide_target: dataGuideTarget,
+  data_guide_target_complete: dataGuideTargetComplete,
 }: DropdownProps) => {
   const generatedId = useId().replace(/:/g, '');
   const triggerId = id ?? `dropdown-trigger-${generatedId}`;
@@ -97,6 +99,7 @@ const Dropdown = ({
   const listRef = useRef<HTMLUListElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const prevForceClearRef = useRef<boolean | undefined>(undefined);
+  const suppressEscapeKeyUpRef = useRef(false);
 
   const isSearchControlled = typeof on_search === 'function';
   const searchTerm = isSearchControlled
@@ -309,6 +312,8 @@ const Dropdown = ({
       })
       .with('Escape', () => {
         event.preventDefault();
+        event.stopPropagation();
+        suppressEscapeKeyUpRef.current = true;
         closeMenu();
         triggerRef.current?.focus();
       })
@@ -317,6 +322,22 @@ const Dropdown = ({
       })
       .otherwise(() => {});
   };
+
+  useEffect(() => {
+    const handleKeyUp = (event: globalThis.KeyboardEvent): void => {
+      if (event.key !== 'Escape' || !suppressEscapeKeyUpRef.current) {
+        return;
+      }
+
+      suppressEscapeKeyUpRef.current = false;
+      event.preventDefault();
+      event.stopPropagation();
+    };
+
+    document.addEventListener('keyup', handleKeyUp, true);
+
+    return () => document.removeEventListener('keyup', handleKeyUp, true);
+  }, []);
 
   const handleSearchChange = (value: string) => {
     if (isSearchControlled) {
@@ -545,8 +566,13 @@ const Dropdown = ({
     return createPortal(
       <div
         ref={menuRef}
-        style={{ ...menuStyle, display: 'flex', flexDirection: 'column' }}
+        style={{
+          ...menuStyle,
+          display: 'flex',
+          flexDirection: 'column',
+        }}
         onKeyDown={handleKeyDown}
+        data-guide-interaction-owner={dataGuideTarget}
         className="overflow-hidden rounded-md border border-gray-500 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
       >
         {renderSearchInput()}
@@ -557,7 +583,12 @@ const Dropdown = ({
   };
 
   return (
-    <div ref={containerRef} className="relative w-full min-w-0">
+    <div
+      ref={containerRef}
+      className="relative w-full min-w-0"
+      data-guide-target={dataGuideTarget}
+      data-guide-target-complete={dataGuideTargetComplete ? 'true' : undefined}
+    >
       <div className="relative flex w-full items-center">
         <button
           ref={triggerRef}

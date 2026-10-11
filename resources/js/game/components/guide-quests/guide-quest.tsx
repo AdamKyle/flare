@@ -1,5 +1,5 @@
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
-import React, { useEffect, useState } from 'react';
+import React, { ReactNode, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 import GuideQuestDefinition, {
@@ -8,41 +8,32 @@ import GuideQuestDefinition, {
 import { useGuideQuestData } from './hooks/use-guide-quest-data';
 import GuideQuestProps from './types/guide-quest-props';
 import { useGuideWalkthrough } from './walkthrough/hooks/use-guide-walkthrough';
+import CurrencyDisplay from '../../reusable-components/currency/currency-display';
+import { CurrencyDisplayMode } from '../../reusable-components/currency/enums/currency-display-mode';
+import { CurrencyType } from '../../reusable-components/currency/enums/currency-type';
+import QuestCurrencyRow from '../../reusable-components/quest/types/quest-currency-row';
 
-import { useGameData } from 'game-data/hooks/use-game-data';
+import { formatNumberWithCommas } from 'game-utils/format-number';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import Card from 'ui/cards/card';
 import ContainerWithTitle from 'ui/container/container-with-title';
+import DetailGridRow from 'ui/detail-grid/detail-grid-row';
+import Dd from 'ui/dl/dd';
+import Dl from 'ui/dl/dl';
+import Dt from 'ui/dl/dt';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
+import Separator from 'ui/separator/separator';
 
 const GuideQuest = ({ on_close }: GuideQuestProps) => {
-  const { setGuideQuestAttention } = useGameData();
-  const { data, error, loading, handInGuideQuest, acknowledgeAttention } =
-    useGuideQuestData();
+  const { data, error, loading, handInGuideQuest } = useGuideQuestData();
   const walkthrough = useGuideWalkthrough();
   const [selectedQuestId, setSelectedQuestId] = useState<number | null>(null);
   const selectedQuest =
     data?.quests.find((quest) => quest.id === selectedQuestId) ??
     data?.quests[0] ??
     null;
-
-  useEffect(() => {
-    if (!data?.has_activity_attention) {
-      return;
-    }
-
-    void acknowledgeAttention().then((acknowledged) => {
-      if (acknowledged) {
-        setGuideQuestAttention(false);
-      }
-    });
-  }, [
-    acknowledgeAttention,
-    data?.has_activity_attention,
-    setGuideQuestAttention,
-  ]);
 
   const renderBlockImage = (imageUrl: string | null) => {
     if (!imageUrl) {
@@ -92,7 +83,10 @@ const GuideQuest = ({ on_close }: GuideQuestProps) => {
 
     return (
       <section aria-labelledby="guide-quest-information">
-        <h4 id="guide-quest-information" className="mb-2 text-lg font-semibold">
+        <h4
+          id="guide-quest-information"
+          className="text-marigold-700 dark:text-marigold-500 mb-2 text-base font-semibold"
+        >
           Information
         </h4>
         <ReactMarkdown>{instructions}</ReactMarkdown>
@@ -100,21 +94,16 @@ const GuideQuest = ({ on_close }: GuideQuestProps) => {
     );
   };
 
-  const renderRequirement = (
-    quest: GuideQuestDefinition,
-    levelComplete: boolean | undefined
-  ) => {
-    if (!quest.required_level) {
-      return <li>Complete the listed Guide Quest requirements.</li>;
-    }
-
-    return (
-      <li>
-        Reach level {quest.required_level}:{' '}
-        {levelComplete ? 'Complete' : 'In progress'}
-      </li>
-    );
-  };
+  const renderRequirementStatus = (
+    label: string,
+    requirement: string,
+    completedRequirements: string[]
+  ) => (
+    <li key={requirement}>
+      {label}:{' '}
+      {completedRequirements.includes(requirement) ? 'Complete' : 'In progress'}
+    </li>
+  );
 
   const renderShowMeButton = (quest: GuideQuestDefinition) => {
     if (!quest.has_walkthrough) {
@@ -132,6 +121,153 @@ const GuideQuest = ({ on_close }: GuideQuestProps) => {
     );
   };
 
+  const renderActions = (quest: GuideQuestDefinition, canHandIn: boolean) => (
+    <div className="flex flex-col gap-3 sm:flex-row">
+      {renderShowMeButton(quest)}
+      <Button
+        label="Hand In"
+        disabled={!canHandIn}
+        on_click={() => void handInGuideQuest(quest.id)}
+        variant={ButtonVariant.SUCCESS}
+      />
+    </div>
+  );
+
+  const renderRequirements = (
+    quest: GuideQuestDefinition,
+    completedRequirements: string[]
+  ) => {
+    const requirements: ReactNode[] = [];
+
+    if (quest.required_level !== null) {
+      requirements.push(
+        renderRequirementStatus(
+          `Reach level ${quest.required_level}`,
+          'required_level',
+          completedRequirements
+        )
+      );
+    }
+
+    if (
+      quest.required_training_skill !== null &&
+      quest.required_training_xp_sacrifice !== null
+    ) {
+      const skillName = quest.training_skill_name ?? 'Required Skill';
+      const percentage = quest.required_training_xp_sacrifice * 100;
+
+      requirements.push(
+        renderRequirementStatus(
+          `${skillName} training at ${percentage}%`,
+          'required_training_xp_sacrifice',
+          completedRequirements
+        )
+      );
+    }
+
+    if (quest.required_skill !== null && quest.required_skill_level !== null) {
+      const skillName = quest.skill_name ?? 'Required Skill';
+
+      requirements.push(
+        renderRequirementStatus(
+          `${skillName} level ${quest.required_skill_level}`,
+          'required_skill_level',
+          completedRequirements
+        )
+      );
+    }
+
+    if (
+      quest.required_faction_id !== null &&
+      quest.required_faction_level !== null
+    ) {
+      const factionName = quest.faction_name ?? 'Required Faction';
+
+      requirements.push(
+        renderRequirementStatus(
+          `${factionName} level ${quest.required_faction_level}`,
+          'required_faction_level',
+          completedRequirements
+        )
+      );
+    }
+
+    if (requirements.length === 0) {
+      requirements.push(
+        <li key="other-requirements">
+          Complete the listed Guide Quest requirements.
+        </li>
+      );
+    }
+
+    return (
+      <section aria-labelledby="guide-quest-requirements">
+        <h4
+          id="guide-quest-requirements"
+          className="text-marigold-700 dark:text-marigold-500 mb-2 text-base font-semibold"
+        >
+          Requirements
+        </h4>
+        <ul className="list-disc pl-5">{requirements}</ul>
+      </section>
+    );
+  };
+
+  const renderRewards = (quest: GuideQuestDefinition) => {
+    const currencyRows: QuestCurrencyRow[] = [
+      {
+        label: 'Gold',
+        currency: CurrencyType.GOLD,
+        value: quest.gold_reward ?? 0,
+      },
+      {
+        label: 'Gold Dust',
+        currency: CurrencyType.GOLD_DUST,
+        value: quest.gold_dust_reward ?? 0,
+      },
+      {
+        label: 'Shards',
+        currency: CurrencyType.SHARDS,
+        value: quest.shards_reward ?? 0,
+      },
+    ].filter((row) => row.value !== 0);
+    const xpReward = quest.xp_reward ?? 0;
+
+    const renderCurrencyRow = (row: QuestCurrencyRow) => (
+      <React.Fragment key={row.label}>
+        <Dt>{row.label}</Dt>
+        <Dd>
+          <CurrencyDisplay
+            currency={row.currency}
+            amount={row.value}
+            display_mode={CurrencyDisplayMode.EXACT}
+            show_label={false}
+          />
+        </Dd>
+      </React.Fragment>
+    );
+
+    return (
+      <section aria-labelledby="guide-quest-rewards">
+        <h4
+          id="guide-quest-rewards"
+          className="text-marigold-700 dark:text-marigold-500 mb-2 text-base font-semibold"
+        >
+          Rewards
+        </h4>
+        <Dl>
+          {currencyRows.map(renderCurrencyRow)}
+          {xpReward !== 0 && (
+            <>
+              <Dt>XP</Dt>
+              <Dd>{formatNumberWithCommas(xpReward)}</Dd>
+            </>
+          )}
+        </Dl>
+      </section>
+    );
+  };
+
   const renderQuest = (quest: GuideQuestDefinition) => {
     const handIn = data?.can_hand_in.find(
       (entry) => entry.quest_id === quest.id
@@ -139,13 +275,19 @@ const GuideQuest = ({ on_close }: GuideQuestProps) => {
     const completed = data?.completed_requirements.find(
       (entry) => entry.quest_id === quest.id
     );
-    const levelComplete =
-      completed?.completed_requirements.includes('required_level');
+    const completedRequirements = completed?.completed_requirements ?? [];
 
     return (
-      <div className="space-y-6">
+      <div className="flex flex-col gap-6">
+        {renderActions(quest, handIn?.can_hand_in ?? false)}
+
+        <Separator additional_css="my-1" />
+
         <section aria-labelledby="guide-quest-story">
-          <h4 id="guide-quest-story" className="mb-2 text-lg font-semibold">
+          <h4
+            id="guide-quest-story"
+            className="text-marigold-700 dark:text-marigold-500 mb-2 text-base font-semibold"
+          >
             Story
           </h4>
           <div className="prose dark:prose-invert max-w-none">
@@ -153,12 +295,16 @@ const GuideQuest = ({ on_close }: GuideQuestProps) => {
           </div>
         </section>
 
+        <Separator additional_css="my-1" />
+
         {renderInformation(quest.instructions)}
+
+        {quest.instructions && <Separator additional_css="my-1" />}
 
         <section aria-labelledby="guide-quest-instructions">
           <h4
             id="guide-quest-instructions"
-            className="mb-2 text-lg font-semibold"
+            className="text-marigold-700 dark:text-marigold-500 mb-2 text-base font-semibold"
           >
             Instructions
           </h4>
@@ -170,38 +316,12 @@ const GuideQuest = ({ on_close }: GuideQuestProps) => {
           </div>
         </section>
 
-        <section aria-labelledby="guide-quest-requirements">
-          <h4
-            id="guide-quest-requirements"
-            className="mb-2 text-lg font-semibold"
-          >
-            Required to Complete
-          </h4>
-          <ul className="list-disc pl-5">
-            {renderRequirement(quest, levelComplete)}
-          </ul>
-        </section>
+        <Separator additional_css="my-1" />
 
-        <section aria-labelledby="guide-quest-rewards">
-          <h4 id="guide-quest-rewards" className="mb-2 text-lg font-semibold">
-            Rewards
-          </h4>
-          <p>
-            {quest.xp_reward ?? 0} XP, {quest.gold_reward ?? 0} Gold,{' '}
-            {quest.gold_dust_reward ?? 0} Gold Dust, {quest.shards_reward ?? 0}{' '}
-            Shards
-          </p>
-        </section>
-
-        <div className="flex flex-col gap-3 pt-2 sm:flex-row">
-          {renderShowMeButton(quest)}
-          <Button
-            label="Hand In"
-            disabled={!handIn?.can_hand_in}
-            on_click={() => void handInGuideQuest(quest.id)}
-            variant={ButtonVariant.SUCCESS}
-          />
-        </div>
+        <DetailGridRow>
+          {renderRequirements(quest, completedRequirements)}
+          {renderRewards(quest)}
+        </DetailGridRow>
       </div>
     );
   };
@@ -267,7 +387,7 @@ const GuideQuest = ({ on_close }: GuideQuestProps) => {
     return (
       <>
         {renderQuestSelection(data.quests, selectedQuest.id)}
-        <h3 className="text-glacier-900 dark:text-glacier-100 mb-5 text-2xl font-semibold">
+        <h3 className="text-glacier-900 dark:text-glacier-100 mb-5 text-xl font-semibold">
           {selectedQuest.name}
         </h3>
         {renderWalkthroughError()}

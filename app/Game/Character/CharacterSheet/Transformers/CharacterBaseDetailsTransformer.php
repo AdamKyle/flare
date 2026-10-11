@@ -48,16 +48,16 @@ class CharacterBaseDetailsTransformer extends BaseTransformer
             'int_raw' => $character->int,
             'agi_raw' => $character->agi,
             'focus_raw' => $character->focus,
-            'str_modded' => $characterStatBuilder->statMod('str'),
-            'dur_modded' => $characterStatBuilder->statMod('dur'),
-            'dex_modded' => $characterStatBuilder->statMod('dex'),
-            'chr_modded' => $characterStatBuilder->statMod('chr'),
-            'int_modded' => $characterStatBuilder->statMod('int'),
-            'agi_modded' => $characterStatBuilder->statMod('agi'),
-            'focus_modded' => $characterStatBuilder->statMod('focus'),
-            'attack' => $characterStatBuilder->buildTotalAttack(),
-            'health' => $characterStatBuilder->buildHealth(),
-            'ac' => $characterStatBuilder->buildDefence(),
+            'str_modded' => $this->roundStat($characterStatBuilder->statMod('str')),
+            'dur_modded' => $this->roundStat($characterStatBuilder->statMod('dur')),
+            'dex_modded' => $this->roundStat($characterStatBuilder->statMod('dex')),
+            'chr_modded' => $this->roundStat($characterStatBuilder->statMod('chr')),
+            'int_modded' => $this->roundStat($characterStatBuilder->statMod('int')),
+            'agi_modded' => $this->roundStat($characterStatBuilder->statMod('agi')),
+            'focus_modded' => $this->roundStat($characterStatBuilder->statMod('focus')),
+            'attack' => $this->roundStat($characterStatBuilder->buildTotalAttack()),
+            'health' => $this->roundStat($characterStatBuilder->buildHealth()),
+            'ac' => $this->roundStat($characterStatBuilder->buildDefence()),
             'class_bonus_chance' => (new ClassAttackBuilder($character))->buildAttackData()['chance'],
             'gold' => $character->gold,
             'gold_dust' => $character->gold_dust,
@@ -68,17 +68,28 @@ class CharacterBaseDetailsTransformer extends BaseTransformer
             'can_access_labyrinth_oracle' => $character->map->gameMap->mapType()->isLabyrinth(),
             'can_access_twisted_earth' => $character->map->gameMap->mapType()->isTwistedMemories(),
             'is_in_timeout' => ! is_null($character->user->timeout_until),
-            'weapon_attack' => $characterStatBuilder->buildDamage(ItemType::validWeapons()),
-            'voided_weapon_attack' => $characterStatBuilder->buildDamage(ItemType::validWeapons(), true),
-            'ring_damage' => $characterStatBuilder->buildDamage(ItemType::RING->value),
-            'spell_damage' => $characterStatBuilder->buildDamage(ItemType::SPELL_DAMAGE->value),
-            'voided_spell_damage' => $characterStatBuilder->buildDamage(ItemType::SPELL_DAMAGE->value, true),
-            'healing_amount' => $characterStatBuilder->buildHealing(),
-            'voided_healing_amount' => $characterStatBuilder->buildHealing(true),
+            'weapon_attack' => $this->roundStat($characterStatBuilder->buildDamage(ItemType::validWeapons())),
+            'voided_weapon_attack' => $this->roundStat($characterStatBuilder->buildDamage(ItemType::validWeapons(), true)),
+            'ring_damage' => $this->roundStat($characterStatBuilder->buildDamage(ItemType::RING->value)),
+            'spell_damage' => $this->roundStat($characterStatBuilder->buildDamage(ItemType::SPELL_DAMAGE->value)),
+            'voided_spell_damage' => $this->roundStat($characterStatBuilder->buildDamage(ItemType::SPELL_DAMAGE->value, true)),
+            'healing_amount' => $this->roundStat($characterStatBuilder->buildHealing()),
+            'voided_healing_amount' => $this->roundStat($characterStatBuilder->buildHealing(true)),
             'gold_bars' => $this->fetchGoldBarsAmount($character),
             'map_name' => $character->map->gameMap->name,
             'inventory_count' => $this->characterInventoryCountTransformer->transform($character),
         ];
+    }
+
+    /**
+     * Round a Character stat or combat value to the nearest whole number.
+     *
+     * @param float|int $value
+     * @return int
+     */
+    private function roundStat(float|int $value): int
+    {
+        return round($value);
     }
 
     /**

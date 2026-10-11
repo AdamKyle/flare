@@ -15,6 +15,8 @@ const MonsterTopSection = ({
   monsters,
   select_action,
   monster_selection_disabled = false,
+  monster_selection_guide_target: monsterSelectionGuideTarget,
+  monster_selection_guide_complete: monsterSelectionGuideComplete,
 }: MonsterTopSectionProps): ReactNode => {
   const isAtFirstMonster = current_index <= 0;
   const isAtLastMonster = current_index >= total_monsters;
@@ -72,6 +74,8 @@ const MonsterTopSection = ({
             current_index={current_index}
             on_select={select_action}
             disabled={monster_selection_disabled}
+            data_guide_target={monsterSelectionGuideTarget}
+            data_guide_target_complete={monsterSelectionGuideComplete}
           />
         </div>
 

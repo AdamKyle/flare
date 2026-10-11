@@ -24,7 +24,9 @@ import MonsterSectionProps from './types/monster-section-props';
 import { getImageTierByIndex } from './util/monster-image-tier';
 import FactionLoyaltyAutomationStatus from '../../../factions/components/faction-loyalty-automation-status';
 import { useFactionLoyaltyContext } from '../../../factions/hooks/use-faction-loyalty-context';
+import { GuideWalkthroughInteractionSignal } from '../../../guide-quests/walkthrough/enums/guide-walkthrough-interaction-signal';
 import { useGuideTarget } from '../../../guide-quests/walkthrough/hooks/use-guide-target';
+import { useGuideWalkthrough } from '../../../guide-quests/walkthrough/hooks/use-guide-walkthrough';
 import { GuideTargets } from '../../../guide-quests/walkthrough/registry/guide-targets';
 import AttackButtonsContainer from '../../components/fight-section/attack-buttons-container';
 import AttackCooldownTimer from '../../components/fight-section/attack-cooldown-timer';
@@ -58,6 +60,8 @@ const MonsterSection = ({
   show_monster_stats,
 }: MonsterSectionProps): ReactNode => {
   const { gameData, listenForMonsterUpdates } = useGameData();
+  const { active_target: activeGuideTarget, completeTargetInteraction } =
+    useGuideWalkthrough();
   const {
     loading,
     setRequestData,
@@ -76,6 +80,8 @@ const MonsterSection = ({
   const [showExplorationConfiguration, setShowExplorationConfiguration] =
     useState(false);
   const [showDelveConfiguration, setShowDelveConfiguration] = useState(false);
+  const [hasSelectedExplorationMonster, setHasSelectedExplorationMonster] =
+    useState(false);
   const initiateFightGuideTarget = useGuideTarget(
     GuideTargets.MANUAL_FIGHT_INITIATE
   );
@@ -237,6 +243,11 @@ const MonsterSection = ({
 
     setSelectedMonsterId(monster.id);
     setMonsterToFight(null);
+    setHasSelectedExplorationMonster(true);
+    completeTargetInteraction(
+      GuideTargets.EXPLORATION_MONSTER,
+      GuideWalkthroughInteractionSignal.SELECTED
+    );
   };
 
   const handleAttackMonster = (attackType: AttackType) => {
@@ -284,6 +295,10 @@ const MonsterSection = ({
   }
 
   const handleSetupExploration = () => {
+    setHasSelectedExplorationMonster(
+      activeGuideTarget !== GuideTargets.EXPLORATION_OPEN &&
+        selectedMonsterId !== null
+    );
     setShowExplorationConfiguration(true);
   };
 
@@ -309,6 +324,7 @@ const MonsterSection = ({
         label="Setup Exploration"
         variant={ButtonVariant.SUCCESS}
         additional_css="block mx-auto w-48 mt-4"
+        data_guide_target={GuideTargets.EXPLORATION_OPEN}
       />
     );
   };
@@ -605,16 +621,26 @@ const MonsterSection = ({
 
   return (
     <>
-      <MonsterTopSection
-        img_src={getMonsterImage()}
-        total_monsters={monsters.length - 1}
-        current_index={currentIndex}
-        view_monster_stats={show_monster_stats}
-        monster_name={monsterName}
-        monsters={monsters}
-        select_action={handleMonsterSelected}
-        monster_selection_disabled={isAtDelveLocation}
-      />
+      <div>
+        <MonsterTopSection
+          img_src={getMonsterImage()}
+          total_monsters={monsters.length - 1}
+          current_index={currentIndex}
+          view_monster_stats={show_monster_stats}
+          monster_name={monsterName}
+          monsters={monsters}
+          select_action={handleMonsterSelected}
+          monster_selection_disabled={isAtDelveLocation}
+          monster_selection_guide_target={
+            showExplorationConfiguration
+              ? GuideTargets.EXPLORATION_MONSTER
+              : undefined
+          }
+          monster_selection_guide_complete={
+            showExplorationConfiguration && hasSelectedExplorationMonster
+          }
+        />
+      </div>
       {renderMonsterFightSection()}
     </>
   );

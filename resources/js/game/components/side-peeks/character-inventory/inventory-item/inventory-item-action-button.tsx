@@ -7,6 +7,8 @@ import DropDownButton from 'ui/buttons/drop-down-button';
 
 const InventoryItemActionButton = ({
   on_select_action,
+  is_open,
+  on_open_change,
 }: InventoryItemActionButtonProps) => {
   const data = {
     dropdown_label: 'Actions',
@@ -39,7 +41,14 @@ const InventoryItemActionButton = ({
     ],
   };
 
-  return <DropDownButton data={data} on_select={on_select_action} />;
+  return (
+    <DropDownButton
+      data={data}
+      on_select={on_select_action}
+      is_open={is_open}
+      on_open_change={on_open_change}
+    />
+  );
 };
 
 export default InventoryItemActionButton;

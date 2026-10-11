@@ -3,6 +3,7 @@ import React, { ReactNode } from 'react';
 import CharacterAlchemyBoons from './alchemy-boons/character-alchemy-boons';
 import { useManageCharacterInventoryVisibility } from './hooks/use-manage-character-inventory-visibility';
 import CharacterCardDetailsProps from './types/character-card-details-props';
+import CharacterIdentity from '../../../../../reusable-components/character/components/character-identity';
 import CurrencyDisplay from '../../../../../reusable-components/currency/currency-display';
 import { CurrencyDisplayMode } from '../../../../../reusable-components/currency/enums/currency-display-mode';
 import { CurrencyType } from '../../../../../reusable-components/currency/enums/currency-type';
@@ -10,8 +11,12 @@ import { AttackTypes } from '../../../../character-sheet/enums/attack-types';
 import { StatTypes } from '../../../../character-sheet/enums/stat-types';
 import { useManageAttackDetailsBreakdown } from '../../../../character-sheet/hooks/use-manage-attack-details-breakdown';
 import { useManageStatDetailsBreakdown } from '../../../../character-sheet/hooks/use-manage-stat-details-breakdown';
+import { GuideTargets } from '../../../../guide-quests/walkthrough/registry/guide-targets';
 import { useManageCharacterSheetVisibility } from '../../../../hooks/use-manage-character-sheet-visibility';
+import { useOpenClassDetail } from '../../../../side-peeks/game-data/hooks/use-open-class-detail';
+import { useOpenRaceDetail } from '../../../../side-peeks/game-data/hooks/use-open-race-detail';
 import XpBar from '../../../components/character-details/xp-bar';
+import TrainingSkillProgress from '../../../components/fight-section/training-skill-progress';
 
 import { shortenNumber } from 'game-utils/format-number';
 
@@ -33,6 +38,8 @@ const CharacterCardDetails = ({
   const { openCharacterInventory } = useManageCharacterInventoryVisibility();
   const { openAttackDetails } = useManageAttackDetailsBreakdown();
   const { openStatDetails } = useManageStatDetailsBreakdown();
+  const { openRaceDetail } = useOpenRaceDetail();
+  const { openClassDetail } = useOpenClassDetail();
 
   const rawProgress =
     (characterData.inventory_count.inventory_count /
@@ -42,8 +49,19 @@ const CharacterCardDetails = ({
   const characterInventorProgress = Math.min(rawProgress, 100);
 
   return (
-    <>
+    <div data-guide-target={GuideTargets.CHARACTER_CARD_OVERVIEW}>
       <XpBar current_xp={characterData.xp} max_xp={characterData.xp_next} />
+      <TrainingSkillProgress />
+      <Separator additional_css="mx-4" />
+      <CharacterIdentity
+        race_id={characterData.race_id}
+        race_name={characterData.race}
+        class_id={characterData.class_id}
+        class_name={characterData.class}
+        on_open_race={openRaceDetail}
+        on_open_class={openClassDetail}
+      />
+      <Separator />
       <div className="grid grid-cols-2 gap-2">
         <div>
           <h4 className="text-danube-700 dark:text-danube-300">Stats</h4>
@@ -118,7 +136,7 @@ const CharacterCardDetails = ({
                 additional_css={'font-bold'}
               />
             </Dt>
-            <dd>{shortenNumber(characterData.focus_modded)}</dd>
+            <Dd>{shortenNumber(characterData.focus_modded)}</Dd>
           </Dl>
         </div>
         <div>
@@ -238,6 +256,7 @@ const CharacterCardDetails = ({
         label={`Manage Inventory (${characterData.inventory_count.inventory_count}/${characterData.inventory_count.inventory_max})`}
         variant={ButtonVariant.SUCCESS}
         additional_css="w-full my-2"
+        data_guide_target={GuideTargets.CHARACTER_MANAGE_INVENTORY}
       />
       <Button
         label="See More Details"
@@ -246,9 +265,10 @@ const CharacterCardDetails = ({
         }}
         variant={ButtonVariant.PRIMARY}
         additional_css="w-full"
+        data_guide_target={GuideTargets.CHARACTER_MORE_DETAILS}
       />
       <CharacterAlchemyBoons boons={activeBoons} on_open={onOpenActiveBoons} />
-    </>
+    </div>
   );
 };
 

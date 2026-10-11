@@ -126,6 +126,14 @@ class SkillServiceTest extends TestCase
 
         $this->assertEquals(200, $result['status']);
         $this->assertEquals('You are now training: '.$skillToTrain->name, $result['message']);
+
+        $skills = $this->skillService->getSkills(
+            $character->refresh(),
+            [$skillToTrain->game_skill_id]
+        );
+
+        $this->assertTrue($skills[0]['is_training']);
+        $this->assertEquals(0.10, $skills[0]['xp_towards']);
     }
 
     public function test_switch_training_skills()
@@ -157,6 +165,15 @@ class SkillServiceTest extends TestCase
 
         $this->assertEquals(200, $result['status']);
         $this->assertEquals('You are now training: '.$skillToTrain->name, $result['message']);
+
+        $skills = $this->skillService->getSkills(
+            $character->refresh(),
+            [$skillToTrain->game_skill_id, $secondarySkill->id]
+        );
+        $trainingSkill = collect($skills)->firstWhere('id', $skillToTrain->id);
+
+        $this->assertTrue($trainingSkill['is_training']);
+        $this->assertEquals(0.10, $trainingSkill['xp_towards']);
     }
 
     public function test_do_not_assign_xp_to_a_skill_that_doesnt_exist()

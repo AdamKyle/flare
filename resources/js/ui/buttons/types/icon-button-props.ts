@@ -13,4 +13,6 @@ export default interface IconButtonProps {
   aria_busy?: boolean;
   center_content?: boolean;
   status_indicator?: ReactNode;
+  data_guide_target?: string;
+  data_guide_target_complete?: boolean;
 }

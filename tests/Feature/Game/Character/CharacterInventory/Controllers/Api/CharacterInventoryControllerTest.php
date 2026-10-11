@@ -17,15 +17,17 @@ use Tests\Traits\CreateCharacterAutomation;
 use Tests\Traits\CreateCharacterGemModifier;
 use Tests\Traits\CreateGameGemAbility;
 use Tests\Traits\CreateGem;
+use Tests\Traits\CreateHolyStack;
 use Tests\Traits\CreateInventorySets;
 use Tests\Traits\CreateItem;
+use Tests\Traits\CreateItemAffix;
 use Tests\Traits\CreateItemSkill;
 use Tests\Traits\CreateItemSkillProgression;
 use Tests\Traits\CreateItemSocket;
 
 class CharacterInventoryControllerTest extends TestCase
 {
-    use CreateAlchemyBagSlot, CreateBatchCrafting, CreateCharacterAutomation, CreateCharacterGemModifier, CreateGameGemAbility, CreateGem, CreateInventorySets, CreateItem, CreateItemSkill, CreateItemSkillProgression, CreateItemSocket, RefreshDatabase;
+    use CreateAlchemyBagSlot, CreateBatchCrafting, CreateCharacterAutomation, CreateCharacterGemModifier, CreateGameGemAbility, CreateGem, CreateHolyStack, CreateInventorySets, CreateItem, CreateItemAffix, CreateItemSkill, CreateItemSkillProgression, CreateItemSocket, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -130,6 +132,95 @@ class CharacterInventoryControllerTest extends TestCase
 
         $response->assertOk();
         $this->assertArrayHasKey('data', $response->json());
+    }
+
+    public function test_inventory_can_filter_by_item_types(): void
+    {
+        $sword = $this->createItem(['name' => 'Filter Sword', 'type' => ItemType::SWORD->value]);
+        $ring = $this->createItem(['name' => 'Filter Ring', 'type' => ItemType::RING->value]);
+        $damageSpell = $this->createItem(['name' => 'Damage Spell', 'type' => ItemType::SPELL_DAMAGE->value]);
+        $healingSpell = $this->createItem(['name' => 'Healing Spell', 'type' => ItemType::SPELL_HEALING->value]);
+        $body = $this->createItem(['name' => 'Filter Body', 'type' => 'body']);
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($sword)
+            ->giveItem($ring)
+            ->giveItem($damageSpell)
+            ->giveItem($healingSpell)
+            ->giveItem($body)
+            ->getCharacter();
+
+        $ringResponse = $this->actingAs($character->user)
+            ->getJson('/api/character/'.$character->id.'/inventory?filters[item_types][]=ring');
+
+        $ringResponse->assertOk();
+        $this->assertSame(['ring'], array_column($ringResponse->json('data'), 'type'));
+
+        $spellResponse = $this->actingAs($character->user)
+            ->getJson('/api/character/'.$character->id.'/inventory?filters[item_types][]=spell-damage&filters[item_types][]=spell-healing');
+
+        $spellResponse->assertOk();
+        $this->assertEqualsCanonicalizing(
+            ['spell-damage', 'spell-healing'],
+            array_column($spellResponse->json('data'), 'type')
+        );
+    }
+
+    public function test_inventory_can_combine_item_type_and_rarity_filters(): void
+    {
+        $uniqueAffix = $this->createItemAffix(['type' => 'prefix', 'randomly_generated' => true]);
+        $uniqueSword = $this->createItem(['name' => 'Unique Sword', 'type' => ItemType::SWORD->value, 'item_prefix_id' => $uniqueAffix->id]);
+        $normalSword = $this->createItem(['name' => 'Normal Sword', 'type' => ItemType::SWORD->value]);
+        $uniqueRing = $this->createItem(['name' => 'Unique Ring', 'type' => ItemType::RING->value, 'item_prefix_id' => $uniqueAffix->id]);
+        $character = $this->character->inventoryManagement()
+            ->giveItem($uniqueSword)
+            ->giveItem($normalSword)
+            ->giveItem($uniqueRing)
+            ->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->getJson('/api/character/'.$character->id.'/inventory?filters[item_types][]=sword&filters[rarity]=unique');
+
+        $response->assertOk();
+        $this->assertSame([$uniqueSword->id], array_column($response->json('data'), 'item_id'));
+    }
+
+    public function test_inventory_mythic_filter_excludes_cosmic_items(): void
+    {
+        $mythic = $this->createItem(['name' => 'Mythic Sword', 'type' => ItemType::SWORD->value, 'is_mythic' => true]);
+        $cosmic = $this->createItem(['name' => 'Cosmic Sword', 'type' => ItemType::SWORD->value, 'is_mythic' => true, 'is_cosmic' => true]);
+        $character = $this->character->inventoryManagement()->giveItem($mythic)->giveItem($cosmic)->getCharacter();
+
+        $cosmicResponse = $this->actingAs($character->user)
+            ->getJson('/api/character/'.$character->id.'/inventory?filters[rarity]=cosmic');
+        $mythicResponse = $this->actingAs($character->user)
+            ->getJson('/api/character/'.$character->id.'/inventory?filters[rarity]=mythic');
+
+        $cosmicResponse->assertOk();
+        $mythicResponse->assertOk();
+        $this->assertSame(['Cosmic Sword'], array_column($cosmicResponse->json('data'), 'name'));
+        $this->assertSame(['Mythic Sword'], array_column($mythicResponse->json('data'), 'name'));
+    }
+
+    public function test_inventory_can_filter_normal_single_and_dual_enchanted_items(): void
+    {
+        $prefix = $this->createItemAffix(['type' => 'prefix', 'randomly_generated' => false]);
+        $suffix = $this->createItemAffix(['type' => 'suffix', 'randomly_generated' => false]);
+        $single = $this->createItem(['name' => 'Single Enchanted', 'item_prefix_id' => $prefix->id]);
+        $dual = $this->createItem(['name' => 'Dual Enchanted', 'item_prefix_id' => $prefix->id, 'item_suffix_id' => $suffix->id]);
+        $holySingle = $this->createItem(['name' => 'Holy Single', 'item_prefix_id' => $prefix->id]);
+        $this->createHolyStack(['item_id' => $holySingle->id]);
+        $character = $this->character->inventoryManagement()->giveItem($single)->giveItem($dual)->giveItem($holySingle)->getCharacter();
+
+        $singleResponse = $this->actingAs($character->user)
+            ->getJson('/api/character/'.$character->id.'/inventory?filters[rarity]=single-enchanted');
+        $dualResponse = $this->actingAs($character->user)
+            ->getJson('/api/character/'.$character->id.'/inventory?filters[rarity]=dual-enchanted');
+
+        $singleResponse->assertOk();
+        $dualResponse->assertOk();
+        $this->assertSame([$single->id], array_column($singleResponse->json('data'), 'item_id'));
+        $this->assertSame([$dual->id], array_column($dualResponse->json('data'), 'item_id'));
     }
 
     public function test_quest_items_returns_paginated_quest_items(): void
