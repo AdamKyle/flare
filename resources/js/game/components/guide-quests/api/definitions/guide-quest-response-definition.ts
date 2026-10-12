@@ -1,8 +1,22 @@
 import GuideQuestDefinition from './guide-quest-definition';
 
+export interface GuideQuestBatchCraftedItemRequirementProgressDefinition {
+  requirement_index: number;
+  source: string;
+  item_id: number | null;
+  required_amount: number | null;
+  current_amount: number;
+  must_be_enchanted: boolean;
+  is_complete: boolean;
+}
+
+type BatchCraftedItemRequirementProgress =
+  GuideQuestBatchCraftedItemRequirementProgressDefinition;
+
 export interface GuideQuestRequirementProgressDefinition {
   quest_id: number;
   completed_requirements: string[];
+  required_batch_crafted_item_requirements: BatchCraftedItemRequirementProgress[];
 }
 
 export interface GuideQuestHandInDefinition {

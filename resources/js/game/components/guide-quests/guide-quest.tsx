@@ -1,10 +1,11 @@
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
-import React, { ReactNode, useState } from 'react';
+import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 import GuideQuestDefinition, {
   GuideQuestContentBlockDefinition,
 } from './api/definitions/guide-quest-definition';
+import GuideQuestRequirements from './components/guide-quest-requirements';
 import GuideQuestSelector from './components/guide-quest-selector';
 import { useGuideQuestData } from './hooks/use-guide-quest-data';
 import GuideQuestProps from './types/guide-quest-props';
@@ -95,17 +96,6 @@ const GuideQuest = ({ on_close }: GuideQuestProps) => {
     );
   };
 
-  const renderRequirementStatus = (
-    label: string,
-    requirement: string,
-    completedRequirements: string[]
-  ) => (
-    <li key={requirement}>
-      {label}:{' '}
-      {completedRequirements.includes(requirement) ? 'Complete' : 'In progress'}
-    </li>
-  );
-
   const renderShowMeButton = (quest: GuideQuestDefinition) => {
     if (!quest.has_walkthrough) {
       return null;
@@ -133,86 +123,6 @@ const GuideQuest = ({ on_close }: GuideQuestProps) => {
       />
     </div>
   );
-
-  const renderRequirements = (
-    quest: GuideQuestDefinition,
-    completedRequirements: string[]
-  ) => {
-    const requirements: ReactNode[] = [];
-
-    if (quest.required_level !== null) {
-      requirements.push(
-        renderRequirementStatus(
-          `Reach level ${quest.required_level}`,
-          'required_level',
-          completedRequirements
-        )
-      );
-    }
-
-    if (
-      quest.required_training_skill !== null &&
-      quest.required_training_xp_sacrifice !== null
-    ) {
-      const skillName = quest.training_skill_name ?? 'Required Skill';
-      const percentage = quest.required_training_xp_sacrifice * 100;
-
-      requirements.push(
-        renderRequirementStatus(
-          `${skillName} training at ${percentage}%`,
-          'required_training_xp_sacrifice',
-          completedRequirements
-        )
-      );
-    }
-
-    if (quest.required_skill !== null && quest.required_skill_level !== null) {
-      const skillName = quest.skill_name ?? 'Required Skill';
-
-      requirements.push(
-        renderRequirementStatus(
-          `${skillName} level ${quest.required_skill_level}`,
-          'required_skill_level',
-          completedRequirements
-        )
-      );
-    }
-
-    if (
-      quest.required_faction_id !== null &&
-      quest.required_faction_level !== null
-    ) {
-      const factionName = quest.faction_name ?? 'Required Faction';
-
-      requirements.push(
-        renderRequirementStatus(
-          `${factionName} level ${quest.required_faction_level}`,
-          'required_faction_level',
-          completedRequirements
-        )
-      );
-    }
-
-    if (requirements.length === 0) {
-      requirements.push(
-        <li key="other-requirements">
-          Complete the listed Guide Quest requirements.
-        </li>
-      );
-    }
-
-    return (
-      <section aria-labelledby="guide-quest-requirements">
-        <h4
-          id="guide-quest-requirements"
-          className="text-marigold-700 dark:text-marigold-500 mb-2 text-base font-semibold"
-        >
-          Requirements
-        </h4>
-        <ul className="list-disc pl-5">{requirements}</ul>
-      </section>
-    );
-  };
 
   const renderRewards = (quest: GuideQuestDefinition) => {
     const currencyRows: QuestCurrencyRow[] = [
@@ -277,6 +187,8 @@ const GuideQuest = ({ on_close }: GuideQuestProps) => {
       (entry) => entry.quest_id === quest.id
     );
     const completedRequirements = completed?.completed_requirements ?? [];
+    const batchCraftedItemRequirements =
+      completed?.required_batch_crafted_item_requirements ?? [];
 
     return (
       <div className="flex flex-col gap-6">
@@ -320,7 +232,11 @@ const GuideQuest = ({ on_close }: GuideQuestProps) => {
         <Separator additional_css="my-1" />
 
         <DetailGridRow>
-          {renderRequirements(quest, completedRequirements)}
+          <GuideQuestRequirements
+            quest={quest}
+            completed_requirements={completedRequirements}
+            batch_crafted_item_requirements={batchCraftedItemRequirements}
+          />
           {renderRewards(quest)}
         </DetailGridRow>
       </div>
