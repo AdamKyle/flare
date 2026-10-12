@@ -5,6 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import GuideQuestDefinition, {
   GuideQuestContentBlockDefinition,
 } from './api/definitions/guide-quest-definition';
+import GuideQuestSelector from './components/guide-quest-selector';
 import { useGuideQuestData } from './hooks/use-guide-quest-data';
 import GuideQuestProps from './types/guide-quest-props';
 import { useGuideWalkthrough } from './walkthrough/hooks/use-guide-walkthrough';
@@ -326,35 +327,6 @@ const GuideQuest = ({ on_close }: GuideQuestProps) => {
     );
   };
 
-  const renderQuestSelection = (
-    quests: GuideQuestDefinition[],
-    selectedQuestIdValue: number
-  ) => {
-    if (quests.length <= 1) {
-      return null;
-    }
-
-    return (
-      <div className="mb-4">
-        <label htmlFor="guide-quest-selection" className="mb-1 block">
-          Available Guide Quest
-        </label>
-        <select
-          id="guide-quest-selection"
-          value={selectedQuestIdValue}
-          onChange={(event) => setSelectedQuestId(Number(event.target.value))}
-          className="w-full rounded-sm border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-900"
-        >
-          {quests.map((quest) => (
-            <option key={quest.id} value={quest.id}>
-              {quest.name}
-            </option>
-          ))}
-        </select>
-      </div>
-    );
-  };
-
   const renderWalkthroughError = () => {
     if (!walkthrough.error) {
       return null;
@@ -386,7 +358,11 @@ const GuideQuest = ({ on_close }: GuideQuestProps) => {
 
     return (
       <>
-        {renderQuestSelection(data.quests, selectedQuest.id)}
+        <GuideQuestSelector
+          quests={data.quests}
+          selected_quest_id={selectedQuest.id}
+          on_select={setSelectedQuestId}
+        />
         <h3 className="text-glacier-900 dark:text-glacier-100 mb-5 text-xl font-semibold">
           {selectedQuest.name}
         </h3>

@@ -6,25 +6,19 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { match } from 'ts-pattern';
 
 import BackPackSelectionActions from './back-pack-selection-actions';
-import BackpackFilterDefinition, {
-  BackpackRarityFilter,
-} from './types/backpack-filter-definition';
+import BackpackFilters from './components/backpack-filters';
+import { useBackpackFilters } from './hooks/use-backpack-filters';
+import { useTargetedBackpackEquip } from './hooks/use-targeted-backpack-equip';
+import BackpackFilterDefinition from './types/backpack-filter-definition';
 import { EquippableItemWithBase } from '../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
 import { useInfiniteScroll } from '../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
 import { GuideTargets } from '../../../guide-quests/walkthrough/registry/guide-targets';
 import GenericItemList from '../../components/items/generic-item-list';
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
-import { useEquipmentManagementRestriction } from '../hooks/use-equipment-management-restriction';
-import { useEquipItem } from '../inventory-item/api/hooks/use-equip-item';
 import InventoryItemDetailStack from '../inventory-item/inventory-item-detail-stack';
 import { SelectedEquippableItemsOptions } from './enums/selected-equippable-items-options';
 import BackpackItemsProps from './types/backpack-items-props';
-import {
-  armourPositions,
-  InventoryItemTypes,
-  weaponTypes,
-} from '../../../character-sheet/partials/character-inventory/enums/inventory-item-types';
-import { useManageMultipleSelectedItemsApi } from '../hooks/use-manage-multiple-selected-items-api';
+import { useManageMultipleSelectedItemsApi } from '../api/hooks/use-manage-multiple-selected-items-api';
 import { ItemSelectedType } from '../types/item-selected-type';
 
 import InventoryCountDefinition from 'game-data/api-data-definitions/character/inventory-counts-definition';
@@ -38,117 +32,8 @@ import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 import Input from 'ui/input/input';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
+import Separator from 'ui/separator/separator';
 import SidePeekOptionDefinition from 'ui/side-peek/options/types/side-peek-option-definition';
-
-const equipmentOptions: DropdownItem[] = [
-  { label: 'Weapon', value: 'weapon' },
-  { label: 'Armour', value: 'armour' },
-  { label: 'Spells', value: 'spells' },
-  { label: 'Trinkets', value: 'trinkets' },
-  { label: 'Artifacts', value: 'artifacts' },
-  { label: 'Rings', value: 'rings' },
-];
-
-const weaponItemTypes = weaponTypes.filter(
-  (itemType) => itemType !== InventoryItemTypes.SHIELD
-);
-
-const weaponSubtypeOptions: DropdownItem[] = weaponItemTypes.map(
-  (itemType) => ({
-    label: itemType
-      .split('-')
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' '),
-    value: itemType,
-  })
-);
-
-const armourItemTypes = [...armourPositions, InventoryItemTypes.SHIELD];
-
-const armourSubtypeOptions: DropdownItem[] = [
-  { label: 'Body', value: InventoryItemTypes.BODY },
-  { label: 'Helmet', value: InventoryItemTypes.HELMET },
-  { label: 'Sleeves', value: InventoryItemTypes.SLEEVES },
-  { label: 'Gloves', value: InventoryItemTypes.GLOVES },
-  { label: 'Leggings', value: InventoryItemTypes.LEGGINGS },
-  { label: 'Feet', value: InventoryItemTypes.FEET },
-  { label: 'Shield', value: InventoryItemTypes.SHIELD },
-];
-
-const rarityOptions: DropdownItem[] = [
-  { label: 'Unique Items', value: 'unique' },
-  { label: 'Mythic', value: 'mythic' },
-  { label: 'Cosmic', value: 'cosmic' },
-  { label: 'Single Enchanted', value: 'single-enchanted' },
-  { label: 'Dual Enchanted', value: 'dual-enchanted' },
-];
-
-const resolveItemType = (
-  value: DropdownItem['value']
-): InventoryItemTypes | null =>
-  Object.values(InventoryItemTypes).find((itemType) => itemType === value) ??
-  null;
-
-const resolveRarity = (
-  value: DropdownItem['value']
-): BackpackRarityFilter | null => {
-  if (value === 'unique') {
-    return 'unique';
-  }
-
-  if (value === 'mythic') {
-    return 'mythic';
-  }
-
-  if (value === 'cosmic') {
-    return 'cosmic';
-  }
-
-  if (value === 'single-enchanted') {
-    return 'single-enchanted';
-  }
-
-  if (value === 'dual-enchanted') {
-    return 'dual-enchanted';
-  }
-
-  return null;
-};
-
-const resolveEquipmentItemTypes = (
-  equipmentFilter: string | null,
-  equipmentSubtype: string | null
-): InventoryItemTypes[] | undefined => {
-  if (equipmentFilter === 'weapon') {
-    const subtype = resolveItemType(equipmentSubtype ?? '');
-
-    return subtype === null ? weaponItemTypes : [subtype];
-  }
-
-  if (equipmentFilter === 'armour') {
-    const subtype = resolveItemType(equipmentSubtype ?? '');
-
-    return subtype === null ? armourItemTypes : [subtype];
-  }
-
-  if (equipmentFilter === 'spells') {
-    return [InventoryItemTypes.SPELL_DAMAGE, InventoryItemTypes.SPELL_HEALING];
-  }
-
-  if (equipmentFilter === 'trinkets') {
-    return [InventoryItemTypes.TRINKET];
-  }
-
-  if (equipmentFilter === 'artifacts') {
-    return [InventoryItemTypes.ARTIFACT];
-  }
-
-  if (equipmentFilter === 'rings') {
-    return [InventoryItemTypes.RING];
-  }
-
-  return undefined;
-};
 
 const resolveSelectedEquippableItemsOption = (
   value: DropdownItem['value']
@@ -186,14 +71,6 @@ const BackpackItems = ({
   const [equippedItemSuccessMessage, setEquippedItemSuccessMessage] = useState<
     string | null
   >(null);
-  const [equipmentFilter, setEquipmentFilter] = useState<string | null>(null);
-  const [equipmentSubtype, setEquipmentSubtype] = useState<string | null>(null);
-  const [rarityFilter, setRarityFilter] = useState<BackpackRarityFilter | null>(
-    initial_filters?.rarity ?? null
-  );
-  const [useInitialItemTypes, setUseInitialItemTypes] = useState(
-    initial_filters?.item_types !== undefined
-  );
 
   const {
     data,
@@ -210,29 +87,10 @@ const BackpackItems = ({
     initialFilters: initial_filters,
   });
 
-  useEffect(() => {
-    const itemTypes = useInitialItemTypes
-      ? initial_filters?.item_types
-      : resolveEquipmentItemTypes(equipmentFilter, equipmentSubtype);
-    const filters: BackpackFilterDefinition = {};
-
-    if (itemTypes !== undefined && itemTypes.length > 0) {
-      filters.item_types = itemTypes;
-    }
-
-    if (rarityFilter !== null) {
-      filters.rarity = rarityFilter;
-    }
-
-    setFilters(filters);
-  }, [
-    equipmentFilter,
-    equipmentSubtype,
-    initial_filters?.item_types,
-    rarityFilter,
+  const backpackFilters = useBackpackFilters({
+    initial_filters,
     setFilters,
-    useInitialItemTypes,
-  ]);
+  });
 
   const {
     successMessage,
@@ -304,32 +162,24 @@ const BackpackItems = ({
     });
   };
 
-  const onEquipSuccess = (successMessage: string) => {
-    resetDirectEquipError();
-    setEquippedItemSuccessMessage(successMessage);
-    setSlotId(null);
-    setRefresh((prevState) => !prevState);
-    on_equipment_changed?.();
-  };
-
-  const {
-    is_restricted: isEquipmentRestricted,
-    restriction_message: equipmentRestrictionMessage,
-  } = useEquipmentManagementRestriction();
-
-  const {
-    loading: directEquipLoading,
-    error: directEquipError,
-    resetError: resetDirectEquipError,
-    setRequestParams: setDirectEquipRequestParams,
-  } = useEquipItem({
+  const targetedEquip = useTargetedBackpackEquip({
     character_id: character.id,
-    on_success: onEquipSuccess,
+    target_position,
+    on_equipment_changed,
+    refresh_backpack: () => setRefresh((previous) => !previous),
+    close_item_detail: () => setSlotId(null),
+    set_success_message: setEquippedItemSuccessMessage,
   });
 
   const clearItemFeedback = (): void => {
-    resetDirectEquipError();
-    setEquippedItemSuccessMessage(null);
+    targetedEquip.resetFeedback();
+  };
+
+  const handleItemActionSuccess = (successMessage: string): void => {
+    setEquippedItemSuccessMessage(successMessage);
+    setSlotId(null);
+    setRefresh((previous) => !previous);
+    on_equipment_changed?.();
   };
 
   const handleOnItemClick = (slot_id: number) => {
@@ -366,30 +216,6 @@ const BackpackItems = ({
     setActionSelected(resolvedAction);
     setIsSelectionDisabled(true);
     setCloseSuccessMessage(true);
-  };
-
-  const handleEquipmentFilterSelected = (item: DropdownItem): void => {
-    setUseInitialItemTypes(false);
-    setEquipmentFilter(String(item.value));
-    setEquipmentSubtype(null);
-  };
-
-  const handleEquipmentFilterCleared = (): void => {
-    setUseInitialItemTypes(false);
-    setEquipmentFilter(null);
-    setEquipmentSubtype(null);
-  };
-
-  const handleEquipmentSubtypeSelected = (item: DropdownItem): void => {
-    const itemType = resolveItemType(item.value);
-
-    if (itemType !== null) {
-      setEquipmentSubtype(itemType);
-    }
-  };
-
-  const handleRaritySelected = (item: DropdownItem): void => {
-    setRarityFilter(resolveRarity(item.value));
   };
 
   const { handleScroll: handleInventoryScroll } = useInfiniteScroll({
@@ -504,15 +330,11 @@ const BackpackItems = ({
               label: 'Equip',
               loading_label: 'Equipping...',
               variant: ButtonVariant.SUCCESS,
-              loading: directEquipLoading,
-              disabled: isEquipmentRestricted,
+              loading: targetedEquip.loading,
+              disabled: targetedEquip.is_restricted,
               aria_label: `Equip ${selectedItem.name}`,
               on_click: () => {
-                setDirectEquipRequestParams({
-                  slot_id: selectedItem.slot_id,
-                  equip_type: selectedItem.type,
-                  position: target_position,
-                });
+                targetedEquip.equipSelectedItem(selectedItem);
               },
             },
           ]
@@ -520,13 +342,13 @@ const BackpackItems = ({
     const notice =
       target_position === undefined ? undefined : (
         <>
-          {equipmentRestrictionMessage !== null && (
+          {targetedEquip.restriction_message !== null && (
             <Alert variant={AlertVariant.WARNING}>
-              {equipmentRestrictionMessage}
+              {targetedEquip.restriction_message}
             </Alert>
           )}
-          {directEquipError !== null && (
-            <ApiErrorAlert apiError={directEquipError.message} />
+          {targetedEquip.error !== null && (
+            <ApiErrorAlert apiError={targetedEquip.error.message} />
           )}
         </>
       );
@@ -537,7 +359,7 @@ const BackpackItems = ({
         character_id={character.id}
         aria_label="Item Details"
         on_close={handleCloseItemView}
-        on_action={onEquipSuccess}
+        on_action={handleItemActionSuccess}
         show_actions={target_position === undefined}
         footer_options={footerOptions}
         notice={notice}
@@ -557,7 +379,7 @@ const BackpackItems = ({
           variant={ButtonVariant.PRIMARY}
         />
       </div>
-      <hr className="w-full border-t border-gray-300 dark:border-gray-600" />
+      <Separator />
       {renderSuccessMessage()}
       <div className="px-4 pt-2">
         <Input
@@ -567,36 +389,7 @@ const BackpackItems = ({
           default_value={initial_search_text ?? null}
         />
       </div>
-      <div className="grid gap-2 px-4 pt-2 sm:grid-cols-2">
-        <Dropdown
-          items={equipmentOptions}
-          on_select={handleEquipmentFilterSelected}
-          on_clear={handleEquipmentFilterCleared}
-          selection_placeholder="Equipment"
-        />
-        {equipmentFilter === 'weapon' && (
-          <Dropdown
-            items={weaponSubtypeOptions}
-            on_select={handleEquipmentSubtypeSelected}
-            on_clear={() => setEquipmentSubtype(null)}
-            selection_placeholder="Weapon Type"
-          />
-        )}
-        {equipmentFilter === 'armour' && (
-          <Dropdown
-            items={armourSubtypeOptions}
-            on_select={handleEquipmentSubtypeSelected}
-            on_clear={() => setEquipmentSubtype(null)}
-            selection_placeholder="Armour Type"
-          />
-        )}
-        <Dropdown
-          items={rarityOptions}
-          on_select={handleRaritySelected}
-          on_clear={() => setRarityFilter(null)}
-          selection_placeholder="Rarity / Enchantment"
-        />
-      </div>
+      <BackpackFilters {...backpackFilters} />
       {renderSelectionActions()}
       <div className="min-h-0 flex-1">
         <GenericItemList

@@ -2,22 +2,20 @@ import { useApiHandler } from 'api-handler/hooks/use-api-handler';
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import UseManageMultipleSelectedItemsApiParams from './deffinitions/use-manage-multiple-selected-items-api-params';
-import UseManageMultipleSelectedItemsDefinition from './deffinitions/use-manage-multiple-selected-items-definition';
-import UseManageMultipleSelectedItemsResponse from './deffinitions/use-manage-multiple-selected-items-response';
-import { ItemSelectedType } from '../types/item-selected-type';
+import UseManageMultipleSelectedItemsApiParams from './definitions/use-manage-multiple-selected-items-api-params';
+import UseManageMultipleSelectedItemsDefinition from './definitions/use-manage-multiple-selected-items-definition';
+import UseManageMultipleSelectedItemsResponse from './definitions/use-manage-multiple-selected-items-response';
+import { ItemSelectedType } from '../../types/item-selected-type';
 
 import InventoryCountDefinition from 'game-data/api-data-definitions/character/inventory-counts-definition';
 
 export const useManageMultipleSelectedItemsApi =
   (): UseManageMultipleSelectedItemsDefinition => {
     const { apiHandler, getUrl } = useApiHandler();
-
     const [loading, setLoading] = useState(false);
     const [error, setError] =
       useState<UseManageMultipleSelectedItemsDefinition['error']>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
-
     const abortControllerRef = useRef<AbortController | null>(null);
 
     useEffect(() => {
@@ -65,10 +63,9 @@ export const useManageMultipleSelectedItemsApi =
           }
 
           onSuccess(result.inventory_count);
-
           setSuccessMessage(result.message);
-        } catch (err) {
-          if (axios.isCancel(err)) {
+        } catch (requestError) {
+          if (axios.isCancel(requestError)) {
             return;
           }
 
@@ -76,8 +73,11 @@ export const useManageMultipleSelectedItemsApi =
             return;
           }
 
-          if (err instanceof AxiosError && err.response?.data) {
-            setError(err.response.data);
+          if (
+            requestError instanceof AxiosError &&
+            requestError.response?.data
+          ) {
+            setError(requestError.response.data);
 
             return;
           }
@@ -94,7 +94,7 @@ export const useManageMultipleSelectedItemsApi =
     );
 
     const handleSelection = useCallback(
-      (params: UseManageMultipleSelectedItemsApiParams) => {
+      (params: UseManageMultipleSelectedItemsApiParams): void => {
         const url = getUrl(params.url, { character: params.character_id });
 
         void processApiCall(url, params.apiParams, params.onSuccess);
@@ -102,10 +102,5 @@ export const useManageMultipleSelectedItemsApi =
       [getUrl, processApiCall]
     );
 
-    return {
-      handleSelection,
-      error,
-      successMessage,
-      loading,
-    };
+    return { handleSelection, error, successMessage, loading };
   };

@@ -1,7 +1,8 @@
 import React, { ReactNode } from 'react';
 
 import XpBarProps from './types/xp-bar-props';
-import { formatNumberWithCommas } from '../../../../util/format-number';
+
+import { formatNumberWithCommas } from 'game-utils/format-number';
 
 import { ProgressBarSize } from 'ui/progress/enums/progress-bar-size';
 import { ProgressBarVariant } from 'ui/progress/enums/progress-bar-variant';

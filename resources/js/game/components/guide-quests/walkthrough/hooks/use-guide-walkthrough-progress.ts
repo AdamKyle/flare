@@ -106,12 +106,6 @@ export const useGuideWalkthroughProgress =
 
         const nextStep = steps[nextIndex];
 
-        console.log('[GuideWalkthrough] advanceToStep: start', {
-          nextIndex,
-          nextStepId: nextStep?.id ?? null,
-          nextStepTitle: nextStep?.title ?? null,
-        });
-
         try {
           if (!nextStep) {
             await saveProgress(activeGuideQuestId, null, true);
@@ -119,45 +113,11 @@ export const useGuideWalkthroughProgress =
             return GuideWalkthroughAdvanceResult.COMPLETED;
           }
 
-          console.log('[GuideWalkthrough] advanceToStep: before saveProgress', {
-            nextIndex,
-            nextStepId: nextStep.id,
-            nextStepTitle: nextStep.title,
-          });
-
           await saveProgress(activeGuideQuestId, nextStep.id, false);
 
-          console.log('[GuideWalkthrough] advanceToStep: after saveProgress', {
-            nextIndex,
-            nextStepId: nextStep.id,
-          });
-
-          console.log('[GuideWalkthrough] advanceToStep: before flushSync', {
-            nextIndex,
-            nextStepId: nextStep.id,
-            nextStepTitle: nextStep.title,
-          });
-
+          // Driver resolves the next target immediately, so commit its step first.
           flushSync(() => {
-            console.log(
-              '[GuideWalkthrough] advanceToStep: inside flushSync before setStepIndex',
-              {
-                nextIndex,
-              }
-            );
             setStepIndex(nextIndex);
-            console.log(
-              '[GuideWalkthrough] advanceToStep: inside flushSync after setStepIndex',
-              {
-                nextIndex,
-              }
-            );
-          });
-
-          console.log('[GuideWalkthrough] advanceToStep: after flushSync', {
-            nextIndex,
-            nextStepId: nextStep.id,
-            nextStepTitle: nextStep.title,
           });
 
           return GuideWalkthroughAdvanceResult.ADVANCED;

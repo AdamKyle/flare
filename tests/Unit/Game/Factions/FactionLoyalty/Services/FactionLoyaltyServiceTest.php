@@ -7,6 +7,7 @@ use App\Flare\Models\FactionLoyaltyAutomationWarning;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Monster;
 use App\Game\Automation\Values\AutomationType;
+use App\Game\Core\Chance\PhpRandomNumberGenerator;
 use App\Game\Core\Combat\Values\AttackType;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Events\Values\EventType;
@@ -39,7 +40,7 @@ class FactionLoyaltyServiceTest extends TestCase
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignFactionSystem()->getCharacter();
-        $this->factionLoyaltyService = resolve(FactionLoyaltyService::class);
+        $this->factionLoyaltyService = new FactionLoyaltyService(new PhpRandomNumberGenerator);
     }
 
     protected function tearDown(): void

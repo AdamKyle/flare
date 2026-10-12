@@ -7,6 +7,7 @@ import CharacterIdentity from '../../../../../reusable-components/character/comp
 import CurrencyDisplay from '../../../../../reusable-components/currency/currency-display';
 import { CurrencyDisplayMode } from '../../../../../reusable-components/currency/enums/currency-display-mode';
 import { CurrencyType } from '../../../../../reusable-components/currency/enums/currency-type';
+import XpBar from '../../../../../reusable-components/progress/xp-bar';
 import { AttackTypes } from '../../../../character-sheet/enums/attack-types';
 import { StatTypes } from '../../../../character-sheet/enums/stat-types';
 import { useManageAttackDetailsBreakdown } from '../../../../character-sheet/hooks/use-manage-attack-details-breakdown';
@@ -15,7 +16,6 @@ import { GuideTargets } from '../../../../guide-quests/walkthrough/registry/guid
 import { useManageCharacterSheetVisibility } from '../../../../hooks/use-manage-character-sheet-visibility';
 import { useOpenClassDetail } from '../../../../side-peeks/game-data/hooks/use-open-class-detail';
 import { useOpenRaceDetail } from '../../../../side-peeks/game-data/hooks/use-open-race-detail';
-import XpBar from '../../../components/character-details/xp-bar';
 import TrainingSkillProgress from '../../../components/fight-section/training-skill-progress';
 
 import { shortenNumber } from 'game-utils/format-number';

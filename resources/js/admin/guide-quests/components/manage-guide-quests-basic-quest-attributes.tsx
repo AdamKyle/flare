@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import ManageGuideQuestStepProps from './types/manage-guide-quest-step-props';
 import { useManageFormSectionData } from '../hooks/use-manage-form-section-data';
@@ -6,6 +6,7 @@ import { useManageFormSectionData } from '../hooks/use-manage-form-section-data'
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Dropdown from 'ui/drop-down/drop-down';
+import TextAreaField from 'ui/forms/text-area-field';
 import Input from 'ui/input/input';
 
 const ManageGuideQuestsBasicQuestAttributes = ({
@@ -23,6 +24,14 @@ const ManageGuideQuestsBasicQuestAttributes = ({
   });
 
   const guideQuest = data_for_component.guide_quest ?? null;
+  const [instructions, setInstructions] = useState(
+    guideQuest?.instructions ?? ''
+  );
+
+  const updateInstructions = (value: string) => {
+    setInstructions(value);
+    handleUpdateFormData('instructions', value);
+  };
 
   const getDefaultUnlockLevel = (): string => {
     if (!guideQuest) {
@@ -87,19 +96,12 @@ const ManageGuideQuestsBasicQuestAttributes = ({
         </div>
 
         <div className="mt-4">
-          <label
-            htmlFor="guide-quest-information"
-            className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200"
-          >
-            General Information
-          </label>
-          <textarea
+          <TextAreaField
             id="guide-quest-information"
-            defaultValue={guideQuest?.instructions ?? ''}
-            onChange={(event) =>
-              handleUpdateFormData('instructions', event.target.value)
-            }
-            className="min-h-32 w-full rounded-sm border border-gray-300 bg-white p-2 text-gray-900 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100"
+            label="General Information"
+            value={instructions}
+            on_change={updateInstructions}
+            rows={8}
           />
         </div>
 

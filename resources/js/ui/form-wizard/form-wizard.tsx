@@ -70,6 +70,7 @@ const FormWizard = ({
   icon_navigation,
   current_step_index,
   on_step_change,
+  allow_direct_step_navigation = true,
 }: FormWizardProps) => {
   const [internal_current_index, set_internal_current_index] = useState(0);
   const is_controlled = current_step_index !== undefined;
@@ -142,7 +143,7 @@ const FormWizard = ({
   };
 
   const handleDotClick = (target_index: number) => {
-    if (is_loading) {
+    if (is_loading || !allow_direct_step_navigation) {
       return;
     }
 

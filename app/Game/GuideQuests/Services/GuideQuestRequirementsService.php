@@ -197,6 +197,13 @@ class GuideQuestRequirementsService
         return $this;
     }
 
+    /**
+     * Record completion of all required batch-crafted Items.
+     *
+     * @param Character $character
+     * @param GuideQuest $quest
+     * @return GuideQuestRequirementsService
+     */
     public function requiredBatchCraftedItems(Character $character, GuideQuest $quest): GuideQuestRequirementsService
     {
         if (is_null($quest->required_batch_crafted_items)) {
@@ -212,6 +219,13 @@ class GuideQuestRequirementsService
         return $this;
     }
 
+    /**
+     * Determine whether all batch-crafted Item requirements are complete.
+     *
+     * @param Character $character
+     * @param array $requiredBatchCraftedItems
+     * @return bool
+     */
     public function hasRequiredBatchCraftedItems(Character $character, array $requiredBatchCraftedItems): bool
     {
         $requirements = $this->batchCraftedItemRequirements($character, $requiredBatchCraftedItems);
@@ -219,22 +233,32 @@ class GuideQuestRequirementsService
         return collect($requirements)->every(fn (array $requirement): bool => $requirement['is_complete']);
     }
 
+    /**
+     * Return factual progress for each batch-crafted Item requirement.
+     *
+     * @param Character $character
+     * @param array $requiredBatchCraftedItems
+     * @return array
+     */
     public function batchCraftedItemRequirements(Character $character, array $requiredBatchCraftedItems): array
     {
         return collect($requiredBatchCraftedItems)->map(function (array $requiredBatchCraftedItem, int $requirementIndex) use ($character): array {
             $source = $requiredBatchCraftedItem['source'] ?? 'inventory';
-            $itemId = (int) ($requiredBatchCraftedItem['item_id'] ?? 0);
-            $requiredAmount = (int) ($requiredBatchCraftedItem['amount'] ?? 0);
-            $item = Item::find($requiredBatchCraftedItem['item_id'] ?? null);
-            $mustBeEnchanted = $source === 'alchemy_bag'
-                ? false
-                : (bool) ($requiredBatchCraftedItem['must_be_enchanted'] ?? false);
+            $itemId = $requiredBatchCraftedItem['item_id'] ?? null;
+            $requiredAmount = $requiredBatchCraftedItem['amount'] ?? null;
+            $configuredEnchantment = $requiredBatchCraftedItem['must_be_enchanted'] ?? false;
+            $hasValidValues = is_int($itemId) && is_int($requiredAmount) && $requiredAmount >= 1;
+            $mustBeEnchanted = $source !== 'alchemy_bag'
+                && is_bool($configuredEnchantment)
+                && $configuredEnchantment;
+            $item = $hasValidValues ? Item::find($itemId) : null;
             $currentAmount = 0;
 
             if (! is_null($item) && $source === 'alchemy_bag' && $item->type === 'alchemy') {
-                $currentAmount = (int) AlchemyBagSlot::where('character_id', $character->id)
+                $summedAmount = AlchemyBagSlot::where('character_id', $character->id)
                     ->where('item_id', $item->id)
                     ->sum('amount');
+                $currentAmount = $summedAmount;
             }
 
             if (! is_null($item) && $source === 'inventory' && $item->type !== 'alchemy') {
@@ -244,15 +268,22 @@ class GuideQuestRequirementsService
             return [
                 'requirement_index' => $requirementIndex,
                 'source' => $source,
-                'item_id' => $itemId,
-                'required_amount' => $requiredAmount,
+                'item_id' => $itemId ?? 0,
+                'required_amount' => $requiredAmount ?? 0,
                 'current_amount' => $currentAmount,
                 'must_be_enchanted' => $mustBeEnchanted,
-                'is_complete' => ! is_null($item) && $currentAmount >= $requiredAmount,
+                'is_complete' => $hasValidValues && ! is_null($item) && $currentAmount >= $requiredAmount,
             ];
         })->values()->all();
     }
 
+    /**
+     * Determine whether one Alchemy Bag Item requirement is complete.
+     *
+     * @param Character $character
+     * @param array $requiredBatchCraftedItem
+     * @return bool
+     */
     public function hasRequiredAlchemyBagItemAmount(Character $character, array $requiredBatchCraftedItem): bool
     {
         $requirements = $this->batchCraftedItemRequirements($character, [$requiredBatchCraftedItem]);
@@ -260,9 +291,23 @@ class GuideQuestRequirementsService
         return $requirements[0]['is_complete'];
     }
 
+    /**
+     * Return matching inventory slot ids for one batch-crafted requirement.
+     *
+     * @param Character $character
+     * @param array $requiredBatchCraftedItem
+     * @return array
+     */
     public function matchingBatchCraftedItemSlotIds(Character $character, array $requiredBatchCraftedItem): array
     {
-        $item = Item::find($requiredBatchCraftedItem['item_id'] ?? null);
+        $itemId = $requiredBatchCraftedItem['item_id'] ?? null;
+        $requiredAmount = $requiredBatchCraftedItem['amount'] ?? null;
+
+        if (! is_int($itemId) || ! is_int($requiredAmount) || $requiredAmount < 1) {
+            return [];
+        }
+
+        $item = Item::find($itemId);
 
         if (is_null($item) || ($requiredBatchCraftedItem['source'] ?? 'inventory') === 'alchemy_bag') {
             return [];
@@ -271,14 +316,23 @@ class GuideQuestRequirementsService
         return $this->matchingBatchCraftedItemSlotsQuery(
             $character,
             $item,
-            (bool) ($requiredBatchCraftedItem['must_be_enchanted'] ?? false),
+            is_bool($requiredBatchCraftedItem['must_be_enchanted'] ?? null)
+                && $requiredBatchCraftedItem['must_be_enchanted'],
         )
             ->orderBy('id')
-            ->limit((int) ($requiredBatchCraftedItem['amount'] ?? 0))
+            ->limit($requiredAmount)
             ->pluck('id')
             ->all();
     }
 
+    /**
+     * Build the matching inventory slot query for one required Item.
+     *
+     * @param Character $character
+     * @param Item $item
+     * @param bool $mustBeEnchanted
+     * @return Builder
+     */
     private function matchingBatchCraftedItemSlotsQuery(Character $character, Item $item, bool $mustBeEnchanted): Builder
     {
         return InventorySlot::where('inventory_id', $character->inventory->id)

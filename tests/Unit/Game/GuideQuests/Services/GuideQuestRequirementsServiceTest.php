@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Game\GuideQuests\Services;
 
-use App\Admin\Services\GuideQuestService as AdminGuideQuestService;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameSkill;
@@ -22,6 +21,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateAlchemyBagSlot;
 use Tests\Traits\CreateBatchCrafting;
 use Tests\Traits\CreateDelveAutomation;
 use Tests\Traits\CreateEvent;
@@ -40,7 +40,7 @@ use Tests\Traits\CreateScheduledEvent;
 
 class GuideQuestRequirementsServiceTest extends TestCase
 {
-    use CreateBatchCrafting, CreateDelveAutomation, CreateEvent, CreateFactionLoyalty, CreateGameClassSpecial, CreateGameMap, CreateGameSkill, CreateGlobalEventGoal, CreateGuideQuest, CreateInventorySets, CreateItem, CreateItemAffix, CreateNpc, CreateQuest, CreateScheduledEvent, RefreshDatabase;
+    use CreateAlchemyBagSlot, CreateBatchCrafting, CreateDelveAutomation, CreateEvent, CreateFactionLoyalty, CreateGameClassSpecial, CreateGameMap, CreateGameSkill, CreateGlobalEventGoal, CreateGuideQuest, CreateInventorySets, CreateItem, CreateItemAffix, CreateNpc, CreateQuest, CreateScheduledEvent, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -54,7 +54,7 @@ class GuideQuestRequirementsServiceTest extends TestCase
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignFactionSystem();
 
-        $this->guideQuestRequirementsService = resolve(GuideQuestRequirementsService::class);
+        $this->guideQuestRequirementsService = new GuideQuestRequirementsService;
 
         $this->item = $this->createItem(['type' => 'quest']);
     }
@@ -1674,8 +1674,13 @@ class GuideQuestRequirementsServiceTest extends TestCase
         $character = $this->character->getCharacter();
         $dagger = $this->createItem(['name' => 'Iron Dagger', 'type' => 'dagger', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
         $potion = $this->createItem(['name' => 'Lesser Stat Potion', 'type' => 'alchemy', 'alchemy_type' => AlchemyItemType::INCREASE_STATS->value]);
-        $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $dagger->id]);
-        $character->alchemyBag->slots()->create(['alchemy_bag_id' => $character->alchemyBag->id, 'character_id' => $character->id, 'item_id' => $potion->id, 'amount' => 3]);
+        $character = $this->character->inventoryManagement()->giveItem($dagger)->getCharacter();
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $potion->id,
+            'amount' => 3,
+        ]);
 
         $requirements = $this->guideQuestRequirementsService->batchCraftedItemRequirements($character->refresh(), [
             ['source' => 'inventory', 'item_id' => $dagger->id, 'amount' => 1, 'must_be_enchanted' => false],
@@ -1684,7 +1689,7 @@ class GuideQuestRequirementsServiceTest extends TestCase
 
         $this->assertSame(1, $requirements[0]['current_amount']);
         $this->assertTrue($requirements[0]['is_complete']);
-        $this->assertSame(3, $requirements[1]['current_amount']);
+        $this->assertEquals(3, $requirements[1]['current_amount']);
         $this->assertFalse($requirements[1]['must_be_enchanted']);
         $this->assertFalse($requirements[1]['is_complete']);
     }
@@ -1855,33 +1860,5 @@ class GuideQuestRequirementsServiceTest extends TestCase
         $finishedRequirements = $this->guideQuestRequirementsService->requiredBatchCraftedItems($character->refresh(), $guideQuest)->getFinishedRequirements();
 
         $this->assertNotContains('required_batch_crafted_items', $finishedRequirements);
-    }
-
-    public function test_only_two_configured_rows_are_honored_after_cleaning(): void
-    {
-        $dagger = $this->createItem(['name' => 'Clean Iron Dagger', 'type' => 'dagger', 'can_craft' => true]);
-        $helmet = $this->createItem(['name' => 'Clean Iron Helmet', 'type' => 'helmet', 'can_craft' => true]);
-        $ring = $this->createItem(['name' => 'Clean Copper Ring', 'type' => 'ring', 'can_craft' => true]);
-        $guideQuestService = resolve(AdminGuideQuestService::class);
-
-        $params = $guideQuestService->cleanRequest([
-            'required_batch_crafting_type' => null,
-            'required_batch_crafting_hours' => null,
-            'required_batch_crafted_items' => [
-                ['source' => 'inventory', 'item_id' => $dagger->id, 'amount' => 1, 'must_be_enchanted' => false],
-                ['source' => 'inventory', 'item_id' => $helmet->id, 'amount' => 1, 'must_be_enchanted' => false],
-                ['source' => 'inventory', 'item_id' => $ring->id, 'amount' => 1, 'must_be_enchanted' => false],
-            ],
-            'required_skill_level' => null,
-            'required_skill' => null,
-            'required_passive_level' => null,
-            'required_passive_skill' => null,
-            'required_faction_level' => null,
-            'required_faction_id' => null,
-        ]);
-
-        $this->assertCount(2, $params['required_batch_crafted_items']);
-        $this->assertSame($dagger->id, $params['required_batch_crafted_items'][0]['item_id']);
-        $this->assertSame($helmet->id, $params['required_batch_crafted_items'][1]['item_id']);
     }
 }

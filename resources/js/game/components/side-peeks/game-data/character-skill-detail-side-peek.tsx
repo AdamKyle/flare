@@ -56,50 +56,18 @@ const CharacterSkillDetailSidePeek = ({
     setTrainingMessage(null);
     const response = await train(skillId, xpPercentage);
 
-    console.log('[GuideWalkthrough] handleTrain: API response received', {
-      skillId,
-      xpPercentage,
-    });
-
     const accuracy = response?.skills.training_skills.find(
       (trainingSkill) => trainingSkill.name === 'Accuracy'
-    );
-
-    console.log(
-      '[GuideWalkthrough] handleTrain: Accuracy state from response',
-      {
-        found: accuracy !== undefined,
-        isTraining: accuracy?.is_training ?? null,
-        xpTowards: accuracy?.xp_towards ?? null,
-      }
     );
 
     if (
       accuracy?.is_training &&
       Math.abs(accuracy.xp_towards - 0.1) < Number.EPSILON
     ) {
-      console.log(
-        '[GuideWalkthrough] handleTrain: before completeRequiredEvent',
-        {
-          event: GuideWalkthroughEvent.SKILL_TRAINING_STARTED,
-        }
-      );
-
-      const walkthroughEventCompleted = await completeRequiredEvent(
-        GuideWalkthroughEvent.SKILL_TRAINING_STARTED
-      );
-
-      console.log(
-        '[GuideWalkthrough] handleTrain: after completeRequiredEvent',
-        {
-          completed: walkthroughEventCompleted,
-        }
-      );
+      await completeRequiredEvent(GuideWalkthroughEvent.SKILL_TRAINING_STARTED);
     }
 
-    console.log('[GuideWalkthrough] handleTrain: before applyTrainingResponse');
     applyTrainingResponse(response);
-    console.log('[GuideWalkthrough] handleTrain: after applyTrainingResponse');
   };
 
   const handleCancel = async () => {

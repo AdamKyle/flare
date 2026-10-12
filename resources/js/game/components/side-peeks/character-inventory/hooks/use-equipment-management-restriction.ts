@@ -1,4 +1,4 @@
-import UseEquipmentManagementRestrictionDefinition from './deffinitions/use-equipment-management-restriction-definition';
+import UseEquipmentManagementRestrictionDefinition from './definitions/use-equipment-management-restriction-definition';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
 

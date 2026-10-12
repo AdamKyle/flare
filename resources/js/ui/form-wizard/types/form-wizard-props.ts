@@ -14,4 +14,5 @@ export default interface FormWizardProps {
   icon_navigation?: boolean;
   current_step_index?: number;
   on_step_change?: (current_index: number) => void;
+  allow_direct_step_navigation?: boolean;
 }

@@ -11,22 +11,9 @@ use App\Admin\Services\GuideQuestService;
 use App\Admin\Transformers\GuideQuestDetailTransformer;
 use App\Admin\Transformers\GuideQuestListTransformer;
 use App\Admin\Transformers\GuideQuestTransformer;
-use App\Flare\Models\GameBuilding;
-use App\Flare\Models\GameMap;
-use App\Flare\Models\GameSkill;
 use App\Flare\Models\GuideQuest;
-use App\Flare\Models\Item;
-use App\Flare\Models\PassiveSkill;
-use App\Flare\Models\Quest;
 use App\Flare\Pagination\Pagination;
-use App\Game\Core\Items\Values\ItemSpecialtyType;
-use App\Game\Events\Values\EventType;
 use App\Game\GuideQuests\Services\GuideQuestWalkthroughService;
-use App\Game\GuideQuests\Values\GuideQuestWalkthroughEvent;
-use App\Game\GuideQuests\Values\GuideQuestWalkthroughStepType;
-use App\Game\GuideQuests\Values\GuideQuestWalkthroughTarget;
-use App\Game\Maps\Values\MapName;
-use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Http\JsonResponse;
 
 class GuideQuestsController
@@ -83,26 +70,9 @@ class GuideQuestsController
      */
     public function guideQuest(GuideQuestRequest $request): JsonResponse
     {
-        $guideQuest = GuideQuest::find($request->validated('guide_quest_id'));
-
-        return response()->json([
-            'guide_quest' => is_null($guideQuest) ? null : $this->guideQuestTransformer->transform($guideQuest),
-            'game_skills' => GameSkill::pluck('name', 'id')->toArray(),
-            'faction_maps' => GameMap::whereNotIn('name', [MapName::PURGATORY->value, MapName::ICE_PLANE->value])->pluck('name', 'id')->toArray(),
-            'quests' => Quest::pluck('name', 'id')->toArray(),
-            'quest_items' => Item::where('type', 'quest')->pluck('name', 'id')->toArray(),
-            'passives' => PassiveSkill::pluck('name', 'id')->toArray(),
-            'skill_types' => SkillTypeValue::getValues(),
-            'kingdom_buildings' => GameBuilding::pluck('name', 'id')->toArray(),
-            'events' => EventType::getOptionsForSelect(),
-            'guide_quests' => GuideQuest::pluck('name', 'id')->toArray(),
-            'game_maps' => GameMap::pluck('name', 'id')->toArray(),
-            'item_specialty_types' => ItemSpecialtyType::getValuesForSelect(),
-            'walkthrough_steps' => is_null($guideQuest) ? [] : $guideQuest->walkthroughSteps()->get(),
-            'walkthrough_target_options' => GuideQuestWalkthroughTarget::options(),
-            'walkthrough_event_options' => GuideQuestWalkthroughEvent::options(),
-            'walkthrough_step_type_options' => GuideQuestWalkthroughStepType::options(),
-        ]);
+        return response()->json(
+            $this->guideQuestAdminReadService->editorData($request->validated('guide_quest_id'))
+        );
     }
 
     /**
@@ -132,7 +102,7 @@ class GuideQuestsController
      */
     public function storeFormResponse(GuideQuestStoreRequest $guideQuestStoreRequest): JsonResponse
     {
-        $guideQuest = $this->guideQuestService->upsert($guideQuestStoreRequest->all(), new GuideQuest);
+        $guideQuest = $this->guideQuestService->upsert($guideQuestStoreRequest->validated(), new GuideQuest);
 
         return response()->json(['guide_quest' => $this->guideQuestTransformer->transform($guideQuest)]);
     }

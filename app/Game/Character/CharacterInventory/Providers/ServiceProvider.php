@@ -9,6 +9,7 @@ use App\Game\Character\CharacterInventory\Builders\EquipManyBuilder;
 use App\Game\Character\CharacterInventory\Contracts\CurrencyCacheIssuer;
 use App\Game\Character\CharacterInventory\Services\BatchCraftingSetService;
 use App\Game\Character\CharacterInventory\Services\CharacterGemBagService;
+use App\Game\Character\CharacterInventory\Services\CharacterInventoryFilterService;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\CurrencyCacheGenerator;
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
@@ -76,7 +77,8 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(DisenchantService::class),
                 $app->make(Pagination::class),
                 $app->make(Manager::class),
-                $app->make(InventorySetOptionTransformer::class)
+                $app->make(InventorySetOptionTransformer::class),
+                $app->make(CharacterInventoryFilterService::class),
             );
         });
 

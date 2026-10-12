@@ -10,7 +10,7 @@ import CharacterIdentity from '../../reusable-components/character/components/ch
 import CurrencyDisplay from '../../reusable-components/currency/currency-display';
 import { CurrencyDisplayMode } from '../../reusable-components/currency/enums/currency-display-mode';
 import { CurrencyType } from '../../reusable-components/currency/enums/currency-type';
-import XpBar from '../actions/components/character-details/xp-bar';
+import XpBar from '../../reusable-components/progress/xp-bar';
 import { GuideTargets } from '../guide-quests/walkthrough/registry/guide-targets';
 import { useOpenClassDetail } from '../side-peeks/game-data/hooks/use-open-class-detail';
 import { useOpenRaceDetail } from '../side-peeks/game-data/hooks/use-open-race-detail';

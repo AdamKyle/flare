@@ -1,5 +1,4 @@
-export type BackpackRarityFilter =
-  'unique' | 'mythic' | 'cosmic' | 'single-enchanted' | 'dual-enchanted';
+import { BackpackRarityFilter } from '../enums/backpack-rarity-filter';
 
 export default interface BackpackFilterDefinition extends Record<
   string,

@@ -85,12 +85,6 @@ export const useGuideWalkthroughDriver =
     }, []);
 
     const destroyDriver = useCallback((): void => {
-      console.log('[GuideWalkthrough] driver: destroyDriver called', {
-        hasDriver: driverRef.current !== null,
-        internalDestroyBefore: internalDestroyRef.current,
-        activeTargetConnected: activeTargetRef.current?.isConnected ?? null,
-      });
-
       if (pendingAnimationFrameRef.current !== null) {
         window.cancelAnimationFrame(pendingAnimationFrameRef.current);
         pendingAnimationFrameRef.current = null;
@@ -105,12 +99,10 @@ export const useGuideWalkthroughDriver =
       targetRectRef.current = null;
 
       internalDestroyRef.current = true;
-      console.log('[GuideWalkthrough] driver: internal destroy started');
 
       try {
         driverRef.current?.destroy();
       } finally {
-        console.log('[GuideWalkthrough] driver: internal destroy finished');
         internalDestroyRef.current = false;
         driverRef.current = null;
       }
@@ -119,25 +111,13 @@ export const useGuideWalkthroughDriver =
     const presentDriverStep = useCallback(
       (params: PresentGuideStepParams): void => {
         destroyDriver();
-        console.log('[GuideWalkthrough] driver: presenting step', {
-          title: params.step.title,
-          target: params.step.target ?? null,
-        });
         driverRef.current = presentGuideStep({
           ...params,
           on_close: () => {
-            console.log('[GuideWalkthrough] driver: on_close invoked', {
-              internalDestroy: internalDestroyRef.current,
-            });
-
             if (internalDestroyRef.current) {
-              console.log(
-                '[GuideWalkthrough] driver: on_close ignored for internal destroy'
-              );
               return;
             }
 
-            console.log('[GuideWalkthrough] driver: forwarding user close');
             params.on_close();
           },
         });

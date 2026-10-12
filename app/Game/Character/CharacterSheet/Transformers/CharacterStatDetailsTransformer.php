@@ -11,17 +11,31 @@ class CharacterStatDetailsTransformer extends BaseTransformer
 {
     private bool $ignoreReductions = false;
 
+    /**
+     * @param CharacterStatBuilder $characterStatBuilder
+     */
+    public function __construct(private readonly CharacterStatBuilder $characterStatBuilder) {}
+
+    /**
+     * Configure whether stat reductions are ignored.
+     *
+     * @param bool $ignoreReductions
+     * @return void
+     */
     public function setIgnoreReductions(bool $ignoreReductions): void
     {
         $this->ignoreReductions = $ignoreReductions;
     }
 
     /**
-     * Gets the response data for the character sheet
+     * Return the Character's factual stat and combat details.
+     *
+     * @param Character $character
+     * @return array
      */
     public function transform(Character $character): array
     {
-        $characterStatBuilder = resolve(CharacterStatBuilder::class)->setCharacter($character, $this->ignoreReductions);
+        $characterStatBuilder = $this->characterStatBuilder->setCharacter($character, $this->ignoreReductions);
 
         return [
             'str' => $character->str,

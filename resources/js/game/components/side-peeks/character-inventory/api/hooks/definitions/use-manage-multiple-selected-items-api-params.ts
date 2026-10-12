@@ -1,4 +1,4 @@
-import { ItemSelectedType } from '../../types/item-selected-type';
+import { ItemSelectedType } from '../../../types/item-selected-type';
 
 import InventoryCountDefinition from 'game-data/api-data-definitions/character/inventory-counts-definition';
 

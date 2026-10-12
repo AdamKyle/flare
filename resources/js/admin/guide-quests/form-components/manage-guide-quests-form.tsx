@@ -1,14 +1,9 @@
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
-import { isEmpty, isNil } from 'lodash';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React from 'react';
 
 import ManageGuideQuestsTextContent from './manage-guide-quest-text-content';
 import ManageGuideQuestsFormProps from './types/manage-guide-quests-form-props';
-import GuideQuestDefinition from '../api/definitions/guide-quest-definition';
-import { GuideQuestWalkthroughStepDefinition } from '../api/definitions/guide-quest-definition';
 import { useFetchGuideQuest } from '../api/hooks/use-fetch-guide-quest';
-import { useStoreGuideQuestContent } from '../api/hooks/use-store-guide-quest-content';
-import { useStoreGuideQuestWalkthrough } from '../api/hooks/use-store-guide-quest-walkthrough';
 import ManageGuideQuestRequiredFaction from '../components/manage-guide-quest-required-faction';
 import ManageGuideQuestWalkthrough from '../components/manage-guide-quest-walkthrough';
 import ManageGuideQuestsBasicQuestAttributes from '../components/manage-guide-quests-basic-quest-attributes';
@@ -20,7 +15,7 @@ import ManageGuideQuestsRequiredLevels from '../components/manage-guide-quests-r
 import ManageGuideQuestsRequiredQuestAndPlaneAttributes from '../components/manage-guide-quests-required-quest-and-plane-attributes';
 import ManageGuideQuestsRequiredStats from '../components/manage-guide-quests-required-stats';
 import ManageGuideQuestsRewardsAndBonuses from '../components/manage-guide-quests-rewards-and-bonuses';
-import { makeRequestObject } from '../utils/guide-quest-form-data-util';
+import { useManageGuideQuestForm } from '../hooks/use-manage-guide-quest-form';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
@@ -37,162 +32,11 @@ const ManageGuideQuestsForm = ({
     id: guide_quest_id,
   });
 
-  const {
-    loading: currentlyStoring,
-    error: storageError,
-    setRequestParams,
-    canMoveForward,
-  } = useStoreGuideQuestContent({ update_guide_quest: updateGuideQuest });
-  const {
-    error: walkthroughStorageError,
-    loading: walkthroughStoring,
-    storeWalkthrough,
-  } = useStoreGuideQuestWalkthrough();
-
-  const [formData, setFormData] = useState<
-    Array<Partial<GuideQuestDefinition> | null>
-  >([]);
-
-  const storingRef = useRef(currentlyStoring);
-  const canMoveForwardRef = useRef(canMoveForward);
-  const storageErrorRef = useRef(storageError);
-
-  useEffect(() => {
-    storingRef.current = currentlyStoring;
-    canMoveForwardRef.current = canMoveForward;
-    storageErrorRef.current = storageError;
-  }, [currentlyStoring, canMoveForward, storageError]);
-
-  const handleNextStep = async (current_index: number): Promise<boolean> => {
-    const lastStepIndex = 13;
-
-    const data_for_submission = formData[current_index];
-    const isFormDataEmpty =
-      !data_for_submission || isEmpty(data_for_submission);
-
-    if (
-      current_index >= 5 &&
-      current_index < lastStepIndex &&
-      isFormDataEmpty
-    ) {
-      return true;
-    }
-
-    let questId = guide_quest_id;
-
-    if (!isNil(data) && !isNil(data?.guide_quest)) {
-      questId = data.guide_quest.id;
-    }
-
-    if (current_index === 4) {
-      if (questId <= 0) {
-        return false;
-      }
-
-      const walkthroughSteps = data_for_submission?.walkthrough_steps ?? [];
-
-      return storeWalkthrough(questId, walkthroughSteps);
-    }
-
-    const requestObject = makeRequestObject(questId, data_for_submission ?? {});
-    setRequestParams(requestObject);
-
-    const canProceed =
-      !isFormDataEmpty && !!canMoveForwardRef.current && isNil(error);
-
-    if (canProceed && current_index === lastStepIndex) {
-      window.location.assign(`/admin/guide-quests/show/${questId}`);
-    }
-
-    return canProceed;
-  };
-
-  const handleSetFormDataFromComponent = useCallback(
-    (step: number, data: Partial<GuideQuestDefinition>) => {
-      setFormData((prev) => {
-        const next = prev.slice();
-
-        if (next.length <= step) {
-          next.length = step + 1;
-        }
-
-        next[step] = data;
-
-        return next;
-      });
-    },
-    []
-  );
-
-  const handleUpdateStep0 = useCallback(
-    (updated: Partial<GuideQuestDefinition>) => {
-      handleSetFormDataFromComponent(0, updated);
-    },
-    [handleSetFormDataFromComponent]
-  );
-
-  const handleUpdateWalkthrough = useCallback(
-    (steps: GuideQuestWalkthroughStepDefinition[]) => {
-      handleSetFormDataFromComponent(4, { walkthrough_steps: steps });
-    },
-    [handleSetFormDataFromComponent]
-  );
-
-  const handleUpdateStep5 = useCallback(
-    (updated: Partial<GuideQuestDefinition>) => {
-      handleSetFormDataFromComponent(5, updated);
-    },
-    [handleSetFormDataFromComponent]
-  );
-
-  const handleUpdateStep6 = useCallback(
-    (updated: Partial<GuideQuestDefinition>) => {
-      handleSetFormDataFromComponent(6, updated);
-    },
-    [handleSetFormDataFromComponent]
-  );
-
-  const handleUpdateStep7 = useCallback(
-    (updated: Partial<GuideQuestDefinition>) => {
-      handleSetFormDataFromComponent(7, updated);
-    },
-    [handleSetFormDataFromComponent]
-  );
-
-  const handleUpdateStep8 = useCallback(
-    (updated: Partial<GuideQuestDefinition>) => {
-      handleSetFormDataFromComponent(8, updated);
-    },
-    [handleSetFormDataFromComponent]
-  );
-
-  const handleUpdateStep9 = useCallback(
-    (updated: Partial<GuideQuestDefinition>) => {
-      handleSetFormDataFromComponent(9, updated);
-    },
-    [handleSetFormDataFromComponent]
-  );
-
-  const handleUpdateStep10 = useCallback(
-    (updated: Partial<GuideQuestDefinition>) => {
-      handleSetFormDataFromComponent(10, updated);
-    },
-    [handleSetFormDataFromComponent]
-  );
-
-  const handleUpdateStep11 = useCallback(
-    (updated: Partial<GuideQuestDefinition>) => {
-      handleSetFormDataFromComponent(11, updated);
-    },
-    [handleSetFormDataFromComponent]
-  );
-
-  const handleUpdateStep12 = useCallback(
-    (updated: Partial<GuideQuestDefinition>) => {
-      handleSetFormDataFromComponent(12, updated);
-    },
-    [handleSetFormDataFromComponent]
-  );
+  const guideQuestForm = useManageGuideQuestForm({
+    guide_quest_id,
+    data,
+    updateGuideQuest,
+  });
 
   if (loading) {
     return (
@@ -232,26 +76,22 @@ const ManageGuideQuestsForm = ({
       <FormWizard
         total_steps={14}
         name="Create / Edit Guide Quest"
-        is_loading={currentlyStoring || walkthroughStoring}
-        on_request_next={handleNextStep}
-        form_error={
-          storageError ??
-          (walkthroughStorageError
-            ? { message: walkthroughStorageError }
-            : null)
-        }
+        is_loading={guideQuestForm.isSaving}
+        on_request_next={guideQuestForm.handleNextStep}
+        form_error={guideQuestForm.formError}
+        allow_direct_step_navigation={false}
       >
         <Step step_title="Basic Info" key="basic">
           <ManageGuideQuestsBasicQuestAttributes
             data_for_component={data}
-            on_update={handleUpdateStep0}
+            on_update={(updated) => guideQuestForm.setStepData(0, updated)}
           />
         </Step>
 
         <Step step_title="Introduction" key="intro">
           <ManageGuideQuestsTextContent
             step={1}
-            on_update_content={handleSetFormDataFromComponent}
+            on_update_content={guideQuestForm.setStepData}
             field_key={'intro_text'}
             initial_content={data.guide_quest}
           />
@@ -260,7 +100,7 @@ const ManageGuideQuestsForm = ({
         <Step step_title={'Desktop Instructions'} key={'desktop-instructions'}>
           <ManageGuideQuestsTextContent
             step={2}
-            on_update_content={handleSetFormDataFromComponent}
+            on_update_content={guideQuestForm.setStepData}
             field_key={'desktop_instructions'}
             initial_content={data.guide_quest}
           />
@@ -268,7 +108,7 @@ const ManageGuideQuestsForm = ({
         <Step step_title={'Mobile Instructions'} key={'mobile-instructions'}>
           <ManageGuideQuestsTextContent
             step={3}
-            on_update_content={handleSetFormDataFromComponent}
+            on_update_content={guideQuestForm.setStepData}
             field_key={'mobile_instructions'}
             initial_content={data.guide_quest}
           />
@@ -276,13 +116,13 @@ const ManageGuideQuestsForm = ({
         <Step step_title="Guided Walkthrough" key="guided-walkthrough">
           <ManageGuideQuestWalkthrough
             data={data}
-            on_update={handleUpdateWalkthrough}
+            on_update={guideQuestForm.setWalkthroughSteps}
           />
         </Step>
         <Step step_title={'Required levels'} key={'required-levels'}>
           <ManageGuideQuestsRequiredLevels
             data_for_component={data}
-            on_update={handleUpdateStep5}
+            on_update={(updated) => guideQuestForm.setStepData(5, updated)}
           />
         </Step>
         <Step
@@ -291,13 +131,13 @@ const ManageGuideQuestsForm = ({
         >
           <ManageGuideQuestRequiredFaction
             data_for_component={data}
-            on_update={handleUpdateStep6}
+            on_update={(updated) => guideQuestForm.setStepData(6, updated)}
           />
         </Step>
         <Step step_title={'Required Stats'} key={'required-stats'}>
           <ManageGuideQuestsRequiredStats
             data_for_component={data}
-            on_update={handleUpdateStep7}
+            on_update={(updated) => guideQuestForm.setStepData(7, updated)}
           />
         </Step>
         <Step
@@ -306,7 +146,7 @@ const ManageGuideQuestsForm = ({
         >
           <ManageGuideQuestsRequiredKingdomAttributes
             data_for_component={data}
-            on_update={handleUpdateStep8}
+            on_update={(updated) => guideQuestForm.setStepData(8, updated)}
           />
         </Step>
 
@@ -316,7 +156,7 @@ const ManageGuideQuestsForm = ({
         >
           <ManageGuideQuestsRequiredItemAttributes
             data_for_component={data}
-            on_update={handleUpdateStep9}
+            on_update={(updated) => guideQuestForm.setStepData(9, updated)}
           />
         </Step>
 
@@ -326,7 +166,7 @@ const ManageGuideQuestsForm = ({
         >
           <ManageGuideQuestsRequiredQuestAndPlaneAttributes
             data_for_component={data}
-            on_update={handleUpdateStep10}
+            on_update={(updated) => guideQuestForm.setStepData(10, updated)}
           />
         </Step>
 
@@ -336,21 +176,21 @@ const ManageGuideQuestsForm = ({
         >
           <ManageGuideQuestsRequiredClassRanksAttributes
             data_for_component={data}
-            on_update={handleUpdateStep11}
+            on_update={(updated) => guideQuestForm.setStepData(11, updated)}
           />
         </Step>
 
         <Step step_title={'Required Currencies'} key={'required-currencies'}>
           <ManageGuideQuestsRequiredCurrencies
             data_for_component={data}
-            on_update={handleUpdateStep12}
+            on_update={(updated) => guideQuestForm.setStepData(12, updated)}
           />
         </Step>
 
         <Step step_title={'Rewards and Bonuses'} key={'rewards-and-bonuses'}>
           <ManageGuideQuestsRewardsAndBonuses
             data_for_component={data}
-            on_update={(updated) => handleSetFormDataFromComponent(13, updated)}
+            on_update={(updated) => guideQuestForm.setStepData(13, updated)}
           />
         </Step>
       </FormWizard>

@@ -1,8 +1,8 @@
 import React, { ReactNode } from 'react';
 
+import XpBar from '../../../../reusable-components/progress/xp-bar';
 import { useCharacterSkills } from '../../../character-sheet/skills/api/hooks/use-character-skills';
 import { useOpenCharacterSkillDetail } from '../../../character-sheet/skills/hooks/use-open-character-skill-detail';
-import XpBar from '../character-details/xp-bar';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
 
