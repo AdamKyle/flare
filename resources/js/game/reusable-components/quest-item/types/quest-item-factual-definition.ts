@@ -49,6 +49,9 @@ export default interface QuestItemFactualDefinition {
   effect: string | null;
   move_time_out_mod_bonus: number | null;
   fight_time_out_mod_bonus: number | null;
+  skill_name: string | null;
+  skill_bonus: number | null;
+  skill_training_bonus: number | null;
   drop_location: LocationIdentityDefinition | null;
   required_monsters: MonsterIdentityDefinition[];
   required_quest: QuestIdentityDefinition | null;

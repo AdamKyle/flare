@@ -13,3 +13,8 @@ export const isExplorationWarningOutput = (
   output: ExplorationLogOutputDefinition | ExplorationWarningOutputDefinition
 ): output is ExplorationWarningOutputDefinition =>
   'exploration_log_id' in output;
+
+export const isExplorationDeathWarningOutput = (
+  output: ExplorationLogOutputDefinition | ExplorationWarningOutputDefinition
+): output is ExplorationWarningOutputDefinition =>
+  isExplorationWarningOutput(output) && output.type === 'character_died';

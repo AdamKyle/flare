@@ -15,6 +15,9 @@ export default interface BaseQuestItemDefinition extends BaseItemDetails {
   craft_only: boolean;
   move_time_out_mod_bonus: number;
   fight_time_out_mod_bonus: number;
+  skill_name: string | null;
+  skill_bonus: number | null;
+  skill_training_bonus: number | null;
   effect: string;
   drop_location: LocationIdentityDefinition;
   required_monsters: MonsterIdentityDefinition[];

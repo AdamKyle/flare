@@ -50,9 +50,11 @@ const CharacterCardDetails = ({
 
   return (
     <div data-guide-target={GuideTargets.CHARACTER_CARD_OVERVIEW}>
-      <XpBar current_xp={characterData.xp} max_xp={characterData.xp_next} />
-      <TrainingSkillProgress />
-      <Separator additional_css="mx-4" />
+      <div className="space-y-3">
+        <XpBar current_xp={characterData.xp} max_xp={characterData.xp_next} />
+        <TrainingSkillProgress />
+      </div>
+      <Separator />
       <CharacterIdentity
         race_id={characterData.race_id}
         race_name={characterData.race}
@@ -60,6 +62,7 @@ const CharacterCardDetails = ({
         class_name={characterData.class}
         on_open_race={openRaceDetail}
         on_open_class={openClassDetail}
+        inline
       />
       <Separator />
       <div className="grid grid-cols-2 gap-2">

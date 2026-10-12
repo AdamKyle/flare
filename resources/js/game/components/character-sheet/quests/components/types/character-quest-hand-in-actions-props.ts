@@ -7,4 +7,5 @@ export default interface CharacterQuestHandInActionsProps {
   success_message: string | null;
   error_message: string | null;
   on_hand_in: () => void;
+  show_hand_in_button?: boolean;
 }

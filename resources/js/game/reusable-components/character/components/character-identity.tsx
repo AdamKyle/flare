@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import React, { ReactNode } from 'react';
 
 import CharacterIdentityProps from '../types/character-identity-props';
@@ -12,13 +13,14 @@ const CharacterIdentity = ({
   class_name: className,
   on_open_race: onOpenRace,
   on_open_class: onOpenClass,
+  inline = false,
 }: CharacterIdentityProps): ReactNode => {
   return (
     <div className="grid grid-cols-2 gap-4">
-      <div className="min-w-0">
-        <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-          Race
-        </p>
+      <div className={clsx('min-w-0', inline && 'flex items-center gap-1')}>
+        <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+          Race{inline ? ':' : ''}
+        </span>
         <LinkButton
           label={raceName}
           variant={ButtonVariant.PRIMARY}
@@ -27,10 +29,10 @@ const CharacterIdentity = ({
           additional_css="max-w-full text-left break-words"
         />
       </div>
-      <div className="min-w-0">
-        <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-          Class
-        </p>
+      <div className={clsx('min-w-0', inline && 'flex items-center gap-1')}>
+        <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+          Class{inline ? ':' : ''}
+        </span>
         <LinkButton
           label={className}
           variant={ButtonVariant.PRIMARY}

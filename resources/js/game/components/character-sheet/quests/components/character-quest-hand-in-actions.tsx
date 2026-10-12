@@ -14,6 +14,7 @@ const CharacterQuestHandInActions = ({
   success_message: successMessage,
   error_message: errorMessage,
   on_hand_in: onHandIn,
+  show_hand_in_button: showHandInButton = true,
 }: CharacterQuestHandInActionsProps): ReactNode => {
   const renderMutationAlert = (): ReactNode => {
     if (errorMessage) {
@@ -48,15 +49,17 @@ const CharacterQuestHandInActions = ({
     <div className="flex flex-col gap-3">
       {renderMutationAlert()}
       {renderReadinessAlert()}
-      <div className="flex justify-end">
-        <Button
-          label="Hand In Quest"
-          variant={ButtonVariant.PRIMARY}
-          disabled={!readiness.can_hand_in || handingIn}
-          aria_busy={handingIn}
-          on_click={onHandIn}
-        />
-      </div>
+      {showHandInButton && (
+        <div className="flex justify-end">
+          <Button
+            label="Hand In Quest"
+            variant={ButtonVariant.PRIMARY}
+            disabled={!readiness.can_hand_in || handingIn}
+            aria_busy={handingIn}
+            on_click={onHandIn}
+          />
+        </div>
+      )}
     </div>
   );
 };

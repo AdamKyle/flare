@@ -10,8 +10,16 @@ import ModifiersSectionProps from '../types/partials/modifer-section-props';
 const ModifiersSection = ({ item, showSeparator }: ModifiersSectionProps) => {
   const hasMove = item.move_time_out_mod_bonus !== 0;
   const hasFight = item.fight_time_out_mod_bonus !== 0;
+  const hasSkillBonus =
+    item.skill_name !== null &&
+    item.skill_bonus !== null &&
+    item.skill_bonus > 0;
+  const hasSkillTrainingBonus =
+    item.skill_name !== null &&
+    item.skill_training_bonus !== null &&
+    item.skill_training_bonus > 0;
 
-  if (!hasMove && !hasFight) {
+  if (!hasMove && !hasFight && !hasSkillBonus && !hasSkillTrainingBonus) {
     return null;
   }
 
@@ -46,6 +54,31 @@ const ModifiersSection = ({ item, showSeparator }: ModifiersSectionProps) => {
     );
   };
 
+  const renderSkillModifierRow = (
+    skillName: string | null,
+    value: number | null,
+    suffix = ''
+  ) => {
+    if (skillName === null || value === null || value <= 0) {
+      return null;
+    }
+
+    return (
+      <DefinitionRow
+        left={<InfoLabel label={`${skillName}${suffix}`} />}
+        right={
+          <span className="inline-flex items-center gap-2 font-semibold whitespace-nowrap text-emerald-700 tabular-nums dark:text-emerald-300">
+            <i
+              className="fas fa-chevron-up text-emerald-600 dark:text-emerald-400"
+              aria-hidden="true"
+            />
+            {formatPercent(value, 2, 0)}
+          </span>
+        }
+      />
+    );
+  };
+
   return (
     <Section
       title="Modifiers"
@@ -59,6 +92,12 @@ const ModifiersSection = ({ item, showSeparator }: ModifiersSectionProps) => {
       {renderModifierRow(
         'Move Timeout Modifier',
         item.move_time_out_mod_bonus ?? 0
+      )}
+      {renderSkillModifierRow(item.skill_name, item.skill_bonus)}
+      {renderSkillModifierRow(
+        item.skill_name,
+        item.skill_training_bonus,
+        ' Training'
       )}
     </Section>
   );

@@ -220,6 +220,29 @@ class ExplorationWarningServiceTest extends TestCase
         });
     }
 
+    public function test_dismiss_character_death_warning_also_dismisses_linked_panel(): void
+    {
+        Event::fake();
+
+        $log = $this->createExplorationLog([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+        ]);
+
+        $warning = $this->createExplorationWarning([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'exploration_log_id' => $log->id,
+            'type' => 'character_died',
+            'message' => 'You died while exploring.',
+        ]);
+
+        $this->service->dismissLatest($this->character);
+
+        $this->assertNotNull($warning->fresh()->dismissed_at);
+        $this->assertNotNull($log->fresh()->panel_dismissed_at);
+    }
+
     public function test_dismiss_latest_soft_dismisses_all_warnings_for_character_at_once(): void
     {
         Event::fake();

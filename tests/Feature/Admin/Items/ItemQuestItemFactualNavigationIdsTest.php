@@ -64,4 +64,25 @@ class ItemQuestItemFactualNavigationIdsTest extends TestCase
         $response->assertJsonPath('presentation.required_monsters.0.id', $monster->id);
         $response->assertJsonPath('presentation.required_monsters.0.game_map.id', $dropMap->id);
     }
+
+    public function test_quest_item_factual_payload_includes_skill_effect_ratios(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $questItem = $this->createItem([
+            'type' => 'quest',
+            'skill_name' => 'Weapon Crafting',
+            'skill_bonus' => 0.15,
+            'skill_training_bonus' => 0.25,
+        ]);
+
+        $response = $this->actingAs($admin)->call(
+            'GET',
+            "/api/admin/items/{$questItem->id}",
+            [], [], [], ['HTTP_ACCEPT' => 'application/json'],
+        );
+
+        $response->assertJsonPath('presentation.skill_name', 'Weapon Crafting');
+        $response->assertJsonPath('presentation.skill_bonus', 0.15);
+        $response->assertJsonPath('presentation.skill_training_bonus', 0.25);
+    }
 }

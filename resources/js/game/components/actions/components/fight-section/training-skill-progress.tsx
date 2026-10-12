@@ -2,14 +2,13 @@ import React, { ReactNode } from 'react';
 
 import { useCharacterSkills } from '../../../character-sheet/skills/api/hooks/use-character-skills';
 import { useOpenCharacterSkillDetail } from '../../../character-sheet/skills/hooks/use-open-character-skill-detail';
+import XpBar from '../character-details/xp-bar';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
 
 import { formatNumberWithCommas } from 'game-utils/format-number';
 
-import { ProgressBarSize } from 'ui/progress/enums/progress-bar-size';
 import { ProgressBarVariant } from 'ui/progress/enums/progress-bar-variant';
-import ProgressBar from 'ui/progress/progress-bar';
 
 const TrainingSkillProgress = (): ReactNode => {
   const { gameData } = useGameData();
@@ -36,11 +35,10 @@ const TrainingSkillProgress = (): ReactNode => {
   const isMaxLevel = trainingSkill.level >= trainingSkill.max_level;
 
   return (
-    <ProgressBar
+    <XpBar
+      current_xp={trainingSkill.xp}
+      max_xp={Math.max(trainingSkill.xp_max, 1)}
       label={`${trainingSkill.name} (Lv. ${trainingSkill.level})`}
-      value={trainingSkill.xp}
-      max={Math.max(trainingSkill.xp_max, 1)}
-      size={ProgressBarSize.THIN}
       variant={ProgressBarVariant.TERRACOTTA}
       value_label={
         isMaxLevel

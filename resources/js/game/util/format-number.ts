@@ -133,12 +133,13 @@ export const formatNumberWithCommas = (value: number): string => {
  */
 export const formatPercent = (
   value: number,
-  fractionDigits: number = 2
+  fractionDigits: number = 2,
+  minimumFractionDigits: number = fractionDigits
 ): string => {
   const percentage = Number(value) * 100;
 
   return `${percentage.toLocaleString('en-US', {
-    minimumFractionDigits: fractionDigits,
+    minimumFractionDigits,
     maximumFractionDigits: fractionDigits,
   })}%`;
 };

@@ -1,9 +1,13 @@
 import React, { ReactNode } from 'react';
 
+import ExplorationDeathPanel from './exploration-death-panel';
 import ExplorationLogPanel from './exploration-log-panel';
 import ExplorationRecoveryPanel from './exploration-recovery-panel';
 import ExplorationWarningPanel from './exploration-warning-panel';
-import { isExplorationWarningOutput } from '../types/exploration-output-response-definition';
+import {
+  isExplorationDeathWarningOutput,
+  isExplorationWarningOutput,
+} from '../types/exploration-output-response-definition';
 import ExplorationSectionProps from '../types/exploration-section-props';
 
 const ExplorationSection = ({
@@ -30,6 +34,19 @@ const ExplorationSection = ({
         output={status.output}
         state="ended"
         on_stopped={onRefetch}
+        on_dismissed={onRefetch}
+      />
+    );
+  }
+
+  if (
+    status?.type === 'warning' &&
+    status.output &&
+    isExplorationDeathWarningOutput(status.output)
+  ) {
+    return (
+      <ExplorationDeathPanel
+        character_id={characterId}
         on_dismissed={onRefetch}
       />
     );

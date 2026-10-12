@@ -1,36 +1,34 @@
 import React, { ReactNode } from 'react';
 
-import { xpbarPercentage } from './helpers/xp-bar-percentage';
 import XpBarProps from './types/xp-bar-props';
 import { formatNumberWithCommas } from '../../../../util/format-number';
 
-const XpBar = (props: XpBarProps): ReactNode => {
-  return (
-    <div className="mb-6 space-y-2">
-      <div className="flex justify-between text-sm font-medium text-gray-800 dark:text-gray-200">
-        <span id="xp-label" className="sr-only">
-          Xp
-        </span>
-        <span>Xp</span>
-        <span aria-labelledby="xp-label" aria-live="polite">
-          {formatNumberWithCommas(props.current_xp)}/
-          {formatNumberWithCommas(props.max_xp)}
-        </span>
-      </div>
-      <div className="h-2 w-full rounded-full bg-gray-300 dark:bg-gray-700">
-        <div
-          className={'h-full rounded-full bg-orange-600 dark:bg-orange-500'}
-          style={{
-            width: xpbarPercentage(props.current_xp, props.max_xp) + '%',
-          }}
-          role="progressbar"
-          aria-valuenow={props.current_xp}
-          aria-valuemin={0}
-          aria-valuemax={props.max_xp}
-        ></div>
-      </div>
-    </div>
-  );
-};
+import { ProgressBarSize } from 'ui/progress/enums/progress-bar-size';
+import { ProgressBarVariant } from 'ui/progress/enums/progress-bar-variant';
+import ProgressBar from 'ui/progress/progress-bar';
+
+const XpBar = ({
+  current_xp: currentXp,
+  max_xp: maxXp,
+  label = 'Xp',
+  value_label: valueLabel,
+  variant = ProgressBarVariant.XP,
+  on_label_click: onLabelClick,
+  aria_label: ariaLabel,
+}: XpBarProps): ReactNode => (
+  <ProgressBar
+    label={label}
+    value={currentXp}
+    max={maxXp}
+    value_label={
+      valueLabel ??
+      `${formatNumberWithCommas(currentXp)}/${formatNumberWithCommas(maxXp)}`
+    }
+    size={ProgressBarSize.THIN}
+    variant={variant}
+    on_label_click={onLabelClick}
+    aria_label={ariaLabel}
+  />
+);
 
 export default XpBar;

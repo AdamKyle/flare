@@ -13,9 +13,12 @@ import { InventoryItemTypes } from '../../partials/character-inventory/enums/inv
 import { useCharacterQuestDetail } from '../api/hooks/use-character-quest-detail';
 import { useHandInCharacterQuest } from '../api/hooks/use-hand-in-character-quest';
 
+import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import { StackedCardContentMode } from 'ui/cards/enums/stacked-card-content-mode';
 import StackedCard from 'ui/cards/stacked-card';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
+import SidePeekOptionsFooter from 'ui/side-peek/options/components/side-peek-options-footer';
+import SidePeekOptionDefinition from 'ui/side-peek/options/types/side-peek-option-definition';
 
 const CharacterQuestDetailStack = ({
   character_id: characterId,
@@ -176,6 +179,7 @@ const CharacterQuestDetailStack = ({
           success_message={handInSuccessMessage}
           error_message={handInError}
           on_hand_in={() => void handleHandIn()}
+          show_hand_in_button={false}
         />
         <QuestDetail
           quest={quest}
@@ -193,6 +197,21 @@ const CharacterQuestDetailStack = ({
     );
   };
 
+  const footerOptions: SidePeekOptionDefinition[] =
+    quest && readiness && !isCompleted
+      ? [
+          {
+            id: 'hand-in-quest',
+            label: 'Hand In Quest',
+            loading_label: 'Handing In...',
+            variant: ButtonVariant.PRIMARY,
+            disabled: !readiness.can_hand_in,
+            loading: handingIn,
+            on_click: () => void handleHandIn(),
+          },
+        ]
+      : [];
+
   return (
     <StackedCard
       on_close={onClose}
@@ -203,6 +222,8 @@ const CharacterQuestDetailStack = ({
         <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-5">
           {renderContent()}
         </div>
+
+        <SidePeekOptionsFooter options={footerOptions} />
 
         {renderNestedQuest()}
         {renderNestedNpc()}

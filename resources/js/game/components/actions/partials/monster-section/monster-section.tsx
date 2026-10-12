@@ -19,6 +19,7 @@ import { BattleType } from './enums/battle-type';
 import MonsterImageProgression from './enums/monster-images';
 import { useExplorationStatus } from './exploration/api/hooks/use-exploration-status';
 import ExplorationSection from './exploration/components/exploration-section';
+import { isExplorationDeathWarningOutput } from './exploration/types/exploration-output-response-definition';
 import MonsterExplorationConfiguration from './monster-exploration-configuration';
 import MonsterSectionProps from './types/monster-section-props';
 import { getImageTierByIndex } from './util/monster-image-tier';
@@ -127,6 +128,10 @@ const MonsterSection = ({
     activeAutomation?.type === AutomationType.EXPLORING;
   const showFullExplorationPanel =
     hasExplorationOutput || hasActiveExplorationAutomationWithoutOutput;
+  const isExplorationDeathWarning =
+    explorationStatus?.type === 'warning' &&
+    explorationStatus.output !== null &&
+    isExplorationDeathWarningOutput(explorationStatus.output);
 
   const visibleDelveStatus = isVisibleDelveStatus(delveStatus)
     ? delveStatus
@@ -356,7 +361,7 @@ const MonsterSection = ({
   };
 
   const renderMonsterFightSection = () => {
-    if (isCharacterDead) {
+    if (isCharacterDead && !isExplorationDeathWarning) {
       return (
         <CharacterDeadAction character_id={gameData?.character?.id || 0} />
       );
@@ -610,7 +615,10 @@ const MonsterSection = ({
 
   const primaryAutomationPanel = resolvePrimaryAutomationPanel();
 
-  if (primaryAutomationPanel !== null && !isCharacterDead) {
+  if (
+    primaryAutomationPanel !== null &&
+    (!isCharacterDead || isExplorationDeathWarning)
+  ) {
     return (
       <AutomationStatus
         primary_panel={primaryAutomationPanel}

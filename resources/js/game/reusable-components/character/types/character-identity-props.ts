@@ -5,4 +5,5 @@ export default interface CharacterIdentityProps {
   class_name: string;
   on_open_race: (raceId: number, raceName: string) => void;
   on_open_class: (classId: number, className: string) => void;
+  inline?: boolean;
 }

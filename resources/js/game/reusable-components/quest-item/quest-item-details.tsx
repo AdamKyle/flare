@@ -25,7 +25,10 @@ const EMPTY_NAVIGATION: QuestItemFactualNavigationDefinition = {};
 const QuestItemDetails = ({ item, navigation }: QuestItemDetailsProps) => {
   const resolvedNavigation = navigation ?? EMPTY_NAVIGATION;
   const hasModifiers =
-    item.move_time_out_mod_bonus !== 0 || item.fight_time_out_mod_bonus !== 0;
+    item.move_time_out_mod_bonus !== 0 ||
+    item.fight_time_out_mod_bonus !== 0 ||
+    (item.skill_name !== null &&
+      ((item.skill_bonus ?? 0) > 0 || (item.skill_training_bonus ?? 0) > 0));
   const monsterDrops = item.required_monsters || [];
   const hasMonsterDrops = monsterDrops.length > 0;
   const requiredQuests = item.required_quests || [];
