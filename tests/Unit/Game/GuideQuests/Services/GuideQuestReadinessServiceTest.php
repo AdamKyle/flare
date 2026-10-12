@@ -3,9 +3,9 @@
 namespace Tests\Unit\Game\GuideQuests\Services;
 
 use App\Game\GuideQuests\Services\GuideQuestReadinessService;
-use App\Game\GuideQuests\Services\GuideQuestRequirementsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\Setup\GuideQuest\GuideQuestServiceFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateBatchCrafting;
 use Tests\Traits\CreateCharacterAutomation;
@@ -25,7 +25,7 @@ class GuideQuestReadinessServiceTest extends TestCase
             'guide_quest_id' => $quest->id,
         ]);
 
-        $canHandIn = (new GuideQuestReadinessService(new GuideQuestRequirementsService))
+        $canHandIn = (new GuideQuestReadinessService((new GuideQuestServiceFactory)->buildRequirements()))
             ->canHandIn($character, $quest);
 
         $this->assertFalse($canHandIn);
@@ -36,7 +36,7 @@ class GuideQuestReadinessServiceTest extends TestCase
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $quest = $this->createGuideQuest(['required_level' => 1]);
         $this->createCharacterAutomation(['character_id' => $character->id]);
-        $service = new GuideQuestReadinessService(new GuideQuestRequirementsService);
+        $service = new GuideQuestReadinessService((new GuideQuestServiceFactory)->buildRequirements());
 
         $this->assertFalse($service->canHandIn($character, $quest));
         $this->assertTrue($service->canHandIn($character, $quest, true));
@@ -57,7 +57,7 @@ class GuideQuestReadinessServiceTest extends TestCase
             'completed_at' => null,
         ]);
 
-        $canHandIn = (new GuideQuestReadinessService(new GuideQuestRequirementsService))
+        $canHandIn = (new GuideQuestReadinessService((new GuideQuestServiceFactory)->buildRequirements()))
             ->canHandIn($character, $quest);
 
         $this->assertFalse($canHandIn);
@@ -68,7 +68,7 @@ class GuideQuestReadinessServiceTest extends TestCase
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $completedQuest = $this->createGuideQuest(['required_level' => 1]);
         $incompleteQuest = $this->createGuideQuest(['required_level' => 2]);
-        $service = new GuideQuestReadinessService(new GuideQuestRequirementsService);
+        $service = new GuideQuestReadinessService((new GuideQuestServiceFactory)->buildRequirements());
 
         $this->assertTrue($service->canHandIn($character, $completedQuest));
         $this->assertFalse($service->canHandIn($character, $incompleteQuest));

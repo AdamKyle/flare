@@ -9,7 +9,6 @@ use App\Game\Character\CharacterInventory\Builders\EquipManyBuilder;
 use App\Game\Character\CharacterInventory\Contracts\CurrencyCacheIssuer;
 use App\Game\Character\CharacterInventory\Services\BatchCraftingSetService;
 use App\Game\Character\CharacterInventory\Services\CharacterGemBagService;
-use App\Game\Character\CharacterInventory\Services\CharacterInventoryFilterService;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\CurrencyCacheGenerator;
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
@@ -18,18 +17,9 @@ use App\Game\Character\CharacterInventory\Services\MultiInventoryActionService;
 use App\Game\Character\CharacterInventory\Transformers\CharacterGemSlotsTransformer;
 use App\Game\Character\CharacterInventory\Transformers\CharacterGemsTransformer;
 use App\Game\Character\CharacterInventory\Transformers\CharacterInventoryCountTransformer;
-use App\Game\Character\CharacterInventory\Transformers\InventorySetOptionTransformer;
-use App\Game\Character\CharacterInventory\Transformers\InventoryTransformer;
 use App\Game\Character\CharacterInventory\Validations\SetHandsValidation;
-use App\Game\Core\Items\Enricher\ItemEnricherFactory;
-use App\Game\Core\Items\Transformers\Api\UsableItemTransformer;
-use App\Game\Core\Items\Transformers\EquippableItemTransformer;
-use App\Game\Core\Items\Transformers\QuestItemTransformer;
 use App\Game\Shop\Services\ShopService;
 use App\Game\Skills\Services\DisenchantManyService;
-use App\Game\Skills\Services\DisenchantService;
-use App\Game\Skills\Services\MassDisenchantService;
-use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 
@@ -61,24 +51,6 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(Manager::class),
                 $app->make(CharacterAttackTransformer::class),
                 $app->make(InventorySetService::class)
-            );
-        });
-
-        $this->app->bind(CharacterInventoryService::class, function ($app) {
-            return new CharacterInventoryService(
-                $app->make(ItemEnricherFactory::class),
-                $app->make(EquippableItemTransformer::class),
-                $app->make(QuestItemTransformer::class),
-                $app->make(UsableItemTransformer::class),
-                $app->make(InventoryTransformer::class),
-                $app->make(InventorySetService::class),
-                $app->make(MassDisenchantService::class),
-                $app->make(UpdateCharacterSkillsService::class),
-                $app->make(DisenchantService::class),
-                $app->make(Pagination::class),
-                $app->make(Manager::class),
-                $app->make(InventorySetOptionTransformer::class),
-                $app->make(CharacterInventoryFilterService::class),
             );
         });
 

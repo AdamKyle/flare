@@ -7,6 +7,7 @@ use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Shop\Services\GemShopService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\Setup\Character\CharacterInventoryServiceFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGem;
 
@@ -28,7 +29,8 @@ class GemShopServiceTest extends TestCase
 
         $this->character = $characterFactory->getCharacter();
 
-        $this->shopService = resolve(GemShopService::class);
+        $gemBagService = (new CharacterInventoryServiceFactory)->buildGemBagService();
+        $this->shopService = new GemShopService($gemBagService);
     }
 
     protected function tearDown(): void

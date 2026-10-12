@@ -5,34 +5,28 @@ namespace Tests\Unit\Game\Shop\Services;
 use App\Flare\Pagination\Pagination;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\Character\CharacterAttack\Transformers\CharacterAttackTransformer;
-use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
 use App\Game\Character\CharacterInventory\Services\InventorySetService;
 use App\Game\Character\CharacterInventory\Transformers\CharacterInventoryCountTransformer;
-use App\Game\Character\CharacterInventory\Transformers\InventorySetOptionTransformer;
-use App\Game\Character\CharacterInventory\Transformers\InventoryTransformer;
 use App\Game\Character\CharacterInventory\Validations\SetHandsValidation;
-use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Chance\PhpRandomNumberGenerator;
 use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Items\Enricher\EquippableEnricher;
 use App\Game\Core\Items\Enricher\ItemEnricherFactory;
-use App\Game\Core\Items\Transformers\Api\UsableItemTransformer as ApiUsableItemTransformer;
 use App\Game\Core\Items\Transformers\QuestItemTransformer;
 use App\Game\Core\Items\Transformers\UsableItemTransformer;
 use App\Game\Shop\Events\BuyItemEvent;
 use App\Game\Shop\Services\ShopService;
 use App\Game\Skills\Services\DisenchantService;
-use App\Game\Skills\Services\MassDisenchantService;
 use App\Game\Skills\Services\SkillBonusContextService;
 use App\Game\Skills\Services\SkillBonusService;
-use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use League\Fractal\Manager;
 use Mockery;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\Setup\Character\CharacterInventoryServiceFactory;
 use Tests\Setup\Items\ItemTransformerFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameSkill;
@@ -75,19 +69,9 @@ class ShopServiceTest extends TestCase
 
         $this->shopService = new ShopService(
             new EquipItemService($manager, new CharacterAttackTransformer, $inventorySetService),
-            new CharacterInventoryService(
-                $itemEnricherFactory,
-                $equippableItemTransformer,
-                $questItemTransformer,
-                new ApiUsableItemTransformer,
-                new InventoryTransformer($itemEnricherFactory),
-                $inventorySetService,
-                new MassDisenchantService(new SkillCheckService($randomNumberGenerator, $skillBonusService), $randomNumberGenerator, new ChanceCalculator($randomNumberGenerator), $skillBonusService),
+            (new CharacterInventoryServiceFactory)->buildFacade(
                 Mockery::mock(UpdateCharacterSkillsService::class),
                 Mockery::mock(DisenchantService::class),
-                new Pagination($manager),
-                $manager,
-                new InventorySetOptionTransformer,
             ),
             new CharacterInventoryCountTransformer,
             (new ItemTransformerFactory)->buildItemTransformer($itemEnricherFactory),

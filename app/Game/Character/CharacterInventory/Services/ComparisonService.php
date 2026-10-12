@@ -17,7 +17,7 @@ class ComparisonService
 {
     /**
      * @param ValidEquipPositionsValue $validEquipPositionsValue
-     * @param CharacterInventoryService $characterInventoryService
+     * @param CharacterInventoryComparisonService $characterInventoryComparisonService
      * @param EquipItemService $equipItemService
      * @param Manager $manager
      * @param EquippableItemTransformer $equippableItemTransformer
@@ -25,7 +25,7 @@ class ComparisonService
      */
     public function __construct(
         private readonly ValidEquipPositionsValue $validEquipPositionsValue,
-        private readonly CharacterInventoryService $characterInventoryService,
+        private readonly CharacterInventoryComparisonService $characterInventoryComparisonService,
         private readonly EquipItemService $equipItemService,
         private readonly Manager $manager,
         private readonly EquippableItemTransformer $equippableItemTransformer,
@@ -41,18 +41,13 @@ class ComparisonService
      */
     public function buildComparisonData(Character $character, InventorySlot $itemToEquip): ?array
     {
-        $service = $this->characterInventoryService->setCharacter($character)
-            ->setInventorySlot($itemToEquip)
-            ->setPositions($this->validEquipPositionsValue->getPositions($itemToEquip->item))
-            ->setInventory();
-
-        $normalizedType = $service->getType($itemToEquip->item);
+        $positions = $this->validEquipPositionsValue->getPositions($itemToEquip->item);
+        $inventory = $this->characterInventoryComparisonService->comparisonInventory($character, $itemToEquip, $positions);
+        $normalizedType = $this->characterInventoryComparisonService->itemType($itemToEquip->item);
 
         if (is_null($normalizedType)) {
             return null;
         }
-
-        $inventory = $service->inventory();
 
         $viewData = [
             'details' => [],
@@ -67,7 +62,7 @@ class ComparisonService
             'setIndex' => 0,
         ];
 
-        if ($service->inventory()->isNotEmpty()) {
+        if ($inventory->isNotEmpty()) {
             $setEquipped = $character->inventorySets()->where('is_equipped', true)->first();
             $hasSet = ! is_null($setEquipped);
             $setIndex = ! is_null($setEquipped) ? $character->inventorySets->search(function ($set) {
@@ -153,12 +148,14 @@ class ComparisonService
      */
     public function buildShopData(Character $character, Item $item): array
     {
-        $service = $this->characterInventoryService->setCharacter($character)
-            ->setPositions($this->validEquipPositionsValue->getPositions($item))
-            ->setInventory();
+        $inventory = $this->characterInventoryComparisonService->comparisonInventory(
+            $character,
+            null,
+            $this->validEquipPositionsValue->getPositions($item),
+        );
 
         return [
-            'details' => $this->equipItemService->getItemStats($item, $service->inventory(), $character),
+            'details' => $this->equipItemService->getItemStats($item, $inventory, $character),
             'item_to_equip' => [
                 'item_id' => $item->id,
                 'name' => $item->affix_name,

@@ -5,6 +5,7 @@ namespace App\Game\GuideQuests\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterGuideQuestProgress;
 use App\Flare\Models\GuideQuest;
+use App\Game\GuideQuests\Services\Requirements\CraftingGuideQuestRequirementService;
 use App\Game\GuideQuests\Values\GuideQuestWalkthroughStatus;
 
 class GuideQuestService
@@ -14,12 +15,14 @@ class GuideQuestService
      * @param GuideQuestReadinessService $guideQuestReadinessService
      * @param GuideQuestAttentionService $guideQuestAttentionService
      * @param GuideQuestRewardService $guideQuestRewardService
+     * @param CraftingGuideQuestRequirementService $craftingGuideQuestRequirementService
      */
     public function __construct(
         private readonly GuideQuestProgressionService $guideQuestProgressionService,
         private readonly GuideQuestReadinessService $guideQuestReadinessService,
         private readonly GuideQuestAttentionService $guideQuestAttentionService,
         private readonly GuideQuestRewardService $guideQuestRewardService,
+        private readonly CraftingGuideQuestRequirementService $craftingGuideQuestRequirementService,
     ) {}
 
     /**
@@ -56,10 +59,8 @@ class GuideQuestService
             $completedRequirements[] = [
                 'quest_id' => $quest->id,
                 'completed_requirements' => $questCompletedRequirements,
-                'required_batch_crafted_item_requirements' => $this->guideQuestReadinessService->batchCraftedItemRequirements(
-                    $character,
-                    $quest,
-                ),
+                'required_batch_crafted_item_requirements' => $this->craftingGuideQuestRequirementService
+                    ->batchCraftedItemRequirements($character, $quest->required_batch_crafted_items ?? []),
             ];
         }
 

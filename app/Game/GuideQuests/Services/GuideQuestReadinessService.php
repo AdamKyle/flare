@@ -56,64 +56,7 @@ class GuideQuestReadinessService
      */
     public function completedRequirements(Character $character, GuideQuest $quest): array
     {
-        $stats = ['str', 'dex', 'dur', 'int', 'chr', 'agi', 'focus'];
-        $completedRequirements = $this->guideQuestRequirementsService->requiredLevelCheck($character, $quest)
-            ->requiredReincarnatedAmount($character, $quest)
-            ->requiredExplorationHours($character, $quest)
-            ->requiredTrainingSkill($character, $quest)
-            ->requiredQuest($character, $quest)
-            ->requiredSkillCheck($character, $quest)
-            ->requiredSkillCheck($character, $quest, false)
-            ->requiredSkillTypeCheck($character, $quest)
-            ->requiredFactionLevel($character, $quest)
-            ->requiredGameMapAccess($character, $quest)
-            ->requiredQuestItem($character, $quest)
-            ->requiredQuestItem($character, $quest, false)
-            ->requiredKingdomCount($character, $quest)
-            ->requiredKingdomBuildingLevel($character, $quest)
-            ->requiredKingdomUnitCount($character, $quest)
-            ->requiredKingdomPassiveLevel($character, $quest)
-            ->requiredCurrency($character, $quest, 'gold')
-            ->requiredCurrency($character, $quest, 'gold_dust')
-            ->requiredCurrency($character, $quest, 'shards')
-            ->requiredCurrency($character, $quest, 'copper_coins')
-            ->requiredTotalStats($character, $quest, $stats)
-            ->requiredStats($character, $quest, $stats)
-            ->requiredClassRanksEquipped($character, $quest)
-            ->requiredClassRankLevel($character, $quest)
-            ->requiredKingdomGoldBarsAmount($character, $quest)
-            ->requiredKingdomSpecificBuildingLevel($character, $quest)
-            ->requiredGlobalEventKillAmount($character, $quest)
-            ->requiredGlobalEventCraftAmount($character, $quest)
-            ->requiredGlobalEventEnchantAmount($character, $quest)
-            ->requirePlayerToBeOnASpecificMap($character, $quest)
-            ->requiredSpecialtyType($character, $quest)
-            ->requiredHolyStacks($character, $quest)
-            ->requiredFameLevel($character, $quest)
-            ->requiredDelveSurvivalTime($character, $quest)
-            ->requiredDelvePackSize($character, $quest)
-            ->requiredBatchCraftingExperienceHours($character, $quest)
-            ->requiredBatchCraftedItems($character, $quest)
-            ->getFinishedRequirements();
-
-        $this->guideQuestRequirementsService->resetFinishedRequirements();
-
-        return $completedRequirements;
-    }
-
-    /**
-     * Return factual progress for the Guide Quest's batch-crafted Item requirements.
-     *
-     * @param Character $character
-     * @param GuideQuest $quest
-     * @return array
-     */
-    public function batchCraftedItemRequirements(Character $character, GuideQuest $quest): array
-    {
-        return $this->guideQuestRequirementsService->batchCraftedItemRequirements(
-            $character,
-            $quest->required_batch_crafted_items ?? [],
-        );
+        return $this->guideQuestRequirementsService->completedRequirements($character, $quest);
     }
 
     /**

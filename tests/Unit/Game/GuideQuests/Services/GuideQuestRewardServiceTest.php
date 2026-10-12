@@ -7,13 +7,14 @@ use App\Flare\Models\QuestsCompleted;
 use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
 use App\Game\BattleRewardProcessing\Values\BattleRewardEnqueueResult;
 use App\Game\GuideQuests\Services\GuideQuestReadinessService;
-use App\Game\GuideQuests\Services\GuideQuestRequirementsService;
 use App\Game\GuideQuests\Services\GuideQuestRewardService;
+use App\Game\GuideQuests\Services\Requirements\CraftingGuideQuestRequirementService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Mockery;
 use RuntimeException;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\Setup\GuideQuest\GuideQuestServiceFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGuideQuest;
 
@@ -26,10 +27,11 @@ class GuideQuestRewardServiceTest extends TestCase
         Event::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $quest = $this->createGuideQuest(['required_level' => 1]);
-        $requirements = new GuideQuestRequirementsService;
+        $craftingRequirements = new CraftingGuideQuestRequirementService;
+        $requirements = (new GuideQuestServiceFactory)->buildRequirements($craftingRequirements);
         $service = new GuideQuestRewardService(
             new GuideQuestReadinessService($requirements),
-            $requirements,
+            $craftingRequirements,
             new BattleRewardProcessingQueueManager,
         );
 
@@ -47,14 +49,15 @@ class GuideQuestRewardServiceTest extends TestCase
         Event::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $quest = $this->createGuideQuest(['required_level' => 1]);
-        $requirements = new GuideQuestRequirementsService;
+        $craftingRequirements = new CraftingGuideQuestRequirementService;
+        $requirements = (new GuideQuestServiceFactory)->buildRequirements($craftingRequirements);
         $queueManager = Mockery::mock(BattleRewardProcessingQueueManager::class);
         $queueManager->shouldReceive('enqueue')
             ->once()
             ->andReturn(BattleRewardEnqueueResult::failed(new RuntimeException('database unavailable')));
         $service = new GuideQuestRewardService(
             new GuideQuestReadinessService($requirements),
-            $requirements,
+            $craftingRequirements,
             $queueManager,
         );
 

@@ -4,21 +4,12 @@ namespace Tests\Unit\Game\Skills\Services;
 
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
-use App\Flare\Pagination\Pagination;
 use App\Game\Character\CharacterInventory\Jobs\DisenchantMany;
-use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
-use App\Game\Character\CharacterInventory\Services\InventorySetService;
-use App\Game\Character\CharacterInventory\Transformers\InventorySetOptionTransformer;
-use App\Game\Character\CharacterInventory\Transformers\InventoryTransformer;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
-use App\Game\Core\Items\Enricher\ItemEnricherFactory;
-use App\Game\Core\Items\Transformers\Api\UsableItemTransformer as ApiUsableItemTransformer;
-use App\Game\Core\Items\Transformers\EquippableItemTransformer;
-use App\Game\Core\Items\Transformers\QuestItemTransformer;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Events\Services\GlobalEventGoalEligibilityService;
 use App\Game\Messages\Builders\ServerMessageBuilder;
@@ -28,7 +19,6 @@ use App\Game\Skills\Events\UpdateCharacterEnchantingList;
 use App\Game\Skills\Events\UpdateSkillEvent;
 use App\Game\Skills\Services\DisenchantService;
 use App\Game\Skills\Services\EnchantingAffixService;
-use App\Game\Skills\Services\MassDisenchantService;
 use App\Game\Skills\Services\SkillBonusContextService;
 use App\Game\Skills\Services\SkillBonusService;
 use App\Game\Skills\Services\SkillCheckService;
@@ -36,11 +26,11 @@ use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
-use League\Fractal\Manager;
 use Mockery;
 use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterCacheDataFactory;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\Setup\Character\CharacterInventoryServiceFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateGameSkill;
@@ -626,19 +616,9 @@ class DisenchantServiceTest extends TestCase
 
         $item = $this->createItem();
 
-        $characterInventoryService = new CharacterInventoryService(
-            Mockery::mock(ItemEnricherFactory::class),
-            Mockery::mock(EquippableItemTransformer::class),
-            Mockery::mock(QuestItemTransformer::class),
-            Mockery::mock(ApiUsableItemTransformer::class),
-            Mockery::mock(InventoryTransformer::class),
-            Mockery::mock(InventorySetService::class),
-            Mockery::mock(MassDisenchantService::class),
+        $characterInventoryService = (new CharacterInventoryServiceFactory)->buildFacade(
             Mockery::mock(UpdateCharacterSkillsService::class),
             Mockery::mock(DisenchantService::class),
-            new Pagination(new Manager()),
-            Mockery::mock(Manager::class),
-            Mockery::mock(InventorySetOptionTransformer::class),
         );
 
         $result = $characterInventoryService->setCharacter($character)->disenchantItem($item->id);
@@ -693,19 +673,9 @@ class DisenchantServiceTest extends TestCase
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
-        $characterInventoryService = new CharacterInventoryService(
-            Mockery::mock(ItemEnricherFactory::class),
-            Mockery::mock(EquippableItemTransformer::class),
-            Mockery::mock(QuestItemTransformer::class),
-            Mockery::mock(ApiUsableItemTransformer::class),
-            Mockery::mock(InventoryTransformer::class),
-            Mockery::mock(InventorySetService::class),
-            Mockery::mock(MassDisenchantService::class),
+        $characterInventoryService = (new CharacterInventoryServiceFactory)->buildFacade(
             Mockery::mock(UpdateCharacterSkillsService::class),
             Mockery::mock(DisenchantService::class),
-            new Pagination(new Manager()),
-            Mockery::mock(Manager::class),
-            Mockery::mock(InventorySetOptionTransformer::class),
         );
 
         $result = $characterInventoryService->setCharacter($character)->disenchantItem($item->id);

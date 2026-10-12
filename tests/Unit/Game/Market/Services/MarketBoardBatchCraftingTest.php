@@ -3,18 +3,14 @@
 namespace Tests\Unit\Game\Market\Services;
 
 use App\Flare\Models\MarketBoard as MarketBoardModel;
-use App\Flare\Pagination\Pagination;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\Character\CharacterAttack\Transformers\CharacterAttackTransformer;
-use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
+use App\Game\Character\CharacterInventory\Services\CharacterInventoryComparisonService;
 use App\Game\Character\CharacterInventory\Services\ComparisonService;
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
 use App\Game\Character\CharacterInventory\Services\InventorySetService;
 use App\Game\Character\CharacterInventory\Transformers\CharacterInventoryCountTransformer;
-use App\Game\Character\CharacterInventory\Transformers\InventorySetOptionTransformer;
-use App\Game\Character\CharacterInventory\Transformers\InventoryTransformer;
 use App\Game\Character\CharacterInventory\Validations\SetHandsValidation;
-use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Chance\PhpRandomNumberGenerator;
 use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Items\Enricher\EquippableEnricher;
@@ -26,12 +22,8 @@ use App\Game\Core\Values\ValidEquipPositionsValue;
 use App\Game\Market\Services\MarketBoard;
 use App\Game\Market\Services\MarketRealtimePublisher;
 use App\Game\Market\Transformers\MarketItemsTransformer;
-use App\Game\Skills\Services\DisenchantService;
-use App\Game\Skills\Services\MassDisenchantService;
 use App\Game\Skills\Services\SkillBonusContextService;
 use App\Game\Skills\Services\SkillBonusService;
-use App\Game\Skills\Services\SkillCheckService;
-use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use League\Fractal\Manager;
 use Mockery;
@@ -71,20 +63,7 @@ class MarketBoardBatchCraftingTest extends TestCase
 
         $comparisonService = new ComparisonService(
             new ValidEquipPositionsValue,
-            new CharacterInventoryService(
-                $itemEnricherFactory,
-                $equippableItemTransformer,
-                $questItemTransformer,
-                $apiUsableItemTransformer,
-                new InventoryTransformer($itemEnricherFactory),
-                $inventorySetService,
-                new MassDisenchantService(new SkillCheckService($randomNumberGenerator, $skillBonusService), $randomNumberGenerator, new ChanceCalculator($randomNumberGenerator), $skillBonusService),
-                Mockery::mock(UpdateCharacterSkillsService::class),
-                Mockery::mock(DisenchantService::class),
-                new Pagination($manager),
-                $manager,
-                new InventorySetOptionTransformer,
-            ),
+            new CharacterInventoryComparisonService,
             $equipItemService,
             $manager,
             $equippableItemTransformer,

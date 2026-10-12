@@ -5,6 +5,7 @@ namespace Tests\Unit\Game\Character\CharacterInventory\Services;
 use App\Game\Character\CharacterInventory\Services\CharacterGemBagService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\Setup\Character\CharacterInventoryServiceFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGem;
 
@@ -22,7 +23,7 @@ class CharacterGemBagServiceTest extends TestCase
 
         $this->character = (new CharacterFactory)->createBaseCharacter();
 
-        $this->characterGemBagService = resolve(CharacterGemBagService::class);
+        $this->characterGemBagService = (new CharacterInventoryServiceFactory)->buildGemBagService();
     }
 
     protected function tearDown(): void

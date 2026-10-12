@@ -14,6 +14,7 @@ use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\HandleCharacterLevelUp;
 use App\Game\GuideQuests\Events\ShowGuideQuestCompletedToast;
+use App\Game\GuideQuests\Services\Requirements\CraftingGuideQuestRequirementService;
 use App\Game\GuideQuests\Values\GuideQuestRequiredItemSource;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Support\Facades\Log;
@@ -24,12 +25,12 @@ class GuideQuestRewardService
 
     /**
      * @param GuideQuestReadinessService $guideQuestReadinessService
-     * @param GuideQuestRequirementsService $guideQuestRequirementsService
+     * @param CraftingGuideQuestRequirementService $craftingGuideQuestRequirementService
      * @param BattleRewardProcessingQueueManager $battleRewardProcessingQueueManager
      */
     public function __construct(
         private readonly GuideQuestReadinessService $guideQuestReadinessService,
-        private readonly GuideQuestRequirementsService $guideQuestRequirementsService,
+        private readonly CraftingGuideQuestRequirementService $craftingGuideQuestRequirementService,
         private readonly BattleRewardProcessingQueueManager $battleRewardProcessingQueueManager,
     ) {}
 
@@ -193,7 +194,7 @@ class GuideQuestRewardService
             return false;
         }
 
-        if (! $this->guideQuestRequirementsService->hasRequiredBatchCraftedItems($character, $quest->required_batch_crafted_items)) {
+        if (! $this->craftingGuideQuestRequirementService->hasRequiredBatchCraftedItems($character, $quest->required_batch_crafted_items)) {
             return false;
         }
 
@@ -222,7 +223,7 @@ class GuideQuestRewardService
             return $this->consumeRequiredAlchemyBagItems($character, $requiredItem);
         }
 
-        $slotIds = $this->guideQuestRequirementsService->matchingBatchCraftedItemSlotIds($character, $requiredItem);
+        $slotIds = $this->craftingGuideQuestRequirementService->matchingBatchCraftedItemSlotIds($character, $requiredItem);
 
         if (count($slotIds) < $requiredItem['amount']) {
             return false;
@@ -242,7 +243,7 @@ class GuideQuestRewardService
      */
     private function consumeRequiredAlchemyBagItems(Character $character, array $requiredItem): bool
     {
-        if (! $this->guideQuestRequirementsService->hasRequiredAlchemyBagItemAmount($character, $requiredItem)) {
+        if (! $this->craftingGuideQuestRequirementService->hasRequiredAlchemyBagItemAmount($character, $requiredItem)) {
             return false;
         }
 
