@@ -1,145 +1,111 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 
-import ManageGuideQuestStepProps from './types/manage-guide-quest-step-props';
-import { useManageFormSectionData } from '../hooks/use-manage-form-section-data';
+import GuideQuestFormFieldsProps from './types/guide-quest-form-fields-props';
+import {
+  guideQuestDropdownItems,
+  selectedGuideQuestOption,
+} from '../utils/guide-quest-form-options';
 
 import Dropdown from 'ui/drop-down/drop-down';
-import Input from 'ui/input/input';
+import FieldWrapper from 'ui/forms/field-wrapper';
+import NumberField from 'ui/forms/number-field';
 
 const ManageGuideQuestsRequiredQuestAndPlaneAttributes = ({
-  data_for_component,
-  on_update,
-}: ManageGuideQuestStepProps) => {
-  const { handleUpdateFormData, convertObjectToKeyValue, getPreSelected } =
-    useManageFormSectionData({
-      on_update,
-      initial_values: data_for_component.guide_quest,
-    });
+  state,
+  errors,
+  form_options: formOptions,
+  on_change: onChange,
+}: GuideQuestFormFieldsProps): ReactNode => {
+  const mapItems = guideQuestDropdownItems(formOptions.game_maps);
+  const questItems = guideQuestDropdownItems(formOptions.quests);
+  const questItemItems = guideQuestDropdownItems(formOptions.quest_items);
 
-  const guideQuest = data_for_component.guide_quest ?? null;
-
-  const getDefaultString = (candidate?: number | string | null): string => {
-    if (!candidate) {
-      return '';
-    }
-
-    return String(candidate);
-  };
-
-  const mapItems = convertObjectToKeyValue(data_for_component.game_maps);
-  const preSelectedRequiredMap = getPreSelected(
-    mapItems,
-    guideQuest?.required_game_map_id
-  );
-  const preSelectedBeOnMap = getPreSelected(
-    mapItems,
-    guideQuest?.be_on_game_map
-  );
-
-  const questItems = convertObjectToKeyValue(data_for_component.quests);
-  const preSelectedQuest = getPreSelected(
-    questItems,
-    guideQuest?.required_quest_id
-  );
-
-  const questItemItems = convertObjectToKeyValue(
-    data_for_component.quest_items
-  );
-  const preSelectedQuestItem = getPreSelected(
-    questItemItems,
-    guideQuest?.required_quest_item_id
-  );
-  const preSelectedSecondaryQuestItem = getPreSelected(
-    questItemItems,
-    guideQuest?.secondary_quest_item_id
+  const renderDropdown = (
+    id: string,
+    label: string,
+    field:
+      | 'required_game_map_id'
+      | 'be_on_game_map'
+      | 'required_quest_id'
+      | 'required_quest_item_id'
+      | 'secondary_quest_item_id',
+    items: typeof mapItems
+  ) => (
+    <FieldWrapper id={id} label={label} error={errors[field]}>
+      {(describedBy) => (
+        <Dropdown
+          id={id}
+          items={items}
+          pre_selected_item={selectedGuideQuestOption(items, state[field])}
+          selection_placeholder="No requirement"
+          on_select={(item) => onChange(field, Number(item.value))}
+          on_clear={() => onChange(field, null)}
+          aria_described_by={describedBy}
+          aria_invalid={!!errors[field]}
+        />
+      )}
+    </FieldWrapper>
   );
 
   return (
     <div className="space-y-4">
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
-          Required Plane Access
-        </label>
-        <Dropdown
-          items={mapItems}
-          pre_selected_item={preSelectedRequiredMap}
-          on_select={(value) =>
-            handleUpdateFormData('required_game_map_id', value)
-          }
-        />
-      </div>
-
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
-          Physically Be on plane
-        </label>
-        <Dropdown
-          items={mapItems}
-          pre_selected_item={preSelectedBeOnMap}
-          on_select={(value) => handleUpdateFormData('be_on_game_map', value)}
-        />
-      </div>
-
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
-          Required Quest Completed
-        </label>
-        <Dropdown
-          items={questItems}
-          pre_selected_item={preSelectedQuest}
-          on_select={(value) =>
-            handleUpdateFormData('required_quest_id', value)
-          }
-        />
-      </div>
-
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
-          Required Quest Item
-        </label>
-        <Dropdown
-          items={questItemItems}
-          pre_selected_item={preSelectedQuestItem}
-          on_select={(value) =>
-            handleUpdateFormData('required_quest_item_id', value)
-          }
-        />
-      </div>
-
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
-          Required Secondary Quest Item
-        </label>
-        <Dropdown
-          items={questItemItems}
-          pre_selected_item={preSelectedSecondaryQuestItem}
-          on_select={(value) =>
-            handleUpdateFormData('secondary_quest_item_id', value)
-          }
-        />
-      </div>
-
-      <div className="my-4 flex items-center">
-        <span className="h-px flex-1 bg-gray-300 dark:bg-gray-700" />
-        <span className="px-3 text-sm text-gray-500 dark:text-gray-400">
-          Event Goals Participation
-        </span>
-        <span className="h-px flex-1 bg-gray-300 dark:bg-gray-700" />
-      </div>
-
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
-          Required Event Goal Kill Count
-        </label>
-        <Input
-          default_value={getDefaultString(
-            guideQuest?.required_event_goal_participation
-          )}
-          on_change={(value) =>
-            handleUpdateFormData('required_event_goal_participation', value)
-          }
-        />
-      </div>
+      {renderDropdown(
+        'guide-quest-required-game-map',
+        'Required Plane Access',
+        'required_game_map_id',
+        mapItems
+      )}
+      {renderDropdown(
+        'guide-quest-be-on-game-map',
+        'Physically Be on plane',
+        'be_on_game_map',
+        mapItems
+      )}
+      {renderDropdown(
+        'guide-quest-required-quest',
+        'Required Quest Completed',
+        'required_quest_id',
+        questItems
+      )}
+      {renderDropdown(
+        'guide-quest-required-quest-item',
+        'Required Quest Item',
+        'required_quest_item_id',
+        questItemItems
+      )}
+      {renderDropdown(
+        'guide-quest-secondary-quest-item',
+        'Required Secondary Quest Item',
+        'secondary_quest_item_id',
+        questItemItems
+      )}
+      <NumberField
+        id="guide-quest-required-event-goal-participation"
+        label="Required Event Goal Kill Count"
+        value={state.required_event_goal_participation}
+        on_change={(value) =>
+          onChange('required_event_goal_participation', value)
+        }
+        error={errors.required_event_goal_participation}
+      />
+      <NumberField
+        id="guide-quest-required-event-goal-crafting-participation"
+        label="Required Event Goal Crafting Count"
+        value={state.required_event_goal_crafting_participation}
+        on_change={(value) =>
+          onChange('required_event_goal_crafting_participation', value)
+        }
+        error={errors.required_event_goal_crafting_participation}
+      />
+      <NumberField
+        id="guide-quest-required-event-goal-enchanting-participation"
+        label="Required Event Goal Enchanting Count"
+        value={state.required_event_goal_enchanting_participation}
+        on_change={(value) =>
+          onChange('required_event_goal_enchanting_participation', value)
+        }
+        error={errors.required_event_goal_enchanting_participation}
+      />
     </div>
   );
 };

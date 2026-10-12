@@ -5,12 +5,13 @@ namespace Tests\Feature\Admin\GuideQuests;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateGuideQuest;
+use Tests\Traits\CreateItem;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateUser;
 
 class GuideQuestsAdminControllerTest extends TestCase
 {
-    use CreateGuideQuest, CreateRole, CreateUser, RefreshDatabase;
+    use CreateGuideQuest, CreateItem, CreateRole, CreateUser, RefreshDatabase;
 
     public function test_index_renders_the_modern_admin_shell(): void
     {
@@ -93,5 +94,100 @@ class GuideQuestsAdminControllerTest extends TestCase
 
         $this->assertSame(200, $response->getStatusCode());
         $response->assertSee('data-guide-quest-id="0"', false);
+    }
+
+    public function test_full_guide_quest_content_payload_is_accepted(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $guideQuest = $this->createGuideQuest();
+
+        $this->actingAs($admin)
+            ->postJson('/api/admin/store-guide-quest', [
+                'guide_quest_id' => $guideQuest->id,
+                'has_image' => false,
+                'content' => [
+                    'name' => 'Updated Guide Quest',
+                    'instructions' => 'Inspect the complete form.',
+                    'intro_text' => [],
+                    'desktop_instructions' => [],
+                    'mobile_instructions' => [],
+                    'required_level' => 10,
+                    'required_training_xp_sacrifice' => 0.25,
+                    'required_batch_crafted_items' => [],
+                ],
+            ])
+            ->assertOk()
+            ->assertJsonPath('guide_quest.name', 'Updated Guide Quest');
+    }
+
+    public function test_unexpected_guide_quest_content_key_is_rejected(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+
+        $this->actingAs($admin)
+            ->postJson('/api/admin/store-guide-quest', [
+                'guide_quest_id' => 0,
+                'has_image' => false,
+                'content' => ['name' => 'Guide Quest', 'id' => 123],
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('content');
+    }
+
+    public function test_guide_quest_name_is_required(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+
+        $this->actingAs($admin)
+            ->postJson('/api/admin/store-guide-quest', [
+                'guide_quest_id' => 0,
+                'has_image' => false,
+                'content' => [],
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('content.name')
+            ->assertJsonFragment(['Guide Quest Name is required.']);
+    }
+
+    public function test_training_xp_sacrifice_must_be_within_ratio_range(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+
+        $this->actingAs($admin)
+            ->postJson('/api/admin/store-guide-quest', [
+                'guide_quest_id' => 0,
+                'has_image' => false,
+                'content' => [
+                    'name' => 'Guide Quest',
+                    'required_training_xp_sacrifice' => 2,
+                ],
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('content.required_training_xp_sacrifice')
+            ->assertJsonFragment(['Training XP Sacrifice cannot be above 1.']);
+    }
+
+    public function test_batch_crafted_item_amount_must_be_at_least_one(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $item = $this->createItem();
+
+        $this->actingAs($admin)
+            ->postJson('/api/admin/store-guide-quest', [
+                'guide_quest_id' => 0,
+                'has_image' => false,
+                'content' => [
+                    'name' => 'Guide Quest',
+                    'required_batch_crafted_items' => [[
+                        'source' => 'inventory',
+                        'item_id' => $item->id,
+                        'amount' => 0,
+                        'must_be_enchanted' => false,
+                    ]],
+                ],
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('content.required_batch_crafted_items.0.amount')
+            ->assertJsonFragment(['Required crafted item amount must be at least 1.']);
     }
 }

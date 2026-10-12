@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import UseFetchGuideQuestParamsDefinition from './definitions/use-fetch-guide-quest-params-definition';
 import UseFetchGuideQuestsDefinition from './definitions/use-fetch-guide-quests-definition';
-import GuideQuestResponseDefinition from '../definitions/guide-quest-response-defintion';
+import GuideQuestResponseDefinition from '../definitions/guide-quest-response-definition';
 import { GuideQuestApiUrls } from '../enums/guide-quest-api-urls';
 
 export const useFetchGuideQuest = ({

@@ -1,121 +1,83 @@
-import GuideQuestDefinition, {
-  GuideQuestContentBlockDefinition,
-} from '../api/definitions/guide-quest-definition';
-import UseStoreGuideQuestRequestDefinition from '../api/hooks/definitions/use-store-guide-quest-request-definition';
-import StepSliceDefinition from '../definitions/step-slice-definition';
+import { GuideQuestContentBlockDefinition } from '../api/definitions/guide-quest-definition';
+import GuideQuestFormStateDefinition from '../definitions/guide-quest-form-state-definition';
 
-/**
- * Append a single content-block array (intro/desktop/mobile) to FormData.
- * @param form FormData to mutate
- * @param key One of "intro_text" | "desktop_instructions" | "mobile_instructions"
- * @param blocks Array of content blocks
- * @return void
- */
-export function appendContentBlocksToForm(
-  form: FormData,
-  key: 'intro_text' | 'desktop_instructions' | 'mobile_instructions',
+const CONTENT_FIELDS = [
+  'intro_text',
+  'desktop_instructions',
+  'mobile_instructions',
+] as const;
+
+const appendContentBlocks = (
+  formData: FormData,
+  field: (typeof CONTENT_FIELDS)[number],
   blocks: GuideQuestContentBlockDefinition[]
-): void {
-  blocks.forEach((block, index) => {
-    form.append(`${key}[${index}][id]`, block?.id ?? '');
-    form.append(`${key}[${index}][content]`, block?.content ?? '');
-
-    if (block?.image_url instanceof File) {
-      form.append(`${key}[${index}][image_url]`, block.image_url);
-    } else if (typeof block?.image_url === 'string') {
-      form.append(`${key}[${index}][image_url]`, block.image_url);
-    } else {
-      form.append(`${key}[${index}][image_url]`, '');
-    }
-  });
-}
-
-/**
- * Build a FormData snapshot from a step slice, handling block arrays and primitives.
- * @param slice Step slice object (maybe undefined)
- * @return FormData containing the serialized slice
- */
-export function buildFormDataFromSlice(
-  slice: StepSliceDefinition | undefined
-): FormData {
-  const form = new FormData();
-
-  if (!slice) {
-    return form;
+): void => {
+  if (blocks.length === 0) {
+    formData.append(`content[${field}]`, '');
+    return;
   }
 
-  Object.entries(slice).forEach(([key, value]) => {
-    if (
-      key === 'intro_text' ||
-      key === 'desktop_instructions' ||
-      key === 'mobile_instructions'
-    ) {
-      if (Array.isArray(value)) {
-        appendContentBlocksToForm(
-          form,
-          key,
-          value as GuideQuestContentBlockDefinition[]
-        );
-      }
+  blocks.forEach((block, index) => {
+    formData.append(`content[${field}][${index}][id]`, block.id);
+    formData.append(`content[${field}][${index}][content]`, block.content);
+    formData.append(
+      `content[${field}][${index}][image_url]`,
+      block.image_url ?? ''
+    );
+  });
+};
+
+export const buildGuideQuestFormData = (
+  state: GuideQuestFormStateDefinition
+): FormData => {
+  const formData = new FormData();
+
+  Object.entries(state).forEach(([field, value]) => {
+    if (field === 'walkthrough_steps') {
       return;
     }
 
-    if (value !== null && value !== undefined) {
-      form.append(key, String(value as string | number | boolean));
+    if (CONTENT_FIELDS.includes(field as (typeof CONTENT_FIELDS)[number])) {
+      appendContentBlocks(
+        formData,
+        field as (typeof CONTENT_FIELDS)[number],
+        value as GuideQuestContentBlockDefinition[]
+      );
+      return;
     }
+
+    if (field === 'required_batch_crafted_items') {
+      const rows =
+        value as GuideQuestFormStateDefinition['required_batch_crafted_items'];
+      rows.forEach((row, index) => {
+        Object.entries(row).forEach(([rowField, rowValue]) => {
+          formData.append(
+            `content[required_batch_crafted_items][${index}][${rowField}]`,
+            typeof rowValue === 'boolean'
+              ? rowValue
+                ? '1'
+                : '0'
+              : String(rowValue ?? '')
+          );
+        });
+      });
+      return;
+    }
+
+    if (typeof value === 'boolean') {
+      formData.append(`content[${field}]`, value ? '1' : '0');
+      return;
+    }
+
+    formData.append(`content[${field}]`, String(value ?? ''));
   });
 
-  return form;
-}
+  return formData;
+};
 
-/**
- * Determine if a step slice contains any uploaded images in its block arrays.
- * @param slice Step slice object (maybe undefined)
- * @return true if any block has a non-null image_url; otherwise false
- */
-export function hasImagesInSlice(
-  slice: Partial<GuideQuestDefinition> | undefined
-): boolean {
-  if (!slice) {
-    return false;
-  }
-
-  const keys: Array<keyof Partial<GuideQuestDefinition>> = [
-    'intro_text',
-    'desktop_instructions',
-    'mobile_instructions',
-  ];
-
-  for (const k of keys) {
-    const blocks = slice[k];
-
-    if (
-      Array.isArray(blocks) &&
-      blocks.some((b) => (b as GuideQuestContentBlockDefinition)?.image_url)
-    ) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-/**
- * Construct the request object expected by the submitter for a given step.
- * @param guideQuestId Numeric guide quest id (0 for create)
- * @param slice Step slice object (maybe undefined)
- * @return FormRequestDefinition containing form_data and has_images
- */
-export function makeRequestObject(
-  guideQuestId: number,
-  slice: Partial<GuideQuestDefinition>
-): UseStoreGuideQuestRequestDefinition {
-  const form_data = buildFormDataFromSlice(slice);
-  const has_images = hasImagesInSlice(slice);
-
-  return {
-    guide_quest_id: guideQuestId,
-    content: form_data,
-    has_image: has_images,
-  };
-}
+export const guideQuestFormHasImages = (
+  state: GuideQuestFormStateDefinition
+): boolean =>
+  CONTENT_FIELDS.some((field) =>
+    state[field].some((block) => block.image_url !== null)
+  );

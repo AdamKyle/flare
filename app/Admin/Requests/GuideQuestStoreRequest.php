@@ -30,6 +30,28 @@ class GuideQuestStoreRequest extends FormRequest
     ];
 
     /**
+     * Normalize empty multipart content collections before validation.
+     *
+     * @return void
+     */
+    protected function prepareForValidation(): void
+    {
+        $content = $this->input('content');
+
+        if (! is_array($content)) {
+            return;
+        }
+
+        foreach (['intro_text', 'desktop_instructions', 'mobile_instructions'] as $field) {
+            if (($content[$field] ?? null) === '') {
+                $content[$field] = [];
+            }
+        }
+
+        $this->merge(['content' => $content]);
+    }
+
+    /**
      * Determine if the user is authorized to make this request.
      *
      * @return bool
@@ -50,7 +72,7 @@ class GuideQuestStoreRequest extends FormRequest
             'guide_quest_id' => 'required|integer',
             'has_image' => 'required|boolean',
             'content' => ['required', 'array:'.implode(',', self::CONTENT_FIELDS)],
-            'content.name' => 'sometimes|required|string|max:255',
+            'content.name' => 'required|string|max:255',
             'content.instructions' => 'sometimes|nullable|string',
             'content.intro_text' => 'sometimes|array',
             'content.desktop_instructions' => 'sometimes|array',
@@ -95,6 +117,11 @@ class GuideQuestStoreRequest extends FormRequest
     {
         return [
             'guide_quest_id' => 'What guide quest do you want to manage?',
+            'content.name.required' => 'Guide Quest Name is required.',
+            'content.required_training_xp_sacrifice.numeric' => 'Training XP Sacrifice must be a number.',
+            'content.required_training_xp_sacrifice.min' => 'Training XP Sacrifice cannot be below 0.',
+            'content.required_training_xp_sacrifice.max' => 'Training XP Sacrifice cannot be above 1.',
+            'content.required_batch_crafted_items.*.amount.min' => 'Required crafted item amount must be at least 1.',
         ];
     }
 }

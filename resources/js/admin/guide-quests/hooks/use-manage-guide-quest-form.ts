@@ -1,103 +1,122 @@
-import { isEmpty } from 'lodash';
-import { useCallback, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import UseManageGuideQuestFormDefinition from './definitions/use-manage-guide-quest-form-definition';
 import UseManageGuideQuestFormParams from './definitions/use-manage-guide-quest-form-params';
-import GuideQuestDefinition, {
-  GuideQuestWalkthroughStepDefinition,
-} from '../api/definitions/guide-quest-definition';
-import { useStoreGuideQuestContent } from '../api/hooks/use-store-guide-quest-content';
+import { useSaveGuideQuest } from '../api/hooks/use-save-guide-quest';
 import { useStoreGuideQuestWalkthrough } from '../api/hooks/use-store-guide-quest-walkthrough';
-import { makeRequestObject } from '../utils/guide-quest-form-data-util';
-
-const LAST_STEP_INDEX = 13;
-const FIRST_OPTIONAL_STEP_INDEX = 5;
+import GuideQuestFormErrorsDefinition from '../definitions/guide-quest-form-errors-definition';
+import GuideQuestFormStateDefinition from '../definitions/guide-quest-form-state-definition';
+import {
+  createEmptyGuideQuestFormState,
+  createGuideQuestFormState,
+} from '../utils/guide-quest-form-state';
+import {
+  validateGuideQuestForm,
+  validateGuideQuestStep,
+} from '../utils/guide-quest-form-validation';
 
 export const useManageGuideQuestForm = ({
   guide_quest_id: guideQuestId,
   data,
   updateGuideQuest,
 }: UseManageGuideQuestFormParams): UseManageGuideQuestFormDefinition => {
-  const [formData, setFormData] = useState<
-    Array<Partial<GuideQuestDefinition> | null>
-  >([]);
+  const [formState, setFormState] = useState<GuideQuestFormStateDefinition>(
+    () => ({
+      ...(data.guide_quest
+        ? createGuideQuestFormState(data.guide_quest)
+        : createEmptyGuideQuestFormState()),
+      walkthrough_steps: data.walkthrough_steps,
+    })
+  );
+  const [clientErrors, setClientErrors] =
+    useState<GuideQuestFormErrorsDefinition>({});
   const {
-    loading: isContentSaving,
+    saving,
     error: contentError,
-    storeGuideQuestContent,
-  } = useStoreGuideQuestContent({ update_guide_quest: updateGuideQuest });
+    field_errors: serverFieldErrors,
+    save,
+    clear_field_error: clearServerFieldError,
+  } = useSaveGuideQuest();
   const {
     error: walkthroughError,
-    loading: isWalkthroughSaving,
+    loading: walkthroughSaving,
     storeWalkthrough,
   } = useStoreGuideQuestWalkthrough();
-
-  const setStepData = useCallback(
-    (step: number, stepData: Partial<GuideQuestDefinition>): void => {
-      setFormData((previous) => {
-        const next = previous.slice();
-
-        if (next.length <= step) {
-          next.length = step + 1;
-        }
-
-        next[step] = stepData;
-
-        return next;
-      });
-    },
-    []
+  const fieldErrors = useMemo(
+    () => ({ ...clientErrors, ...serverFieldErrors }),
+    [clientErrors, serverFieldErrors]
   );
 
-  const setWalkthroughSteps = useCallback(
-    (steps: GuideQuestWalkthroughStepDefinition[]): void => {
-      setStepData(4, { walkthrough_steps: steps });
-    },
-    [setStepData]
-  );
-
-  const handleNextStep = async (currentIndex: number): Promise<boolean> => {
-    const stepData = formData[currentIndex];
-    const isStepEmpty = !stepData || isEmpty(stepData);
-
-    if (
-      currentIndex >= FIRST_OPTIONAL_STEP_INDEX &&
-      currentIndex < LAST_STEP_INDEX &&
-      isStepEmpty
-    ) {
-      return true;
-    }
-
-    const currentQuestId = data?.guide_quest?.id ?? guideQuestId;
-
-    if (currentIndex === 4) {
-      if (currentQuestId <= 0) {
-        return false;
+  const updateField: UseManageGuideQuestFormDefinition['update_field'] = (
+    field,
+    value
+  ) => {
+    setFormState((previous) => ({ ...previous, [field]: value }));
+    clearServerFieldError(field);
+    setClientErrors((previous) => {
+      if (!(field in previous)) {
+        return previous;
       }
 
-      return storeWalkthrough(
-        currentQuestId,
-        stepData?.walkthrough_steps ?? []
-      );
+      const next = { ...previous };
+      delete next[field];
+      return next;
+    });
+  };
+
+  const updateWalkthroughSteps: UseManageGuideQuestFormDefinition['update_walkthrough_steps'] =
+    (steps) => updateField('walkthrough_steps', steps);
+
+  const validateStep = (stepIndex: number): boolean => {
+    const errors = validateGuideQuestStep(stepIndex, formState);
+    setClientErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const submit = async () => {
+    const validationErrors = validateGuideQuestForm(formState);
+    setClientErrors(validationErrors);
+
+    if (Object.keys(validationErrors).length > 0) {
+      return null;
     }
 
-    const saved = await storeGuideQuestContent(
-      makeRequestObject(currentQuestId, stepData ?? {})
+    const savedGuideQuest = await save(guideQuestId, formState);
+
+    if (!savedGuideQuest) {
+      return null;
+    }
+
+    const walkthroughSaved = await storeWalkthrough(
+      savedGuideQuest.id,
+      formState.walkthrough_steps
     );
 
-    if (saved && currentIndex === LAST_STEP_INDEX) {
-      window.location.assign(`/admin/guide-quests/show/${currentQuestId}`);
+    if (!walkthroughSaved) {
+      return null;
     }
 
-    return saved;
+    updateGuideQuest({
+      ...data,
+      guide_quest: {
+        ...savedGuideQuest,
+        walkthrough_steps: formState.walkthrough_steps,
+      },
+      walkthrough_steps: formState.walkthrough_steps,
+    });
+
+    return savedGuideQuest;
   };
 
   return {
-    handleNextStep,
-    setStepData,
-    setWalkthroughSteps,
-    isSaving: isContentSaving || isWalkthroughSaving,
-    formError:
+    form_state: formState,
+    field_errors: fieldErrors,
+    update_field: updateField,
+    update_walkthrough_steps: updateWalkthroughSteps,
+    validate_step: validateStep,
+    submit,
+    is_saving: saving || walkthroughSaving,
+    save_error:
       contentError ??
       (walkthroughError === null ? null : { message: walkthroughError }),
   };

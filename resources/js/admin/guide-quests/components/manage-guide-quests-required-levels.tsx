@@ -1,212 +1,145 @@
-import { range, zipObject } from 'lodash';
-import React, { useMemo } from 'react';
+import React, { ReactNode } from 'react';
 
-import ManageGuideQuestStepProps from './types/manage-guide-quest-step-props';
-import { useManageFormSectionData } from '../hooks/use-manage-form-section-data';
+import GuideQuestFormFieldsProps from './types/guide-quest-form-fields-props';
+import {
+  guideQuestDropdownItems,
+  selectedGuideQuestOption,
+} from '../utils/guide-quest-form-options';
 
 import Dropdown from 'ui/drop-down/drop-down';
-import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
-import Input from 'ui/input/input';
+import FieldWrapper from 'ui/forms/field-wrapper';
+import NumberField from 'ui/forms/number-field';
 
 const ManageGuideQuestsRequiredLevels = ({
-  data_for_component,
-  on_update,
-}: ManageGuideQuestStepProps) => {
-  const { convertObjectToKeyValue, handleUpdateFormData } =
-    useManageFormSectionData({
-      on_update,
-      initial_values: data_for_component.guide_quest,
-    });
+  state,
+  errors,
+  form_options: formOptions,
+  on_change: onChange,
+}: GuideQuestFormFieldsProps): ReactNode => {
+  const skillItems = guideQuestDropdownItems(formOptions.game_skills);
+  const skillTypeItems = formOptions.skill_types.map((label, value) => ({
+    value,
+    label,
+  }));
 
-  const guideQuest = data_for_component.guide_quest ?? null;
-
-  const getDefaultString = (candidate?: number | string | null): string => {
-    if (!candidate) {
-      return '';
-    }
-
-    return String(candidate);
-  };
-
-  const skillItems = useMemo(() => {
-    return convertObjectToKeyValue(data_for_component.game_skills);
-  }, [convertObjectToKeyValue, data_for_component.game_skills]);
-
-  const skillTypeItems = useMemo(() => {
-    const map = zipObject(
-      range(data_for_component.skill_types.length),
-      data_for_component.skill_types
-    );
-    return convertObjectToKeyValue(map);
-  }, [convertObjectToKeyValue, data_for_component.skill_types]);
-
-  const getPreselected = (
-    items: DropdownItem[],
-    candidate: number | null | undefined
-  ): DropdownItem | undefined => {
-    if (candidate === null || candidate === undefined) {
-      return undefined;
-    }
-
-    const valueAsString = String(candidate);
-
-    const found = items.find((item) => item.value === valueAsString);
-
-    if (!found) {
-      return undefined;
-    }
-
-    return found;
-  };
-
-  const preselectedRequiredSkill = useMemo(() => {
-    return getPreselected(skillItems, guideQuest?.required_skill);
-  }, [skillItems, guideQuest?.required_skill]);
-
-  const preselectedSecondarySkill = useMemo(() => {
-    return getPreselected(skillItems, guideQuest?.required_secondary_skill);
-  }, [skillItems, guideQuest?.required_secondary_skill]);
-
-  const preselectedTrainingSkill = useMemo(() => {
-    return getPreselected(skillItems, guideQuest?.required_training_skill);
-  }, [skillItems, guideQuest?.required_training_skill]);
-
-  const preselectedSkillType = useMemo(() => {
-    return getPreselected(skillTypeItems, guideQuest?.required_skill_type);
-  }, [skillTypeItems, guideQuest?.required_skill_type]);
+  const renderSkill = (
+    id: string,
+    label: string,
+    field:
+      'required_training_skill' | 'required_skill' | 'required_secondary_skill',
+    value: number | null
+  ) => (
+    <FieldWrapper id={id} label={label} error={errors[field]}>
+      {(describedBy) => (
+        <Dropdown
+          id={id}
+          items={skillItems}
+          pre_selected_item={selectedGuideQuestOption(skillItems, value)}
+          selection_placeholder="No required skill"
+          on_select={(item) => onChange(field, Number(item.value))}
+          on_clear={() => onChange(field, null)}
+          aria_described_by={describedBy}
+          aria_invalid={!!errors[field]}
+        />
+      )}
+    </FieldWrapper>
+  );
 
   return (
     <div className="space-y-4">
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
-          Required Character Level
-        </label>
-        <Input
-          default_value={getDefaultString(guideQuest?.required_level)}
-          on_change={(value) => handleUpdateFormData('required_level', value)}
-        />
-      </div>
-
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
-          Required Exploration Hours
-        </label>
-        <Input
-          default_value={getDefaultString(
-            guideQuest?.required_exploration_hours
-          )}
-          on_change={(value) =>
-            handleUpdateFormData('required_exploration_hours', value)
-          }
-        />
-      </div>
-
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
-          Required Training Skill
-        </label>
-        <Dropdown
-          items={skillItems}
-          pre_selected_item={preselectedTrainingSkill}
-          on_select={(value) =>
-            handleUpdateFormData('required_training_skill', value)
-          }
-        />
-      </div>
-
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
-          Required Training XP Sacrifice
-        </label>
-        <p className="mb-2 text-xs text-gray-600 dark:text-gray-400">
-          Enter a decimal fraction; 0.10 equals 10%.
-        </p>
-        <Input
-          default_value={getDefaultString(
-            guideQuest?.required_training_xp_sacrifice
-          )}
-          on_change={(value) =>
-            handleUpdateFormData('required_training_xp_sacrifice', value)
-          }
-        />
-      </div>
-
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
-          Required Skill
-        </label>
-        <Dropdown
-          items={skillItems}
-          pre_selected_item={preselectedRequiredSkill}
-          on_select={(value) => handleUpdateFormData('required_skill', value)}
-        />
-      </div>
-
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
-          Required Skill Level
-        </label>
-        <Input
-          default_value={getDefaultString(guideQuest?.required_skill_level)}
-          on_change={(value) =>
-            handleUpdateFormData('required_skill_level', value)
-          }
-        />
-      </div>
-
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
-          Secondary Required Skill
-        </label>
-        <Dropdown
-          items={skillItems}
-          pre_selected_item={preselectedSecondarySkill}
-          on_select={(value) =>
-            handleUpdateFormData('required_secondary_skill', value)
-          }
-        />
-      </div>
-
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
-          Secondary Required Skill Level
-        </label>
-        <Input
-          default_value={getDefaultString(
-            guideQuest?.required_secondary_skill_level
-          )}
-          on_change={(value) =>
-            handleUpdateFormData('required_secondary_skill_level', value)
-          }
-        />
-      </div>
-
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
-          Required Skill Type
-        </label>
-        <Dropdown
-          items={skillTypeItems}
-          pre_selected_item={preselectedSkillType}
-          on_select={(value) =>
-            handleUpdateFormData('required_skill_type', value)
-          }
-        />
-      </div>
-
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
-          Required Skill Type Level
-        </label>
-        <Input
-          default_value={getDefaultString(
-            guideQuest?.required_skill_type_level
-          )}
-          on_change={(value) =>
-            handleUpdateFormData('required_skill_type_level', value)
-          }
-        />
-      </div>
+      <NumberField
+        id="guide-quest-required-level"
+        label="Required Character Level"
+        value={state.required_level}
+        on_change={(value) => onChange('required_level', value)}
+        error={errors.required_level}
+      />
+      <NumberField
+        id="guide-quest-required-exploration-hours"
+        label="Required Exploration Hours"
+        value={state.required_exploration_hours}
+        on_change={(value) => onChange('required_exploration_hours', value)}
+        error={errors.required_exploration_hours}
+      />
+      {renderSkill(
+        'guide-quest-required-training-skill',
+        'Required Training Skill',
+        'required_training_skill',
+        state.required_training_skill
+      )}
+      <NumberField
+        id="guide-quest-required-training-xp-sacrifice"
+        label="Required Training XP Sacrifice"
+        description="Enter a decimal fraction; 0.10 equals 10%."
+        min={0}
+        max={1}
+        value={state.required_training_xp_sacrifice}
+        on_change={(value) => onChange('required_training_xp_sacrifice', value)}
+        error={errors.required_training_xp_sacrifice}
+      />
+      <NumberField
+        id="guide-quest-required-reincarnation-amount"
+        label="Required Reincarnation Amount"
+        value={state.required_reincarnation_amount}
+        on_change={(value) => onChange('required_reincarnation_amount', value)}
+        error={errors.required_reincarnation_amount}
+      />
+      {renderSkill(
+        'guide-quest-required-skill',
+        'Required Skill',
+        'required_skill',
+        state.required_skill
+      )}
+      <NumberField
+        id="guide-quest-required-skill-level"
+        label="Required Skill Level"
+        value={state.required_skill_level}
+        on_change={(value) => onChange('required_skill_level', value)}
+        error={errors.required_skill_level}
+      />
+      {renderSkill(
+        'guide-quest-required-secondary-skill',
+        'Secondary Required Skill',
+        'required_secondary_skill',
+        state.required_secondary_skill
+      )}
+      <NumberField
+        id="guide-quest-required-secondary-skill-level"
+        label="Secondary Required Skill Level"
+        value={state.required_secondary_skill_level}
+        on_change={(value) => onChange('required_secondary_skill_level', value)}
+        error={errors.required_secondary_skill_level}
+      />
+      <FieldWrapper
+        id="guide-quest-required-skill-type"
+        label="Required Skill Type"
+        error={errors.required_skill_type}
+      >
+        {(describedBy) => (
+          <Dropdown
+            id="guide-quest-required-skill-type"
+            items={skillTypeItems}
+            pre_selected_item={selectedGuideQuestOption(
+              skillTypeItems,
+              state.required_skill_type
+            )}
+            selection_placeholder="No required skill type"
+            on_select={(item) =>
+              onChange('required_skill_type', Number(item.value))
+            }
+            on_clear={() => onChange('required_skill_type', null)}
+            aria_described_by={describedBy}
+            aria_invalid={!!errors.required_skill_type}
+          />
+        )}
+      </FieldWrapper>
+      <NumberField
+        id="guide-quest-required-skill-type-level"
+        label="Required Skill Type Level"
+        value={state.required_skill_type_level}
+        on_change={(value) => onChange('required_skill_type_level', value)}
+        error={errors.required_skill_type_level}
+      />
     </div>
   );
 };

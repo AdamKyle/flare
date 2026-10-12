@@ -1,92 +1,51 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 
-import ManageGuideQuestStepProps from './types/manage-guide-quest-step-props';
-import { useManageFormSectionData } from '../hooks/use-manage-form-section-data';
+import GuideQuestFormFieldsProps from './types/guide-quest-form-fields-props';
 
-import Input from 'ui/input/input';
+import NumberField from 'ui/forms/number-field';
 
 const ManageGuideQuestsRewardsAndBonuses = ({
-  data_for_component,
-  on_update,
-}: ManageGuideQuestStepProps) => {
-  const { handleUpdateFormData } = useManageFormSectionData({
-    on_update,
-    initial_values: data_for_component.guide_quest,
-  });
-
-  const guideQuest = data_for_component.guide_quest ?? null;
-
-  const getDefaultString = (candidate?: number | string | null): string => {
-    if (!candidate) {
-      return '';
-    }
-
-    return String(candidate);
-  };
-
-  return (
-    <div className="space-y-4">
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
-          Extra Faction Points Per Kill
-        </label>
-        <Input
-          default_value={getDefaultString(guideQuest?.faction_points_per_kill)}
-          on_change={(value) =>
-            handleUpdateFormData('faction_points_per_kill', value)
-          }
-        />
-      </div>
-
-      <div className="my-4 flex items-center">
-        <span className="h-px flex-1 bg-gray-300 dark:bg-gray-700" />
-        <span className="px-3 text-sm text-gray-500 dark:text-gray-400">
-          Reward Section
-        </span>
-        <span className="h-px flex-1 bg-gray-300 dark:bg-gray-700" />
-      </div>
-
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
-          XP Reward
-        </label>
-        <Input
-          default_value={getDefaultString(guideQuest?.xp_reward)}
-          on_change={(value) => handleUpdateFormData('xp_reward', value)}
-        />
-      </div>
-
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
-          Gold Reward
-        </label>
-        <Input
-          default_value={getDefaultString(guideQuest?.gold_reward)}
-          on_change={(value) => handleUpdateFormData('gold_reward', value)}
-        />
-      </div>
-
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
-          Gold Dust Rewards
-        </label>
-        <Input
-          default_value={getDefaultString(guideQuest?.gold_dust_reward)}
-          on_change={(value) => handleUpdateFormData('gold_dust_reward', value)}
-        />
-      </div>
-
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
-          Shards Reward
-        </label>
-        <Input
-          default_value={getDefaultString(guideQuest?.shards_reward)}
-          on_change={(value) => handleUpdateFormData('shards_reward', value)}
-        />
-      </div>
-    </div>
-  );
-};
+  state,
+  errors,
+  on_change: onChange,
+}: GuideQuestFormFieldsProps): ReactNode => (
+  <div className="space-y-4">
+    <NumberField
+      id="guide-quest-faction-points-per-kill"
+      label="Extra Faction Points Per Kill"
+      value={state.faction_points_per_kill}
+      on_change={(value) => onChange('faction_points_per_kill', value)}
+      error={errors.faction_points_per_kill}
+    />
+    <NumberField
+      id="guide-quest-xp-reward"
+      label="XP Reward"
+      value={state.xp_reward}
+      on_change={(value) => onChange('xp_reward', value)}
+      error={errors.xp_reward}
+    />
+    <NumberField
+      id="guide-quest-gold-reward"
+      label="Gold Reward"
+      value={state.gold_reward}
+      on_change={(value) => onChange('gold_reward', value)}
+      error={errors.gold_reward}
+    />
+    <NumberField
+      id="guide-quest-gold-dust-reward"
+      label="Gold Dust Rewards"
+      value={state.gold_dust_reward}
+      on_change={(value) => onChange('gold_dust_reward', value)}
+      error={errors.gold_dust_reward}
+    />
+    <NumberField
+      id="guide-quest-shards-reward"
+      label="Shards Reward"
+      value={state.shards_reward}
+      on_change={(value) => onChange('shards_reward', value)}
+      error={errors.shards_reward}
+    />
+  </div>
+);
 
 export default ManageGuideQuestsRewardsAndBonuses;

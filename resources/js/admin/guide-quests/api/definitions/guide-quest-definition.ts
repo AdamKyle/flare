@@ -15,6 +15,13 @@ export interface GuideQuestWalkthroughStepDefinition {
   optional_if_target_missing: boolean;
 }
 
+export interface GuideQuestBatchCraftedItemDefinition {
+  source: 'inventory' | 'alchemy_bag';
+  item_id: number | null;
+  amount: number | string;
+  must_be_enchanted: boolean;
+}
+
 export default interface GuideQuestDefinition {
   id: number;
   name: string;
@@ -26,6 +33,7 @@ export default interface GuideQuestDefinition {
   required_exploration_hours: number | null;
   required_training_skill: number | null;
   required_training_xp_sacrifice: number | null;
+  required_reincarnation_amount: number | null;
   required_skill: number | null;
   required_skill_level: number | null;
   required_faction_id: number | null;
@@ -76,5 +84,14 @@ export default interface GuideQuestDefinition {
   required_copper_coins: number | null;
   required_specialty_type: string | null;
   required_fame_level: number | null;
+  must_be_pledged_to_faction: boolean | number | null;
+  must_be_assisting_npc: boolean | number | null;
+  required_delve_survival_time: number | null;
+  required_delve_pack_size: number | null;
+  required_batch_crafting_type: string | null;
+  required_batch_crafting_hours: number | null;
+  required_batch_crafted_items: GuideQuestBatchCraftedItemDefinition[] | null;
+  required_event_goal_crafting_participation: number | null;
+  required_event_goal_enchanting_participation: number | null;
   walkthrough_steps: GuideQuestWalkthroughStepDefinition[];
 }

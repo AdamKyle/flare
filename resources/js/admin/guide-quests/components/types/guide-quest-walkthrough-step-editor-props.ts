@@ -1,5 +1,5 @@
 import { GuideQuestWalkthroughStepDefinition } from '../../api/definitions/guide-quest-definition';
-import GuideQuestResponseDefinition from '../../api/definitions/guide-quest-response-defintion';
+import GuideQuestResponseDefinition from '../../api/definitions/guide-quest-response-definition';
 
 export default interface GuideQuestWalkthroughStepEditorProps {
   step: GuideQuestWalkthroughStepDefinition;

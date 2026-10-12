@@ -6,7 +6,7 @@ export interface GuideQuestWalkthroughOptionDefinition {
 }
 
 export default interface GuideQuestResponseDefinition {
-  guide_quest: GuideQuestDefinition;
+  guide_quest: GuideQuestDefinition | null;
   game_skills: { [key: number]: string };
   faction_maps: { [key: number]: string };
   quests: { [key: number]: string };

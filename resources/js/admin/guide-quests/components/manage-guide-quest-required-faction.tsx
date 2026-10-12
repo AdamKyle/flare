@@ -1,75 +1,62 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 
-import ManageGuideQuestStepProps from './types/manage-guide-quest-step-props';
-import { useManageFormSectionData } from '../hooks/use-manage-form-section-data';
+import GuideQuestFormFieldsProps from './types/guide-quest-form-fields-props';
+import {
+  guideQuestDropdownItems,
+  selectedGuideQuestOption,
+} from '../utils/guide-quest-form-options';
 
 import Dropdown from 'ui/drop-down/drop-down';
-import Input from 'ui/input/input';
+import FieldWrapper from 'ui/forms/field-wrapper';
+import NumberField from 'ui/forms/number-field';
 
 const ManageGuideQuestRequiredFaction = ({
-  data_for_component,
-  on_update,
-}: ManageGuideQuestStepProps) => {
-  const { convertObjectToKeyValue, handleUpdateFormData, getPreSelected } =
-    useManageFormSectionData({
-      on_update,
-      initial_values: data_for_component.guide_quest,
-    });
-
-  const guideQuest = data_for_component.guide_quest ?? null;
-
-  const getDefaultString = (candidate?: number | string | null): string => {
-    if (!candidate) {
-      return '';
-    }
-
-    return String(candidate);
-  };
-
-  const factionItems = convertObjectToKeyValue(data_for_component.faction_maps);
-  const preSelectedFaction = getPreSelected(
-    factionItems,
-    guideQuest?.required_faction_id
-  );
+  state,
+  errors,
+  form_options: formOptions,
+  on_change: onChange,
+}: GuideQuestFormFieldsProps): ReactNode => {
+  const factionItems = guideQuestDropdownItems(formOptions.faction_maps);
 
   return (
     <div className="space-y-4">
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
-          Required Faction
-        </label>
-        <Dropdown
-          items={factionItems}
-          pre_selected_item={preSelectedFaction}
-          on_select={(value) =>
-            handleUpdateFormData('required_faction_id', value)
-          }
-        />
-      </div>
-
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
-          Required Faction Level
-        </label>
-        <Input
-          default_value={getDefaultString(guideQuest?.required_faction_level)}
-          on_change={(value) =>
-            handleUpdateFormData('required_faction_level', value)
-          }
-        />
-      </div>
-
-      <div>
-        <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">
-          Required Fame Level
-        </label>
-        <Input
-          default_value={getDefaultString(guideQuest?.required_fame_level)}
-          on_change={(value) =>
-            handleUpdateFormData('required_fame_level', value)
-          }
-        />
-      </div>
+      <FieldWrapper
+        id="guide-quest-required-faction"
+        label="Required Faction"
+        error={errors.required_faction_id}
+      >
+        {(describedBy) => (
+          <Dropdown
+            id="guide-quest-required-faction"
+            items={factionItems}
+            pre_selected_item={selectedGuideQuestOption(
+              factionItems,
+              state.required_faction_id
+            )}
+            selection_placeholder="No required faction"
+            on_select={(item) =>
+              onChange('required_faction_id', Number(item.value))
+            }
+            on_clear={() => onChange('required_faction_id', null)}
+            aria_described_by={describedBy}
+            aria_invalid={!!errors.required_faction_id}
+          />
+        )}
+      </FieldWrapper>
+      <NumberField
+        id="guide-quest-required-faction-level"
+        label="Required Faction Level"
+        value={state.required_faction_level}
+        on_change={(value) => onChange('required_faction_level', value)}
+        error={errors.required_faction_level}
+      />
+      <NumberField
+        id="guide-quest-required-fame-level"
+        label="Required Fame Level"
+        value={state.required_fame_level}
+        on_change={(value) => onChange('required_fame_level', value)}
+        error={errors.required_fame_level}
+      />
     </div>
   );
 };
