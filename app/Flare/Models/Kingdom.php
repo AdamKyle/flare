@@ -238,9 +238,19 @@ class Kingdom extends Model
         return $this->hasMany(CapitalCityUnitQueue::class, 'kingdom_id', 'id');
     }
 
+    public function unitRecruitmentQueue()
+    {
+        return $this->hasMany(UnitInQueue::class, 'kingdom_id', 'id');
+    }
+
     public function unitsMovementQueue()
     {
         return $this->hasMany(UnitMovementQueue::class, 'from_kingdom_id', 'id');
+    }
+
+    public function incomingUnitsMovementQueue()
+    {
+        return $this->hasMany(UnitMovementQueue::class, 'to_kingdom_id', 'id');
     }
 
     public function character()

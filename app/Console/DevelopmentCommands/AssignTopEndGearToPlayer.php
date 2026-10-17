@@ -31,7 +31,7 @@ class AssignTopEndGearToPlayer extends Command
     /**
      * Execute the console command.
      */
-    public function handle(): void
+    public function handle(): int
     {
         $characterName = $this->argument('characterName');
 
@@ -40,7 +40,7 @@ class AssignTopEndGearToPlayer extends Command
         if (is_null($character)) {
             $this->error('No character found for name: ' . $characterName);
 
-            return;
+            return self::FAILURE;
         }
 
         $topEndGear = Item::doesntHave('appliedHolyStacks')
@@ -49,10 +49,10 @@ class AssignTopEndGearToPlayer extends Command
             ->where('specialty_type', ItemSpecialtyType::PURGATORY_CHAINS)
             ->get();
 
-        if (empty($topEndGear)) {
+        if ($topEndGear->isEmpty()) {
             $this->error('There are no purgatory items.');
 
-            return;
+            return self::FAILURE;
         }
 
         $prefix = ItemAffix::where('type', 'prefix')
@@ -66,6 +66,29 @@ class AssignTopEndGearToPlayer extends Command
             ->where($character->damage_stat . '_mod', '>', 0)
             ->orderBy('skill_level_required', 'desc')
             ->first();
+
+        $topEndOil = Item::where('type', 'alchemy')
+            ->where('name', 'like', '%Oil%')
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if (is_null($prefix)) {
+            $this->error('No eligible non-random prefix exists for the character damage stat.');
+
+            return self::FAILURE;
+        }
+
+        if (is_null($suffix)) {
+            $this->error('No eligible non-random suffix exists for the character damage stat.');
+
+            return self::FAILURE;
+        }
+
+        if (is_null($topEndOil) || ! in_array($topEndOil->holy_level, [1, 2, 3, 4, 5], true)) {
+            $this->error('No valid holy oil with a supported holy level exists.');
+
+            return self::FAILURE;
+        }
 
         $bar = $this->output->createProgressBar(count($topEndGear));
 
@@ -81,7 +104,7 @@ class AssignTopEndGearToPlayer extends Command
                 for ($i = 1; $i <= 2; $i++) {
                     $character->inventory->slots()->create([
                         'inventory_id' => $character->inventory->id,
-                        'item_id' => $this->modifyItem($topEndItem, $prefix, $suffix)->id,
+                        'item_id' => $this->modifyItem($topEndItem, $prefix, $suffix, $topEndOil)->id,
                     ]);
 
                     $character = $character->refresh();
@@ -94,7 +117,7 @@ class AssignTopEndGearToPlayer extends Command
 
             $character->inventory->slots()->create([
                 'inventory_id' => $character->inventory->id,
-                'item_id' => $this->modifyItem($topEndItem, $prefix, $suffix)->id,
+                'item_id' => $this->modifyItem($topEndItem, $prefix, $suffix, $topEndOil)->id,
             ]);
 
             $character = $character->refresh();
@@ -103,9 +126,11 @@ class AssignTopEndGearToPlayer extends Command
         }
 
         $bar->finish();
+
+        return self::SUCCESS;
     }
 
-    protected function modifyItem(Item $item, ItemAffix $prefix, ItemAffix $suffix): Item
+    protected function modifyItem(Item $item, ItemAffix $prefix, ItemAffix $suffix, Item $topEndOil): Item
     {
         $newItem = $item->duplicate();
 
@@ -118,13 +143,11 @@ class AssignTopEndGearToPlayer extends Command
 
         $newItem = $newItem->refresh();
 
-        return $this->applyHolyOilsToItem($newItem);
+        return $this->applyHolyOilsToItem($newItem, $topEndOil);
     }
 
-    protected function applyHolyOilsToItem(Item $item): Item
+    protected function applyHolyOilsToItem(Item $item, Item $topEndOil): Item
     {
-        $topEndOil = Item::where('type', 'alchemy')->where('name', 'like', '%Oil%')->orderBy('id', 'desc')->first();
-
         for ($i = 1; $i <= 20; $i++) {
             $holyItemEffect = new ItemHolyValue($topEndOil->holy_level);
 

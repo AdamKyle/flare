@@ -6,9 +6,13 @@ use Exception;
 use App\Flare\Models\BuildingExpansionQueue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use App\Flare\Models\CapitalCityUnitQueue;
+use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomLog;
+use App\Flare\Models\UnitInQueue;
+use App\Flare\Models\UnitMovementQueue;
 use App\Flare\Values\NpcTypes;
 use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Service\KingdomUpdateService;
@@ -108,6 +112,91 @@ class KingdomUpdateServiceTest extends TestCase
         $this->assertNull($this->kingdomUpdateService->getKingdom());
 
         $this->assertEquals(0, Kingdom::all()->count());
+    }
+
+    public function testDestroyNpcKingdomDeletesRecruitmentAndMovementQueuesWithoutDeletingUnrelatedRows(): void
+    {
+        $gameMap = GameMap::first();
+        $targetKingdom = $this->createKingdom([
+            'character_id' => null,
+            'npc_owned' => true,
+            'game_map_id' => $gameMap->id,
+            'last_walked' => now()->subDays(120),
+        ]);
+        $unrelatedKingdom = $this->createKingdom([
+            'character_id' => $this->character->getCharacter()->id,
+            'game_map_id' => $gameMap->id,
+            'last_walked' => now(),
+        ]);
+        $gameUnit = $this->createGameUnit();
+        $targetRecruitment = UnitInQueue::factory()->create([
+            'character_id' => $this->character->getCharacter()->id,
+            'kingdom_id' => $targetKingdom->id,
+            'game_unit_id' => $gameUnit->id,
+            'amount' => 1,
+        ]);
+        $unrelatedRecruitment = UnitInQueue::factory()->create([
+            'character_id' => $this->character->getCharacter()->id,
+            'kingdom_id' => $unrelatedKingdom->id,
+            'game_unit_id' => $gameUnit->id,
+            'amount' => 1,
+        ]);
+        $targetInboundMovement = UnitMovementQueue::factory()->create([
+            'character_id' => $this->character->getCharacter()->id,
+            'from_kingdom_id' => $unrelatedKingdom->id,
+            'to_kingdom_id' => $targetKingdom->id,
+        ]);
+        $targetSelfMovement = UnitMovementQueue::factory()->create([
+            'character_id' => $this->character->getCharacter()->id,
+            'from_kingdom_id' => $targetKingdom->id,
+            'to_kingdom_id' => $targetKingdom->id,
+        ]);
+        $unrelatedMovement = UnitMovementQueue::factory()->create([
+            'character_id' => $this->character->getCharacter()->id,
+            'from_kingdom_id' => $unrelatedKingdom->id,
+            'to_kingdom_id' => $unrelatedKingdom->id,
+        ]);
+
+        $this->kingdomUpdateService->setKingdom($targetKingdom)->updateKingdom();
+
+        $this->assertNull(Kingdom::find($targetKingdom->id));
+        $this->assertNull(UnitInQueue::find($targetRecruitment->id));
+        $this->assertNull(UnitMovementQueue::find($targetInboundMovement->id));
+        $this->assertNull(UnitMovementQueue::find($targetSelfMovement->id));
+        $this->assertNotNull(Kingdom::find($unrelatedKingdom->id));
+        $this->assertNotNull(UnitInQueue::find($unrelatedRecruitment->id));
+        $this->assertNotNull(UnitMovementQueue::find($unrelatedMovement->id));
+    }
+
+    public function testDestroyNpcKingdomStillDeletesCapitalCityUnitQueueWithoutDeletingUnrelatedRows(): void
+    {
+        $gameMap = GameMap::first();
+        $targetKingdom = $this->createKingdom([
+            'character_id' => null,
+            'npc_owned' => true,
+            'game_map_id' => $gameMap->id,
+            'last_walked' => now()->subDays(120),
+        ]);
+        $unrelatedKingdom = $this->createKingdom([
+            'character_id' => $this->character->getCharacter()->id,
+            'game_map_id' => $gameMap->id,
+            'last_walked' => now(),
+        ]);
+        $targetCapitalCityQueue = CapitalCityUnitQueue::factory()->create([
+            'character_id' => $this->character->getCharacter()->id,
+            'kingdom_id' => $targetKingdom->id,
+            'requested_kingdom' => $targetKingdom->id,
+        ]);
+        $unrelatedCapitalCityQueue = CapitalCityUnitQueue::factory()->create([
+            'character_id' => $this->character->getCharacter()->id,
+            'kingdom_id' => $unrelatedKingdom->id,
+            'requested_kingdom' => $unrelatedKingdom->id,
+        ]);
+
+        $this->kingdomUpdateService->setKingdom($targetKingdom)->updateKingdom();
+
+        $this->assertNull(CapitalCityUnitQueue::find($targetCapitalCityQueue->id));
+        $this->assertNotNull(CapitalCityUnitQueue::find($unrelatedCapitalCityQueue->id));
     }
 
     public function testOverPopulatedAndTakesAllTreasury()
@@ -371,6 +460,35 @@ class KingdomUpdateServiceTest extends TestCase
         foreach ($types as $type) {
             $this->assertEquals(0, $kingdom->{'current_'.$type});
         }
+    }
+
+    public function testMissingResourceBuildingDoesNotThrowOrIncreaseThatResource(): void
+    {
+        $kingdom = $this->createKingdomForCharacter($this->character);
+
+        $this->bailIfMissingKeyElements($kingdom);
+
+        $resourceBuildingIds = $kingdom->buildings
+            ->filter(function ($building) {
+                return $building->gives_resources;
+            })
+            ->pluck('game_building_id');
+
+        GameBuilding::whereIn('id', $resourceBuildingIds)->update([
+            'increase_wood_amount' => 0,
+        ]);
+
+        $kingdom->update([
+            'current_wood' => 0,
+            'max_wood' => 100,
+        ]);
+
+        $this->kingdomUpdateService->setKingdom($kingdom->refresh())->updateKingdom();
+
+        $updatedKingdom = $this->kingdomUpdateService->getKingdom();
+
+        $this->assertNotNull($updatedKingdom);
+        $this->assertEquals(0, $updatedKingdom->current_wood);
     }
 
     public function testGiveSomeResourcesToKingdomWhenBuildingsDamaged()

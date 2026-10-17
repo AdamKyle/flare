@@ -34,6 +34,11 @@ class Kernel extends ConsoleKernel
         // Clean the chat every three months starting at 2am.
         $schedule->command('clean:chat')->cron('0 2 * */3 *')->timezone(config('app.timezone'));
 
+        $schedule->command('clean:historical-system-logs')
+            ->cron('0 2 1 * *')
+            ->timezone(config('app.timezone'))
+            ->withoutOverlapping();
+
         // Clean Weekly Fights every Sunday at 3am
         $schedule->command('reset:weekly-fights')->cron('0 3 * * 0')->timezone(config('app.timezone'));
 

@@ -106,7 +106,7 @@ class TestExploration extends Command
      */
     protected function createTheCharacters(CharacterBuilderService $characterBuilder, int $charactersToCreate)
     {
-        for ($i = 0; $i <= $charactersToCreate; $i++) {
+        for ($i = 0; $i < $charactersToCreate; $i++) {
             $user = $this->createUser();
 
             $surfaceMap = GameMap::where('name', 'Surface')->first();

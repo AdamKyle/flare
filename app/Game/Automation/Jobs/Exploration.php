@@ -197,7 +197,7 @@ class Exploration implements ShouldQueue
                     'spell_damage' => $this->battleData['spell_damage'],
                     'healing_done' => $this->battleData['healing_done'],
                     'damage_blocked' => $this->battleData['damage_blocked'],
-                ], false);
+                ]);
             }
 
             $time = now()->diffInMinutes($automation->completed_at);

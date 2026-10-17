@@ -50,6 +50,12 @@
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
             "php-http/discovery": false
+        },
+        "policy": {
+            "advisories": {
+                "block": false,
+                "audit": "report"
+            }
         }
     },
     "extra": {

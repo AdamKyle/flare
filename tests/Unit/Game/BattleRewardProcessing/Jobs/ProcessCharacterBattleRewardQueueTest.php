@@ -65,6 +65,9 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
 
         $battleRewardService = Mockery::mock(BattleRewardService::class);
         $battleRewardService->shouldReceive('withHeartbeatCallback')->once()->andReturnSelf();
+        $battleRewardService->shouldReceive('processLedgerAwareRewards')->once()->andThrow(
+            new \Mockery\Exception('using legacy fallback'),
+        );
         $battleRewardService->shouldReceive('setUp')->once()->with($character->id, 22)->andReturnSelf();
         $battleRewardService->shouldReceive('setContext')->once()->with([])->andReturnSelf();
         $battleRewardService->shouldReceive('processRewards')->once()->with(true);
@@ -106,6 +109,9 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
 
         $battleRewardService = Mockery::mock(BattleRewardService::class);
         $battleRewardService->shouldReceive('withHeartbeatCallback')->twice()->andReturnSelf();
+        $battleRewardService->shouldReceive('processLedgerAwareRewards')->twice()->andThrow(
+            new \Mockery\Exception('using legacy fallback'),
+        );
         $battleRewardService->shouldReceive('setUp')->with($character->id, 1)->once()->andThrow(new RuntimeException('reward failed'));
         $battleRewardService->shouldReceive('setUp')->with($character->id, 2)->once()->andReturnSelf();
         $battleRewardService->shouldReceive('setContext')->with([])->once()->andReturnSelf();
@@ -176,6 +182,9 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
 
         $battleRewardService = Mockery::mock(BattleRewardService::class);
         $battleRewardService->shouldReceive('withHeartbeatCallback')->times(50)->andReturnSelf();
+        $battleRewardService->shouldReceive('processLedgerAwareRewards')->times(50)->andThrow(
+            new \Mockery\Exception('using legacy fallback'),
+        );
         $battleRewardService->shouldReceive('setUp')->times(50)->andReturnSelf();
         $battleRewardService->shouldReceive('setContext')->times(50)->andReturnSelf();
         $battleRewardService->shouldReceive('processRewards')->times(50);
@@ -219,6 +228,9 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
 
         $firstBattleRewardService = Mockery::mock(BattleRewardService::class);
         $firstBattleRewardService->shouldReceive('withHeartbeatCallback')->times(50)->andReturnSelf();
+        $firstBattleRewardService->shouldReceive('processLedgerAwareRewards')->times(50)->andThrow(
+            new \Mockery\Exception('using legacy fallback'),
+        );
         $firstBattleRewardService->shouldReceive('setUp')->times(50)->andReturnSelf();
         $firstBattleRewardService->shouldReceive('setContext')->times(50)->andReturnSelf();
         $firstBattleRewardService->shouldReceive('processRewards')->times(50);
@@ -237,6 +249,9 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
 
         $secondBattleRewardService = Mockery::mock(BattleRewardService::class);
         $secondBattleRewardService->shouldReceive('withHeartbeatCallback')->once()->andReturnSelf();
+        $secondBattleRewardService->shouldReceive('processLedgerAwareRewards')->once()->andThrow(
+            new \Mockery\Exception('using legacy fallback'),
+        );
         $secondBattleRewardService->shouldReceive('setUp')->once()->with($character->id, 51)->andReturnSelf();
         $secondBattleRewardService->shouldReceive('setContext')->once()->with([])->andReturnSelf();
         $secondBattleRewardService->shouldReceive('processRewards')->once();
@@ -272,6 +287,9 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
 
         $battleRewardService = Mockery::mock(BattleRewardService::class);
         $battleRewardService->shouldReceive('withHeartbeatCallback')->once()->andReturnSelf();
+        $battleRewardService->shouldReceive('processLedgerAwareRewards')->once()->andThrow(
+            new \Mockery\Exception('using legacy fallback'),
+        );
         $battleRewardService->shouldReceive('setUp')->once()->with($character->id, 55)->andReturnSelf();
         $battleRewardService->shouldReceive('setContext')->once()->with([])->andReturnSelf();
         $battleRewardService->shouldReceive('processRewards')->once()->with(true);
@@ -307,6 +325,9 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
 
         $battleRewardService = Mockery::mock(BattleRewardService::class);
         $battleRewardService->shouldReceive('withHeartbeatCallback')->once()->andReturnSelf();
+        $battleRewardService->shouldReceive('processLedgerAwareRewards')->once()->andThrow(
+            new \Mockery\Exception('using legacy fallback'),
+        );
         $battleRewardService->shouldReceive('setUp')->once()->with($character->id, 77)->andReturnSelf();
         $battleRewardService->shouldReceive('setContext')->once()->with([])->andReturnSelf();
         $battleRewardService->shouldReceive('processRewards')->once()->with(true);
@@ -341,6 +362,9 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
 
         $battleRewardService = Mockery::mock(BattleRewardService::class);
         $battleRewardService->shouldReceive('withHeartbeatCallback')->twice()->andReturnSelf();
+        $battleRewardService->shouldReceive('processLedgerAwareRewards')->twice()->andThrow(
+            new \Mockery\Exception('using legacy fallback'),
+        );
         $battleRewardService->shouldReceive('setUp')->with($character->id, 1)->once()->andReturnSelf();
         $battleRewardService->shouldReceive('setContext')->with([])->once()->andReturnSelf();
         $battleRewardService->shouldReceive('processRewards')->with(true)->once()->andReturnUsing(
@@ -433,6 +457,9 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
 
         $battleRewardService = Mockery::mock(BattleRewardService::class);
         $battleRewardService->shouldReceive('withHeartbeatCallback')->once()->andReturnSelf();
+        $battleRewardService->shouldReceive('processLedgerAwareRewards')->once()->andThrow(
+            new \Mockery\Exception('using legacy fallback'),
+        );
         $battleRewardService->shouldReceive('setUp')->once()->with($character->id, 2)->andReturnSelf();
         $battleRewardService->shouldReceive('setContext')->once()->with([])->andReturnSelf();
         $battleRewardService->shouldReceive('processRewards')->once()->with(true);
@@ -473,6 +500,9 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
 
         $battleRewardService = Mockery::mock(BattleRewardService::class);
         $battleRewardService->shouldReceive('withHeartbeatCallback')->once()->andReturnSelf();
+        $battleRewardService->shouldReceive('processLedgerAwareRewards')->once()->andThrow(
+            new \Mockery\Exception('using legacy fallback'),
+        );
         $battleRewardService->shouldReceive('setUp')->once()->andReturnSelf();
         $battleRewardService->shouldReceive('setContext')->once()->andReturnSelf();
         $battleRewardService->shouldReceive('processRewards')->once();
@@ -508,6 +538,9 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
 
         $battleRewardService = Mockery::mock(BattleRewardService::class);
         $battleRewardService->shouldReceive('withHeartbeatCallback')->once()->andReturnSelf();
+        $battleRewardService->shouldReceive('processLedgerAwareRewards')->once()->andThrow(
+            new \Mockery\Exception('using legacy fallback'),
+        );
         $battleRewardService->shouldReceive('setUp')->once()->andReturnSelf();
         $battleRewardService->shouldReceive('setContext')->once()->andReturnSelf();
         $battleRewardService->shouldReceive('processRewards')->once();
@@ -543,6 +576,9 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
 
         $battleRewardService = Mockery::mock(BattleRewardService::class);
         $battleRewardService->shouldReceive('withHeartbeatCallback')->once()->andReturnSelf();
+        $battleRewardService->shouldReceive('processLedgerAwareRewards')->once()->andThrow(
+            new \Mockery\Exception('using legacy fallback'),
+        );
         $battleRewardService->shouldReceive('setUp')->once()->andReturnSelf();
         $battleRewardService->shouldReceive('setContext')->once()->andReturnSelf();
         $battleRewardService->shouldReceive('processRewards')->once();
@@ -578,6 +614,9 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
 
         $battleRewardService = Mockery::mock(BattleRewardService::class);
         $battleRewardService->shouldReceive('withHeartbeatCallback')->once()->andReturnSelf();
+        $battleRewardService->shouldReceive('processLedgerAwareRewards')->once()->andThrow(
+            new \Mockery\Exception('using legacy fallback'),
+        );
         $battleRewardService->shouldReceive('setUp')->once()->andReturnSelf();
         $battleRewardService->shouldReceive('setContext')->once()->andReturnSelf();
         $battleRewardService->shouldReceive('processRewards')->once();
@@ -619,6 +658,9 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
 
         $battleRewardService = Mockery::mock(BattleRewardService::class);
         $battleRewardService->shouldReceive('withHeartbeatCallback')->twice()->andReturnSelf();
+        $battleRewardService->shouldReceive('processLedgerAwareRewards')->twice()->andThrow(
+            new \Mockery\Exception('using legacy fallback'),
+        );
         $battleRewardService->shouldReceive('setUp')->twice()->andReturnSelf();
         $battleRewardService->shouldReceive('setContext')->twice()->andReturnSelf();
         $battleRewardService->shouldReceive('processRewards')->twice();
@@ -691,6 +733,9 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
 
         $battleRewardService = Mockery::mock(BattleRewardService::class);
         $battleRewardService->shouldReceive('withHeartbeatCallback')->once()->andReturnSelf();
+        $battleRewardService->shouldReceive('processLedgerAwareRewards')->once()->andThrow(
+            new \Mockery\Exception('using legacy fallback'),
+        );
         $battleRewardService->shouldReceive('setUp')->once()->andReturnSelf();
         $battleRewardService->shouldReceive('setContext')->once()->andReturnSelf();
         $battleRewardService->shouldReceive('processRewards')->once();
@@ -729,6 +774,9 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
         ]);
         $battleRewardService = Mockery::mock(BattleRewardService::class);
         $battleRewardService->shouldReceive('withHeartbeatCallback')->once()->andReturnSelf();
+        $battleRewardService->shouldReceive('processLedgerAwareRewards')->once()->andThrow(
+            new \Mockery\Exception('using legacy fallback'),
+        );
         $battleRewardService->shouldReceive('setUp')->once()->andReturnSelf();
         $battleRewardService->shouldReceive('setContext')->once()->andReturnSelf();
         $battleRewardService->shouldReceive('processRewards')->once();
@@ -777,6 +825,9 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
         ]);
         $battleRewardService = Mockery::mock(BattleRewardService::class);
         $battleRewardService->shouldReceive('withHeartbeatCallback')->once()->andReturnSelf();
+        $battleRewardService->shouldReceive('processLedgerAwareRewards')->once()->andThrow(
+            new \Mockery\Exception('using legacy fallback'),
+        );
         $battleRewardService->shouldReceive('setUp')->once()->andReturnSelf();
         $battleRewardService->shouldReceive('setContext')->once()->andReturnSelf();
         $battleRewardService->shouldReceive('processRewards')->once()->andThrow(

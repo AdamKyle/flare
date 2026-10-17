@@ -29,7 +29,9 @@ trait DestroyKingdom
 
         $kingdom->buildingsQueue()->delete();
         $kingdom->unitsMovementQueue()->delete();
+        $kingdom->incomingUnitsMovementQueue()->delete();
         $kingdom->unitsQueue()->delete();
+        $kingdom->unitRecruitmentQueue()->delete();
         $kingdom->units()->delete();
         $kingdom->buildings()->delete();
 
