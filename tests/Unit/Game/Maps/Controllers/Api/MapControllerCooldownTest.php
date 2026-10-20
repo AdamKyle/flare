@@ -56,6 +56,24 @@ class MapControllerCooldownTest extends TestCase
         $this->assertEquals(['invalid input'], $response->getData(true));
     }
 
+    public function testTraverseDelegatesToArgumentServiceAndReturnsItsStatusAndBody(): void
+    {
+        $this->character->update(['can_move' => true]);
+        $request = new TraverseRequest;
+        $request->merge(['map_id' => 42]);
+        $this->assertSame(['map_id' => 'required|integer'], $request->rules());
+        $movementService = $this->createMock(MovementService::class);
+        $movementService->expects($this->once())
+            ->method('updateCharacterPlane')
+            ->with(42, $this->character->refresh())
+            ->willReturn(['status' => 201, 'can_access_hell_forged_shop' => true]);
+
+        $response = $this->controller()->traverse($request, $this->character->refresh(), $movementService);
+
+        $this->assertSame(201, $response->getStatusCode());
+        $this->assertSame(['can_access_hell_forged_shop' => true], $response->getData(true));
+    }
+
     public function testTeleportReturnsUnprocessableWhenCharacterCannotMove(): void
     {
         $response = $this->controller()->teleport(new TeleportRequest, $this->character->refresh());

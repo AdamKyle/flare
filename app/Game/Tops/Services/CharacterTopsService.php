@@ -3,6 +3,7 @@
 namespace App\Game\Tops\Services;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\Session;
 use App\Flare\Models\UserLoginDuration;
 use App\Game\Tops\Services\Concerns\BuildsTopsResponses;
 use Illuminate\Http\Request;
@@ -21,11 +22,20 @@ class CharacterTopsService
         $metrics = [['key' => 'progression', 'label' => 'Progression']];
 
         $query = Character::with(['race', 'class', 'map.gameMap', 'user']);
+        $characters = $query->get();
+        $userIds = $characters->pluck('user_id')->unique()->values();
+        $lastActivityByUser = UserLoginDuration::whereIn('user_id', $userIds)
+            ->orderByRaw('COALESCE(last_activity, logged_in_at) desc')
+            ->get()
+            ->groupBy('user_id')
+            ->map(fn ($durations) => $durations->first());
+        $onlineUserIds = Session::whereIn('user_id', $userIds)
+            ->pluck('user_id')
+            ->unique()
+            ->flip();
 
-        $rows = $query->get()->map(function (Character $character) {
-            $lastActivity = UserLoginDuration::where('user_id', $character->user_id)
-                ->orderByRaw('COALESCE(last_activity, logged_in_at) desc')
-                ->first();
+        $rows = $characters->map(function (Character $character) use ($lastActivityByUser, $onlineUserIds) {
+            $lastActivity = $lastActivityByUser->get($character->user_id);
 
             return [
                 'rank' => 0,
@@ -40,7 +50,7 @@ class CharacterTopsService
                 'map' => $character->map?->gameMap?->name,
                 'gold' => $character->gold,
                 'last_active_at' => $lastActivity?->last_activity?->toISOString() ?? $lastActivity?->logged_in_at?->toISOString(),
-                'online' => $character->isLoggedIn(),
+                'online' => $onlineUserIds->has($character->user_id),
             ];
         });
 

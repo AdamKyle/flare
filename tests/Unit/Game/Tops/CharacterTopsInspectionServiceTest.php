@@ -9,6 +9,7 @@ use App\Flare\Models\DelveExploration;
 use App\Flare\Models\ExplorationLog;
 use App\Flare\Models\Gem;
 use App\Flare\Models\GameMap;
+use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameClassSpecial;
 use App\Flare\Models\GameSkill;
@@ -24,6 +25,7 @@ use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
 use App\Flare\Models\Map;
 use App\Flare\Models\Npc;
+use App\Flare\Models\PassiveSkill;
 use App\Flare\Models\Quest;
 use App\Flare\Models\QuestsCompleted;
 use App\Flare\Models\Skill;
@@ -32,6 +34,7 @@ use App\Flare\Models\User;
 use App\Flare\Models\UserLoginDuration;
 use App\Game\Tops\Services\CharacterTopsInspectionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class CharacterTopsInspectionServiceTest extends TestCase
@@ -598,6 +601,63 @@ class CharacterTopsInspectionServiceTest extends TestCase
         $this->assertFalse($data['completed_guide_quests'][0]['viewer_has_unlocked']);
     }
 
+    public function testGuideQuestDetailsPreserveAppendedSerializationValuesAndOrderWhenLookupsAreBatched(): void
+    {
+        $owner = User::factory()->create();
+        $character = Character::factory()->create(['user_id' => $owner->id]);
+        $skill = GameSkill::factory()->create(['name' => 'Primary Skill']);
+        $secondarySkill = GameSkill::factory()->create(['name' => 'Secondary Skill']);
+        $requiredQuestNpc = Npc::factory()->create();
+        $requiredQuest = Quest::factory()->create(['name' => 'Required Quest', 'npc_id' => $requiredQuestNpc->id]);
+        $passive = PassiveSkill::factory()->create(['name' => 'Required Passive']);
+        $factionMap = GameMap::factory()->create(['name' => 'Faction Plane']);
+        $requiredMap = GameMap::factory()->create(['name' => 'Required Plane']);
+        $standingMap = GameMap::factory()->create(['name' => 'Standing Plane']);
+        $building = GameBuilding::factory()->create(['name' => 'Required Building']);
+        $parentQuest = GuideQuest::factory()->create(['name' => 'Parent Guide Quest']);
+        $prefix = ItemAffix::factory()->create(['name' => 'Ancient']);
+        $suffix = ItemAffix::factory()->create(['name' => 'Trials']);
+        $questItem = Item::factory()->create([
+            'name' => 'Relic',
+            'type' => 'quest',
+            'item_prefix_id' => $prefix->id,
+            'item_suffix_id' => $suffix->id,
+        ]);
+        $batchItem = Item::factory()->create(['name' => 'Crafted Dagger', 'type' => 'dagger']);
+        $guideQuest = GuideQuest::factory()->create([
+            'required_skill' => $skill->id,
+            'required_secondary_skill' => $secondarySkill->id,
+            'required_quest_id' => $requiredQuest->id,
+            'required_passive_skill' => $passive->id,
+            'required_faction_id' => $factionMap->id,
+            'required_game_map_id' => $requiredMap->id,
+            'be_on_game_map' => $standingMap->id,
+            'required_kingdom_building_id' => $building->id,
+            'parent_id' => $parentQuest->id,
+            'required_quest_item_id' => $questItem->id,
+            'secondary_quest_item_id' => null,
+            'required_batch_crafting_type' => 'craft',
+            'required_batch_crafted_items' => [[
+                'item_id' => $batchItem->id,
+                'amount' => 2,
+                'must_be_enchanted' => true,
+            ]],
+        ]);
+        QuestsCompleted::factory()->create(['character_id' => $character->id, 'guide_quest_id' => $guideQuest->id]);
+        $appendedKeys = [
+            'skill_name', 'faction_name', 'game_map_name', 'quest_name', 'quest_item_name',
+            'secondary_quest_item_name', 'passive_name', 'secondary_skill_name', 'skill_type_name',
+            'kingdom_building_name', 'parent_quest_name', 'required_to_be_on_game_map_name',
+            'required_batch_crafting_type_name', 'required_batch_crafted_item_names',
+        ];
+        $expected = $guideQuest->only($appendedKeys);
+
+        $actual = $this->app->make(CharacterTopsInspectionService::class)->quests($character)['completed_guide_quests'][0];
+
+        $this->assertSame($expected, array_intersect_key($actual, array_flip($appendedKeys)));
+        $this->assertSame($appendedKeys, array_keys(array_intersect_key($actual, array_flip($appendedKeys))));
+    }
+
     public function testQuestDetailPayloadRetainsPublicModalFields(): void
     {
         $owner = User::factory()->create();
@@ -834,6 +894,42 @@ class CharacterTopsInspectionServiceTest extends TestCase
         $this->assertSame('Location Plane', $location['map']['name']);
         $this->assertArrayNotHasKey('character_id', $location);
         $this->assertArrayNotHasKey('mutation_url', $location);
+    }
+
+    public function testRepeatedQuestItemPayloadsPreserveValuesWhileRecordingCurrentQueryPattern(): void
+    {
+        $owner = User::factory()->create();
+        $character = Character::factory()->create(['user_id' => $owner->id]);
+        $gameMap = GameMap::factory()->create(['name' => 'Quest Item Plane']);
+        $npc = Npc::factory()->create(['game_map_id' => $gameMap->id]);
+        $questItem = Item::factory()->create(['type' => 'quest']);
+        Location::factory()->create([
+            'game_map_id' => $gameMap->id,
+            'quest_reward_item_id' => $questItem->id,
+            'name' => 'Repeated Quest Item Location',
+        ]);
+        $firstQuest = Quest::factory()->create(['npc_id' => $npc->id, 'item_id' => $questItem->id]);
+        $secondQuest = Quest::factory()->create(['npc_id' => $npc->id, 'item_id' => $questItem->id]);
+        QuestsCompleted::factory()->create(['character_id' => $character->id, 'quest_id' => $firstQuest->id]);
+        QuestsCompleted::factory()->create(['character_id' => $character->id, 'quest_id' => $secondQuest->id]);
+        $queries = [];
+
+        DB::listen(function ($query) use (&$queries): void {
+            $queries[] = $query->sql;
+        });
+
+        $data = $this->app->make(CharacterTopsInspectionService::class)->quests($character, $owner);
+        $questItemQueries = collect($queries)->filter(
+            fn (string $sql): bool => str_contains($sql, 'quest_item_id')
+                || str_contains($sql, 'reward_item')
+                || str_contains($sql, 'quest_reward_item_id')
+        );
+
+        $this->assertSame(
+            $data['completed_quests'][0]['details']['item'],
+            $data['completed_quests'][1]['details']['item']
+        );
+        $this->assertLessThanOrEqual(4, $questItemQueries->count());
     }
 
     public function testStatsPreservesExistingFieldsAndIncludesPreloadedCharacterSheetData(): void

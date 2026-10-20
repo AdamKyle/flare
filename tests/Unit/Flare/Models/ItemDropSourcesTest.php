@@ -2,7 +2,10 @@
 
 namespace Tests\Unit\Flare\Models;
 
+use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
+use App\Flare\Models\Npc;
+use App\Flare\Models\Quest;
 use App\Flare\Values\LocationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -195,5 +198,70 @@ class ItemDropSourcesTest extends TestCase
 
         $this->assertCount(1, $sources);
         $this->assertSame($firstMonster->name, $sources[0]['monster_name']);
+    }
+
+    public function testRequiredMonsterSelectsLowestIdWhenMultipleMonstersRequireItem(): void
+    {
+        $item = $this->createItem(['type' => 'quest']);
+        $firstMonster = $this->createMonster(['quest_item_id' => $item->id]);
+        $this->createMonster(['quest_item_id' => $item->id]);
+
+        $this->assertSame($firstMonster->id, $item->refresh()->required_monster->id);
+    }
+
+    public function testRequiredQuestSelectsLowestIdWhenMultipleQuestsRewardItem(): void
+    {
+        $item = $this->createItem(['type' => 'quest']);
+        $npc = Npc::factory()->create();
+        $firstQuest = Quest::factory()->create(['npc_id' => $npc->id, 'reward_item' => $item->id]);
+        Quest::factory()->create(['npc_id' => $npc->id, 'reward_item' => $item->id]);
+
+        $this->assertSame($firstQuest->id, $item->refresh()->required_quest->id);
+    }
+
+    public function testLocationsAreReturnedInAscendingIdOrder(): void
+    {
+        $item = $this->createItem(['type' => 'quest']);
+        GameMap::factory()->create();
+        $firstLocation = $this->createLocation(['quest_reward_item_id' => $item->id]);
+        $secondLocation = $this->createLocation(['quest_reward_item_id' => $item->id]);
+
+        $this->assertSame([$firstLocation->id, $secondLocation->id], $item->refresh()->locations->pluck('id')->all());
+    }
+
+    public function testDropSourceSelectsLowestIdWeeklyLocation(): void
+    {
+        $item = $this->createItem(['type' => 'quest']);
+        $this->createMonster([
+            'quest_item_id' => $item->id,
+            'only_for_location_type' => LocationType::ALCHEMY_CHURCH->value,
+        ]);
+        $firstLocation = $this->createLocation([
+            'type' => LocationType::ALCHEMY_CHURCH->value,
+            'name' => 'First Weekly Location',
+        ]);
+        $this->createLocation([
+            'type' => LocationType::ALCHEMY_CHURCH->value,
+            'name' => 'Second Weekly Location',
+        ]);
+
+        $source = $item->refresh()->drop_sources[0];
+
+        $this->assertSame($firstLocation->name, $source['location_name']);
+    }
+
+    public function testQuestItemSerializationPreservesAppendedSourceStructures(): void
+    {
+        $item = $this->createItem(['type' => 'quest']);
+        $data = $item->refresh()->toArray();
+
+        $this->assertArrayHasKey('required_monster', $data);
+        $this->assertArrayHasKey('required_quest', $data);
+        $this->assertArrayHasKey('locations', $data);
+        $this->assertArrayHasKey('drop_sources', $data);
+        $this->assertNull($data['required_monster']);
+        $this->assertNull($data['required_quest']);
+        $this->assertSame([], $data['locations']);
+        $this->assertSame([], $data['drop_sources']);
     }
 }

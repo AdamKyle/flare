@@ -7,6 +7,7 @@ use App\Flare\Models\User;
 use App\Flare\Models\UserLoginDuration;
 use App\Game\Tops\Services\CharacterTopsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class CharacterTopsServiceTest extends TestCase
@@ -52,5 +53,39 @@ class CharacterTopsServiceTest extends TestCase
         $this->assertSame($character->id, $currentMonth['rows'][0]['character_id']);
         $this->assertSame($currentMonth['rows'][0]['character_id'], $allTime['rows'][0]['character_id']);
         $this->assertSame($currentMonth['rows'][0]['level'], $allTime['rows'][0]['level']);
+    }
+
+    public function testCharacterLeaderboardRecordsCurrentPerCharacterActivityQueryPattern(): void
+    {
+        $firstUser = User::factory()->create();
+        $secondUser = User::factory()->create();
+        Character::factory()->create(['user_id' => $firstUser->id, 'name' => 'First Query Character']);
+        Character::factory()->create(['user_id' => $secondUser->id, 'name' => 'Second Query Character']);
+        UserLoginDuration::factory()->create([
+            'user_id' => $firstUser->id,
+            'logged_in_at' => now()->subMinute(),
+            'last_activity' => now()->subMinute(),
+            'last_heart_beat' => now()->subMinute(),
+        ]);
+        UserLoginDuration::factory()->create([
+            'user_id' => $secondUser->id,
+            'logged_in_at' => now(),
+            'last_activity' => now(),
+            'last_heart_beat' => now(),
+        ]);
+        $queries = [];
+
+        DB::listen(function ($query) use (&$queries): void {
+            $queries[] = $query->sql;
+        });
+
+        $data = $this->app->make(CharacterTopsService::class)->leaderboard(['period' => 'current_month']);
+        $activityQueries = collect($queries)->filter(
+            fn (string $sql): bool => str_contains($sql, 'user_login_durations')
+                || str_contains($sql, 'sessions')
+        );
+
+        $this->assertCount(2, $data['rows']);
+        $this->assertCount(2, $activityQueries);
     }
 }

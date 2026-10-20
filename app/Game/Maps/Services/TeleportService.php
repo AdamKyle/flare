@@ -5,6 +5,7 @@ namespace App\Game\Maps\Services;
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\Character;
 use App\Flare\Models\Location;
+use App\Flare\Values\LocationType;
 use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Core\Events\UpdateTopBarEvent;
@@ -118,7 +119,8 @@ class TeleportService extends BaseMovementService
             event(new MoveTimeOutEvent($character, $timeout, true));
         }
 
-        event(new UpdateTopBarEvent($character));
+        $updateCharacterTops = is_null($location) || $location->type !== LocationType::TWISTED_GATE->value;
+        event(new UpdateTopBarEvent($character, $updateCharacterTops));
 
         if (! is_null($location)) {
 

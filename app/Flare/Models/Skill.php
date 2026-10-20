@@ -17,6 +17,8 @@ class Skill extends Model
 {
     use CalculateSkillBonus, CalculateTimeReduction, HasFactory;
 
+    private ?SkillBonusContextService $skillBonusContextService = null;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -75,6 +77,11 @@ class Skill extends Model
     public function getItemSkillBreakdown(string $skillAttribute = 'skill_bonus'): array
     {
         return $this->getItemBonusBreakDown($this->baseSkill, $skillAttribute);
+    }
+
+    public function useSkillBonusContext(SkillBonusContextService $skillBonusContextService): void
+    {
+        $this->skillBonusContextService = $skillBonusContextService;
     }
 
     public function getNameAttribute()
@@ -371,7 +378,7 @@ class Skill extends Model
 
             if ($bonus > 0) {
                 $itemsThatEffectBonus[] = [
-                    'name' => $slot->item->affix_name,
+                    'name' => $this->itemAffixName($slot->item),
                     'type' => $slot->item->type,
                     'position' => $slot->position,
                     'affix_count' => $slot->item->affix_count,
@@ -391,7 +398,7 @@ class Skill extends Model
 
                 if ($bonus > 0) {
                     $itemsThatEffectBonus[] = [
-                        'name' => $slot->item->affix_name,
+                        'name' => $this->itemAffixName($slot->item),
                         'type' => $slot->item->type,
                         'position' => $slot->position,
                         'affix_count' => $slot->item->affix_count,
@@ -406,6 +413,29 @@ class Skill extends Model
         }
 
         return $itemsThatEffectBonus;
+    }
+
+    private function itemAffixName(Item $item): string
+    {
+        if (is_null($this->skillBonusContextService)
+            || ! $item->relationLoaded('itemPrefix')
+            || ! $item->relationLoaded('itemSuffix')) {
+            return $item->affix_name;
+        }
+
+        $prefix = $item->itemPrefix;
+        $suffix = $item->itemSuffix;
+        $name = '';
+
+        if (! is_null($prefix)) {
+            $name = '*'.$prefix->name.'* '.$item->name;
+        }
+
+        if (! is_null($suffix)) {
+            $name .= $name === '' ? $item->name.' *'.$suffix->name.'*' : ' *'.$suffix->name.'*';
+        }
+
+        return $name === '' ? $item->name : $name;
     }
 
     private function getCharacterBoonsBonus(string $skillBonusAttribute)
@@ -441,7 +471,7 @@ class Skill extends Model
 
     private function getSkillBonusSources(): SkillBonusContextService
     {
-        $skillBonusSources = resolve(SkillBonusContextService::class);
+        $skillBonusSources = $this->skillBonusContextService ?? resolve(SkillBonusContextService::class);
 
         $skillBonusSources->setSkillInstance($this);
 

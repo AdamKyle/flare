@@ -12,6 +12,7 @@ use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;
@@ -2735,5 +2736,47 @@ class CharacterStatBuilderTest extends TestCase
         $moddedStr = $this->characterStatBuilder->setCharacter($character)->statMod('str');
 
         $this->assertEqualsWithDelta($str + ($str * 0.60), $moddedStr, 0.00001);
+    }
+
+    public function testCharacterStatBuildWithEquippedStartingItemsRecordsQueryPatterns(): void
+    {
+        $character = $this->character->equipStartingEquipment()->getCharacter()->refresh();
+        $queries = [];
+
+        DB::listen(function ($query) use (&$queries): void {
+            $queries[] = $query->sql;
+        });
+
+        $builder = $this->characterStatBuilder->setCharacter($character);
+        $str = $builder->statMod('str');
+        $dur = $builder->statMod('dur');
+        $dex = $builder->statMod('dex');
+        $chr = $builder->statMod('chr');
+        $int = $builder->statMod('int');
+        $agi = $builder->statMod('agi');
+        $focus = $builder->statMod('focus');
+        $attack = $builder->buildTotalAttack();
+        $health = $builder->buildHealth();
+        $defence = $builder->buildDefence();
+        $healing = $builder->buildHealing();
+
+        $this->assertIsFloat($str);
+        $this->assertIsFloat($dur);
+        $this->assertIsFloat($dex);
+        $this->assertIsFloat($chr);
+        $this->assertIsFloat($int);
+        $this->assertIsFloat($agi);
+        $this->assertIsFloat($focus);
+        $this->assertIsInt($attack);
+        $this->assertIsFloat($health);
+        $this->assertIsFloat($defence);
+        $this->assertIsInt($healing);
+        $this->assertNotEmpty($queries, sprintf('Observed %d SQL queries while building character stats.', count($queries)));
+        $this->assertTrue(
+            collect($queries)->contains(
+                fn (string $sql): bool => str_contains($sql, 'inventory_slots') || str_contains($sql, 'items')
+            ),
+            sprintf('Observed %d SQL queries, but none contained an item/equipment lookup.', count($queries))
+        );
     }
 }

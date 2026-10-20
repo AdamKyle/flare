@@ -58,4 +58,29 @@ class CharacterTopsUpdateListenerTest extends TestCase
             return $event->characterId === $character->id;
         });
     }
+
+    public function testCharacterTopsListenerSkipsUpdatesWhenEventOptsOut(): void
+    {
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        $broadcastTopsUpdateService = Mockery::mock(BroadcastTopsUpdateService::class);
+        $broadcastTopsUpdateService
+            ->shouldNotReceive('broadcastCharacterCurrentMonth');
+
+        $characterTopsInspectionService = Mockery::mock(CharacterTopsInspectionService::class);
+        $characterTopsInspectionService
+            ->shouldNotReceive('fullProfile');
+
+        Event::fake();
+
+        (new CharacterTopsUpdateListener(
+            $broadcastTopsUpdateService,
+            $characterTopsInspectionService,
+        ))->handle(new UpdateTopBarEvent($character, false));
+
+        Event::assertNotDispatched(CharacterTopsInspectionUpdated::class);
+    }
 }

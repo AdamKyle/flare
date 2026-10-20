@@ -13,12 +13,12 @@ use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\DefenceBui
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ElementalAtonement;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HealingBuilder;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HolyBuilder;
+use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ItemSkillAttribute;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ReductionsBuilder;
 use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Character\Concerns\Boons;
 use App\Game\Character\Concerns\FetchEquipped;
 use Exception;
-use Facades\App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ItemSkillAttribute;
 use Illuminate\Support\Collection;
 
 class CharacterStatBuilder
@@ -57,7 +57,8 @@ class CharacterStatBuilder
         HealingBuilder $healingBuilder,
         HolyBuilder $holyBuilder,
         ReductionsBuilder $reductionsBuilder,
-        ElementalAtonement $elementalAtonement
+        ElementalAtonement $elementalAtonement,
+        private readonly ItemSkillAttribute $itemSkillAttribute,
     ) {
         $this->defenceBuilder = $defenceBuilder;
         $this->damageBuilder = $damageBuilder;
@@ -73,6 +74,8 @@ class CharacterStatBuilder
     public function setCharacter(Character $character, bool $ignoreReductions = false): CharacterStatBuilder
     {
         $this->ignoreReductions = $ignoreReductions;
+
+        $character->loadMissing('inventory.slots.item');
 
         $this->character = $character;
 
@@ -190,7 +193,7 @@ class CharacterStatBuilder
 
         $baseStat = $this->applyBoons($baseStat);
         $baseStat = $this->applyBoons($baseStat, $stat.'_mod');
-        $baseStat += ItemSkillAttribute::fetchModifier($this->character, $stat.'_mod');
+        $baseStat += $this->itemSkillAttribute->fetchModifierFromEquippedItems($this->equippedItems, $stat.'_mod');
 
         if ($stat === $this->character->damage_stat) {
             $classSpecialsBonus = $this->character->classSpecialsEquipped
@@ -321,7 +324,7 @@ class CharacterStatBuilder
         $itemSkillBonus = 0;
 
         if (! is_null($this->equippedItems)) {
-            $itemSkillBonus = ItemSkillAttribute::fetchModifier($this->character, 'base_ac');
+            $itemSkillBonus = $this->itemSkillAttribute->fetchModifierFromEquippedItems($this->equippedItems, 'base_ac');
         }
 
         return $defence + ($defence * ($holyBonus + $classSpecialsBonus + $itemSkillBonus));
@@ -389,7 +392,7 @@ class CharacterStatBuilder
         $itemSkillBonus = 0;
 
         if (!is_null($this->equippedItems)) {
-            $itemSkillBonus = ItemSkillAttribute::fetchModifier($this->character, 'base_damage');
+            $itemSkillBonus = $this->itemSkillAttribute->fetchModifierFromEquippedItems($this->equippedItems, 'base_damage');
         }
 
         $attackBonus = $this->holyInfo()->fetchAttackBonus() + $itemSkillBonus;
@@ -617,7 +620,7 @@ class CharacterStatBuilder
         $itemSkillBonus = 0;
 
         if (! is_null($this->equippedItems)) {
-            $itemSkillBonus = ItemSkillAttribute::fetchModifier($this->character, 'base_healing');
+            $itemSkillBonus = $this->itemSkillAttribute->fetchModifierFromEquippedItems($this->equippedItems, 'base_healing');
         }
 
         return ceil($healing + ($healing * ($this->holyInfo()->fetchHealingBonus() + $classSpecialsBonus + $itemSkillBonus)));

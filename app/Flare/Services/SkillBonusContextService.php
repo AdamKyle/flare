@@ -25,6 +25,16 @@ class SkillBonusContextService
 
     private array $classById = [];
 
+    public function reset(): void
+    {
+        $this->skill = null;
+        $this->inventoryIdByCharacterId = [];
+        $this->equippedSlotsByCharacterId = [];
+        $this->questSlotsByInventoryIdAndSkillName = [];
+        $this->boonsByCharacterId = [];
+        $this->classById = [];
+    }
+
     public function setSkillInstance(Skill $skill): void
     {
         $this->skill = $skill;
@@ -57,14 +67,14 @@ class SkillBonusContextService
         $slots = InventorySlot::query()
             ->where('inventory_id', $inventoryId)
             ->where('equipped', true)
-            ->with('item')
+            ->with('item.itemPrefix', 'item.itemSuffix', 'item.appliedHolyStacks')
             ->get();
 
         if ($slots->isEmpty()) {
             $equippedSet = InventorySet::query()
                 ->where('character_id', $characterId)
                 ->where('is_equipped', true)
-                ->with('slots.item')
+                ->with('slots.item.itemPrefix', 'slots.item.itemSuffix', 'slots.item.appliedHolyStacks')
                 ->first();
 
             if (! is_null($equippedSet)) {
@@ -106,7 +116,7 @@ class SkillBonusContextService
                 $query->where('type', 'quest')
                     ->where('skill_name', $skillName);
             })
-            ->with('item')
+            ->with('item.itemPrefix', 'item.itemSuffix', 'item.appliedHolyStacks')
             ->get();
 
         $this->questSlotsByInventoryIdAndSkillName[$questSlotsKey] = $slots;

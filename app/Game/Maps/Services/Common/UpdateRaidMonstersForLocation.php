@@ -87,7 +87,7 @@ trait UpdateRaidMonstersForLocation
 
         $currentGameMapId = $location->map->id;
 
-        $raidEvents = ScheduledEvent::where('currently_running', true)->whereNotNull('raid_id')->get();
+        $raidEvents = ScheduledEvent::with('raid')->where('currently_running', true)->whereNotNull('raid_id')->get();
 
         foreach ($raidEvents as $raidEvent) {
             $raidBossLocationId = $raidEvent->raid->raid_boss_location_id;

@@ -6,17 +6,23 @@ use App\Flare\Models\Character;
 use App\Flare\Models\DelveExploration;
 use App\Flare\Models\ExplorationLog;
 use App\Flare\Models\GameClassSpecial;
+use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\GuideQuest;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
+use App\Flare\Models\ItemAffix;
+use App\Flare\Models\Location;
+use App\Flare\Models\Monster;
 use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
+use App\Flare\Models\PassiveSkill;
 use App\Flare\Models\QuestsCompleted;
 use App\Flare\Models\Skill;
 use App\Flare\Models\User;
 use App\Flare\Models\UserLoginDuration;
+use App\Flare\Services\SkillBonusContextService;
 use App\Flare\Transformers\BasicSkillsTransformer;
 use App\Flare\Transformers\CharacterStatDetailsTransformer;
 use App\Flare\Transformers\CharacterGemsTransformer;
@@ -26,6 +32,9 @@ use App\Flare\Transformers\CharacterReincarnationInfoTransformer;
 use App\Flare\Transformers\ItemTransformer;
 use App\Flare\Transformers\SkillsTransformer;
 use App\Game\GuideQuests\Services\GuideQuestService;
+use App\Game\Character\CharacterInventory\Values\AlchemyItemType;
+use App\Game\Character\CharacterInventory\Values\ArmourType;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\ClassRanks\Services\ClassRankService;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\Builders\StatDetailsBuilder\StatModifierDetails;
@@ -33,6 +42,8 @@ use App\Game\Core\Services\CharacterPassiveSkills;
 use App\Game\Skills\Values\SkillTypeValue;
 use App\Game\Tops\Services\Concerns\BuildsTopsResponses;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Collection;
 
 class CharacterTopsInspectionService
 {
@@ -54,6 +65,7 @@ class CharacterTopsInspectionService
         private readonly CharacterStatBuilder $characterStatBuilder,
         private readonly ClassRankService $classRankService,
         private readonly StatModifierDetails $statModifierDetails,
+        private readonly SkillBonusContextService $skillBonusContextService,
     ) {}
 
     public function overview(Character $character): array
@@ -234,6 +246,7 @@ class CharacterTopsInspectionService
 
     public function skills(Character $character): array
     {
+        $this->skillBonusContextService->reset();
         $character->load([
             'class',
             'skills.baseSkill',
@@ -241,9 +254,11 @@ class CharacterTopsInspectionService
             'classRanks.gameClass',
             'classRanks.weaponMasteries',
             'classSpecialsEquipped.gameClassSpecial.gameClass',
+            'boons.itemUsed',
+            'inventory.slots.item.itemPrefix',
+            'inventory.slots.item.itemSuffix',
+            'inventory.slots.item.appliedHolyStacks',
         ]);
-
-        $character->loadMissing('inventory');
 
         $classRanks = $character->classRanks->filter(fn ($rank): bool => $rank->level > 1)->map(fn ($rank) => [
             'class_id' => $rank->game_class_id,
@@ -281,6 +296,10 @@ class CharacterTopsInspectionService
         ])->values()->all();
 
         $meaningfulSkills = $character->skills->filter(fn ($skill): bool => $skill->level > 1 || $skill->xp > 0);
+        $meaningfulSkills->each(function (Skill $skill) use ($character): void {
+            $skill->setRelation('character', $character);
+            $skill->useSkillBonusContext($this->skillBonusContextService);
+        });
         $regularSkills = $meaningfulSkills->filter(fn ($skill): bool => (bool) $skill->baseSkill?->can_train);
         $craftingSkills = $meaningfulSkills->reject(fn ($skill): bool => (bool) $skill->baseSkill?->can_train);
 
@@ -354,6 +373,8 @@ class CharacterTopsInspectionService
             'quest.item.dropLocation',
             'quest.requiredQuest',
             'quest.requiredQuest.raid',
+            'quest.requiredQuest.npc.gameMap',
+            'quest.passive',
             'quest.factionMap',
             'quest.secondaryItem',
             'quest.secondaryItem.dropLocation',
@@ -371,12 +392,18 @@ class CharacterTopsInspectionService
         $viewerCompletedQuestIds = is_null($viewerCharacter) ? [] : QuestsCompleted::where('character_id', $viewerCharacter->id)->whereNotNull('quest_id')->pluck('quest_id')->all();
 
         $viewerCompletedGuideQuestIds = is_null($viewerCharacter) ? [] : QuestsCompleted::where('character_id', $viewerCharacter->id)->whereNotNull('guide_quest_id')->pluck('guide_quest_id')->all();
+        $questItemPayloads = [];
+        $questMapPayloads = [];
+        $questLookups = $this->questItemLookups();
+        $guideQuestLookups = $this->guideQuestLookups($quests->pluck('guideQuest')->filter());
 
         return [
             'completed_quest_count' => $quests->whereNotNull('quest_id')->count(),
             'completed_guide_quest_count' => $quests->whereNotNull('guide_quest_id')->count(),
-            'completed_quests' => $quests->whereNotNull('quest_id')->map(fn ($quest) => $this->questDetails($quest, $viewerCharacter, $viewerCompletedQuestIds))->values()->all(),
-            'completed_guide_quests' => $quests->whereNotNull('guide_quest_id')->map(fn ($quest) => $this->guideQuestDetails($quest, $viewerCharacter, $viewerCompletedGuideQuestIds))->values()->all(),
+            'completed_quests' => $quests->whereNotNull('quest_id')->map(function ($quest) use ($viewerCharacter, $viewerCompletedQuestIds, &$questItemPayloads, &$questMapPayloads, &$questLookups): array {
+                return $this->questDetails($quest, $viewerCharacter, $viewerCompletedQuestIds, $questItemPayloads, $questMapPayloads, $questLookups);
+            })->values()->all(),
+            'completed_guide_quests' => $quests->whereNotNull('guide_quest_id')->map(fn ($quest) => $this->guideQuestDetails($quest, $viewerCharacter, $viewerCompletedGuideQuestIds, $guideQuestLookups))->values()->all(),
             'completion_chart' => $this->questCompletionChart($quests),
             'summary_chart' => $this->questSummaryChart($character, $quests),
         ];
@@ -582,7 +609,8 @@ class CharacterTopsInspectionService
             ];
         }
 
-        $transformedItem = $this->itemTransformer->transform($item);
+        $loadedAffixes = collect([$item->itemPrefix, $item->itemSuffix])->filter()->keyBy('id');
+        $transformedItem = $this->itemTransformer->transform($item, $this->itemAffixName($item, $loadedAffixes));
         $transformedItem['sockets'] = $item->sockets
             ->filter(fn ($socket): bool => ! is_null($socket->gem))
             ->map(fn ($socket): array => $this->characterGemsTransformer->transform($socket->gem))
@@ -609,7 +637,14 @@ class CharacterTopsInspectionService
         ];
     }
 
-    private function questDetails(QuestsCompleted $questCompletion, ?Character $viewerCharacter, array $viewerCompletedQuestIds): array
+    private function questDetails(
+        QuestsCompleted $questCompletion,
+        ?Character $viewerCharacter,
+        array $viewerCompletedQuestIds,
+        array &$questItemPayloads,
+        array &$questMapPayloads,
+        array &$questLookups,
+    ): array
     {
         $quest = $questCompletion->quest;
 
@@ -651,11 +686,11 @@ class CharacterTopsInspectionService
             'viewer_required_quest_complete' => $viewerRequiredQuestComplete,
             'viewer_required_quest_chain_complete' => $viewerRequiredQuestChainComplete,
             'viewer_completed_quest_ids' => is_null($viewerCharacter) ? [] : $viewerCompletedQuestIds,
-            'details' => $this->questDetailPayload($quest),
+            'details' => $this->questDetailPayload($quest, $questItemPayloads, $questMapPayloads, $questLookups),
         ];
     }
 
-    private function questDetailPayload(Quest $quest): array
+    private function questDetailPayload(Quest $quest, array &$questItemPayloads, array &$questMapPayloads, array &$questLookups): array
     {
         return [
             'id' => $quest->id,
@@ -685,13 +720,13 @@ class CharacterTopsInspectionService
                 ? null
                 : $quest->unlocksFeature()?->getNameOfFeature(),
             'unlocks_passive_name' => $quest->unlocks_passive_name,
-            'npc' => $this->publicQuestNpc($quest->npc),
-            'item' => $this->publicQuestItem($quest->item),
-            'secondary_item' => $this->publicQuestItem($quest->secondaryItem),
-            'required_plane' => $this->publicQuestMap($quest->requiredPlane),
-            'faction_map' => $this->publicQuestMap($quest->factionMap),
-            'faction_loyalty_npc' => $this->publicQuestNpc($quest->factionLoyaltyNpc),
-            'required_quest' => $this->publicRequiredQuest($quest->requiredQuest),
+            'npc' => $this->publicQuestNpc($quest->npc, $questItemPayloads, $questMapPayloads, $questLookups),
+            'item' => $this->publicQuestItem($quest->item, $questItemPayloads, $questMapPayloads, $questLookups),
+            'secondary_item' => $this->publicQuestItem($quest->secondaryItem, $questItemPayloads, $questMapPayloads, $questLookups),
+            'required_plane' => $this->publicQuestMap($quest->requiredPlane, $questItemPayloads, $questMapPayloads, $questLookups),
+            'faction_map' => $this->publicQuestMap($quest->factionMap, $questItemPayloads, $questMapPayloads, $questLookups),
+            'faction_loyalty_npc' => $this->publicQuestNpc($quest->factionLoyaltyNpc, $questItemPayloads, $questMapPayloads, $questLookups),
+            'required_quest' => $this->publicRequiredQuest($quest->requiredQuest, $questItemPayloads, $questMapPayloads, $questLookups),
             'reward_item' => is_null($quest->rewardItem) ? null : [
                 'id' => $quest->rewardItem->id,
                 'name' => $quest->rewardItem->name,
@@ -699,7 +734,7 @@ class CharacterTopsInspectionService
         ];
     }
 
-    private function publicRequiredQuest(?Quest $quest): ?array
+    private function publicRequiredQuest(?Quest $quest, array &$questItemPayloads, array &$questMapPayloads, array &$questLookups): ?array
     {
         if (is_null($quest)) {
             return null;
@@ -710,7 +745,7 @@ class CharacterTopsInspectionService
             'name' => $quest->name,
             'raid_id' => $quest->raid_id,
             'belongs_to_map_name' => $quest->belongs_to_map_name,
-            'npc' => $this->publicQuestNpc($quest->npc),
+            'npc' => $this->publicQuestNpc($quest->npc, $questItemPayloads, $questMapPayloads, $questLookups),
             'raid' => is_null($quest->raid) ? null : [
                 'id' => $quest->raid->id,
                 'name' => $quest->raid->name,
@@ -718,7 +753,7 @@ class CharacterTopsInspectionService
         ];
     }
 
-    private function publicQuestNpc(?Npc $npc): ?array
+    private function publicQuestNpc(?Npc $npc, array &$questItemPayloads, array &$questMapPayloads, array &$questLookups): ?array
     {
         if (is_null($npc)) {
             return null;
@@ -730,46 +765,87 @@ class CharacterTopsInspectionService
             'x_position' => $npc->x_position,
             'y_position' => $npc->y_position,
             'must_be_at_same_location' => $npc->must_be_at_same_location,
-            'game_map' => $this->publicQuestMap($npc->gameMap),
+            'game_map' => $this->publicQuestMap($npc->gameMap, $questItemPayloads, $questMapPayloads, $questLookups),
         ];
     }
 
-    private function publicQuestMap(?GameMap $gameMap, int $depth = 0): ?array
+    private function publicQuestMap(
+        ?GameMap $gameMap,
+        array &$questItemPayloads,
+        array &$questMapPayloads,
+        array &$questLookups,
+        int $depth = 0,
+    ): ?array
     {
         if (is_null($gameMap)) {
             return null;
         }
 
-        $requiredItem = $depth >= 4 ? null : $gameMap->map_required_item;
+        $payloadKey = $gameMap->id.':'.$depth;
 
-        return [
+        if (array_key_exists($payloadKey, $questMapPayloads)) {
+            return $questMapPayloads[$payloadKey];
+        }
+
+        if (! array_key_exists($gameMap->id, $questLookups['map_required_items'])) {
+            $questLookups['map_required_items'][$gameMap->id] = $gameMap->map_required_item;
+        }
+
+        $requiredItem = $depth >= 4 ? null : $questLookups['map_required_items'][$gameMap->id];
+
+        $questMapPayloads[$payloadKey] = [
             'id' => $gameMap->id,
             'name' => $gameMap->name,
-            'map_required_item' => $this->publicQuestItem($requiredItem, $depth + 1),
+            'map_required_item' => $this->publicQuestItem($requiredItem, $questItemPayloads, $questMapPayloads, $questLookups, $depth + 1),
         ];
+
+        return $questMapPayloads[$payloadKey];
     }
 
-    private function publicQuestItem(?Item $item, int $depth = 0): ?array
+    private function publicQuestItem(
+        ?Item $item,
+        array &$questItemPayloads,
+        array &$questMapPayloads,
+        array &$questLookups,
+        int $depth = 0,
+    ): ?array
     {
         if (is_null($item)) {
             return null;
         }
 
-        $requiredQuest = $item->required_quest;
-        $requiredMonster = $item->required_monster;
-        $dropLocation = $item->dropLocation;
+        $payloadKey = $item->id.':'.$depth;
 
-        return [
+        if (array_key_exists($payloadKey, $questItemPayloads)) {
+            return $questItemPayloads[$payloadKey];
+        }
+
+        if (! array_key_exists($item->id, $questLookups['required_quests'])) {
+            $questLookups['required_quests'][$item->id] = $item->required_quest;
+            $questLookups['required_monsters'][$item->id] = $item->required_monster;
+            $questLookups['locations'][$item->id] = $item->locations;
+            $questLookups['drop_sources'][$item->id] = $item->drop_sources;
+        }
+
+        if (! array_key_exists($item->id, $questLookups['drop_locations'])) {
+            $questLookups['drop_locations'][$item->id] = $item->dropLocation;
+        }
+
+        $requiredQuest = $questLookups['required_quests'][$item->id];
+        $requiredMonster = $questLookups['required_monsters'][$item->id];
+        $dropLocation = $questLookups['drop_locations'][$item->id];
+
+        $questItemPayloads[$payloadKey] = [
             'id' => $item->id,
             'name' => $item->name,
             'drop_location_id' => $item->drop_location_id,
-            'required_quest' => $depth >= 4 || is_null($requiredQuest) ? null : $this->publicRequiredQuest($requiredQuest),
+            'required_quest' => $depth >= 4 || is_null($requiredQuest) ? null : $this->publicRequiredQuest($requiredQuest, $questItemPayloads, $questMapPayloads, $questLookups),
             'required_monster' => is_null($requiredMonster) ? null : [
                 'name' => $requiredMonster->name,
                 'is_celestial_entity' => (bool) $requiredMonster->is_celestial_entity,
                 'is_raid_boss' => (bool) $requiredMonster->is_raid_boss,
                 'is_raid_monster' => (bool) $requiredMonster->is_raid_monster,
-                'game_map' => $this->publicQuestMap($requiredMonster->gameMap, $depth + 1),
+                'game_map' => $this->publicQuestMap($requiredMonster->gameMap, $questItemPayloads, $questMapPayloads, $questLookups, $depth + 1),
             ],
             'drop_location' => is_null($dropLocation) ? null : [
                 'name' => $dropLocation->name,
@@ -777,16 +853,16 @@ class CharacterTopsInspectionService
                 'y' => $dropLocation->y,
                 'hours_to_drop' => $dropLocation->hours_to_drop,
                 'delve_enemy_strength_increase' => $dropLocation->delve_enemy_strength_increase,
-                'map' => $this->publicQuestMap($dropLocation->map, $depth + 1),
+                'map' => $this->publicQuestMap($dropLocation->map, $questItemPayloads, $questMapPayloads, $questLookups, $depth + 1),
             ],
-            'locations' => collect($item->locations)->map(fn ($location): array => [
+            'locations' => collect($questLookups['locations'][$item->id])->map(fn ($location): array => [
                 'id' => $location->id,
                 'name' => $location->name,
                 'x' => $location->x,
                 'y' => $location->y,
-                'map' => $this->publicQuestMap($location->map, $depth + 1),
+                'map' => $this->publicQuestMap($location->map, $questItemPayloads, $questMapPayloads, $questLookups, $depth + 1),
             ])->values()->all(),
-            'drop_sources' => collect($item->drop_sources)->map(fn (array $source): array => [
+            'drop_sources' => collect($questLookups['drop_sources'][$item->id])->map(fn (array $source): array => [
                 'source_type' => $source['source_type'] ?? null,
                 'monster_name' => $source['monster_name'] ?? null,
                 'map_name' => $source['map_name'] ?? null,
@@ -796,9 +872,94 @@ class CharacterTopsInspectionService
                 'location_map' => $source['location_map'] ?? null,
             ])->values()->all(),
         ];
+
+        return $questItemPayloads[$payloadKey];
     }
 
-    private function guideQuestDetails(QuestsCompleted $questCompletion, ?Character $viewerCharacter, array $viewerCompletedGuideQuestIds): array
+    private function questItemLookups(): array
+    {
+        $itemIds = Item::where('type', 'quest')->pluck('id');
+        $requiredMonsters = Monster::whereIn('quest_item_id', $itemIds)
+            ->with('gameMap')
+            ->orderBy('id')
+            ->get()
+            ->groupBy('quest_item_id')
+            ->map(fn (EloquentCollection $monsters): ?Monster => $monsters->first());
+        $requiredQuests = Quest::whereIn('reward_item', $itemIds)
+            ->with('npc', 'npc.gameMap', 'item')
+            ->orderBy('id')
+            ->get()
+            ->groupBy('reward_item')
+            ->map(fn (EloquentCollection $quests): ?Quest => $quests->first());
+        $locations = Location::whereIn('quest_reward_item_id', $itemIds)
+            ->with('map')
+            ->orderBy('id')
+            ->get()
+            ->groupBy('quest_reward_item_id');
+        $locationTypes = $requiredMonsters
+            ->pluck('only_for_location_type')
+            ->filter()
+            ->unique()
+            ->values();
+        $locationsByType = Location::whereIn('type', $locationTypes)
+            ->with('map')
+            ->orderBy('id')
+            ->get()
+            ->groupBy('type')
+            ->map(fn (EloquentCollection $typedLocations): ?Location => $typedLocations->first());
+        $lookups = [
+            'drop_locations' => [],
+            'drop_sources' => [],
+            'locations' => [],
+            'map_required_items' => [],
+            'required_monsters' => [],
+            'required_quests' => [],
+        ];
+
+        foreach ($itemIds as $itemId) {
+            $monster = $requiredMonsters->get($itemId);
+            $lookups['required_monsters'][$itemId] = $monster;
+            $lookups['required_quests'][$itemId] = $requiredQuests->get($itemId);
+            $lookups['locations'][$itemId] = $locations->get($itemId, new EloquentCollection);
+            $lookups['drop_sources'][$itemId] = $this->questItemDropSources($monster, $locationsByType);
+        }
+
+        return $lookups;
+    }
+
+    private function questItemDropSources(?Monster $monster, Collection $locationsByType): array
+    {
+        if (is_null($monster)) {
+            return [];
+        }
+
+        $source = [
+            'monster_name' => $monster->name,
+            'map_name' => $monster->gameMap?->name ?? 'Unknown',
+            'source_type' => match (true) {
+                $monster->is_celestial_entity => 'Celestial',
+                $monster->is_raid_boss => 'Raid Boss',
+                $monster->is_raid_monster => 'Raid Monster',
+                ! is_null($monster->only_for_location_type) => 'Weekly Fight Monster',
+                default => 'Normal Monster',
+            },
+        ];
+
+        if (! is_null($monster->only_for_location_type)) {
+            $location = $locationsByType->get($monster->only_for_location_type);
+
+            if (! is_null($location)) {
+                $source['location_name'] = $location->name;
+                $source['location_x'] = $location->x;
+                $source['location_y'] = $location->y;
+                $source['location_map'] = $location->map?->name;
+            }
+        }
+
+        return [$source];
+    }
+
+    private function guideQuestDetails(QuestsCompleted $questCompletion, ?Character $viewerCharacter, array $viewerCompletedGuideQuestIds, array $guideQuestLookups): array
     {
         $quest = $questCompletion->guideQuest;
 
@@ -811,7 +972,8 @@ class CharacterTopsInspectionService
                 ->contains(fn (GuideQuest $currentQuest): bool => $currentQuest->id === $quest->id);
         }
 
-        $details = is_null($quest) ? [] : $quest->only([
+        $details = is_null($quest) ? [] : [
+            ...$quest->only([
             'id', 'name', 'intro_text', 'instructions', 'desktop_instructions', 'mobile_instructions',
             'required_level', 'required_reincarnation_amount', 'required_skill', 'required_skill_level',
             'required_secondary_skill', 'required_secondary_skill_level', 'required_faction_id', 'required_faction_level',
@@ -827,10 +989,9 @@ class CharacterTopsInspectionService
             'required_holy_stacks', 'required_attached_gems', 'required_specialty_type', 'must_be_pledged_to_faction',
             'must_be_assisting_npc', 'required_fame_level', 'required_delve_survival_time', 'required_delve_pack_size',
             'required_batch_crafting_type', 'required_batch_crafting_hours', 'required_batch_crafted_items',
-            'skill_name', 'faction_name', 'game_map_name', 'quest_name', 'quest_item_name', 'secondary_quest_item_name',
-            'passive_name', 'secondary_skill_name', 'skill_type_name', 'kingdom_building_name', 'parent_quest_name',
-            'required_to_be_on_game_map_name', 'required_batch_crafting_type_name', 'required_batch_crafted_item_names',
-        ]);
+            ]),
+            ...$guideQuestLookups[$quest->id],
+        ];
 
         return [
             ...$details,
@@ -840,6 +1001,139 @@ class CharacterTopsInspectionService
             'viewer_has_completed' => $viewerHasCompleted,
             'viewer_has_unlocked' => $viewerHasUnlocked,
         ];
+    }
+
+    private function guideQuestLookups(Collection $guideQuests): array
+    {
+        $skillIds = $guideQuests->pluck('required_skill')
+            ->merge($guideQuests->pluck('required_secondary_skill'))
+            ->filter()
+            ->unique()
+            ->values();
+        $questIds = $guideQuests->pluck('required_quest_id')->filter()->unique()->values();
+        $passiveIds = $guideQuests->pluck('required_passive_skill')->filter()->unique()->values();
+        $gameMapIds = $guideQuests->pluck('required_faction_id')
+            ->merge($guideQuests->pluck('required_game_map_id'))
+            ->merge($guideQuests->pluck('be_on_game_map'))
+            ->filter()
+            ->unique()
+            ->values();
+        $gameBuildingIds = $guideQuests->pluck('required_kingdom_building_id')->filter()->unique()->values();
+        $parentQuestIds = $guideQuests->pluck('parent_id')->filter()->unique()->values();
+        $batchItemIds = $guideQuests->flatMap(fn (GuideQuest $guideQuest): array => collect($guideQuest->required_batch_crafted_items ?? [])
+            ->pluck('item_id')
+            ->filter()
+            ->all());
+        $questItemIds = $guideQuests->pluck('required_quest_item_id')
+            ->merge($guideQuests->pluck('secondary_quest_item_id'))
+            ->filter();
+        $itemIds = $questItemIds->merge($batchItemIds)->unique()->values();
+
+        $skills = GameSkill::whereIn('id', $skillIds)->pluck('name', 'id');
+        $quests = Quest::whereIn('id', $questIds)->pluck('name', 'id');
+        $passives = PassiveSkill::whereIn('id', $passiveIds)->pluck('name', 'id');
+        $gameMaps = GameMap::whereIn('id', $gameMapIds)->pluck('name', 'id');
+        $gameBuildings = GameBuilding::whereIn('id', $gameBuildingIds)->pluck('name', 'id');
+        $parentQuests = GuideQuest::whereIn('id', $parentQuestIds)->pluck('name', 'id');
+        $items = Item::whereIn('id', $itemIds)->get()->keyBy('id');
+        $affixIds = $items->pluck('item_prefix_id')
+            ->merge($items->pluck('item_suffix_id'))
+            ->filter()
+            ->unique()
+            ->values();
+        $affixes = ItemAffix::whereIn('id', $affixIds)->get()->keyBy('id');
+
+        return $guideQuests->mapWithKeys(function (GuideQuest $guideQuest) use ($skills, $quests, $passives, $gameMaps, $gameBuildings, $parentQuests, $items, $affixes): array {
+            $requiredQuestItem = $items->get($guideQuest->required_quest_item_id);
+            $secondaryQuestItem = $items->get($guideQuest->secondary_quest_item_id);
+
+            return [$guideQuest->id => [
+                'skill_name' => $skills->get($guideQuest->required_skill),
+                'faction_name' => $gameMaps->get($guideQuest->required_faction_id),
+                'game_map_name' => $gameMaps->get($guideQuest->required_game_map_id),
+                'quest_name' => $quests->get($guideQuest->required_quest_id),
+                'quest_item_name' => $requiredQuestItem?->type === 'quest' ? $this->itemAffixName($requiredQuestItem, $affixes) : null,
+                'secondary_quest_item_name' => $secondaryQuestItem?->type === 'quest' ? $this->itemAffixName($secondaryQuestItem, $affixes) : null,
+                'passive_name' => $passives->get($guideQuest->required_passive_skill),
+                'secondary_skill_name' => $skills->get($guideQuest->required_secondary_skill),
+                'skill_type_name' => $guideQuest->skill_type_name,
+                'kingdom_building_name' => $gameBuildings->get($guideQuest->required_kingdom_building_id),
+                'parent_quest_name' => $parentQuests->get($guideQuest->parent_id),
+                'required_to_be_on_game_map_name' => $gameMaps->get($guideQuest->be_on_game_map),
+                'required_batch_crafting_type_name' => $guideQuest->required_batch_crafting_type_name,
+                'required_batch_crafted_item_names' => $this->guideQuestBatchCraftedItemNames($guideQuest, $items),
+            ]];
+        })->all();
+    }
+
+    private function itemAffixName(Item $item, Collection $affixes): string
+    {
+        $prefix = $affixes->get($item->item_prefix_id);
+        $suffix = $affixes->get($item->item_suffix_id);
+        $name = '';
+
+        if (! is_null($prefix)) {
+            $name = '*'.$prefix->name.'* '.$item->name;
+        }
+
+        if (! is_null($suffix)) {
+            $name .= $name === '' ? $item->name.' *'.$suffix->name.'*' : ' *'.$suffix->name.'*';
+        }
+
+        return $name === '' ? $item->name : $name;
+    }
+
+    private function guideQuestBatchCraftedItemNames(GuideQuest $guideQuest, Collection $items): array
+    {
+        return collect($guideQuest->required_batch_crafted_items ?? [])->map(function (array $requirement, int $requirementIndex) use ($items): ?array {
+            $item = $items->get($requirement['item_id'] ?? null);
+
+            if (is_null($item)) {
+                return null;
+            }
+
+            $source = $requirement['source'] ?? 'inventory';
+
+            return [
+                'requirement_index' => $requirementIndex,
+                'source' => $source,
+                'item_id' => $item->id,
+                'name' => $item->name,
+                'type' => $item->type,
+                'type_name' => $source === 'alchemy_bag'
+                    ? $this->alchemyItemTypeName($item->alchemy_type)
+                    : $this->batchCraftedItemTypeName($item->type),
+                'amount' => (int) ($requirement['amount'] ?? 0),
+                'must_be_enchanted' => $source === 'alchemy_bag' ? false : (bool) ($requirement['must_be_enchanted'] ?? false),
+            ];
+        })->filter()->values()->all();
+    }
+
+    private function batchCraftedItemTypeName(string $type): string
+    {
+        return match ($type) {
+            ItemType::DAGGER->value => 'Daggers',
+            ItemType::SPELL_DAMAGE->value => 'Spell Damage',
+            ItemType::SPELL_HEALING->value => 'Spell Healing',
+            default => in_array($type, ArmourType::allTypes(), true)
+                ? ItemType::getProperNameForType($type)
+                : ItemType::getProperNameForType($type),
+        };
+    }
+
+    private function alchemyItemTypeName(?string $alchemyType): string
+    {
+        return match ($alchemyType) {
+            AlchemyItemType::INCREASE_STATS->value => 'Increases Stats',
+            AlchemyItemType::INCREASE_SKILL_TYPE->value => 'Increases Training Skills',
+            AlchemyItemType::INCREASE_DAMAGE->value => 'Increases Damage',
+            AlchemyItemType::INCREASE_ARMOUR->value => 'Increases Armour',
+            AlchemyItemType::INCREASE_HEALING->value => 'Increases Healing',
+            AlchemyItemType::INCREASE_ALCHEMY_SKILL->value => 'Increases Alchemy Skill',
+            AlchemyItemType::DAMAGES_KINGDOMS->value => 'Damages Kingdoms',
+            AlchemyItemType::HOLY_OILS->value => 'Holy Oils',
+            default => ItemType::getProperNameForType($alchemyType ?? 'alchemy'),
+        };
     }
 
     private function questCompletionChart($quests): array

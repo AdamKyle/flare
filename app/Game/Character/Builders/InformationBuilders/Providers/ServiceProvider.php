@@ -59,7 +59,8 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(HealingBuilder::class),
                 $app->make(HolyBuilder::class),
                 $app->make(ReductionsBuilder::class),
-                $app->make(ElementalAtonement::class)
+                $app->make(ElementalAtonement::class),
+                $app->make(ItemSkillAttribute::class),
             );
         });
     }

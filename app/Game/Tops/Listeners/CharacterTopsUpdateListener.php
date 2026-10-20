@@ -16,6 +16,10 @@ class CharacterTopsUpdateListener
 
     public function handle(UpdateTopBarEvent $event): void
     {
+        if (! $event->updateCharacterTops) {
+            return;
+        }
+
         $this->broadcastTopsUpdateService->broadcastCharacterCurrentMonth();
         broadcast(new CharacterTopsInspectionUpdated($event->character->id, $this->characterTopsInspectionService->fullProfile($event->character)));
     }

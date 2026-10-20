@@ -324,7 +324,7 @@ class Item extends Model
     public function getRequiredMonsterAttribute()
     {
         if ($this->type === 'quest') {
-            return Monster::where('quest_item_id', $this->id)->with('gameMap')->first();
+            return Monster::where('quest_item_id', $this->id)->with('gameMap')->orderBy('id')->first();
         }
 
         return null;
@@ -333,7 +333,7 @@ class Item extends Model
     public function getRequiredQuestAttribute()
     {
         if ($this->type === 'quest') {
-            return Quest::where('reward_item', $this->id)->with('npc', 'npc.gameMap', 'item')->first();
+            return Quest::where('reward_item', $this->id)->with('npc', 'npc.gameMap', 'item')->orderBy('id')->first();
         }
 
         return null;
@@ -342,7 +342,7 @@ class Item extends Model
     public function getLocationsAttribute()
     {
         if ($this->type === 'quest') {
-            return Location::where('quest_reward_item_id', $this->id)->with('map')->get();
+            return Location::where('quest_reward_item_id', $this->id)->with('map')->orderBy('id')->get();
         }
 
         return [];
@@ -367,7 +367,7 @@ class Item extends Model
         ];
 
         if (! is_null($monster->only_for_location_type)) {
-            $location = Location::where('type', $monster->only_for_location_type)->with('map')->first();
+            $location = Location::where('type', $monster->only_for_location_type)->with('map')->orderBy('id')->first();
 
             if (! is_null($location)) {
                 $source['location_name'] = $location->name;

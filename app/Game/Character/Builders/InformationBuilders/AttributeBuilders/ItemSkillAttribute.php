@@ -18,6 +18,11 @@ class ItemSkillAttribute
     {
         $equippedItems = $this->fetchEquipped($character);
 
+        return $this->fetchModifierFromEquippedItems($equippedItems, $attribute);
+    }
+
+    public function fetchModifierFromEquippedItems(?Collection $equippedItems, string $attribute): float
+    {
         if (is_null($equippedItems)) {
             return 0;
         }

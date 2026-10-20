@@ -16,7 +16,7 @@ class ItemTransformer extends TransformerAbstract
     /**
      * Gets the response data for the character sheet
      */
-    public function transform(Item $item): array
+    public function transform(Item $item, ?string $affixName = null): array
     {
         $itemSkills = [];
         $itemSkillProgressions = [];
@@ -32,7 +32,7 @@ class ItemTransformer extends TransformerAbstract
 
         return [
             'id' => $item->id,
-            'name' => $item->affix_name,
+            'name' => $affixName ?? $item->affix_name,
             'affix_count' => $item->affix_count,
             'description' => nl2br(e($item->description)),
             'raw_damage' => $item->base_damage,

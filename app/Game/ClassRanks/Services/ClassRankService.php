@@ -31,13 +31,13 @@ class ClassRankService
      */
     public function getSpecials(Character $character): array
     {
-        $classSpecialsEquipped = $character->classSpecialsEquipped()->with('gameClassSpecial')->where('equipped', '=', true)->get();
-        $classSpecialsNotEquipped = $character->classSpecialsEquipped()->with('gameClassSpecial')->where('equipped', '=', false)->get();
+        $classSpecialsEquipped = $character->classSpecialsEquipped()->with('gameClassSpecial.gameClass')->where('equipped', '=', true)->get();
+        $classSpecialsNotEquipped = $character->classSpecialsEquipped()->with('gameClassSpecial.gameClass')->where('equipped', '=', false)->get();
 
         $damageStatAmount = $character->getInformation()->statMod($character->damage_stat);
 
         return [
-            'class_specialties' => GameClassSpecial::all()->transform(function ($special) {
+            'class_specialties' => GameClassSpecial::with('gameClass')->get()->transform(function ($special) {
                 $special->class_name = $special->gameClass->name;
 
                 return $special;

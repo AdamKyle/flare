@@ -337,7 +337,7 @@ class TraverseService
 
         $this->updateActionsForMap($gameMap, $oldGameMap, $character);
 
-        $monsters = $this->getMonstersForMap($character->map, $mapId);
+        $monsters = $this->getMonstersForMap($character->map, $gameMap);
 
         $characterBaseStats = new Item($character, $this->characterSheetBaseInfoTransformer);
 
@@ -345,7 +345,7 @@ class TraverseService
 
         event(new UpdateBaseCharacterInformation($user, $characterBaseStats));
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateTopBarEvent($character, false));
 
         event(new UpdateMonsterList($monsters, $user));
     }
@@ -379,7 +379,7 @@ class TraverseService
         }
     }
 
-    protected function getMonstersForMap(Map $characterMap, int $mapId): array
+    protected function getMonstersForMap(Map $characterMap, GameMap $gameMap): array
     {
         $locationWithEffect = Location::whereNotNull('enemy_strength_type')
             ->where('x', $characterMap->character_position_x)
@@ -389,12 +389,13 @@ class TraverseService
 
         $canAccessPurgatory = $characterMap->character->inventory->slots->where('items.effect', ItemEffectsValue::PURGATORY)->count() > 0;
 
-        $monsters = Cache::get('monsters')[GameMap::find($mapId)->name];
+        $cachedMonsters = Cache::get('monsters');
+        $monsters = $cachedMonsters[$gameMap->name];
 
         if (! is_null($locationWithEffect)) {
 
             if ($characterMap->gameMap->only_during_event_type && $canAccessPurgatory) {
-                return Cache::get('monsters')[$locationWithEffect->name];
+                return $cachedMonsters[$locationWithEffect->name];
             }
 
             if (isset($monsters['easier'])) {

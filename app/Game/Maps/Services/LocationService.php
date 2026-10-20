@@ -74,14 +74,12 @@ class LocationService
      */
     public function getLocationData(Character $character, bool $includeLocationData = true, ?Raid $raid = null): array
     {
-
         $this->locationBasedEvents($character);
-
-       $this->kingdomManagement();
-
+        $this->kingdomManagement();
         $lockedLocation = $this->getLockedLocation($character);
 
         $map = $character->map->gameMap;
+        $mapType = $map->mapType();
 
         $locationData = [
             'map_url' => Storage::disk('maps')->url($character->map_url),
@@ -98,12 +96,12 @@ class LocationService
             'characters_on_map' => $this->getActiveUsersCountForMap($character),
             'lockedLocationType' => is_null($lockedLocation) ? null : $lockedLocation->type,
             'is_event_based' => $this->isEventBasedUpdate,
-            'can_access_hell_forged_shop' => $map->mapType()->isHell(),
-            'can_access_purgatory_chains_shop' => $map->mapType()->isPurgatory(),
-            'can_access_twisted_earth_shop' => $map->mapType()->isTwistedMemories(),
-            'can_access_hell_forged' => $map->mapType()->isHell(),
-            'can_access_purgatory_chains' =>  $map->mapType()->isPurgatory(),
-            'can_access_twisted_memories' => $map->mapType()->isTwistedMemories(),
+            'can_access_hell_forged_shop' => $mapType->isHell(),
+            'can_access_purgatory_chains_shop' => $mapType->isPurgatory(),
+            'can_access_twisted_earth_shop' => $mapType->isTwistedMemories(),
+            'can_access_hell_forged' => $mapType->isHell(),
+            'can_access_purgatory_chains' =>  $mapType->isPurgatory(),
+            'can_access_twisted_memories' => $mapType->isTwistedMemories(),
         ];
 
         if ($includeLocationData) {
@@ -118,7 +116,7 @@ class LocationService
      */
     public function locationBasedEvents(Character $character): void
     {
-         $this->processLocation($character);
+        $this->processLocation($character);
 
         // In case automation is running, this way the timer updates.
         event(new UpdateCharacterStatus($character));
