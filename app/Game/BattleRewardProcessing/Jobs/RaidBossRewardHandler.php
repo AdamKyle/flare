@@ -12,9 +12,11 @@ use App\Flare\Models\RaidBossParticipation;
 use App\Game\Battle\Concerns\HandleGivingAncestorItem;
 use App\Game\Battle\Events\UpdateRaidAttacksLeft;
 use App\Game\Battle\Handlers\BattleEventHandler;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestPriority;
 use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -41,13 +43,13 @@ class RaidBossRewardHandler implements ShouldQueue
     /**
      * @return void
      *
-     * @throws \Exception
+     * @throws Exception
      */
-    public function handle(BattleEventHandler $battleEventHandler)
+    public function handle(BattleEventHandler $battleEventHandler): void
     {
         $character = Character::find($this->characterId);
 
-        $battleEventHandler->processMonsterDeath($this->characterId, $this->monsterId);
+        $battleEventHandler->processMonsterDeath($this->characterId, $this->monsterId, [], BattleRewardRequestPriority::FIRST);
 
         if (! is_null($this->raidId)) {
 

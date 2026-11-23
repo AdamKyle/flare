@@ -14,6 +14,7 @@ use Tests\Traits\CreateItem;
 
 use Tests\Traits\CreateGameMap;
 
+use App\Flare\Models\CharacterBattleRewardRequest;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Location;
@@ -25,10 +26,12 @@ use App\Flare\Models\RaidBossParticipation;
 use App\Flare\Values\ItemSpecialtyType;
 use App\Game\Battle\Events\UpdateRaidAttacksLeft;
 use App\Game\Battle\Handlers\BattleEventHandler;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestPriority;
 use App\Game\BattleRewardProcessing\Jobs\RaidBossRewardHandler;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Queue;
 use ReflectionMethod;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -260,5 +263,19 @@ class RaidBossRewardHandlerTest extends TestCase
         Event::assertNotDispatched(GlobalMessageEvent::class, function (GlobalMessageEvent $event) use ($charA) {
             return str_contains($event->message, $charA->name) && str_contains($event->message, 'Congratulations');
         });
+    }
+
+    public function testRaidMonsterDeathRewardIsQueuedAtFirstPriority(): void
+    {
+        Queue::fake();
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $monster = $this->createMonster();
+
+        (new RaidBossRewardHandler($character->id, $monster->id))->handle(resolve(BattleEventHandler::class));
+
+        $request = CharacterBattleRewardRequest::where('character_id', $character->id)->first();
+
+        $this->assertSame(BattleRewardRequestPriority::FIRST, $request->priority);
     }
 }
