@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Npc;
 use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Handlers\BattleEventHandler;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestPriority;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use Psr\SimpleCache\InvalidArgumentException;
@@ -99,7 +100,7 @@ class FactionLoyaltyFightService
      */
     private function handleMonsterDeath(Character $character, Npc $npc, array $data): array {
         if ($data['health']['current_monster_health'] <= 0) {
-            $this->battleEventHandler->processMonsterDeath($character->id, $data['monster']['id']);
+            $this->battleEventHandler->processMonsterDeath($character->id, $data['monster']['id'], [], BattleRewardRequestPriority::FIRST);
 
             return $this->successResult([
                 'message' => 'You have slaughtered the monster! ' . $npc->real_name . ' is happy with your progress! (Check Server Messages for more details on items and additional messages. On mobile, you can select Server Messages from the Orange Chat Tabs drop down below)',
