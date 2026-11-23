@@ -11,6 +11,7 @@ use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
 use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Handlers\BattleEventHandler;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestPriority;
 use App\Game\BattleRewardProcessing\Jobs\BattleAttackHandler;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -67,7 +68,7 @@ class MonsterFightService
         if ($data['health']['current_monster_health'] <= 0) {
 
             if (!$returnData) {
-                $this->battleEventHandler->processMonsterDeath($character->id, $data['monster']['id']);
+                $this->battleEventHandler->processMonsterDeath($character->id, $data['monster']['id'], [], BattleRewardRequestPriority::FIRST);
 
                 event(new AttackTimeOutEvent($character));
             }
