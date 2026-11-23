@@ -2,6 +2,7 @@
 
 namespace App\Game\BattleRewardProcessing\Services;
 
+use App\Admin\Services\MonitoredBugReportService;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterBattleRewardRequestMessage;
@@ -34,9 +35,11 @@ use App\Flare\Models\ExplorationLog;
 use App\Game\Automation\Services\ExplorationLogService;
 use App\Game\Messages\Types\CurrenciesMessageTypes;
 use App\Game\Skills\Services\SkillService;
+use App\Game\Tops\Events\FactionLoyaltyTopsUpdated;
 use App\Game\Tops\Services\BroadcastTopsUpdateService;
 use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
+use Illuminate\Broadcasting\BroadcastException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -77,6 +80,7 @@ class BattleRewardService
      * @param BattleGlobalEventParticipationHandler $battleGlobalEventParticipationHandler
      * @param SkillService $skillService
      * @param RandomAffixGenerator $randomAffixGenerator
+     * @param MonitoredBugReportService $monitoredBugReportService
      */
     public function __construct(
         private readonly BattleMessageHandler $battleMessageHandler,
@@ -96,6 +100,7 @@ class BattleRewardService
         private readonly RandomAffixGenerator $randomAffixGenerator,
         private readonly BroadcastTopsUpdateService $broadcastTopsUpdateService,
         private readonly GlobalEventGoalEligibilityService $globalEventGoalEligibilityService,
+        private readonly MonitoredBugReportService $monitoredBugReportService,
     ) {}
 
     /**
@@ -918,7 +923,29 @@ class BattleRewardService
             ['character_id' => $this->character->id]
         );
 
-        $this->broadcastTopsUpdateService->broadcastFactionLoyaltyCurrentMonth();
+        try {
+            $this->broadcastTopsUpdateService->broadcastFactionLoyaltyCurrentMonth();
+        } catch (BroadcastException $exception) {
+            $context = [
+                'reward_request_id' => $this->battleRewardMessageContext->requestId(),
+                'reward_step' => $this->battleRewardMessageContext->stepName()?->value,
+                'character_id' => $this->character->id,
+                'event_class' => FactionLoyaltyTopsUpdated::class,
+                'exception_class' => $exception::class,
+                'exception' => $exception->getMessage(),
+                'trace' => $exception->getTraceAsString(),
+            ];
+
+            Log::channel('reward_processing')->error('Faction loyalty tops broadcast failed during reward processing.', $context);
+
+            $this->monitoredBugReportService->reportError(
+                'battle-reward-queue',
+                'Faction loyalty tops broadcast failed during reward processing.',
+                $context,
+                $exception::class,
+                $this->character->id,
+            );
+        }
     }
 
     /**

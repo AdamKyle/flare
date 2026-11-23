@@ -2,6 +2,7 @@
 
 namespace App\Game\BattleRewardProcessing\Providers;
 
+use App\Admin\Services\MonitoredBugReportService;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\GlobalEventParticipation;
 use App\Flare\ServerFight\BattleMessages;
@@ -132,6 +133,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(RandomAffixGenerator::class),
                 $app->make(BroadcastTopsUpdateService::class),
                 $app->make(GlobalEventGoalEligibilityService::class),
+                $app->make(MonitoredBugReportService::class),
             );
         });
 
