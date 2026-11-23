@@ -177,81 +177,55 @@ class DisenchantService
         $characterCurrentGoldDust = $this->character->gold_dust;
 
         $canDisenchant = $characterRoll > $dcCheck;
+        $isGoldDustCapped = $characterCurrentGoldDust >= MaxCurrenciesValue::MAX_GOLD_DUST;
 
-        if ($characterCurrentGoldDust >= MaxCurrenciesValue::MAX_GOLD_DUST && $canDisenchant) {
-            event(new UpdateSkillEvent($this->disenchantingSkill));
+        if (! $canDisenchant) {
+            $this->updateGoldDust($this->character, true, deferTopBarUpdate: true);
 
-            $character = $this->character;
-
-            DB::afterCommit(function () use ($character): void {
-                try {
-                    event(new UpdateCharacterInventoryCountEvent($character));
-                } catch (Throwable $throwable) {
-                    $context = [
-                        'character_id' => $character->id,
-                        'event_class' => UpdateCharacterInventoryCountEvent::class,
-                        'disenchant_outcome' => 'gold_dust_capped',
-                        'gold_dust_total' => $character->gold_dust,
-                        'exception_class' => $throwable::class,
-                        'exception' => $throwable->getMessage(),
-                        'trace' => $throwable->getTraceAsString(),
-                    ];
-
-                    Log::error('Inventory count update after disenchant failed.', $context);
-
-                    $this->monitoredBugReportService->reportError(
-                        'disenchanting',
-                        'Inventory count update after disenchant failed.',
-                        $context,
-                        $throwable::class,
-                        $character->id,
-                    );
-                }
-            });
-
-            ServerMessageHandler::sendBasicMessage($this->character->user, 'Disenchanted item but got no gold dust as you are capped. Maybe you want to auto sell it (can be enabled in your settings, profile icon -> settings, scroll down to Auto Disenchant)?');
+            ServerMessageHandler::handleMessage($this->character->user, CraftingMessageTypes::FAILED_TO_DISENCHANT);
 
             return;
         }
 
-        if ($canDisenchant) {
-            $goldDust = $this->updateGoldDust($this->character, false, true, true);
+        if (! $isGoldDustCapped) {
+            $goldDust = $this->updateGoldDust($this->character, deferTopBarUpdate: true);
 
             ServerMessageHandler::handleMessage($this->character->user, CraftingMessageTypes::DISENCHANTED, number_format($goldDust));
+        }
 
-            event(new UpdateSkillEvent($this->disenchantingSkill));
+        event(new UpdateSkillEvent($this->disenchantingSkill));
 
-            $character = $this->character;
+        $character = $this->character;
+        $disenchantOutcome = $isGoldDustCapped ? 'gold_dust_capped' : 'disenchanted';
 
-            DB::afterCommit(function () use ($character): void {
-                try {
-                    event(new UpdateCharacterInventoryCountEvent($character));
-                } catch (Throwable $throwable) {
-                    $context = [
-                        'character_id' => $character->id,
-                        'event_class' => UpdateCharacterInventoryCountEvent::class,
-                        'disenchant_outcome' => 'disenchanted',
-                        'gold_dust_total' => $character->gold_dust,
-                        'exception_class' => $throwable::class,
-                        'exception' => $throwable->getMessage(),
-                        'trace' => $throwable->getTraceAsString(),
-                    ];
+        DB::afterCommit(function () use ($character, $disenchantOutcome): void {
+            try {
+                event(new UpdateCharacterInventoryCountEvent($character));
+            } catch (Throwable $throwable) {
+                $context = [
+                    'character_id' => $character->id,
+                    'event_class' => UpdateCharacterInventoryCountEvent::class,
+                    'disenchant_outcome' => $disenchantOutcome,
+                    'gold_dust_total' => $character->gold_dust,
+                    'exception_class' => $throwable::class,
+                    'exception' => $throwable->getMessage(),
+                    'trace' => $throwable->getTraceAsString(),
+                ];
 
-                    Log::error('Inventory count update after disenchant failed.', $context);
+                Log::error('Inventory count update after disenchant failed.', $context);
 
-                    $this->monitoredBugReportService->reportError(
-                        'disenchanting',
-                        'Inventory count update after disenchant failed.',
-                        $context,
-                        $throwable::class,
-                        $character->id,
-                    );
-                }
-            });
-        } else {
-            $this->updateGoldDust($this->character, true, true, true);
+                $this->monitoredBugReportService->reportError(
+                    'disenchanting',
+                    'Inventory count update after disenchant failed.',
+                    $context,
+                    $throwable::class,
+                    $character->id,
+                );
+            }
+        });
 
-            ServerMessageHandler::handleMessage($this->character->user, CraftingMessageTypes::FAILED_TO_DISENCHANT);
+        if ($isGoldDustCapped) {
+            ServerMessageHandler::sendBasicMessage($this->character->user, 'Disenchanted item but got no gold dust as you are capped. Maybe you want to auto sell it (can be enabled in your settings, profile icon -> settings, scroll down to Auto Disenchant)?');
         }
     }
 
