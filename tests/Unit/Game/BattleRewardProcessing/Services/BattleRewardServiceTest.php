@@ -730,6 +730,33 @@ class BattleRewardServiceTest extends TestCase
         resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
 
         $this->assertSame(BattleRewardStepStatus::COMPLETED, $request->steps()->where('step_name', BattleRewardStepName::FACTION_LOYALTY_BOUNTY)->firstOrFail()->status);
+    }
+
+    public function testLedgerRunsLaterStepsWhenFactionLoyaltyTopsBroadcastFails(): void
+    {
+        Queue::fake();
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $factionLoyaltyFactory = (new FactionLoyaltyFactory)
+            ->setUp($character);
+
+        $character = $factionLoyaltyFactory->getCharacter();
+        $factionLoyaltyNpc = $factionLoyaltyFactory->getAssistingFactionLoyaltyNpc();
+        $monster = $factionLoyaltyFactory->getBountyMonstersForNpc($factionLoyaltyNpc)[0];
+
+        $request = $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+            'handler_payload' => ['character_id' => $character->id, 'monster_id' => $monster->id, 'context' => ['total_creatures' => 1]],
+        ]);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request);
+        $request->steps()->whereNotIn('step_name', [BattleRewardStepName::FACTION_LOYALTY_BOUNTY, BattleRewardStepName::GLOBAL_EVENT_PARTICIPATION])->update(['status' => BattleRewardStepStatus::COMPLETED]);
+
+        Event::listen(FactionLoyaltyTopsUpdated::class, function (): void {
+            throw new BroadcastException('The broadcast server could not be reached.');
+        });
+
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+
         $this->assertSame(BattleRewardStepStatus::COMPLETED, $request->steps()->where('step_name', BattleRewardStepName::GLOBAL_EVENT_PARTICIPATION)->firstOrFail()->status);
     }
 
