@@ -5,21 +5,30 @@ namespace Tests\Unit\Game\BattleRewardProcessing\Services;
 use Tests\Traits\CreateCharacterBattleReward;
 
 use App\Flare\Models\CharacterBattleRewardRequest;
+use App\Flare\Models\MonitoredSystemErrorOccurrence;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepName;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepStatus;
 use App\Game\BattleRewardProcessing\Services\BattleRewardLedgerService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Services\DropCheckService;
+use App\Game\Skills\Services\SkillCheckService;
+use Illuminate\Broadcasting\BroadcastException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Queue;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateItem;
 use Tests\Traits\CreateMonster;
 
 class BattleRewardItemDropIdempotencyTest extends TestCase
 {
-    use CreateCharacterBattleReward, CreateMonster, MockeryPHPUnitIntegration, RefreshDatabase;
+    use CreateCharacterBattleReward, CreateItem, CreateMonster, MockeryPHPUnitIntegration, RefreshDatabase;
 
     public function testSavedItemDropPayloadIsReusedOnResume(): void
     {
@@ -143,5 +152,100 @@ class BattleRewardItemDropIdempotencyTest extends TestCase
 
         $this->assertSame(42, $capturedPlan['drops'][0]['item_id']);
         $this->assertTrue($capturedPlan['drops'][0]['is_mythic']);
+    }
+
+    public function testDisenchantTopBarUpdateRunsAfterItemDropStepCommits(): void
+    {
+        Queue::fake();
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character->update(['gold_dust' => 0]);
+        $character->user->update(['auto_disenchant' => true, 'auto_disenchant_amount' => 'all', 'auto_sell_item' => false]);
+        $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+        $item = $this->createItem();
+        $request = $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+            'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
+        ]);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request);
+        $request->steps()->where('step_name', '!=', BattleRewardStepName::ITEM_DROPS)->update(['status' => BattleRewardStepStatus::COMPLETED]);
+        $request->steps()->where('step_name', BattleRewardStepName::ITEM_DROPS)->update([
+            'payload_json' => ['plan' => ['drops' => [['item_id' => $item->id, 'is_mythic' => false]], 'game_map_bonus' => 0, 'looting_chance' => 0]],
+        ]);
+        $this->instance(SkillCheckService::class, Mockery::mock(SkillCheckService::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('getDCCheck')->andReturn(1);
+            $mock->shouldReceive('characterRoll')->andReturn(100);
+        }));
+        $recordedTransactionLevels = [];
+        Event::listen(UpdateTopBarEvent::class, function () use (&$recordedTransactionLevels): void {
+            $recordedTransactionLevels[] = DB::transactionLevel();
+        });
+
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+
+        $this->assertSame([1], $recordedTransactionLevels);
+    }
+
+    public function testFailedDisenchantTopBarUpdateKeepsItemDropStepCompleted(): void
+    {
+        Queue::fake();
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character->update(['gold_dust' => 0]);
+        $character->user->update(['auto_disenchant' => true, 'auto_disenchant_amount' => 'all', 'auto_sell_item' => false]);
+        $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+        $item = $this->createItem();
+        $request = $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+            'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
+        ]);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request);
+        $request->steps()->where('step_name', '!=', BattleRewardStepName::ITEM_DROPS)->update(['status' => BattleRewardStepStatus::COMPLETED]);
+        $request->steps()->where('step_name', BattleRewardStepName::ITEM_DROPS)->update([
+            'payload_json' => ['plan' => ['drops' => [['item_id' => $item->id, 'is_mythic' => false]], 'game_map_bonus' => 0, 'looting_chance' => 0]],
+        ]);
+        $this->instance(SkillCheckService::class, Mockery::mock(SkillCheckService::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('getDCCheck')->andReturn(1);
+            $mock->shouldReceive('characterRoll')->andReturn(100);
+        }));
+        Event::listen(UpdateTopBarEvent::class, function (): void {
+            throw new BroadcastException('The broadcast server could not be reached.');
+        });
+
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+
+        $this->assertSame(BattleRewardStepStatus::COMPLETED, $request->steps()->where('step_name', BattleRewardStepName::ITEM_DROPS)->firstOrFail()->status);
+        $this->assertGreaterThan(0, $character->refresh()->gold_dust);
+    }
+
+    public function testFailedDisenchantTopBarUpdateIsReported(): void
+    {
+        Queue::fake();
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character->update(['gold_dust' => 0]);
+        $character->user->update(['auto_disenchant' => true, 'auto_disenchant_amount' => 'all', 'auto_sell_item' => false]);
+        $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+        $item = $this->createItem();
+        $request = $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+            'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
+        ]);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request);
+        $request->steps()->where('step_name', '!=', BattleRewardStepName::ITEM_DROPS)->update(['status' => BattleRewardStepStatus::COMPLETED]);
+        $request->steps()->where('step_name', BattleRewardStepName::ITEM_DROPS)->update([
+            'payload_json' => ['plan' => ['drops' => [['item_id' => $item->id, 'is_mythic' => false]], 'game_map_bonus' => 0, 'looting_chance' => 0]],
+        ]);
+        $this->instance(SkillCheckService::class, Mockery::mock(SkillCheckService::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('getDCCheck')->andReturn(1);
+            $mock->shouldReceive('characterRoll')->andReturn(100);
+        }));
+        Event::listen(UpdateTopBarEvent::class, function (): void {
+            throw new BroadcastException('The broadcast server could not be reached.');
+        });
+
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+
+        $this->assertCount(1, MonitoredSystemErrorOccurrence::where('message', 'Top bar update after disenchant failed.')->get());
     }
 }
