@@ -195,7 +195,33 @@ class DisenchantService
 
             event(new UpdateSkillEvent($this->disenchantingSkill));
 
-            event(new UpdateCharacterInventoryCountEvent($this->character));
+            $character = $this->character;
+
+            DB::afterCommit(function () use ($character): void {
+                try {
+                    event(new UpdateCharacterInventoryCountEvent($character));
+                } catch (Throwable $throwable) {
+                    $context = [
+                        'character_id' => $character->id,
+                        'event_class' => UpdateCharacterInventoryCountEvent::class,
+                        'disenchant_outcome' => 'disenchanted',
+                        'gold_dust_total' => $character->gold_dust,
+                        'exception_class' => $throwable::class,
+                        'exception' => $throwable->getMessage(),
+                        'trace' => $throwable->getTraceAsString(),
+                    ];
+
+                    Log::error('Inventory count update after disenchant failed.', $context);
+
+                    $this->monitoredBugReportService->reportError(
+                        'disenchanting',
+                        'Inventory count update after disenchant failed.',
+                        $context,
+                        $throwable::class,
+                        $character->id,
+                    );
+                }
+            });
         } else {
             $this->updateGoldDust($this->character, true, true, true);
 
