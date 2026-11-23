@@ -33,6 +33,7 @@ use Illuminate\Broadcasting\BroadcastException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
 use App\Flare\Models\CharacterBattleRewardRequest;
 use App\Flare\Models\CharacterBattleRewardRequestMessage;
@@ -762,6 +763,41 @@ class BattleRewardServiceTest extends TestCase
         $this->assertCount(1, $occurrences);
         $this->assertSame($request->id, $occurrences->first()->context['reward_request_id']);
         $this->assertSame(BattleRewardStepName::FACTION_LOYALTY_BOUNTY->value, $occurrences->first()->context['reward_step']);
+    }
+
+    public function testLedgerBountyStepLogsFactionLoyaltyTopsBroadcastFailure(): void
+    {
+        Queue::fake();
+        Log::spy();
+        Log::shouldReceive('channel')->andReturnSelf();
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $factionLoyaltyFactory = (new FactionLoyaltyFactory)
+            ->setUp($character);
+
+        $character = $factionLoyaltyFactory->getCharacter();
+        $factionLoyaltyNpc = $factionLoyaltyFactory->getAssistingFactionLoyaltyNpc();
+        $monster = $factionLoyaltyFactory->getBountyMonstersForNpc($factionLoyaltyNpc)[0];
+
+        $request = $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+            'handler_payload' => ['character_id' => $character->id, 'monster_id' => $monster->id, 'context' => ['total_creatures' => 1]],
+        ]);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request);
+        $request->steps()->whereNotIn('step_name', [BattleRewardStepName::FACTION_LOYALTY_BOUNTY, BattleRewardStepName::GLOBAL_EVENT_PARTICIPATION])->update(['status' => BattleRewardStepStatus::COMPLETED]);
+
+        Event::listen(FactionLoyaltyTopsUpdated::class, function (): void {
+            throw new BroadcastException('The broadcast server could not be reached.');
+        });
+
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+
+        Log::shouldHaveReceived('error')
+            ->once()
+            ->with('Faction loyalty tops broadcast failed during reward processing.', Mockery::on(
+                fn (array $context): bool => $context['reward_request_id'] === $request->id
+                    && $context['reward_step'] === BattleRewardStepName::FACTION_LOYALTY_BOUNTY->value,
+            ));
     }
 
     public function testNoFactionRewardsGivenWhenCharacterIsAutoBattling(): void

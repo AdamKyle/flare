@@ -19,6 +19,7 @@ use Illuminate\Broadcasting\BroadcastException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
@@ -438,5 +439,80 @@ class BattleRewardItemDropIdempotencyTest extends TestCase
         resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
 
         $this->assertCount(1, MonitoredSystemErrorOccurrence::where('message', 'Inventory count update after disenchant failed.')->get());
+    }
+
+    public function testFailedDisenchantTopBarUpdateIsLogged(): void
+    {
+        Queue::fake();
+        Log::spy();
+        Log::shouldReceive('channel')->andReturnSelf();
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character->update(['gold_dust' => 0]);
+        $character->user->update(['auto_disenchant' => true, 'auto_disenchant_amount' => 'all', 'auto_sell_item' => false]);
+        $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+        $item = $this->createItem();
+        $request = $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+            'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
+        ]);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request);
+        $request->steps()->where('step_name', '!=', BattleRewardStepName::ITEM_DROPS)->update(['status' => BattleRewardStepStatus::COMPLETED]);
+        $request->steps()->where('step_name', BattleRewardStepName::ITEM_DROPS)->update([
+            'payload_json' => ['plan' => ['drops' => [['item_id' => $item->id, 'is_mythic' => false]], 'game_map_bonus' => 0, 'looting_chance' => 0]],
+        ]);
+        $this->instance(SkillCheckService::class, Mockery::mock(SkillCheckService::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('getDCCheck')->andReturn(1);
+            $mock->shouldReceive('characterRoll')->andReturn(100);
+        }));
+        Event::listen(UpdateTopBarEvent::class, function (): void {
+            throw new BroadcastException('The broadcast server could not be reached.');
+        });
+
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+
+        Log::shouldHaveReceived('error')
+            ->once()
+            ->with('Top bar update after disenchant failed.', Mockery::on(
+                fn (array $context): bool => $context['character_id'] === $character->id,
+            ));
+    }
+
+    public function testFailedDisenchantInventoryCountUpdateIsLogged(): void
+    {
+        Queue::fake();
+        Log::spy();
+        Log::shouldReceive('channel')->andReturnSelf();
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character->update(['gold_dust' => 0]);
+        $character->user->update(['auto_disenchant' => true, 'auto_disenchant_amount' => 'all', 'auto_sell_item' => false]);
+        $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+        $item = $this->createItem();
+        $request = $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+            'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
+        ]);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request);
+        $request->steps()->where('step_name', '!=', BattleRewardStepName::ITEM_DROPS)->update(['status' => BattleRewardStepStatus::COMPLETED]);
+        $request->steps()->where('step_name', BattleRewardStepName::ITEM_DROPS)->update([
+            'payload_json' => ['plan' => ['drops' => [['item_id' => $item->id, 'is_mythic' => false]], 'game_map_bonus' => 0, 'looting_chance' => 0]],
+        ]);
+        $this->instance(SkillCheckService::class, Mockery::mock(SkillCheckService::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('getDCCheck')->andReturn(1);
+            $mock->shouldReceive('characterRoll')->andReturn(100);
+        }));
+        Event::listen(UpdateCharacterInventoryCountEvent::class, function (): void {
+            throw new BroadcastException('The broadcast server could not be reached.');
+        });
+
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+
+        Log::shouldHaveReceived('error')
+            ->once()
+            ->with('Inventory count update after disenchant failed.', Mockery::on(
+                fn (array $context): bool => $context['character_id'] === $character->id
+                    && $context['disenchant_outcome'] === 'disenchanted',
+            ));
     }
 }
