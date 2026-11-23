@@ -6,6 +6,7 @@ use Tests\Traits\CreateCharacterBattleReward;
 
 use App\Flare\Models\CharacterBattleRewardRequest;
 use App\Flare\Models\MonitoredSystemErrorOccurrence;
+use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepName;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepStatus;
 use App\Game\BattleRewardProcessing\Services\BattleRewardLedgerService;
@@ -311,5 +312,37 @@ class BattleRewardItemDropIdempotencyTest extends TestCase
         resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
 
         $this->assertSame(BattleRewardStepStatus::COMPLETED, $request->steps()->where('step_name', BattleRewardStepName::ITEM_DROPS)->firstOrFail()->status);
+    }
+
+    public function testCappedDisenchantInventoryCountUpdateRunsAfterItemDropStepCommits(): void
+    {
+        Queue::fake();
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character->update(['gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST]);
+        $character->user->update(['auto_disenchant' => true, 'auto_disenchant_amount' => 'all', 'auto_sell_item' => false]);
+        $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+        $item = $this->createItem();
+        $request = $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+            'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
+        ]);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request);
+        $request->steps()->where('step_name', '!=', BattleRewardStepName::ITEM_DROPS)->update(['status' => BattleRewardStepStatus::COMPLETED]);
+        $request->steps()->where('step_name', BattleRewardStepName::ITEM_DROPS)->update([
+            'payload_json' => ['plan' => ['drops' => [['item_id' => $item->id, 'is_mythic' => false]], 'game_map_bonus' => 0, 'looting_chance' => 0]],
+        ]);
+        $this->instance(SkillCheckService::class, Mockery::mock(SkillCheckService::class, function (MockInterface $mock): void {
+            $mock->shouldReceive('getDCCheck')->andReturn(1);
+            $mock->shouldReceive('characterRoll')->andReturn(100);
+        }));
+        $recordedTransactionLevels = [];
+        Event::listen(UpdateCharacterInventoryCountEvent::class, function () use (&$recordedTransactionLevels): void {
+            $recordedTransactionLevels[] = DB::transactionLevel();
+        });
+
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+
+        $this->assertSame([1], $recordedTransactionLevels);
     }
 }

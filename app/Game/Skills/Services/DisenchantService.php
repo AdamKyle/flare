@@ -181,7 +181,33 @@ class DisenchantService
         if ($characterCurrentGoldDust >= MaxCurrenciesValue::MAX_GOLD_DUST && $canDisenchant) {
             event(new UpdateSkillEvent($this->disenchantingSkill));
 
-            event(new UpdateCharacterInventoryCountEvent($this->character));
+            $character = $this->character;
+
+            DB::afterCommit(function () use ($character): void {
+                try {
+                    event(new UpdateCharacterInventoryCountEvent($character));
+                } catch (Throwable $throwable) {
+                    $context = [
+                        'character_id' => $character->id,
+                        'event_class' => UpdateCharacterInventoryCountEvent::class,
+                        'disenchant_outcome' => 'gold_dust_capped',
+                        'gold_dust_total' => $character->gold_dust,
+                        'exception_class' => $throwable::class,
+                        'exception' => $throwable->getMessage(),
+                        'trace' => $throwable->getTraceAsString(),
+                    ];
+
+                    Log::error('Inventory count update after disenchant failed.', $context);
+
+                    $this->monitoredBugReportService->reportError(
+                        'disenchanting',
+                        'Inventory count update after disenchant failed.',
+                        $context,
+                        $throwable::class,
+                        $character->id,
+                    );
+                }
+            });
 
             ServerMessageHandler::sendBasicMessage($this->character->user, 'Disenchanted item but got no gold dust as you are capped. Maybe you want to auto sell it (can be enabled in your settings, profile icon -> settings, scroll down to Auto Disenchant)?');
 
