@@ -3,6 +3,7 @@
 namespace App\Game\BattleRewardProcessing\Jobs;
 
 use App\Game\Battle\Handlers\BattleEventHandler;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestPriority;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -31,6 +32,6 @@ class BattleAttackHandler implements ShouldQueue
      */
     public function handle(BattleEventHandler $battleEventHandler): void
     {
-        $battleEventHandler->processMonsterDeath($this->characterId, $this->monsterId);
+        $battleEventHandler->processMonsterDeath($this->characterId, $this->monsterId, [], BattleRewardRequestPriority::FIRST);
     }
 }
