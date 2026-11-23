@@ -2,7 +2,7 @@
 
 ## Scope and instructions
 
-- Read every `.agents/skills/**/SKILL.md`, including nested skill files.
+- Read every `.claude/skills/**/SKILL.md`, including nested skill files.
 - Inspected the relevant Batch Crafting, Trinketry, kingdom ownership middleware, kingdom controller regression tests, admin dashboard, and bounded log reader paths before validation.
 - Treated the supplied PHPUnit result as the initial failure report: 2 errors and 8 failures across 4,832 tests and 12,433 assertions.
 - Did not run coverage or frontend commands.
