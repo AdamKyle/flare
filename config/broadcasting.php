@@ -43,8 +43,8 @@ return [
                 'scheme' => env('PUSHER_PROTOCOL', 'http'),
             ],
             'client_options' => [
-                'connect_timeout' => (int) env('PUSHER_CONNECT_TIMEOUT', 3),
-                'timeout' => (int) env('PUSHER_TIMEOUT', 10),
+                'connect_timeout' => 3,
+                'timeout' => 10,
             ],
         ],
 
