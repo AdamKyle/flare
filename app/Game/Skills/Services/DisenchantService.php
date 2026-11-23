@@ -2,6 +2,7 @@
 
 namespace App\Game\Skills\Services;
 
+use App\Admin\Services\MonitoredBugReportService;
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
@@ -18,6 +19,9 @@ use App\Game\Messages\Types\CraftingMessageTypes;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
 use App\Game\Skills\Events\UpdateSkillEvent;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class DisenchantService
 {
@@ -35,7 +39,7 @@ class DisenchantService
 
     private ?InventorySlot $questSlot = null;
 
-    public function __construct(SkillCheckService $skillCheckService, CharacterInventoryService $characterInventoryService)
+    public function __construct(SkillCheckService $skillCheckService, CharacterInventoryService $characterInventoryService, private readonly MonitoredBugReportService $monitoredBugReportService)
     {
         $this->skillCheckService = $skillCheckService;
 
@@ -185,7 +189,7 @@ class DisenchantService
         }
 
         if ($canDisenchant) {
-            $goldDust = $this->updateGoldDust($this->character);
+            $goldDust = $this->updateGoldDust($this->character, false, true, true);
 
             ServerMessageHandler::handleMessage($this->character->user, CraftingMessageTypes::DISENCHANTED, number_format($goldDust));
 
@@ -193,7 +197,7 @@ class DisenchantService
 
             event(new UpdateCharacterInventoryCountEvent($this->character));
         } else {
-            $this->updateGoldDust($this->character, true);
+            $this->updateGoldDust($this->character, true, true, true);
 
             ServerMessageHandler::handleMessage($this->character->user, CraftingMessageTypes::FAILED_TO_DISENCHANT);
         }
@@ -202,7 +206,7 @@ class DisenchantService
     /**
      * Update the characters gold dust.
      */
-    public function updateGoldDust(Character $character, bool $failedCheck = false, bool $canRollGoldDustRush = true): int
+    public function updateGoldDust(Character $character, bool $failedCheck = false, bool $canRollGoldDustRush = true, bool $deferTopBarUpdate = false): int
     {
 
         $goldDust = ! $failedCheck ? $this->fetchGoldDustAmount() : 1;
@@ -227,7 +231,37 @@ class DisenchantService
             'gold_dust' => $characterTotalGoldDust,
         ]);
 
-        event(new UpdateTopBarEvent($character->refresh()));
+        $character = $character->refresh();
+
+        if (! $deferTopBarUpdate) {
+            event(new UpdateTopBarEvent($character));
+        } else {
+            DB::afterCommit(function () use ($character, $goldDust, $characterTotalGoldDust): void {
+                try {
+                    event(new UpdateTopBarEvent($character));
+                } catch (Throwable $throwable) {
+                    $context = [
+                        'character_id' => $character->id,
+                        'event_class' => UpdateTopBarEvent::class,
+                        'gold_dust_gained' => $goldDust,
+                        'gold_dust_total' => $characterTotalGoldDust,
+                        'exception_class' => $throwable::class,
+                        'exception' => $throwable->getMessage(),
+                        'trace' => $throwable->getTraceAsString(),
+                    ];
+
+                    Log::error('Top bar update after disenchant failed.', $context);
+
+                    $this->monitoredBugReportService->reportError(
+                        'disenchanting',
+                        'Top bar update after disenchant failed.',
+                        $context,
+                        $throwable::class,
+                        $character->id,
+                    );
+                }
+            });
+        }
 
         if ($goldDustRushAwarded) {
             if ($characterTotalGoldDust >= MaxCurrenciesValue::MAX_GOLD_DUST) {

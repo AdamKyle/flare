@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Game\Skills\Services;
 
+use App\Admin\Services\MonitoredBugReportService;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Values\ItemEffectsValue;
@@ -179,7 +180,7 @@ class DisenchantServiceTest extends TestCase
         // Create a mock for DisenchantService and allow mocking of protected methods
         $disenchantingService = Mockery::mock(
             DisenchantService::class,
-            [$skillCheckServiceMock, $characterInventoryService]
+            [$skillCheckServiceMock, $characterInventoryService, resolve(MonitoredBugReportService::class)]
         )
             ->makePartial()
             ->shouldAllowMockingProtectedMethods()
@@ -224,7 +225,7 @@ class DisenchantServiceTest extends TestCase
         // Create a mock for DisenchantService and allow mocking of protected methods
         $disenchantingService = Mockery::mock(
             DisenchantService::class,
-            [$skillCheckServiceMock, $characterInventoryService]
+            [$skillCheckServiceMock, $characterInventoryService, resolve(MonitoredBugReportService::class)]
         )
             ->makePartial()
             ->shouldAllowMockingProtectedMethods()
@@ -302,7 +303,7 @@ class DisenchantServiceTest extends TestCase
 
         $disenchantingService = \Mockery::mock(DisenchantService::class)->makePartial();
 
-        $disenchantingService->__construct(resolve(SkillCheckService::class), resolve(CharacterInventoryService::class));
+        $disenchantingService->__construct(resolve(SkillCheckService::class), resolve(CharacterInventoryService::class), resolve(MonitoredBugReportService::class));
 
         $disenchantingService->shouldAllowMockingProtectedMethods()
             ->shouldReceive('fetchDCRoll')
@@ -375,7 +376,7 @@ class DisenchantServiceTest extends TestCase
 
         $disenchantingService = Mockery::mock(
             DisenchantService::class,
-            [$skillCheckServiceMock, $this->app->make(CharacterInventoryService::class)]
+            [$skillCheckServiceMock, $this->app->make(CharacterInventoryService::class), resolve(MonitoredBugReportService::class)]
         )->makePartial()->shouldAllowMockingProtectedMethods();
 
         $disenchantingService->shouldReceive('fetchGoldDustAmount')->once()->andReturn(1000);
@@ -402,7 +403,7 @@ class DisenchantServiceTest extends TestCase
 
         $disenchantingService = Mockery::mock(
             DisenchantService::class,
-            [$skillCheckServiceMock, $this->app->make(CharacterInventoryService::class)]
+            [$skillCheckServiceMock, $this->app->make(CharacterInventoryService::class), resolve(MonitoredBugReportService::class)]
         )->makePartial()->shouldAllowMockingProtectedMethods();
 
         $disenchantingService->shouldReceive('fetchGoldDustAmount')->once()->andReturn(1000);
@@ -432,7 +433,7 @@ class DisenchantServiceTest extends TestCase
 
         $disenchantingService = Mockery::mock(
             DisenchantService::class,
-            [$skillCheckServiceMock, $this->app->make(CharacterInventoryService::class)]
+            [$skillCheckServiceMock, $this->app->make(CharacterInventoryService::class), resolve(MonitoredBugReportService::class)]
         )->makePartial()->shouldAllowMockingProtectedMethods();
 
         $disenchantingService->shouldReceive('fetchGoldDustAmount')->once()->andReturn(1000);
@@ -468,7 +469,7 @@ class DisenchantServiceTest extends TestCase
 
         $disenchantingService = Mockery::mock(
             DisenchantService::class,
-            [$skillCheckServiceMock, $this->app->make(CharacterInventoryService::class)]
+            [$skillCheckServiceMock, $this->app->make(CharacterInventoryService::class), resolve(MonitoredBugReportService::class)]
         )->makePartial()->shouldAllowMockingProtectedMethods();
 
         $disenchantingService->shouldReceive('fetchGoldDustAmount')->twice()->andReturn(1000);
@@ -496,7 +497,7 @@ class DisenchantServiceTest extends TestCase
 
         $disenchantingService = Mockery::mock(
             DisenchantService::class,
-            [$skillCheckServiceMock, $this->app->make(CharacterInventoryService::class)]
+            [$skillCheckServiceMock, $this->app->make(CharacterInventoryService::class), resolve(MonitoredBugReportService::class)]
         )->makePartial()->shouldAllowMockingProtectedMethods();
 
         $disenchantingService->shouldReceive('fetchDCRoll')->never();
@@ -523,7 +524,7 @@ class DisenchantServiceTest extends TestCase
 
         $disenchantingService = Mockery::mock(
             DisenchantService::class,
-            [$skillCheckServiceMock, $this->app->make(CharacterInventoryService::class)]
+            [$skillCheckServiceMock, $this->app->make(CharacterInventoryService::class), resolve(MonitoredBugReportService::class)]
         )->makePartial()->shouldAllowMockingProtectedMethods();
 
         $disenchantingService->shouldReceive('fetchDCRoll')->never();

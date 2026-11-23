@@ -2,6 +2,7 @@
 
 namespace App\Game\Skills\Providers;
 
+use App\Admin\Services\MonitoredBugReportService;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Transformers\BasicSkillsTransformer;
 use App\Flare\Transformers\SkillsTransformer;
@@ -153,7 +154,7 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(DisenchantService::class, function ($app) {
-            return new DisenchantService($app->make(SkillCheckService::class), $app->make(CharacterInventoryService::class));
+            return new DisenchantService($app->make(SkillCheckService::class), $app->make(CharacterInventoryService::class), $app->make(MonitoredBugReportService::class));
         });
 
         $this->app->bind(ItemSkillService::class, function () {
