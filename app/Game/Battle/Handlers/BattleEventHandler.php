@@ -65,10 +65,15 @@ class BattleEventHandler
      * @param integer $characterId
      * @param integer $monsterId
      * @param array $context
+     * @param BattleRewardRequestPriority $priority
      * @return void
      */
-    public function processMonsterDeath(int $characterId, int $monsterId, array $context = []): void
-    {
+    public function processMonsterDeath(
+        int $characterId,
+        int $monsterId,
+        array $context = [],
+        BattleRewardRequestPriority $priority = BattleRewardRequestPriority::SECOND,
+    ): void {
         $character = Character::find($characterId);
         $monster = Monster::find($monsterId);
 
@@ -83,7 +88,7 @@ class BattleEventHandler
 
         $this->battleRewardProcessingQueueManager->enqueue(
             $characterId,
-            BattleRewardRequestPriority::SECOND,
+            $priority,
             $sourceType,
             $sourceId,
             [

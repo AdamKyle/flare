@@ -120,6 +120,26 @@ class BattleEventHandlerTest extends TestCase
             ->processMonsterDeath(10, 20, ['exploration_log_id' => 30]);
     }
 
+    public function testBattleRewardUsesGivenPriority(): void
+    {
+        $queueManager = Mockery::mock(BattleRewardProcessingQueueManager::class);
+        $queueManager->shouldReceive('enqueue')
+            ->once()
+            ->with(
+                Mockery::any(),
+                BattleRewardRequestPriority::FIRST,
+                Mockery::any(),
+                Mockery::any(),
+                Mockery::any(),
+            )
+            ->andReturn(Mockery::mock(CharacterBattleRewardRequest::class));
+
+        $weeklyBattleService = Mockery::mock(WeeklyBattleService::class);
+
+        (new BattleEventHandler($queueManager, $weeklyBattleService, Mockery::mock(BatchCraftingService::class)))
+            ->processMonsterDeath(10, 20, [], BattleRewardRequestPriority::FIRST);
+    }
+
     public function testProcessDeadCharacterEndsBatchCrafting(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
